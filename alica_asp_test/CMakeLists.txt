@@ -94,9 +94,6 @@ add_definitions(-DWITH_THREADS=0) # for libclasp...
 ## Your package locations should be listed before other locations
  include_directories(include ${catkin_INCLUDE_DIRS})
 
-message ("ProjectDir: ${PROJECT_SOURCE_DIR}")
-
-
 catkin_add_gtest(alica_asp-test 
   src/alica_asp_test.cpp
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

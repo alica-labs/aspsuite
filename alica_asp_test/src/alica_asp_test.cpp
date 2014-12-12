@@ -33,7 +33,15 @@ TEST(AlicaAspTest, simplePlanConstraints)
 	{
 		cout << "Model Found" << endl;
 	}
-	cw.printLastModel(true);
+
+	ASSERT_TRUE(cw.query("brokenState", {"s1"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTransition", {"t"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenSynchronisation", {"synch"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTerminalState", {"ts1"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTerminalState", {"ts2"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTerminalState", {"ts3"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTerminalState", {"ts4"})) << cw.toStringLastModel();
+	ASSERT_TRUE(cw.query("brokenTerminalState", {"ts5"})) << cw.toStringLastModel();
 }
 
 // Run all the tests that were declared with TEST()

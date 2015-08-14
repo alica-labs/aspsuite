@@ -35,7 +35,7 @@ hasPostCondition(ts5, pc2).
 
 % Reasons for breaking terminal states:
 % ts1 is success and failure state
-% ts2 is a Terminal State of pTs2, but not a State of pTs2
+% ts2 is a Terminal State of plan pTs2, but not a State of plan pTs2
 % ts3 has a subplan
 % ts4 has no post condition
 % ts5 has two post conditions

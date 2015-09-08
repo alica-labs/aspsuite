@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<alica:CapabilityDefinitionSet xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:alica="http:///de.uni_kassel.vs.cn" id="1441716946899" name="MISSING_NAME" comment="">
+  <capabilities id="1441716948040" name="LaserEyes" comment="">
+    <capValues id="1441716952869" name="Destruction" comment=""/>
+  </capabilities>
+</alica:CapabilityDefinitionSet>

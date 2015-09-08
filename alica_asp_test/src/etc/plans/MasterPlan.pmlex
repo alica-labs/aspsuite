@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="MasterPlan.pml#1441701747920"/>
+    <value xPos="109" yPos="42" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="MasterPlan.pml#1441701747919"/>
+    <value width="800" height="275"/>
+  </extensions>
+  <extensions>
+    <key href="MasterPlan.pml#1441701747921"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="MasterPlan.pml#1441701781326"/>
+    <value xPos="324" yPos="47" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="MasterPlan.pml#1441701794000"/>
+    <value>
+      <bendpoints xPos="401" yPos="100"/>
+    </value>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedState.pml#1441701808444"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

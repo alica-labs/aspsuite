@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ASCII"?>
+<alica:RoleDefinitionSet xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:alica="http:///de.uni_kassel.vs.cn" id="1441716928139" name="MISSING_NAME" comment="">
+  <roles id="1441716929654" name="SuperMan" comment="">
+    <characteristics id="1441716933615" name="LaserEyes" comment="" weight="1.0">
+      <capability>capabilitiesDefinition.cdefset#1441716948040</capability>
+      <value>capabilitiesDefinition.cdefset#1441716952869</value>
+    </characteristics>
+  </roles>
+</alica:RoleDefinitionSet>

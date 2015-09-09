@@ -9,10 +9,14 @@
 #define SRC_ASPSOLVER_H_
 
 #include <engine/constraintmodul/IConstraintSolver.h>
+#include <ClingWrapper.h>
+#include <memory>
+#include <vector>
 
 namespace alica
 {
 	class AlicaEngine;
+	class Plan;
 
 	namespace reasoner
 	{
@@ -27,6 +31,11 @@ namespace alica
 			bool getSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls,
 								vector<void*>& results);
 			shared_ptr<SolverVariable> createVariable(long id);
+			bool validatePlan(Plan* plan);
+
+		private:
+			shared_ptr<supplementary::ClingWrapper> cw;
+			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
 		};
 
 	} /* namespace reasoner */

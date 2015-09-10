@@ -1,4 +1,4 @@
-symrock
+# SymROCK - Symbolic Representation Of dynamiC Knowledge
 =======
 
-Symbolic Representation Of dynamiC Knowledge
+

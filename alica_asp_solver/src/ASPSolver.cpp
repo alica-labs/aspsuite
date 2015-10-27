@@ -16,8 +16,8 @@ namespace alica
 
 		ASPSolver::ASPSolver(AlicaEngine* ae) : IConstraintSolver(ae)
 		{
-			this->planIntegrator = new ASPAlicaPlanIntegrator();
 			this->cw = make_shared<supplementary::ClingWrapper>();
+			this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(cw);
 			this->cw->setNoWarnings(true);
 
 			// read alica background knowledge from static file
@@ -49,15 +49,15 @@ namespace alica
 
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
+			// TODO
 			return nullptr;//make_shared<SolverVariable>();
 		}
 
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
-			if (true)// Add plan only, if it is not already in background knowledge
-			{
-				this->planIntegrator->loadPlanTree(plan, cw);
-			}
+
+			this->planIntegrator->loadPlanTree(plan);
+
 			// Ask for broken stuff related to the given plan
 
 			// Present results

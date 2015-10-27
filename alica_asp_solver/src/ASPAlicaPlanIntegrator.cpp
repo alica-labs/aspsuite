@@ -24,7 +24,7 @@ namespace alica
 			// TODO Auto-generated destructor stub
 		}
 
-		void ASPAlicaPlanIntegrator::loadPlanTree(Plan* p, )
+		void ASPAlicaPlanIntegrator::loadPlanTree(Plan* p)
 		{
 			this->processedPlanIds.clear();
 
@@ -46,7 +46,8 @@ namespace alica
 			// flag to signal, if the plan tree really is a tree
 			bool treeProperty = true;
 
-			this->cw->
+			this->cw->add("PlanBase", {}, "");
+
 
 			return treeProperty;
 		}

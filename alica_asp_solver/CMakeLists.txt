@@ -44,6 +44,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
+    src/ASPAlicaPlanIntegrator.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES})

@@ -8,10 +8,13 @@
 #ifndef SRC_ASPSOLVER_H_
 #define SRC_ASPSOLVER_H_
 
+#include "ASPAlicaPlanIntegrator.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
 #include <ClingWrapper.h>
+
 #include <memory>
 #include <vector>
+
 
 namespace alica
 {

@@ -24,7 +24,7 @@ TEST(AspAlicaStaticFile, simpleTest)
 
 	shared_ptr<supplementary::ClingWrapper> cw = make_shared<supplementary::ClingWrapper>();
 	cw->setNoWarnings(true);
-	cw->addKnowledgeFile("data/alica/alica-background-knowledge.lp");
+	cw->addKnowledgeFile("src/etc/asp_background_knowledge/alica-background-knowledge.lp");
 	cw->addKnowledgeFile("data/alica/alica-simple-test.lp");
 	cw->init();
 	Gringo::SolveResult result = cw->solve();
@@ -70,7 +70,7 @@ TEST(AspAlicaStaticFile, treeShapedHierarchyTest)
 	chrono::_V2::system_clock::time_point start = chrono::high_resolution_clock::now();
 
 	supplementary::ClingWrapper cw;
-	cw.addKnowledgeFile("data/alica/alica-background-knowledge.lp");
+	cw.addKnowledgeFile("src/etc/asp_background_knowledge/alica-background-knowledge.lp");
 	cw.addKnowledgeFile("data/alica/alica-tree-shaped-hierarchy-test.lp");
 	cw.init();
 	Gringo::SolveResult result = cw.solve();

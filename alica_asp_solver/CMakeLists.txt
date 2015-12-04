@@ -24,8 +24,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES alica_asp_solver
+  INCLUDE_DIRS include
+  LIBRARIES alica_asp_solver
   CATKIN_DEPENDS alica_engine cling_wrap system_config fsystem
 #  DEPENDS system_lib
 )

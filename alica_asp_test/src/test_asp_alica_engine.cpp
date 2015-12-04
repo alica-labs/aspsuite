@@ -2,17 +2,21 @@
 
 #include <SystemConfig.h>
 
-// Alica Additional Modules
+// ALICA Additional Modules
 #include <communication/AlicaDummyCommunication.h>
 #include <clock/AlicaSystemClock.h>
 
-// Alica Model and Engine Stuff
-#include <engine/AlicaEngine.h>
+// ALICA Model and Engine Stuff
 #include "BehaviourCreator.h"
 #include "ConditionCreator.h"
 #include "ConstraintCreator.h"
 #include "UtilityFunctionCreator.h"
-#include "engine/PlanBase.h"
+#include <engine/AlicaEngine.h>
+#include <engine/PlanBase.h>
+#include <engine/model/Plan.h>
+
+// ALICA ASP Solver
+#include <alica_asp_solver/ASPSolver.h>
 
 
 class AspAlicaEngine : public ::testing::Test
@@ -47,6 +51,9 @@ protected:
 		crc = new alica::ConstraintCreator();
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
+
+		// 1 stands for the ASPSolver in this test suite only!
+		ae->addSolver(1, new alica::reasoner::ASPSolver(ae));
 	}
 
 	virtual void TearDown()
@@ -63,15 +70,16 @@ protected:
 };
 
 /**
- * Tests whether it is possible to run a behaviour in a primitive plan.
+ * Tests the validation of ALICA plans
  */
-TEST_F(AspAlicaEngine, engineBasedCheckWithSimplePlan)
+TEST_F(AspAlicaEngine, planValidationTest)
 {
-
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
 			<< "Unable to initialise the Alica Engine!";
 
-	ae->start();
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1));
+	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
 
+	EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
 }
 

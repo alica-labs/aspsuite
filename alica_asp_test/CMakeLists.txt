@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -Wall ${CMAKE_CXX_FLAGS}")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED cling_wrap  cmake_modules alica_engine alica_dummy_proxy)
+find_package(catkin REQUIRED cling_wrap  cmake_modules alica_engine alica_dummy_proxy alica_asp_solver)
 
 
 ###################################
@@ -22,7 +22,7 @@ find_package(catkin REQUIRED cling_wrap  cmake_modules alica_engine alica_dummy_
 catkin_package(
   INCLUDE_DIRS src/etc/Expr/include
 #  LIBRARIES alica_asp_test
-  CATKIN_DEPENDS cling_wrap cmake_modules alica_engine alica_dummy_proxy
+  CATKIN_DEPENDS cling_wrap cmake_modules alica_engine alica_dummy_proxy alica_asp_solver
   DEPENDS TBB
 )
 

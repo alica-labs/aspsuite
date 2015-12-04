@@ -5,9 +5,12 @@
  *      Author: Stephan Opfer
  */
 
-#include "ASPAlicaPlanIntegrator.h"
+#include "alica_asp_solver/ASPAlicaPlanIntegrator.h"
 
 #include "engine/model/Plan.h"
+#include "engine/model/State.h"
+
+using namespace std;
 
 namespace alica
 {
@@ -21,14 +24,22 @@ namespace alica
 
 		ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
 		{
-			// TODO Auto-generated destructor stub
 		}
 
-		void ASPAlicaPlanIntegrator::loadPlanTree(Plan* p)
+		bool ASPAlicaPlanIntegrator::loadPlanTree(Plan* p)
 		{
 			this->processedPlanIds.clear();
 
-			bool cylceDetected = this->processPlan(p);
+			this->cw->add("PlanBase", {}, "topLevelPlan(p" + std::to_string(p->getId()) + ").");
+			bool hasTreeProperty = this->processPlan(p);
+
+
+			this->cw->ground("PlanBase", {});
+
+			this->cw->solve();
+
+
+			return hasTreeProperty;
 		}
 
 		bool ASPAlicaPlanIntegrator::processPlan(Plan* p)
@@ -36,6 +47,7 @@ namespace alica
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
 			{// already processed, so there is a cycle
+				cout << "PlanIntegrator: Cycle detected!" << endl;
 				return false;
 			}
 			else
@@ -44,12 +56,30 @@ namespace alica
 			}
 
 			// flag to signal, if the plan tree really is a tree
-			bool treeProperty = true;
+			bool hasTreeProperty = true;
 
-			this->cw->add("PlanBase", {}, "");
+			// add the plan to the knowledge base.
+			cout << "Plan Integrator: processing Plan " << p->getId() << endl;
 
+			this->cw->add("PlanBase", {}, "plan(p" + std::to_string(p->getId()) + ").");
 
-			return treeProperty;
+			for (auto state : p->getStates())
+			{
+				for (auto abstractChildPlan : state->getPlans())
+				{
+					alica::Plan* childPlan = dynamic_cast<alica::Plan*>(abstractChildPlan);
+					if (childPlan != nullptr)
+					{
+						if (!this->processPlan(childPlan))
+						{
+							cout << "PlanIntegrator: treeProperty violated!" << endl;
+							hasTreeProperty = false;
+						}
+					}
+				}
+			}
+
+			return hasTreeProperty;
 		}
 
 	} /* namespace reasoner */

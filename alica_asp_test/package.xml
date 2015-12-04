@@ -16,11 +16,13 @@
   <build_depend>cmake_modules</build_depend>
   <build_depend>alica_engine</build_depend>
   <build_depend>alica_dummy_proxy</build_depend>
+  <build_depend>alica_asp_solver</build_depend>
    
   <run_depend>cling_wrap</run_depend>
   <run_depend>cmake_modules</run_depend>
   <run_depend>alica_engine</run_depend>
   <run_depend>alica_dummy_proxy</run_depend>
+  <run_depend>alica_asp_solver</run_depend>
 
   <export>
   </export>

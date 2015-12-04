@@ -5,7 +5,7 @@
  *      Author: Stephan Opfer
  */
 
-#include "ASPSolver.h"
+#include "alica_asp_solver/ASPSolver.h"
 #include "engine/model/Plan.h"
 #include <SystemConfig.h>
 
@@ -28,7 +28,7 @@ namespace alica
 			this->cw->addKnowledgeFile(alicaBackGroundKnowledgeFile);
 
 			this->cw->init();
-			Gringo::SolveResult result = this->cw->solve();
+			//Gringo::SolveResult result = this->cw->solve();
 		}
 
 		ASPSolver::~ASPSolver()
@@ -53,16 +53,17 @@ namespace alica
 			return nullptr;//make_shared<SolverVariable>();
 		}
 
+		/**
+		 * Validates the well-formedness of a given plan.
+		 */
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 
-			this->planIntegrator->loadPlanTree(plan);
+			return this->planIntegrator->loadPlanTree(plan);
 
 			// Ask for broken stuff related to the given plan
 
 			// Present results
-
-			return false;
 		}
 
 	} /* namespace reasoner */

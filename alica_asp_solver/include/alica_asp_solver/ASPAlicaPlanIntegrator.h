@@ -11,6 +11,8 @@
 #include <memory>
 #include <ClingWrapper.h>
 
+using namespace std;
+
 namespace alica
 {
 	class Plan;
@@ -23,7 +25,7 @@ namespace alica
 		public:
 			ASPAlicaPlanIntegrator(shared_ptr<supplementary::ClingWrapper> cw);
 			virtual ~ASPAlicaPlanIntegrator();
-			void loadPlanTree(Plan* p);
+			bool loadPlanTree(Plan* p);
 
 		private:
 			bool processPlan(Plan* p);

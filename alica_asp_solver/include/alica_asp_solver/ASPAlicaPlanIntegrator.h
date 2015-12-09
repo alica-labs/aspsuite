@@ -20,6 +20,10 @@ namespace alica
 	namespace reasoner
 	{
 
+		//! Integrates ALICA program into ASP.
+		/**
+		 * Helps to integrate all parts of an ALCIA program into the ASP solver.
+		 */
 		class ASPAlicaPlanIntegrator
 		{
 		public:

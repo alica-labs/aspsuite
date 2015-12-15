@@ -10,7 +10,8 @@
 
 #include "ASPAlicaPlanIntegrator.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
-#include <ClingWrapper.h>
+#include <clingo/clingocontrol.hh>
+#include <SystemConfig.h>
 
 #include <memory>
 #include <vector>
@@ -36,9 +37,14 @@ namespace alica
 			shared_ptr<SolverVariable> createVariable(long id);
 			bool validatePlan(Plan* plan);
 
+			void disableWarnings(bool noWarns);
+
 		private:
-			shared_ptr<supplementary::ClingWrapper> cw;
+			shared_ptr<ClingoLib> clingo;
+			DefaultGringoModule gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
+
+			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 		};
 
 	} /* namespace reasoner */

@@ -9,7 +9,7 @@
 #define SRC_ASPALICAPLANINTEGRATOR_H_
 
 #include <memory>
-#include <ClingWrapper.h>
+#include <clingo/clingocontrol.hh>
 
 using namespace std;
 
@@ -27,14 +27,14 @@ namespace alica
 		class ASPAlicaPlanIntegrator
 		{
 		public:
-			ASPAlicaPlanIntegrator(shared_ptr<supplementary::ClingWrapper> cw);
+			ASPAlicaPlanIntegrator(shared_ptr<ClingoLib> clingo);
 			virtual ~ASPAlicaPlanIntegrator();
 			bool loadPlanTree(Plan* p);
 
 		private:
 			bool processPlan(Plan* p);
 
-			shared_ptr<supplementary::ClingWrapper> cw;
+			shared_ptr<ClingoLib> clingo;
 			vector<long> processedPlanIds;
 		};
 

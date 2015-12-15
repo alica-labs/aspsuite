@@ -12,7 +12,7 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED cling_wrap  cmake_modules alica_engine alica_dummy_proxy alica_asp_solver)
+find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_proxy alica_asp_solver)
 
 
 ###################################
@@ -27,7 +27,7 @@ find_package(catkin REQUIRED cling_wrap  cmake_modules alica_engine alica_dummy_
 catkin_package(
   INCLUDE_DIRS src/etc/Expr/include
 #  LIBRARIES alica_asp_test
-  CATKIN_DEPENDS cling_wrap cmake_modules alica_engine alica_dummy_proxy alica_asp_solver
+  CATKIN_DEPENDS clingo_cpp cmake_modules alica_engine alica_dummy_proxy alica_asp_solver
   DEPENDS TBB
 )
 
@@ -46,9 +46,11 @@ catkin_add_gtest(alica_asp-test
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-#message("<<< Catkin Libraries:  ${catkin_LIBRARIES}")
+message("<<< Catkin Libraries:  ${catkin_LIBRARIES}")
 #message("<<< TBB Libraries:  ${TBB_LIBRARIES}")
 find_package(TBB REQUIRED)
+
+
 
 target_link_libraries(alica_asp-test ${catkin_LIBRARIES} ${TBB_LIBRARIES})
 add_dependencies(alica_asp-test ${catkin_LIBRARIES})

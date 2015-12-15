@@ -17,9 +17,9 @@ namespace alica
 	namespace reasoner
 	{
 
-		ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(shared_ptr<supplementary::ClingWrapper> cw)
+		ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(shared_ptr<ClingoLib> clingo)
 		{
-			this->cw = cw;
+			this->clingo = clingo;
 		}
 
 		ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
@@ -30,15 +30,10 @@ namespace alica
 		{
 			this->processedPlanIds.clear();
 
-			this->cw->add("PlanBase", {}, "topLevelPlan(p" + std::to_string(p->getId()) + ").");
+			this->clingo->add("PlanBase", {}, "topLevelPlan(p" + std::to_string(p->getId()) + ").");
 			bool hasTreeProperty = this->processPlan(p);
-
-
-			this->cw->ground("PlanBase", {});
-
-			this->cw->solve();
-
-
+			this->clingo->ground( { {"PlanBase", {}}}, nullptr);
+			this->clingo->solve(nullptr, {});
 			return hasTreeProperty;
 		}
 
@@ -61,7 +56,7 @@ namespace alica
 			// add the plan to the knowledge base.
 			cout << "Plan Integrator: processing Plan " << p->getId() << endl;
 
-			this->cw->add("PlanBase", {}, "plan(p" + std::to_string(p->getId()) + ").");
+			this->clingo->add("PlanBase", {}, "plan(p" + std::to_string(p->getId()) + ").");
 
 			for (auto state : p->getStates())
 			{

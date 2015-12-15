@@ -76,6 +76,11 @@ namespace alica
 			// TODO Auto-generated destructor stub
 		}
 
+		void ASPSolver::load(string filename)
+		{
+			this->clingo->load(std::forward<string>(filename));
+		}
+
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
 		{
 			if (value2->type() != Gringo::Value::Type::FUNC)

@@ -23,10 +23,6 @@ namespace alica
         switch (utilityfunctionConfId)
         {
 
-            case 1450174760570:
-                return make_shared<UtilityFunction1450174760570>();
-                break;
-
             case 1441701808444:
                 return make_shared<UtilityFunction1441701808444>();
                 break;

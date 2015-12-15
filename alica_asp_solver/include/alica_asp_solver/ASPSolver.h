@@ -25,7 +25,7 @@ namespace alica
 	namespace reasoner
 	{
 
-		class ASPSolver : public IConstraintSolver
+		class ASPSolver : public alica::IConstraintSolver
 		{
 		public:
 			ASPSolver(AlicaEngine* ae);
@@ -38,6 +38,7 @@ namespace alica
 			bool validatePlan(Plan* plan);
 
 			void disableWarnings(bool noWarns);
+			void load(string filename);
 
 		private:
 			shared_ptr<ClingoLib> clingo;

@@ -14,6 +14,7 @@
 #include <engine/AlicaEngine.h>
 #include <engine/PlanBase.h>
 #include <engine/model/Plan.h>
+#include <engine/constraintmodul/ConstraintQuery.h>
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
@@ -52,7 +53,7 @@ protected:
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
-		// 1 stands for the ASPSolver in this test suite only!
+		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae));
 	}
 
@@ -77,9 +78,29 @@ TEST_F(AspAlicaEngine, planValidationTest)
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
 			<< "Unable to initialise the Alica Engine!";
 
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1));
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
 
 	EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
+}
+
+/**
+ * Tests the validation of ALICA plans
+ */
+TEST_F(AspAlicaEngine, getSolutionTest)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
+	alica::ConstraintQuery query;
+	// TODO
+//	if (aspSolver->getSolution(,,))
+//	{
+//
+//	}
+
+	//EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
 }
 

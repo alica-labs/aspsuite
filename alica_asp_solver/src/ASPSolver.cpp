@@ -60,7 +60,8 @@ namespace alica
 			bool isTrue = false;
 			this->clingo->solve([isTrue, queryValue](Gringo::Model const &m)
 			{
-				isTrue = m.contains(queryValue);
+				// TODO
+				//isTrue = m.contains(queryValue);
 				return true;
 			},{});
 			return isTrue;
@@ -70,7 +71,7 @@ namespace alica
 		{
 			std::vector<Gringo::Value> gringoValues;
 
-			this->clingo->solve([queryValue, gringoValues, this](Gringo::Model const &m)
+			this->clingo->solve([queryValue, &gringoValues, this](Gringo::Model const &m)
 			{
 				//std::cout << "Inside Lambda!" << std::endl;
 					ClingoModel& clingoModel = (ClingoModel&) m;

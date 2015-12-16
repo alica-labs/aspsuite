@@ -31,17 +31,51 @@ namespace alica
 																					alicaBackGroundKnowledgeFile);
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
-
 			this->clingo->ground({ {"PlanBase", {}}}, nullptr);
+		}
 
-			Gringo::Value queryGringoValue = this->gringoModule.parseValue("plan(wildcard)");
+		ASPSolver::~ASPSolver()
+		{
+			// TODO Auto-generated destructor stub
+		}
 
-			this->clingo->solve([queryGringoValue, this](Gringo::Model const &m)
+		void ASPSolver::load(string filename)
+		{
+			this->clingo->load(std::forward<string>(filename));
+		}
+
+		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
+		{
+			this->clingo->ground(std::forward<Gringo::Control::GroundVec const &>(vec),
+									std::forward<Gringo::Any&&>(context));
+		}
+
+		Gringo::Value ASPSolver::createQueryValue(std::string const &queryString)
+		{
+			return this->gringoModule.parseValue(queryString);
+		}
+
+		bool ASPSolver::isTrue(Gringo::Value queryValue)
+		{
+			bool isTrue = false;
+			this->clingo->solve([isTrue, queryValue](Gringo::Model const &m)
+			{
+				isTrue = m.contains(queryValue);
+				return true;
+			},{});
+			return isTrue;
+		}
+
+		std::vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
+		{
+			std::vector<Gringo::Value> gringoValues;
+
+			this->clingo->solve([queryValue, gringoValues, this](Gringo::Model const &m)
 			{
 				//std::cout << "Inside Lambda!" << std::endl;
 					ClingoModel& clingoModel = (ClingoModel&) m;
-					auto it = clingoModel.out.domains.find(queryGringoValue.sig());
-					std::vector<Gringo::Value> gringoValues;
+					auto it = clingoModel.out.domains.find(queryValue.sig());
+
 					std::vector<Gringo::AtomState const *> atomStates;
 					if (it != clingoModel.out.domains.end())
 					{
@@ -51,7 +85,7 @@ namespace alica
 							//std::cout << domainPair.first << " " << std::endl;
 							if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 							{
-								if (checkMatchValues(&queryGringoValue, &domainPair.first))
+								if (checkMatchValues(&queryValue, &domainPair.first))
 								{
 									gringoValues.push_back(domainPair.first);
 									atomStates.push_back(&(domainPair.second));
@@ -69,16 +103,8 @@ namespace alica
 					return true;
 				},
 					{});
-		}
 
-		ASPSolver::~ASPSolver()
-		{
-			// TODO Auto-generated destructor stub
-		}
-
-		void ASPSolver::load(string filename)
-		{
-			this->clingo->load(std::forward<string>(filename));
+			return gringoValues;
 		}
 
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)

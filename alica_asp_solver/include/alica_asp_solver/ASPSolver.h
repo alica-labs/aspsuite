@@ -39,6 +39,10 @@ namespace alica
 
 			void disableWarnings(bool noWarns);
 			void load(string filename);
+			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
+			Gringo::Value createQueryValue(std::string const &queryString);
+			bool isTrue(Gringo::Value queryValue);
+			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 
 		private:
 			shared_ptr<ClingoLib> clingo;

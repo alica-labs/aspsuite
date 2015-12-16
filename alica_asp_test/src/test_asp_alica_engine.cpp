@@ -94,7 +94,8 @@ TEST_F(AspAlicaEngine, getSolutionTest)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
-	alica::ConstraintQuery query;
+	alica::ConstraintQuery query(ae);
+
 	// TODO
 //	if (aspSolver->getSolution(,,))
 //	{

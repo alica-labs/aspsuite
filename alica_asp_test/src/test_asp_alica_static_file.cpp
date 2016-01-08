@@ -97,7 +97,8 @@ TEST_F(AspAlicaStaticTest, simpleTest)
 	clingo->load("src/etc/asp_background_knowledge/alica-background-knowledge.lp");
 	clingo->load("data/alica/alica-simple-test.lp");
 	clingo->ground({ {"", {}}}, nullptr);
-	Gringo::SolveResult result = clingo->solve();
+	// TODO: implement according to Alicas interface
+	Gringo::SolveResult result;// = clingo->getSolution();
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 
@@ -178,11 +179,11 @@ TEST_F(AspAlicaStaticTest, simpleTest)
 //		cout << endl;
 //	}
 //}
-//
-//// Run all the tests that were declared with TEST()
-//int main(int argc, char **argv)
-//{
-//	testing::InitGoogleTest(&argc, argv);
-//	return RUN_ALL_TESTS();
-//}
-//
+
+// Run all the tests that were declared with TEST()
+int main(int argc, char **argv)
+{
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
+

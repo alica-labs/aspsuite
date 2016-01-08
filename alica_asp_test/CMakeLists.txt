@@ -27,17 +27,18 @@ find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_p
 catkin_package(
   INCLUDE_DIRS src/etc/Expr/include
 #  LIBRARIES alica_asp_test
-  CATKIN_DEPENDS clingo_cpp cmake_modules alica_engine alica_dummy_proxy alica_asp_solver
-  DEPENDS TBB
+  CATKIN_DEPENDS cmake_modules alica_engine alica_dummy_proxy alica_asp_solver clingo_cpp
+  #DEPENDS
 )
 
 ###########
 ## Build ##
 ###########
-add_definitions(-DWITH_THREADS=1) # for libclasp...
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+
+
 include_directories(src/etc/Expr/include  ${catkin_INCLUDE_DIRS})
 
 file(GLOB_RECURSE alica_asp-test_SOURCES "src/*.cpp")
@@ -46,11 +47,8 @@ catkin_add_gtest(alica_asp-test
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
-message("<<< Catkin Libraries:  ${catkin_LIBRARIES}")
-#message("<<< TBB Libraries:  ${TBB_LIBRARIES}")
-find_package(TBB REQUIRED)
 
+message("[alica_asp_test] catkin_LIBRARIES: ${catkin_LIBRARIES}")
+target_link_libraries(alica_asp-test ${catkin_LIBRARIES})
 
-
-target_link_libraries(alica_asp-test ${catkin_LIBRARIES} ${TBB_LIBRARIES})
 add_dependencies(alica_asp-test ${catkin_LIBRARIES})

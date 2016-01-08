@@ -32,16 +32,21 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES alica_asp_solver
   CATKIN_DEPENDS alica_engine clingo_cpp system_config fsystem
-#  DEPENDS system_lib
+  #DEPENDS lua python
 )
 
 ###########
 ## Build ##
 ###########
 add_definitions(-DWITH_THREADS=1) # for libclasp...
+add_definitions(-DWITH_LUA) # for libclasp...
+add_definitions(-DWITH_PYTHON) # for libclasp...
+
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+
+#message("[alica-asp-solver] catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
@@ -51,5 +56,7 @@ add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
     src/ASPAlicaPlanIntegrator.cpp
 )
+
+#message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES})

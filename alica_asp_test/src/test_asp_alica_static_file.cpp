@@ -81,31 +81,31 @@ protected:
 /**
  * Tests the validation of ALICA plans
  */
-TEST_F(AspAlicaStaticTest, simpleTest)
-{
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
-			<< "Unable to initialise the Alica Engine!";
-
-	alica::reasoner::ASPSolver* clingo = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
-
-	EXPECT_TRUE(clingo->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
-
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
-
-	clingo->disableWarnings(true);
-	clingo->load("src/etc/asp_background_knowledge/alica-background-knowledge.lp");
-	clingo->load("data/alica/alica-simple-test.lp");
-	clingo->ground({ {"", {}}}, nullptr);
-	// TODO: implement according to Alicas interface
-	Gringo::SolveResult result;// = clingo->getSolution();
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
-
-	if (Gringo::SolveResult::SAT == result)
-	{
-		cout << "Model Found" << endl;
-	}
+//TEST_F(AspAlicaStaticTest, simpleTest)
+//{
+//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
+//			<< "Unable to initialise the Alica Engine!";
+//
+//	alica::reasoner::ASPSolver* clingo = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+//	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+//
+//	EXPECT_TRUE(clingo->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
+//
+//	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+//
+//	clingo->disableWarnings(true);
+//	clingo->load("src/etc/asp_background_knowledge/alica-background-knowledge.lp");
+//	clingo->load("data/alica/alica-simple-test.lp");
+//	clingo->ground({ {"", {}}}, nullptr);
+//	// TODO: implement according to Alicas interface
+//	Gringo::SolveResult result;// = clingo->getSolution();
+//	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+//	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+//
+//	if (Gringo::SolveResult::SAT == result)
+//	{
+//		cout << "Model Found" << endl;
+//	}
 
 //	ASSERT_TRUE(clingo->query("brokenState",
 //					{	"s1"}))<< clingo->toStringLastModel();
@@ -134,7 +134,8 @@ TEST_F(AspAlicaStaticTest, simpleTest)
 //					{	"e2"}))<< clingo->toStringLastModel();
 //	ASSERT_TRUE(clingo->query("brokenEntryPoint",
 //					{	"e3"}))<< clingo->toStringLastModel();
-}
+
+//}
 
 //TEST(AspAlicaStaticFile, treeShapedHierarchyTest)
 //{

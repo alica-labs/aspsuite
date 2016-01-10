@@ -81,27 +81,34 @@ TEST_F(AspAlicaEngine, planValidationTest)
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
 
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
 	EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
+
+	// stop time measuerment and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
 /**
  * Tests the validation of ALICA plans
  */
-TEST_F(AspAlicaEngine, getSolutionTest)
-{
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
-			<< "Unable to initialise the Alica Engine!";
-
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
-	alica::ConstraintQuery query(ae);
-
-	// TODO
-//	if (aspSolver->getSolution(,,))
-//	{
+//TEST_F(AspAlicaEngine, getSolutionTest)
+//{
+//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
+//			<< "Unable to initialise the Alica Engine!";
 //
-//	}
-
-	//EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
-}
+//	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+//	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
+//	alica::ConstraintQuery query(ae);
+//
+//	// TODO
+////	if (aspSolver->getSolution(,,))
+////	{
+////
+////	}
+//
+//	//EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
+//}
 

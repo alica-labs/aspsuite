@@ -29,7 +29,7 @@ namespace alica
 			string alicaBackGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
 			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
 																					alicaBackGroundKnowledgeFile);
-			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
+			//cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
 			this->clingo->ground({ {"PlanBase", {}}}, nullptr);
 		}
@@ -168,10 +168,11 @@ namespace alica
 
 		/**
 		 * Validates the well-formedness of a given plan.
+		 *
+		 * @returns False, if the plan is not valid. True, otherwise.
 		 */
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
-
 			return this->planIntegrator->loadPlanTree(plan);
 
 			// Ask for broken stuff related to the given plan

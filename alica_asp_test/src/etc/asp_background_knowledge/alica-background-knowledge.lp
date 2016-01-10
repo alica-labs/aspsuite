@@ -1,5 +1,8 @@
 %%%%% General relations between ALICA program elements
 
+% A plan without parents is a topLevelPlan.
+topLevelPlan(P) :- plan(P), ParentPlanCnt = #count{Parent : hasParentPlan(P,Parent), plan(Parent)}, ParentPlanCnt < 1.
+
 % A top-level plan is a plan, too.
 plan(P) :- topLevelPlan(P).
 
@@ -64,8 +67,11 @@ brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCar
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The top-level plan is transitively connected to all other plans. TODO this is crap cause every plan can be empty
-%brokenPlan(P) :- plan(P), not topLevelPlan(P), HasChildCnt = #count{TOP: hasChildPlan(TOP,P), topLevelPlan(TOP)}, HasChildCnt != 1.
+% The top-level plan is transitively connected to all other plans.
+brokenPlan(P) :- plan(P), not topLevelPlan(P), HasChildCnt = #count{TOP: hasChildPlan(TOP,P), topLevelPlan(TOP)}, HasChildCnt != 1.
+
+% There is only one top-level plan.
+brokenPlan(P1) :- topLevelPlan(P1), topLevelPlan(P2), P1 != P2.
 
 % Every plan has at most one parent.
 brokenPlan(P) :- plan(P), ParentPlanCnt = #count{Parent : hasParentPlan(P,Parent), plan(Parent)}, ParentPlanCnt > 1.

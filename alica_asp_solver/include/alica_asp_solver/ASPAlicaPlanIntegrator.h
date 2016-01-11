@@ -11,6 +11,8 @@
 #include <memory>
 #include <clingo/clingocontrol.hh>
 
+#include "alica_asp_solver/ASPGenerator.h"
+
 using namespace std;
 
 namespace alica
@@ -35,6 +37,7 @@ namespace alica
 			bool processPlan(Plan* p);
 
 			shared_ptr<ClingoLib> clingo;
+			alica::reasoner::ASPGenerator gen;
 			vector<long> processedPlanIds;
 		};
 

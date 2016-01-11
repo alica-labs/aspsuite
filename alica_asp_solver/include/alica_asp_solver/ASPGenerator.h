@@ -1,0 +1,56 @@
+/*
+ * ASPGenerator.h
+ *
+ *  Created on: Jan 11, 2016
+ *      Author: emmeda
+ */
+
+#ifndef SRC_ASPGENERATOR_H_
+#define SRC_ASPGENERATOR_H_
+
+#include <string>
+
+#include <engine/model/Plan.h>
+#include <engine/model/EntryPoint.h>
+#include <engine/model/State.h>
+#include <engine/model/Task.h>
+#include <engine/model/PlanType.h>
+
+namespace alica
+{
+	namespace reasoner
+	{
+		class ASPGenerator
+		{
+		public:
+			string plan(Plan* p, bool dotTerminated = true);
+			string entryPoint(EntryPoint* ep, bool dotTerminated = true);
+			string state(State* s, bool dotTerminated = true);
+			string task(Task* t, bool dotTerminated = true);
+			string failureState(State* s, bool dotTerminated = true);
+			string successState(State* s, bool dotTerminated = true);
+			string planType(PlanType* s, bool dotTerminated = true);
+
+			string hasTask(Plan* p, Task* t, bool dotTerminated = true);
+			string hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated = true);
+			string hasMaxCardinality(EntryPoint* ep, int maxCard, bool dotTerminated = true);
+			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
+			string hasState(Plan* p, State* s, bool dotTerminated = true);
+			string hasPlan(State* s, Plan* p, bool dotTerminated = true);
+			string hasPlanType(State* s, PlanType* pt, bool dotTerminated = true);
+			string hasRealisation(PlanType* pt, Plan* p, bool dotTerminated = true);
+
+			string get(Plan* p);
+			string get(EntryPoint* ep);
+			string get(State* s);
+			string get(Task* t);
+			string get(PlanType* pt);
+
+		private:
+			// maps from id to asp string for all ALICA elements
+			std::map<long, string> elements;
+		};
+	}
+}
+#endif /* SRC_ASPGENERATOR_H_ */
+

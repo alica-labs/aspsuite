@@ -6,6 +6,8 @@
  */
 
 #include "alica_asp_solver/ASPAlicaPlanIntegrator.h"
+#include "alica_asp_solver/ASPGenerator.h"
+
 
 #include "engine/model/Plan.h"
 #include "engine/model/PlanType.h"
@@ -75,64 +77,57 @@ namespace alica
 			cout << "ASPAlicaPlanIntegrator: processing plan " << p->getName() << " (ID: " << p->getId() << ")" << endl;
 
 			// add the plan
-			this->clingo->add("PlanBase", {}, "plan(p" + std::to_string(p->getId()) + ").");
+			this->clingo->add("PlanBase", {}, gen.plan(p));
 
 			// add entry point and their tasks
-			// TODO: Optimize string creation
 			for (auto& idEntryPointPair : p->getEntryPoints())
 			{
 				EntryPoint* entryPoint = idEntryPointPair.second;
 				Task* task = entryPoint->getTask();
 
 				// add task
-				this->clingo->add("PlanBase", {}, "task(tsk" + std::to_string(task->getId()) + ").");
-				this->clingo->add("PlanBase", {}, "hasTask(p" + std::to_string(p->getId())
-															  + ", tsk" + std::to_string(task->getId()) + ").");
+				this->clingo->add("PlanBase", {}, gen.task(task));
+				this->clingo->add("PlanBase", {}, gen.hasTask(p, task));
 
 				// add entry point
-				this->clingo->add("PlanBase", {}, "entryPoint(ep" + std::to_string(entryPoint->getId()) + ").");
-				this->clingo->add("PlanBase", {}, "hasMinCardinality(ep" + std::to_string(entryPoint->getId()) + ", "
-								  	  	  	  	  	  	  	  	  	  	 + entryPoint->getMinCardinality() + ").");
-				this->clingo->add("PlanBase", {}, "hasMaxCardinality(ep" + std::to_string(entryPoint->getId()) + ", "
-												  	  	  	  	  	  	 + entryPoint->getMaxCardinality() + ").");
+				this->clingo->add("PlanBase", {}, gen.entryPoint(entryPoint));
+				this->clingo->add("PlanBase", {}, gen.hasMinCardinality(entryPoint, entryPoint->getMinCardinality()));
+				this->clingo->add("PlanBase", {}, gen.hasMaxCardinality(entryPoint, entryPoint->getMaxCardinality()));
+
 				// TODO: success required flag of entry point (for better modeling support)
-				this->clingo->add("PlanBase", {}, "hasEntryPoint(p" + std::to_string(p->getId())
-																	+ ", tsk" + std::to_string(task->getId())
-																	+ ", ep" + std::to_string(entryPoint->getId()) + ").");
+				this->clingo->add("PlanBase", {}, gen.hasEntryPoint(p, task, entryPoint));
 			}
 
 			// add state
 			for (auto& state : p->getStates())
 			{
 
-				this->clingo->add("PlanBase", {}, "hasState(p" + std::to_string(p->getId())
-															   + ", s" + std::to_string(state->getId()) + ").");
+				this->clingo->add("PlanBase", {}, gen.hasState(p, state));
 
-				if (state->failureState)
+				if (state->isFailureState())
 				{
 					// add failure state
-					this->clingo->add("PlanBase", {}, "failureState(s" + std::to_string(state->getId()) + ").");
+					this->clingo->add("PlanBase", {}, gen.failureState(state));
 					// TODO: handle post-condition of failure state
 					// ((FailureState) state).getPostCondition();
 				}
-				else if (state->successState)
+				else if (state->isSuccessState())
 				{
 					// add success state
-					this->clingo->add("PlanBase", {}, "successState(s" + std::to_string(state->getId()) + ").");
+					this->clingo->add("PlanBase", {}, gen.successState(state));
 					// TODO: handle post-condition of success state
 					// ((SuccessState) state).getPostCondition();
 				}
 				else // normal state
 				{
 					// add state
-					this->clingo->add("PlanBase", {}, "state(s" + std::to_string(state->getId()) + ").");
+					this->clingo->add("PlanBase", {}, gen.state(state));
 
 					for (auto abstractChildPlan : state->getPlans())
 					{
 						if (alica::Plan* childPlan = dynamic_cast<alica::Plan*>(abstractChildPlan))
 						{
-							this->clingo->add("PlanBase", {}, "hasPlan(s" + std::to_string(state->getId())
-																		  + ", p" + std::to_string(childPlan->getId()) + ").");
+							this->clingo->add("PlanBase", {}, gen.hasPlan(state, childPlan));
 
 							if (!this->processPlan(childPlan))
 							{
@@ -144,14 +139,12 @@ namespace alica
 						}
 						else if (alica::PlanType* childPlanType = dynamic_cast<alica::PlanType*>(abstractChildPlan))
 						{
-							this->clingo->add("PlanBase", {}, "planType(pt" +  std::to_string(childPlanType->getId()) + ").");
-							this->clingo->add("PlanBase", {}, "hasPlanType(s" + std::to_string(state->getId())
-																			  + ", pt" + std::to_string(childPlanType->getId()) + ").");
+							this->clingo->add("PlanBase", {}, gen.planType(childPlanType));
+							this->clingo->add("PlanBase", {}, gen.hasPlanType(state, childPlanType));
 
 							for (auto& childPlan : childPlanType->getPlans())
 							{
-								this->clingo->add("PlanBase", {}, "hasRealisation(pt" + std::to_string(childPlanType->getId())
-																					  + ", p" + std::to_string(childPlan->getId()) + ").");
+								this->clingo->add("PlanBase", {}, gen.hasRealisation(childPlanType, childPlan));
 								if (!this->processPlan(childPlan))
 								{
 									// TODO: This way to determine the tree property is not correct! Plans can be arbitrarily reused.

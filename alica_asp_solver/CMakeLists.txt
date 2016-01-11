@@ -55,6 +55,7 @@ include_directories(
 add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
     src/ASPAlicaPlanIntegrator.cpp
+    src/ASPGenerator.cpp
 )
 
 #message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")

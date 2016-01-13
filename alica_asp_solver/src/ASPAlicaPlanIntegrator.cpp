@@ -79,22 +79,25 @@ namespace alica
 			// add the plan
 			this->clingo->add("PlanBase", {}, gen.plan(p));
 
-			// add entry point and their tasks
+			// add entry points and their tasks
 			for (auto& idEntryPointPair : p->getEntryPoints())
 			{
 				EntryPoint* entryPoint = idEntryPointPair.second;
 				Task* task = entryPoint->getTask();
 
 				// add task
+				// TODO: what is, if we add the task two or more times to PlanBase?
+				// TODO: should I also integrate the IDLE Task ?
 				this->clingo->add("PlanBase", {}, gen.task(task));
 				this->clingo->add("PlanBase", {}, gen.hasTask(p, task));
 
 				// add entry point
 				this->clingo->add("PlanBase", {}, gen.entryPoint(entryPoint));
+				this->clingo->add("PlanBase", {}, gen.successRequired(entryPoint));
+				this->clingo->add("PlanBase", {}, gen.hasInitialState(entryPoint, entryPoint->getState()));
 				this->clingo->add("PlanBase", {}, gen.hasMinCardinality(entryPoint, entryPoint->getMinCardinality()));
 				this->clingo->add("PlanBase", {}, gen.hasMaxCardinality(entryPoint, entryPoint->getMaxCardinality()));
-
-				// TODO: success required flag of entry point (for better modeling support)
+				this->clingo->add("PlanBase", {}, gen.hasEntryPoint(p, task, entryPoint));
 				this->clingo->add("PlanBase", {}, gen.hasEntryPoint(p, task, entryPoint));
 			}
 
@@ -108,6 +111,7 @@ namespace alica
 				{
 					// add failure state
 					this->clingo->add("PlanBase", {}, gen.failureState(state));
+
 					// TODO: handle post-condition of failure state
 					// ((FailureState) state).getPostCondition();
 				}
@@ -115,6 +119,7 @@ namespace alica
 				{
 					// add success state
 					this->clingo->add("PlanBase", {}, gen.successState(state));
+
 					// TODO: handle post-condition of success state
 					// ((SuccessState) state).getPostCondition();
 				}

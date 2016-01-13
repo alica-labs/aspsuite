@@ -82,6 +82,9 @@ brokenPlan(P) :- plan(P), hasChildPlan(P,P).
 % The top level plan has no parent plans.
 brokenPlan(P) :- topLevelPlan(P), ParentPlanCnt = #count{Parent : hasParentPlan(P,Parent), plan(Parent)}, ParentPlanCnt > 0. 
 
+% Each state is only reachable from exactly one entry point.
+brokenState(S) :- state(S), ReachableEntryPointCnt = #count{EP: reachable(EP,S), entryPoint(EP)}, ReachableEntryPointCnt != 1.
+
 %%%%% Plan base axioms
 
 % An agent can only occupy one state per plan

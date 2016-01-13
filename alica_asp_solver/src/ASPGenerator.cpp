@@ -48,6 +48,10 @@ namespace alica
 			return "planType(" + get(pt) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::successRequired(EntryPoint* ep, bool dotTerminated)
+		{
+			return "successRequired(" + get(ep) + (dotTerminated ? ")." : ")");
+		}
 
 		// BINARY Predicates
 
@@ -69,6 +73,11 @@ namespace alica
 		string ASPGenerator::hasState(Plan* p, State* s, bool dotTerminated)
 		{
 			return "hasState(" + get(p) + ", " + get(s) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::hasInitialState(EntryPoint* ep, State* s, bool dotTerminated)
+		{
+			return "hasInitialState(" + get(ep) + ", " + get(s) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::hasPlan(State* s, Plan* p, bool dotTerminated)

@@ -30,12 +30,14 @@ namespace alica
 			string failureState(State* s, bool dotTerminated = true);
 			string successState(State* s, bool dotTerminated = true);
 			string planType(PlanType* s, bool dotTerminated = true);
+			string successRequired(EntryPoint* ep, bool dotTerminated = true);
 
 			string hasTask(Plan* p, Task* t, bool dotTerminated = true);
 			string hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated = true);
 			string hasMaxCardinality(EntryPoint* ep, int maxCard, bool dotTerminated = true);
 			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
 			string hasState(Plan* p, State* s, bool dotTerminated = true);
+			string hasInitialState(EntryPoint* ep, State* s, bool dotTerminated = true);
 			string hasPlan(State* s, Plan* p, bool dotTerminated = true);
 			string hasPlanType(State* s, PlanType* pt, bool dotTerminated = true);
 			string hasRealisation(PlanType* pt, Plan* p, bool dotTerminated = true);

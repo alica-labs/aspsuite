@@ -53,6 +53,16 @@ namespace alica
 			return "successRequired(" + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::transition(Transition* t, bool dotTerminated)
+		{
+			return "transition(" + get(t) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::syncTransition(SyncTransition* sync, bool dotTerminated)
+		{
+			return "transition(" + get(sync) + (dotTerminated ? ")." : ")");
+		}
+
 		// BINARY Predicates
 
 		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
@@ -93,6 +103,21 @@ namespace alica
 		string ASPGenerator::hasRealisation(PlanType* pt, Plan* p, bool dotTerminated)
 		{
 			return "hasRealisation(" + get(pt) + ", " + get(p) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::hasInTransition(State* s, Transition* t, bool dotTerminated)
+		{
+			return "hasInTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::hasOutTransition(State* s, Transition* t, bool dotTerminated)
+		{
+			return "hasOutTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated)
+		{
+			return "hasSynchedTransition(" + get(sync) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
 
@@ -152,6 +177,26 @@ namespace alica
 			if (iter == this->elements.end())
 			{
 				return this->elements[pt->getId()] = "pt" + std::to_string(pt->getId());
+			}
+			return iter->second;
+		}
+
+		string ASPGenerator::get(Transition* t)
+		{
+			auto&& iter = this->elements.find(t->getId());
+			if (iter == this->elements.end())
+			{
+				return this->elements[t->getId()] = "t" + std::to_string(t->getId());
+			}
+			return iter->second;
+		}
+
+		string ASPGenerator::get(SyncTransition* sync)
+		{
+			auto&& iter = this->elements.find(sync->getId());
+			if (iter == this->elements.end())
+			{
+				return this->elements[sync->getId()] = "t" + std::to_string(sync->getId());
 			}
 			return iter->second;
 		}

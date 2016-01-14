@@ -9,14 +9,15 @@
 #include "alica_asp_solver/ASPGenerator.h"
 
 
-#include "engine/model/Plan.h"
-#include "engine/model/PlanType.h"
-#include "engine/model/BehaviourConfiguration.h"
-#include "engine/model/State.h"
-#include "engine/model/FailureState.h"
-#include "engine/model/SuccessState.h"
-#include "engine/model/Task.h"
-#include "engine/model/EntryPoint.h"
+#include <engine/model/Plan.h>
+#include <engine/model/PlanType.h>
+#include <engine/model/BehaviourConfiguration.h>
+#include <engine/model/State.h>
+#include <engine/model/FailureState.h>
+#include <engine/model/SuccessState.h>
+#include <engine/model/Task.h>
+#include <engine/model/EntryPoint.h>
+#include <engine/model/SyncTransition.h>
 
 using namespace std;
 
@@ -128,7 +129,7 @@ namespace alica
 					// add state
 					this->clingo->add("PlanBase", {}, gen.state(state));
 
-					for (auto abstractChildPlan : state->getPlans())
+					for (auto& abstractChildPlan : state->getPlans())
 					{
 						if (alica::Plan* childPlan = dynamic_cast<alica::Plan*>(abstractChildPlan))
 						{
@@ -165,6 +166,35 @@ namespace alica
 						}
 					}
 				}
+
+				// add state transition relations
+				for (auto& inTransition : state->getInTransitions())
+				{
+					this->clingo->add("PlanBase", {}, gen.hasInTransition(state, inTransition));
+				}
+				for (auto& outTransition : state->getOutTransitions())
+				{
+					this->clingo->add("PlanBase", {}, gen.hasOutTransition(state, outTransition));
+				}
+			}
+
+			// add transitions
+			for (auto& transition : p->getTransitions())
+			{
+				this->clingo->add("PlanBase", {}, gen.transition(transition));
+
+				//TODO: handle pre-conditions of transitions
+			}
+
+			// add synchronisations
+			for (auto& syncTransition : p->getSyncTransitions())
+			{
+				this->clingo->add("PlanBase", {}, gen.syncTransition(syncTransition));
+				for (auto& transition : syncTransition->getInSync())
+				{
+					this->clingo->add("PlanBase", {}, gen.hasSynchedTransition(syncTransition, transition));
+				}
+				// TODO: maybe it is nice to have the timeouts of a sync transition
 			}
 
 			return hasTreeProperty;

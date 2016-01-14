@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="ASCII"?>
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
-    <key href="UnconnectedState.pml#1441701830556"/>
-    <value xPos="97" yPos="100" width="85" height="67"/>
+    <key href="SingleUnconnectedState.pml#1452783421980"/>
+    <value xPos="233" yPos="57" width="81" height="67"/>
   </extensions>
   <extensions>
-    <key href="UnconnectedState.pml#1441701808444"/>
-    <value width="667" height="483"/>
+    <key href="SingleUnconnectedState.pml#1452783421979"/>
+    <value width="756" height="309"/>
   </extensions>
   <extensions>
-    <key href="UnconnectedState.pml#1441701830557"/>
+    <key href="SingleUnconnectedState.pml#1452783421981"/>
     <value/>
   </extensions>
 </uiextensionmodel:PmlUiExtensionMap>

@@ -60,7 +60,7 @@ namespace alica
 			bool isTrue = false;
 			this->clingo->solve([isTrue, queryValue](Gringo::Model const &m)
 			{
-				// TODO
+				// TODO implement isTrue function of ASPSolver
 				//isTrue = m.contains(queryValue);
 				return true;
 			},{});
@@ -140,7 +140,7 @@ namespace alica
 
 		void ASPSolver::disableWarnings(bool value)
 		{
-			// TODO
+			// TODO implement disableWarnings
 //			grOpts_.wNoRedef = value;
 //			grOpts_.wNoCycle = value;
 //			grOpts_.wNoTermUndef = value;
@@ -162,7 +162,7 @@ namespace alica
 
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
-			// TODO
+			// TODO necessary for integration into the alica engine
 			return nullptr; //make_shared<SolverVariable>();
 		}
 

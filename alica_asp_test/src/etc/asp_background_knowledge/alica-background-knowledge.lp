@@ -25,6 +25,8 @@ state(S) :- terminalState(S).
 % Inverse relations between predicates.
 hasState(P,S) :- isStateOf(S,P).
 hasTransition(P,T) :- isTransitionOf(T,P).
+hasInTransition(S,T) :- hasOutState(T,S).
+hasOutTransition(S,T) :- hasInState(T,S).
 
 % Reachability of states within plans
 reachable(S,EP) :- state(S), entryPoint(EP), hasInitialState(EP,S).

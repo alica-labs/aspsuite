@@ -15,6 +15,8 @@
 #include <engine/model/State.h>
 #include <engine/model/Task.h>
 #include <engine/model/PlanType.h>
+#include <engine/model/Transition.h>
+#include <engine/model/SyncTransition.h>
 
 namespace alica
 {
@@ -31,6 +33,8 @@ namespace alica
 			string successState(State* s, bool dotTerminated = true);
 			string planType(PlanType* s, bool dotTerminated = true);
 			string successRequired(EntryPoint* ep, bool dotTerminated = true);
+			string transition(Transition* t, bool dotTerminated = true);
+			string syncTransition(SyncTransition* sync, bool dotTerminated = true);
 
 			string hasTask(Plan* p, Task* t, bool dotTerminated = true);
 			string hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated = true);
@@ -41,12 +45,17 @@ namespace alica
 			string hasPlan(State* s, Plan* p, bool dotTerminated = true);
 			string hasPlanType(State* s, PlanType* pt, bool dotTerminated = true);
 			string hasRealisation(PlanType* pt, Plan* p, bool dotTerminated = true);
+			string hasInTransition(State* s, Transition* t, bool dotTerminated = true);
+			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
+			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
 
 			string get(Plan* p);
 			string get(EntryPoint* ep);
 			string get(State* s);
 			string get(Task* t);
 			string get(PlanType* pt);
+			string get(Transition* t);
+			string get(SyncTransition* sync);
 
 		private:
 			// maps from id to asp string for all ALICA elements

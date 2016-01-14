@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783558495"/>
+    <value xPos="53" yPos="44" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783558494"/>
+    <value yPos="3" width="565" height="399"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783558496"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783576711"/>
+    <value xPos="347" yPos="42" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783579086"/>
+    <value xPos="184" yPos="258" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783583119"/>
+    <value xPos="185" yPos="127" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783592558"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783594385"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783596070"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783597993"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783601103"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedStateMachine.pml#1452783604345"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

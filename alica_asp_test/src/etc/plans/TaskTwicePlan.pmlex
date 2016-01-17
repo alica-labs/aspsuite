@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="TaskTwicePlan.pml#1453033761284"/>
+    <value xPos="98" yPos="14" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="TaskTwicePlan.pml#1453033761283"/>
+    <value width="410" height="313"/>
+  </extensions>
+  <extensions>
+    <key href="TaskTwicePlan.pml#1453033761285"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="TaskTwicePlan.pml#1453033775911"/>
+    <value xPos="99" yPos="149" width="89" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="TaskTwicePlan.pml#1453033782170"/>
+    <value xPos="35" yPos="189"/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

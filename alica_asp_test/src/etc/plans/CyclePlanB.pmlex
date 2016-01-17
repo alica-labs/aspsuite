@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="CyclePlanB.pml#1453033643894"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CyclePlanB.pml#1453033643893"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CyclePlanB.pml#1453033643895"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CyclePlanC.pml#1453033651069"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

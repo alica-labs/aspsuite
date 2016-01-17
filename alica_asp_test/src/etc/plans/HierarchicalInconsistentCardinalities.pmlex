@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="HierarchicalInconsistentCardinalities.pml#1453033407260"/>
+    <value xPos="103" yPos="58" width="162" height="86" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="HierarchicalInconsistentCardinalities.pml#1453033407259"/>
+    <value width="497" height="282"/>
+  </extensions>
+  <extensions>
+    <key href="HierarchicalInconsistentCardinalities.pml#1453033407261"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="Min3AgentPlan.pml#1453033506291"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

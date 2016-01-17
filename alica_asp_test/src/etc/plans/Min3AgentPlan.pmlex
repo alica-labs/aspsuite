@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="Min3AgentPlan.pml#1453033506292"/>
+    <value xPos="91" yPos="43" width="124" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="Min3AgentPlan.pml#1453033506291"/>
+    <value width="393" height="224"/>
+  </extensions>
+  <extensions>
+    <key href="Min3AgentPlan.pml#1453033506293"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

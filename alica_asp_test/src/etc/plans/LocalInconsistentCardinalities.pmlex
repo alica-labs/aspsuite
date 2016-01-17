@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="LocalInconsistentCardinalities.pml#1453033347285"/>
+    <value xPos="142" yPos="83" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="LocalInconsistentCardinalities.pml#1453033347284"/>
+    <value width="531" height="344"/>
+  </extensions>
+  <extensions>
+    <key href="LocalInconsistentCardinalities.pml#1453033347286"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

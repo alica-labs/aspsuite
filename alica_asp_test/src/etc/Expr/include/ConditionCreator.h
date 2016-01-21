@@ -11,7 +11,7 @@ namespace alica
 {
     class BasicCondition;
 
-    class ConditionCreator : public alica::IConditionCreator
+    class ConditionCreator : public IConditionCreator
     {
     public:
         ConditionCreator();

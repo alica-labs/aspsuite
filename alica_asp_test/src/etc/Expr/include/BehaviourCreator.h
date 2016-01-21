@@ -10,7 +10,7 @@ namespace alica
 
     class BasicBehaviour;
 
-    class BehaviourCreator : public alica::IBehaviourCreator
+    class BehaviourCreator : public IBehaviourCreator
     {
     public:
         BehaviourCreator();

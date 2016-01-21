@@ -7,7 +7,7 @@
 namespace alica
 {
 
-    class UtilityFunctionCreator : public alica::IUtilityCreator
+    class UtilityFunctionCreator : public IUtilityCreator
     {
     public:
         virtual ~UtilityFunctionCreator();

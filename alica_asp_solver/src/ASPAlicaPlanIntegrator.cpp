@@ -48,9 +48,6 @@ namespace alica
 			// Ground the created plan base
 			this->clingo->ground( { {"PlanBase", {}}}, nullptr);
 
-			// TODO: This should only be done on queries, so its currently here for easier testing.
-			this->clingo->solve(nullptr, {});
-
 			return hasTreeProperty;
 		}
 

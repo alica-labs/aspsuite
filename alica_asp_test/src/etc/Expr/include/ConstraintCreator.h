@@ -7,7 +7,7 @@
 namespace alica
 {
 
-    class ConstraintCreator : public alica::IConstraintCreator
+    class ConstraintCreator : public IConstraintCreator
     {
     public:
         ConstraintCreator();

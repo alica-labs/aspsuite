@@ -42,12 +42,19 @@ namespace alica
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			Gringo::Value createQueryValue(std::string const &queryString);
 			bool isTrue(Gringo::Value queryValue);
+			bool isTrue(const string& queryValue);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
+			bool onModel(Gringo::Model const &m);
+			bool registerQuery(const string& query);
 
 		private:
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
+
+
+			// key=queries, value=vector<true predicates in the last model>
+			map<Gringo::Value, vector<Gringo::Value>> registeredQueries;
 
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 		};

@@ -74,9 +74,9 @@ protected:
 /**
  * Tests the validation of ALICA plans
  */
-TEST_F(AspAlicaEngine, planValidationTest)
+TEST_F(AspAlicaEngine, singleUnconnectedState)
 {
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "SingleUnconnectedState", ".", false))
 			<< "Unable to initialise the Alica Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
@@ -85,7 +85,10 @@ TEST_F(AspAlicaEngine, planValidationTest)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
+	aspSolver->registerQuery("brokenState(wildcard)");
+	aspSolver->validatePlan(plan);
+
+	EXPECT_TRUE(aspSolver->isTrue("brokenState(wildcard)")) << "Didn't find a broken State in Plan '" << plan->getName() << "'";
 
 	// stop time measuerment and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

@@ -1,3 +1,4 @@
+#program base.
 %%%%% General relations between ALICA program elements
 
 % A plan without parents is a topLevelPlan.

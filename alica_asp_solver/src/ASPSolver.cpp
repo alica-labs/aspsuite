@@ -31,12 +31,12 @@ namespace alica
 																					alicaBackGroundKnowledgeFile);
 			//cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
-			this->clingo->ground({ {"PlanBase", {}}}, nullptr);
+			this->clingo->ground( { {"", {}}}, nullptr);
 		}
 
 		ASPSolver::~ASPSolver()
 		{
-			// TODO Auto-generated destructor stub
+
 		}
 
 		void ASPSolver::load(string filename)
@@ -57,14 +57,35 @@ namespace alica
 
 		bool ASPSolver::isTrue(Gringo::Value queryValue)
 		{
-			bool isTrue = false;
-			this->clingo->solve([isTrue, queryValue](Gringo::Model const &m)
+			auto entry = this->registeredQueries.find(queryValue);
+			if (entry != this->registeredQueries.end() && entry->second.size() > 0)
 			{
-				// TODO implement isTrue function of ASPSolver
-				//isTrue = m.contains(queryValue);
 				return true;
-			},{});
-			return isTrue;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool ASPSolver::isTrue(const string& queryValue)
+		{
+			return this->isTrue(this->gringoModule.parseValue(queryValue));
+		}
+
+		bool ASPSolver::registerQuery(const string& query)
+		{
+			Gringo::Value queryValue = this->gringoModule.parseValue(query);
+			auto entry = this->registeredQueries.find(queryValue);
+			if (entry == this->registeredQueries.end())
+			{
+				this->registeredQueries.emplace(queryValue, vector<Gringo::Value>());
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		std::vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
@@ -173,11 +194,61 @@ namespace alica
 		 */
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
-			return this->planIntegrator->loadPlanTree(plan);
+			this->planIntegrator->loadPlanTree(plan);
 
-			// Ask for broken stuff related to the given plan
+			this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),{});
+		}
 
-			// Present results
+		bool ASPSolver::onModel(Gringo::Model const &m)
+		{
+			cout << "ASPSolver: onModel called!" << endl;
+
+			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+			{
+				std::cout << atom << " ";
+			}
+			std::cout << std::endl;
+
+			ClingoModel& clingoModel = (ClingoModel&)m;
+			bool foundSomething = false;
+			for (auto& queryMapPair : this->registeredQueries)
+			{
+				cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
+
+				queryMapPair.second.clear();
+				//std::vector<Gringo::AtomState const *> atomStates;
+
+				// determine the domain of the query predicate
+				auto it = clingoModel.out.domains.find(queryMapPair.first.sig());
+				if (it == clingoModel.out.domains.end())
+				{
+					cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+					continue;
+				}
+
+				for (auto& domainPair : it->second.domain)
+				{
+					if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+					{
+						cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
+						{
+							cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+							foundSomething = true;
+							queryMapPair.second.push_back(domainPair.first);
+							//atomStates.push_back(&(domainPair.second));
+						}
+						else
+						{
+							cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+
+						}
+					}
+				}
+			}
+
+			return foundSomething;
 		}
 
 	} /* namespace reasoner */

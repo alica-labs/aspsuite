@@ -31,6 +31,7 @@ namespace alica
 																					alicaBackGroundKnowledgeFile);
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
+			// can't ground this here without putting everything in an extra program part
 			//this->clingo->ground( { {"alicaBackground", {}}}, nullptr);
 		}
 

@@ -46,8 +46,8 @@ namespace alica
 			bool hasTreeProperty = this->processPlan(p);
 
 			// Ground the created plan base
+			this->clingo->ground( { {"planBase", {}}}, nullptr);
 			this->clingo->ground( { {"alicaBackground", {}}}, nullptr);
-			this->clingo->ground( { {"testTopLevel", {}}}, nullptr);
 
 			return hasTreeProperty;
 		}

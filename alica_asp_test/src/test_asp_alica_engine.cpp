@@ -86,7 +86,16 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	aspSolver->registerQuery("brokenState(wildcard)");
-	aspSolver->validatePlan(plan);
+	aspSolver->registerQuery("topLevelPlan(wildcard)");
+
+	if (aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: Model found!" << endl;
+	}
+	else
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
 
 	EXPECT_TRUE(aspSolver->isTrue("brokenState(wildcard)")) << "Didn't find a broken State in Plan '" << plan->getName() << "'";
 

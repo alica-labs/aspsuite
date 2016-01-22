@@ -16,7 +16,7 @@ namespace alica
 		ASPSolver::ASPSolver(AlicaEngine* ae) :
 				IConstraintSolver(ae)
 		{
-			std::vector<char const *> args {"clingo", "-e", "brave", nullptr};
+			std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
 
 			this->clingo = make_shared<ClingoLib>(gringoModule, args.size() - 2, args.data());
 
@@ -29,9 +29,9 @@ namespace alica
 			string alicaBackGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
 			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
 																					alicaBackGroundKnowledgeFile);
-			//cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
+			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
-			this->clingo->ground( { {"", {}}}, nullptr);
+			//this->clingo->ground( { {"alicaBackground", {}}}, nullptr);
 		}
 
 		ASPSolver::~ASPSolver()
@@ -196,7 +196,15 @@ namespace alica
 		{
 			this->planIntegrator->loadPlanTree(plan);
 
-			this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),{});
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),{});
+			if (result == Gringo::SolveResult::SAT)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		bool ASPSolver::onModel(Gringo::Model const &m)
@@ -228,6 +236,8 @@ namespace alica
 
 				for (auto& domainPair : it->second.domain)
 				{
+					cout << "ASPSolver: Inside domain-loop!" << endl;
+
 					if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 					{
 						cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;

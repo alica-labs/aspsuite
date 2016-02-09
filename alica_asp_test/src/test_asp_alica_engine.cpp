@@ -97,6 +97,7 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
+	EXPECT_TRUE(aspSolver->isTrue("topLevelPlan(wildcard)")) << "Didn't find a top level plan in plan tree of '" << plan->getName() << "'";
 	EXPECT_TRUE(aspSolver->isTrue("brokenState(wildcard)")) << "Didn't find a broken State in Plan '" << plan->getName() << "'";
 
 	// stop time measuerment and report

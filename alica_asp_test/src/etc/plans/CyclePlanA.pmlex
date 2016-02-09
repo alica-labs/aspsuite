@@ -2,7 +2,7 @@
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
     <key href="CyclePlanA.pml#1453033636580"/>
-    <value/>
+    <value collapsed="false"/>
   </extensions>
   <extensions>
     <key href="CyclePlanA.pml#1453033636578"/>

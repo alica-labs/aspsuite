@@ -14,15 +14,16 @@
 #include <engine/AlicaEngine.h>
 #include <engine/PlanBase.h>
 #include <engine/model/Plan.h>
+#include <engine/model/State.h>
 #include <engine/constraintmodul/ConstraintQuery.h>
 #include <engine/IPlanParser.h>
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
 
-
 class AspAlicaEngine : public ::testing::Test
 {
+
 protected:
 	supplementary::SystemConfig* sc;
 	alica::AlicaEngine* ae;
@@ -54,8 +55,11 @@ protected:
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
+		//std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+
 		// "1" stands for the ASPSolver in this test suite only!
-		ae->addSolver(1, new alica::reasoner::ASPSolver(ae));
+		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 	}
 
 	virtual void TearDown()
@@ -80,49 +84,220 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 			<< "Unable to initialise the Alica Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	aspSolver->registerQuery("brokenState(wildcard)");
-	aspSolver->registerQuery("topLevelPlan(wildcard)");
+	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783421980];
+	string queryString = aspSolver->gen.brokenState(brokenState, false);
+	aspSolver->registerQuery(queryString);
 
-	if (aspSolver->validatePlan(plan))
-	{
-		cout << "ASPAlicaTest: Model found!" << endl;
-	}
-	else
+	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue("topLevelPlan(wildcard)")) << "Didn't find a top level plan in plan tree of '" << plan->getName() << "'";
-	EXPECT_TRUE(aspSolver->isTrue("brokenState(wildcard)")) << "Didn't find a broken State in Plan '" << plan->getName() << "'";
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The state '" << brokenState->getName() << "' should be broken.";
 
-	// stop time measuerment and report
+	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
-/**
- * Tests the validation of ALICA plans
- */
-//TEST_F(AspAlicaEngine, getSolutionTest)
-//{
-//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "MasterPlan", ".", false))
-//			<< "Unable to initialise the Alica Engine!";
-//
-//	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-//	alica::Plan* plan =  ae->getPlanBase()->getMasterPlan();
-//	alica::ConstraintQuery query(ae);
-//
-//	// TODO
-////	if (aspSolver->getSolution(,,))
-////	{
-////
-////	}
-//
-//	//EXPECT_TRUE(aspSolver->validatePlan(plan)) << "MasterPlan '" << plan->getName() << "' is invalid!";
-//}
+TEST_F(AspAlicaEngine, localInconsistentCardinalities)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "LocalInconsistentCardinalities", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::EntryPoint* brokenEntryPoint = (alica::EntryPoint*)(*ae->getPlanParser()->getParsedElements())[1453033347286];
+	string queryString = aspSolver->gen.brokenEntryPoint(brokenEntryPoint, false);
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The EntryPoint '" << brokenEntryPoint->getId() << "' should be broken";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, taskTwiceInPlan)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "TaskTwicePlan", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	string queryString = aspSolver->gen.brokenPlanTaskPair(plan,
+															(alica::Task*)alica::reasoner::ASPSolver::WILDCARD_POINTER,
+															false);
+
+	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
+			<< "'.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, unconnectedStateMachine)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "UnconnectedStateMachine", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::State* brokenState1 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783558495];
+	string queryString1 = aspSolver->gen.brokenState(brokenState1, false);
+	aspSolver->registerQuery(queryString1);
+
+	alica::State* brokenState2 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783576711];
+	string queryString2 = aspSolver->gen.brokenState(brokenState2, false);
+	aspSolver->registerQuery(queryString2);
+
+	alica::State* brokenState3 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783579086];
+	string queryString3 = aspSolver->gen.brokenState(brokenState3, false);
+	aspSolver->registerQuery(queryString3);
+
+	alica::State* brokenState4 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783583119];
+	string queryString4 = aspSolver->gen.brokenState(brokenState4, false);
+	aspSolver->registerQuery(queryString4);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The state '" << brokenState1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The state '" << brokenState2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The state '" << brokenState3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString4)) << "The state '" << brokenState4->getName() << "' should be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "HierarchicalInconsistentCardinalities", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033506291];
+	string queryString = aspSolver->gen.brokenPlan(brokenPlan, false);
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << brokenPlan->getName() << "' should be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, cycleInPlan)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "CyclePlanA", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
+	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan1, false);
+	aspSolver->registerQuery(queryString1);
+
+	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
+	string queryString2 = aspSolver->gen.brokenPlan(brokenPlan2, false);
+	aspSolver->registerQuery(queryString2);
+
+	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
+	string queryString3 = aspSolver->gen.brokenPlan(brokenPlan3, false);
+	aspSolver->registerQuery(queryString3);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, unconnectedSynchronisations)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "UnconnectedSyncRoleset", "UnconnectedSynchronisations", ".", false))
+			<< "Unable to initialise the Alica Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::SyncTransition* brokenSynchronisation1 = (alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
+	string queryString1 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation1, false);
+	aspSolver->registerQuery(queryString1);
+
+	alica::SyncTransition* brokenSynchronisation2 = (alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
+	string queryString2 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation2, false);
+	aspSolver->registerQuery(queryString2);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The synchronisation '" << brokenSynchronisation1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The synchronisation '" << brokenSynchronisation2->getName() << "' should be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
 

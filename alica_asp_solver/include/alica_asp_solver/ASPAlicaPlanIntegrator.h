@@ -11,8 +11,6 @@
 #include <memory>
 #include <clingo/clingocontrol.hh>
 
-#include "alica_asp_solver/ASPGenerator.h"
-
 using namespace std;
 
 namespace alica
@@ -22,6 +20,8 @@ namespace alica
 	namespace reasoner
 	{
 
+		class ASPGenerator;
+
 		//! Integrates ALICA program into ASP.
 		/**
 		 * Helps to integrate all parts of an ALCIA program into the ASP solver.
@@ -29,15 +29,15 @@ namespace alica
 		class ASPAlicaPlanIntegrator
 		{
 		public:
-			ASPAlicaPlanIntegrator(shared_ptr<ClingoLib> clingo);
+			ASPAlicaPlanIntegrator(shared_ptr<ClingoLib> clingo, ASPGenerator* gen);
 			virtual ~ASPAlicaPlanIntegrator();
 			bool loadPlanTree(Plan* p);
 
 		private:
 			bool processPlan(Plan* p);
-
+			ASPGenerator* gen;
 			shared_ptr<ClingoLib> clingo;
-			alica::reasoner::ASPGenerator gen;
+
 			vector<long> processedPlanIds;
 		};
 

@@ -13,14 +13,15 @@ namespace alica
 	namespace reasoner
 	{
 
-		ASPSolver::ASPSolver(AlicaEngine* ae) :
-				IConstraintSolver(ae)
-		{
-			std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+		const void* const ASPSolver::WILDCARD_POINTER = new int(0);
+		const string ASPSolver::WILDCARD_STRING = "wildcard";
 
+		ASPSolver::ASPSolver(AlicaEngine* ae, std::vector<char const*> args) :
+				IConstraintSolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
+		{
 			this->clingo = make_shared<ClingoLib>(gringoModule, args.size() - 2, args.data());
 
-			this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(clingo);
+			this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(clingo, &this->gen);
 
 			this->disableWarnings(true);
 
@@ -117,11 +118,11 @@ namespace alica
 						}
 					}
 
-					for (auto &gringoValue : gringoValues)
-					{
-						std::cout << gringoValue << " ";
-					}
-					std::cout << std::endl;
+//					for (auto &gringoValue : gringoValues)
+//					{
+//						std::cout << gringoValue << " ";
+//					}
+//					std::cout << std::endl;
 
 					return true;
 				},
@@ -145,7 +146,7 @@ namespace alica
 			{
 				Gringo::Value arg = value1->args()[i];
 
-				if (arg.type() == Gringo::Value::Type::ID && arg.name() == "wildcard")
+				if (arg.type() == Gringo::Value::Type::ID && arg.name() == ASPSolver::WILDCARD_STRING)
 					continue;
 
 				if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
@@ -210,19 +211,20 @@ namespace alica
 
 		bool ASPSolver::onModel(Gringo::Model const &m)
 		{
-			cout << "ASPSolver: onModel called!" << endl;
-
+#ifdef ASPSolver_DEBUG
+			cout << "ASPSolver: Found the following model:" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
 				std::cout << atom << " ";
 			}
 			std::cout << std::endl;
+#endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)
 			{
-				cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
+			//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				queryMapPair.second.clear();
 				//std::vector<Gringo::AtomState const *> atomStates;
@@ -237,22 +239,22 @@ namespace alica
 
 				for (auto& domainPair : it->second.domain)
 				{
-					cout << "ASPSolver: Inside domain-loop!" << endl;
+				//	cout << "ASPSolver: Inside domain-loop!" << endl;
 
 					if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 					{
-						cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+			//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
 
 						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
 						{
-							cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+				//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 							foundSomething = true;
 							queryMapPair.second.push_back(domainPair.first);
 							//atomStates.push_back(&(domainPair.second));
 						}
 						else
 						{
-							cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+			//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
 
 						}
 					}

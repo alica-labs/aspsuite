@@ -11,11 +11,20 @@ namespace alica
 {
 	namespace reasoner
 	{
+		ASPGenerator::ASPGenerator(const void* wildcard_pointer, string wildcard_string)
+			: wildcard_pointer(wildcard_pointer), wildcard_string(wildcard_string)
+		{}
+
 		// UNARY Predicates
 
 		string ASPGenerator::plan(Plan* p, bool dotTerminated)
 		{
 			return "plan(" + get(p) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::topLevelPlan(Plan* p, bool dotTerminated)
+		{
+			return "topLevelPlan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::entryPoint(EntryPoint* ep, bool dotTerminated)
@@ -58,9 +67,29 @@ namespace alica
 			return "transition(" + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::syncTransition(SyncTransition* sync, bool dotTerminated)
+		string ASPGenerator::synchronisation(SyncTransition* sync, bool dotTerminated)
 		{
-			return "transition(" + get(sync) + (dotTerminated ? ")." : ")");
+			return "synchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
+		{
+			return "brokenPlan(" + get(p) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::brokenState(State* s, bool dotTerminated)
+		{
+			return "brokenState(" + get(s) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::brokenEntryPoint(EntryPoint* ep, bool dotTerminated)
+		{
+			return "brokenEntryPoint(" + get(ep) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::brokenSynchronisation(SyncTransition* sync, bool dotTerminated)
+		{
+			return "brokenSynchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
 		// BINARY Predicates
@@ -120,6 +149,11 @@ namespace alica
 			return "hasSynchedTransition(" + get(sync) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::brokenPlanTaskPair(Plan* p, Task* t, bool dotTerminated)
+		{
+			return "brokenPlanTaskPair(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
+		}
+
 
 		// TERNARY Predicates
 
@@ -133,6 +167,9 @@ namespace alica
 
 		string ASPGenerator::get(Plan* p)
 		{
+			if (p == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(p->getId());
 			if (iter == this->elements.end())
 			{
@@ -143,6 +180,9 @@ namespace alica
 
 		string ASPGenerator::get(EntryPoint* ep)
 		{
+			if (ep == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(ep->getId());
 			if (iter == this->elements.end())
 			{
@@ -153,6 +193,9 @@ namespace alica
 
 		string ASPGenerator::get(State* s)
 		{
+			if (s == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(s->getId());
 			if (iter == this->elements.end())
 			{
@@ -163,6 +206,9 @@ namespace alica
 
 		string ASPGenerator::get(Task* t)
 		{
+			if (t == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(t->getId());
 			if (iter == this->elements.end())
 			{
@@ -173,6 +219,9 @@ namespace alica
 
 		string ASPGenerator::get(PlanType* pt)
 		{
+			if (pt == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(pt->getId());
 			if (iter == this->elements.end())
 			{
@@ -183,6 +232,8 @@ namespace alica
 
 		string ASPGenerator::get(Transition* t)
 		{
+			if (t == this->wildcard_pointer)
+				return this->wildcard_string;
 			auto&& iter = this->elements.find(t->getId());
 			if (iter == this->elements.end())
 			{
@@ -193,10 +244,13 @@ namespace alica
 
 		string ASPGenerator::get(SyncTransition* sync)
 		{
+			if (sync == this->wildcard_pointer)
+				return this->wildcard_string;
+
 			auto&& iter = this->elements.find(sync->getId());
 			if (iter == this->elements.end())
 			{
-				return this->elements[sync->getId()] = "t" + std::to_string(sync->getId());
+				return this->elements[sync->getId()] = "sync" + std::to_string(sync->getId());
 			}
 			return iter->second;
 		}

@@ -9,6 +9,7 @@
 #define SRC_ASPSOLVER_H_
 
 #include "ASPAlicaPlanIntegrator.h"
+#include "ASPGenerator.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <SystemConfig.h>
@@ -16,6 +17,7 @@
 #include <memory>
 #include <vector>
 
+#define ASPSolver_DEBUG
 
 namespace alica
 {
@@ -28,7 +30,10 @@ namespace alica
 		class ASPSolver : public alica::IConstraintSolver
 		{
 		public:
-			ASPSolver(AlicaEngine* ae);
+			static const void* const WILDCARD_POINTER;
+			static const string WILDCARD_STRING;
+
+			ASPSolver(AlicaEngine* ae, std::vector<char const*> args);
 			virtual ~ASPSolver();
 
 			bool existsSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls);
@@ -46,6 +51,7 @@ namespace alica
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool onModel(Gringo::Model const &m);
 			bool registerQuery(const string& query);
+			alica::reasoner::ASPGenerator gen;
 
 		private:
 			shared_ptr<ClingoLib> clingo;

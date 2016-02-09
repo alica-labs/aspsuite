@@ -25,7 +25,10 @@ namespace alica
 		class ASPGenerator
 		{
 		public:
+			ASPGenerator(const void* wildcard_pointer, string wildcard_string);
+
 			string plan(Plan* p, bool dotTerminated = true);
+			string topLevelPlan(Plan* p, bool dotTerminated = true);
 			string entryPoint(EntryPoint* ep, bool dotTerminated = true);
 			string state(State* s, bool dotTerminated = true);
 			string task(Task* t, bool dotTerminated = true);
@@ -34,7 +37,11 @@ namespace alica
 			string planType(PlanType* s, bool dotTerminated = true);
 			string successRequired(EntryPoint* ep, bool dotTerminated = true);
 			string transition(Transition* t, bool dotTerminated = true);
-			string syncTransition(SyncTransition* sync, bool dotTerminated = true);
+			string synchronisation(SyncTransition* sync, bool dotTerminated = true);
+			string brokenPlan(Plan* s, bool dotTerminated = true);
+			string brokenState(State* s, bool dotTerminated = true);
+			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
+			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);
 
 			string hasTask(Plan* p, Task* t, bool dotTerminated = true);
 			string hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated = true);
@@ -48,6 +55,8 @@ namespace alica
 			string hasInTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
+			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
+
 
 			string get(Plan* p);
 			string get(EntryPoint* ep);
@@ -60,8 +69,12 @@ namespace alica
 		private:
 			// maps from id to asp string for all ALICA elements
 			std::map<long, string> elements;
+
+			const void* wildcard_pointer;
+			string wildcard_string;
 		};
 	}
 }
 #endif /* SRC_ASPGENERATOR_H_ */
+
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035766973"/>
+    <value xPos="65" yPos="48" width="107" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035766972"/>
+    <value width="617" height="459"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035766974"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035790843"/>
+    <value xPos="318" yPos="49" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035803877"/>
+    <value xPos="129" yPos="198" width="219" height="41"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035816681"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035838383"/>
+    <value xPos="73" yPos="295" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035846736"/>
+    <value xPos="45" yPos="246"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035874846"/>
+    <value xPos="343" yPos="298" width="95" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455035906949"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="UnconnectedSynchronisations.pml#1455037378756"/>
+    <value xPos="439" yPos="207"/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

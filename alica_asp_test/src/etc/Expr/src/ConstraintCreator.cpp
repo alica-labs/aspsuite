@@ -17,6 +17,8 @@
 
 #include  "Plans/constraints/HierarchicalInconsistentCardinalities1453033407259Constraints.h"
 
+#include  "Plans/constraints/ReusePlanWithoutCycle1455093185652Constraints.h"
+
 #include  "Plans/constraints/Min3AgentPlan1453033506291Constraints.h"
 
 #include  "Plans/constraints/UnconnectedSynchronisations1455035766972Constraints.h"

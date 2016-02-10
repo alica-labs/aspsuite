@@ -31,10 +31,10 @@ namespace alica
 		public:
 			ASPAlicaPlanIntegrator(shared_ptr<ClingoLib> clingo, ASPGenerator* gen);
 			virtual ~ASPAlicaPlanIntegrator();
-			bool loadPlanTree(Plan* p);
+			void loadPlanTree(Plan* p);
 
 		private:
-			bool processPlan(Plan* p);
+			void processPlan(Plan* p);
 			ASPGenerator* gen;
 			shared_ptr<ClingoLib> clingo;
 

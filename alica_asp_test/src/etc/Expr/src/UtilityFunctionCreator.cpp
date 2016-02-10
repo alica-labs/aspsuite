@@ -17,6 +17,8 @@
 
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
+#include  "Plans/ReusePlanWithoutCycle1455093185652.h"
+
 #include  "Plans/Min3AgentPlan1453033506291.h"
 
 #include  "Plans/UnconnectedSynchronisations1455035766972.h"
@@ -69,6 +71,10 @@ namespace alica
 
             case 1453033407259:
                 return make_shared<UtilityFunction1453033407259>();
+                break;
+
+            case 1455093185652:
+                return make_shared<UtilityFunction1455093185652>();
                 break;
 
             case 1453033506291:

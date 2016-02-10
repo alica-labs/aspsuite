@@ -81,7 +81,7 @@ protected:
 TEST_F(AspAlicaEngine, singleUnconnectedState)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "SingleUnconnectedState", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -108,7 +108,7 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "LocalInconsistentCardinalities", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -135,7 +135,7 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 TEST_F(AspAlicaEngine, taskTwiceInPlan)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "TaskTwicePlan", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -166,7 +166,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 TEST_F(AspAlicaEngine, unconnectedStateMachine)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "UnconnectedStateMachine", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -208,7 +208,7 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "HierarchicalInconsistentCardinalities", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -235,7 +235,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 TEST_F(AspAlicaEngine, cycleInPlan)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "CyclePlanA", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -272,7 +272,7 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "UnconnectedSyncRoleset", "UnconnectedSynchronisations", ".", false))
-			<< "Unable to initialise the Alica Engine!";
+			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
@@ -295,6 +295,37 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 
 	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The synchronisation '" << brokenSynchronisation1->getName() << "' should be broken.";
 	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The synchronisation '" << brokenSynchronisation2->getName() << "' should be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "ReusePlanWithoutCycle", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1455093185652];
+	string queryString = aspSolver->gen.brokenPlan(brokenPlan, false);
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_FALSE(aspSolver->isTrue(queryString)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

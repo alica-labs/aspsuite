@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="rolesDefinition.rdefset#1441716929654"/>
+    <value collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.graph#//@nodes.0"/>
+    <value xPos="559" yPos="31" width="15" height="15"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.graph#//@nodes.0"/>
+    <value xPos="559" yPos="31" width="15" height="15" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.graph#//@nodes.1"/>
+    <value xPos="484" yPos="115" width="143" height="68" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.graph#//@nodes.2"/>
+    <value xPos="559" yPos="199" width="143" height="68" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.graph#//@nodes.3"/>
+    <value xPos="637" yPos="115" width="143" height="68" collapsed="false"/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

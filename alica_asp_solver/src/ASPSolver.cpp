@@ -198,7 +198,7 @@ namespace alica
 		{
 			this->planIntegrator->loadPlanTree(plan);
 
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),{});
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -224,7 +224,7 @@ namespace alica
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)
 			{
-			//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
+				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				queryMapPair.second.clear();
 				//std::vector<Gringo::AtomState const *> atomStates;
@@ -239,22 +239,23 @@ namespace alica
 
 				for (auto& domainPair : it->second.domain)
 				{
-				//	cout << "ASPSolver: Inside domain-loop!" << endl;
+					//	cout << "ASPSolver: Inside domain-loop!" << endl;
 
-					if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+					if (&(domainPair.second)
+							&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 					{
-			//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+						//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
 
 						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
 						{
-				//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+							//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 							foundSomething = true;
 							queryMapPair.second.push_back(domainPair.first);
 							//atomStates.push_back(&(domainPair.second));
 						}
 						else
 						{
-			//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+							//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
 
 						}
 					}
@@ -264,5 +265,97 @@ namespace alica
 			return foundSomething;
 		}
 
+		const long long ASPSolver::getSolvingTime()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			// time in seconds
+			return claspFacade->summary().solveTime * 1000;
+		}
+
+		const long long ASPSolver::getSatTime()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			// time in seconds
+			return claspFacade->summary().satTime * 1000;
+		}
+
+		const long long ASPSolver::getUnsatTime()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			// time in seconds
+			return claspFacade->summary().unsatTime * 1000;
+		}
+
+		const long ASPSolver::getModelCount()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			return claspFacade->summary().enumerated();
+		}
+
+		const long ASPSolver::getAtomCount()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			return claspFacade->summary().lpStats()->atoms;
+		}
+
+		const long ASPSolver::getBodiesCount()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			return claspFacade->summary().lpStats()->bodies;
+		}
+
+		const long ASPSolver::getAuxAtomsCount()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return -1;
+
+			return claspFacade->summary().lpStats()->auxAtoms;
+		}
+
+		void ASPSolver::printStats()
+		{
+			auto claspFacade = this->clingo->clasp;
+
+			if (claspFacade == nullptr)
+				return;
+
+			stringstream ss;
+			ss << "Solve Statistics:" << endl;
+			ss << "TOTAL Time: " << claspFacade->summary().totalTime<< endl;
+			ss << "CPU Time: " << claspFacade->summary().cpuTime<< endl;
+			ss << "SAT Time: " << (claspFacade->summary().satTime*1000.0) << endl;
+			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime*1000.0)<< endl;
+			ss << "SOLVE Time: " << (claspFacade->summary().solveTime*1000.0)<< endl;
+
+			cout << ss.str() << flush;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
+

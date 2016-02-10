@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="ReusePlanWithoutCycle.pml#1455093185653"/>
+    <value xPos="103" yPos="49" width="81" height="67" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.pml#1455093185652"/>
+    <value width="648" height="340"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.pml#1455093185654"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.pml#1455093214694"/>
+    <value xPos="117" yPos="175" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReusePlanWithoutCycle.pml#1455093221781"/>
+    <value xPos="249" yPos="227"/>
+  </extensions>
+  <extensions>
+    <key href="Min3AgentPlan.pml#1453033506291"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

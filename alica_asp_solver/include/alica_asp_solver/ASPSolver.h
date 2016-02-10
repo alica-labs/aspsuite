@@ -53,6 +53,17 @@ namespace alica
 			bool registerQuery(const string& query);
 			alica::reasoner::ASPGenerator gen;
 
+
+			const long long getSolvingTime();
+			const long long getSatTime();
+			const long long getUnsatTime();
+			const long getModelCount();
+			const long getAtomCount();
+			const long getBodiesCount();
+			const long getAuxAtomsCount();
+
+			void printStats();
+
 		private:
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule gringoModule;

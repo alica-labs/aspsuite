@@ -35,7 +35,7 @@ namespace alica
 		{
 		}
 
-		bool ASPAlicaPlanIntegrator::loadPlanTree(Plan* p)
+		void ASPAlicaPlanIntegrator::loadPlanTree(Plan* p)
 		{
 			this->processedPlanIds.clear();
 
@@ -43,13 +43,11 @@ namespace alica
 			this->clingo->add("planBase", {}, gen->topLevelPlan(p));
 
 			// Start recursive integration of plan tree
-			bool hasTreeProperty = this->processPlan(p);
+			this->processPlan(p);
 
 			// Ground the created plan base
 			this->clingo->ground( { {"planBase", {}}}, nullptr);
 			this->clingo->ground( { {"alicaBackground", {}}}, nullptr);
-
-			return hasTreeProperty;
 		}
 
 		/**
@@ -57,21 +55,18 @@ namespace alica
 		 * @param Plan p.
 		 * @return Returns true, if the processed plan is a tree.
 		 */
-		bool ASPAlicaPlanIntegrator::processPlan(Plan* p)
+		void ASPAlicaPlanIntegrator::processPlan(Plan* p)
 		{
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
 			{// already processed, so there is a cycle
 				cout << "PlanIntegrator: Cycle detected!" << endl;
-				return false;
+				return;
 			}
 			else
 			{
 				processedPlanIds.push_back(currentPlanId);
 			}
-
-			// flag to signal, if the plan tree really is a tree
-			bool hasTreeProperty = true;
 
 			cout << "ASPAlicaPlanIntegrator: processing plan " << p->getName() << " (ID: " << p->getId() << ")" << endl;
 
@@ -136,13 +131,7 @@ namespace alica
 						{
 							this->clingo->add("planBase", {}, gen->hasPlan(state, childPlan));
 
-							if (!this->processPlan(childPlan))
-							{
-								// TODO: This way to determine the tree property is not correct! Plans can be arbitrarily reused.
-								cout << "ASPAlicaPlanIntegrator: treeProperty violated by plan '"
-										<< childPlan->getName() << "'" << endl;
-								hasTreeProperty = false;
-							}
+							this->processPlan(childPlan);
 						}
 						else if (alica::PlanType* childPlanType = dynamic_cast<alica::PlanType*>(abstractChildPlan))
 						{
@@ -152,13 +141,7 @@ namespace alica
 							for (auto& childPlan : childPlanType->getPlans())
 							{
 								this->clingo->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan));
-								if (!this->processPlan(childPlan))
-								{
-									// TODO: This way to determine the tree property is not correct! Plans can be arbitrarily reused.
-									cout << "ASPAlicaPlanIntegrator: treeProperty violated by plan '"
-											<< childPlan->getName() << "'" << endl;
-									hasTreeProperty = false;
-								}
+								this->processPlan(childPlan);
 							}
 						}
 						else if (alica::BehaviourConfiguration* childBehaviourConf = dynamic_cast<alica::BehaviourConfiguration*>(abstractChildPlan))
@@ -197,8 +180,6 @@ namespace alica
 				}
 				// TODO: maybe it is nice to have the timeouts of a sync transition
 			}
-
-			return hasTreeProperty;
 		}
 
 	} /* namespace reasoner */

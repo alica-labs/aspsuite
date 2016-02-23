@@ -28,7 +28,7 @@ namespace alica
 			ASPGenerator(const void* wildcard_pointer, string wildcard_string);
 
 			string plan(Plan* p, bool dotTerminated = true);
-			string topLevelPlan(Plan* p, bool dotTerminated = true);
+			string rootPlan(Plan* p, bool dotTerminated = true);
 			string entryPoint(EntryPoint* ep, bool dotTerminated = true);
 			string state(State* s, bool dotTerminated = true);
 			string task(Task* t, bool dotTerminated = true);

@@ -2,25 +2,16 @@
 
 %%%%% General relations between ALICA program elements
 
-% A plan without parents is a topLevelPlan.
-topLevelPlan(P) :- plan(P), not hasParentPlan(P, _).
+% A plan without parents is a rootPlan.
+rootPlan(P) :- plan(P), not hasParentPlan(P, X) : plan(X), X!=P.
 
-% A top-level plan is a plan, too.
-plan(P) :- topLevelPlan(P).
-
-% The top level plan has no parent plans.
-brokenPlan(P) :- topLevelPlan(P), hasParentPlan(P,_). 
-
-% There is only one top-level plan.
-brokenPlan(P1) :- topLevelPlan(P1), topLevelPlan(P2), P1 != P2.
+% There is at most one root plan.
+brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.
 
 % Transitivity of hasParentPlan
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), planType(PT), hasState(Parent, S), hasPlanType(S, PT), hasRealisation(PT, Child).
-hasParentPlan(Child, Parent) :- hasParentPlan(Child, MidPlan), hasParentPlan(MidPlan, Parent).
-
-% hasChildPlan is inverse to hasParentPlan
-%hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasChildPlan(Parent, Child).
+%hasParentPlan(Child, Parent) :- hasParentPlan(Child, MidPlan), hasParentPlan(MidPlan, Parent), Child!=Parent.
 
 % Success and Failure States are subsets of Terminal States, which are subsets of States.
 terminalState(S) :- successState(S).
@@ -80,10 +71,12 @@ brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCar
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The top-level plan is transitively connected to all other plans.
-%brokenPlan(P) :- plan(P), not topLevelPlan(P), HasTopParentCnt = #count{TOP: hasParentPlan(P, TOP), topLevelPlan(TOP)}, HasTopParentCnt != 1.
-brokenPlan(P) :- plan(P), topLevelPlan(TOP), not hasParentPlan(P, TOP), P != TOP.
-brokenPlan(P) :- plan(P), topLevelPlan(TOP1), hasParentPlan(P, TOP1), topLevelPlan(TOP2), hasParentPlan(P, TOP2), TOP1 != TOP2.
+% The root plan is transitively connected to all other plans.
+%brokenPlan(P) :- plan(P), rootPlan(TOP), not hasParentPlan(P, TOP), P != TOP.
+%brokenPlan(P) :- plan(P), rootPlan(TOP1), hasParentPlan(P, TOP1), rootPlan(TOP2), hasParentPlan(P, TOP2), TOP1 != TOP2.
+
+cycleFree(P) :- plan(P), cycleFree(Parent):hasParentPlan(P,Parent).
+cyclicPlan(P) :- plan(P), not cycleFree(P).
 
 % Every plan has at most one parent.
 brokenPlan(P) :- plan(P), ParentPlanCnt = #count{Parent : hasParentPlan(P,Parent), plan(Parent)}, ParentPlanCnt > 1.

@@ -39,9 +39,6 @@ namespace alica
 		{
 			this->processedPlanIds.clear();
 
-			// Add master plan as topLevelPlan
-			this->clingo->add("planBase", {}, gen->topLevelPlan(p));
-
 			// Start recursive integration of plan tree
 			this->processPlan(p);
 

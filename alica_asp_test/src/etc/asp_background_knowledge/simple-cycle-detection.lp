@@ -6,5 +6,5 @@
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- hasParentPlan(Child, MidPlan), hasParentPlan(MidPlan, Parent), Child!=MidPlan, MidPlan!=Parent.
 
-sorted(P) :- plan(P), sorted(Pi):hasParentPlan(P,Pi).
-brokenPlan(P) :- plan(P), not sorted(P).
+cycleFree(P) :- plan(P), cycleFree(Parent):hasParentPlan(P,Parent).
+cyclicPlan(P) :- plan(P), not cycleFree(P).

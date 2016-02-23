@@ -22,11 +22,6 @@ namespace alica
 			return "plan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::topLevelPlan(Plan* p, bool dotTerminated)
-		{
-			return "topLevelPlan(" + get(p) + (dotTerminated ? ")." : ")");
-		}
-
 		string ASPGenerator::entryPoint(EntryPoint* ep, bool dotTerminated)
 		{
 			return "entryPoint(" + get(ep) + (dotTerminated ? ")." : ")");

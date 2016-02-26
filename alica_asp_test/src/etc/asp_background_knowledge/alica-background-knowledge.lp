@@ -2,13 +2,10 @@
 
 %%%%% General relations between ALICA program elements
 
-% A plan without parents is a rootPlan.
+% A plan without parents is a root plan.
 rootPlan(P) :- plan(P), not hasParentPlan(P, X) : plan(X), X!=P.
 
-% There is at most one root plan.
-brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.
-
-% Transitivity of hasParentPlan
+%Transitivity of hasParentPlan
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), planType(PT), hasState(Parent, S), hasPlanType(S, PT), hasRealisation(PT, Child).
 %hasParentPlan(Child, Parent) :- hasParentPlan(Child, MidPlan), hasParentPlan(MidPlan, Parent), Child!=Parent.
@@ -66,31 +63,33 @@ brokenTerminalState(S) :- terminalState(S), PostConditionCnt = #count{PostC : ha
 brokenPlanTaskPair(P, T) :- plan(P), task(T), hasTask(P,T), EntryPointCnt = #count{E : hasEntryPoint(P,T,E), entryPoint(E)}, EntryPointCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), InitialStateCnt = #count{S : hasInitialState(E,S)}, InitialStateCnt > 1.
 
+%% CARDINALITIES
+
 % All plan-task pairs have a valid cardinality interval associated. 
 brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCardinality(E,Min)}, MinCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The root plan is transitively connected to all other plans.
-%brokenPlan(P) :- plan(P), rootPlan(TOP), not hasParentPlan(P, TOP), P != TOP.
-%brokenPlan(P) :- plan(P), rootPlan(TOP1), hasParentPlan(P, TOP1), rootPlan(TOP2), hasParentPlan(P, TOP2), TOP1 != TOP2.
+% The sum of the minimum cardinalities of a child plan is large than the maximum cardinality of the parents entry point		 
+brokenPlan(ChildPlan) :- plan(ChildPlan), SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)}, plan(ParentPlan), entryPoint(ParentEntrypoint), hasMaxCardinality(ParentEntrypoint, ParentMax), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), state(ParentState), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), SumOfChildPlanMinCard > ParentMax. 						 
 
+%% CYCLES
+
+% Cycles are not allowed in the plan hierarchy
 cycleFree(P) :- plan(P), cycleFree(Parent):hasParentPlan(P,Parent).
 cyclicPlan(P) :- plan(P), not cycleFree(P).
 
-% Every plan has at most one parent.
-brokenPlan(P) :- plan(P), ParentPlanCnt = #count{Parent : hasParentPlan(P,Parent), plan(Parent)}, ParentPlanCnt > 1.
+% There is at most one root plan.
+brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.
+
 
 % The transitive closure of the parent-child relationship is asymmetric.
-brokenPlan(P) :- plan(P), hasParentPlan(P,P).
+%brokenPlan(P) :- plan(P), hasParentPlan(P,P).
 
 % Each state is only reachable from exactly one entry point.
 brokenState(S) :- state(S), ReachableEntryPointCnt = #count{EP: isReachableFrom(S,EP), entryPoint(EP)}, ReachableEntryPointCnt != 1.
+						 
 
-% The cardinalities does not fit over hierarchies
-brokenPlan(ChildPlan) :- plan(ChildPlan), entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint),
-						 plan(ParentPlan), entryPoint(ParentEntrypoint), hasMaxCardinality(ParentEntrypoint, ParentMax), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), 
-						 state(ParentState), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), ChildMin > ParentMax. 
 
 %%%%% Plan base axioms
 
@@ -100,8 +99,8 @@ brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : isIn(A,S), sta
 % An agent can only execute one plan per plantype
 brokenPlanBase(A) :- agent(A), planType(PT), InPlanTypePlanCnt = #count{P : hasRealisation(PT,P), plan(P), state(S), hasState(P,S), isIn(A,S)}, InPlanTypePlanCnt > 1.  
 
-% The state occupied by an agent must be isReachableFrom by its corresponding plan-task pair
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasEntryPoint(P,T,E), isIn(A,S), hasTask(P,T), hasState(P,S), not isReachableFrom(S,E). % TODO Nochmal ohne not probieren?
+% The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
+brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasEntryPoint(P,T,E), isIn(A,S), hasTask(P,T), hasState(P,S), not isReachableFrom(S,E).
 
 %%%%% Locality of In-Predicate
 

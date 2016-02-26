@@ -56,8 +56,7 @@ namespace alica
 		{
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
-			{// already processed, so there is a cycle
-				cout << "PlanIntegrator: Cycle detected!" << endl;
+			{// already processed
 				return;
 			}
 			else

@@ -72,6 +72,12 @@ namespace alica
 			return "brokenPlan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::cyclicPlan(Plan* p, bool dotTerminated)
+		{
+			return "cyclicPlan(" + get(p) + (dotTerminated ? ")." : ")");
+		}
+
+
 		string ASPGenerator::brokenState(State* s, bool dotTerminated)
 		{
 			return "brokenState(" + get(s) + (dotTerminated ? ")." : ")");

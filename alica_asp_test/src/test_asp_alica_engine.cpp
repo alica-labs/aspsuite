@@ -207,7 +207,7 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 
 TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 {
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "HierarchicalInconsistentCardinalities", ".", false))
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "HierarchicalInconsistentCardinalities", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
@@ -244,17 +244,16 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
-	//string queryString1 = aspSolver->gen.brokenPlan(brokenPlan1, false);
-	string queryString1 = "cyclicPlan(p1453033636578)";
+	string queryString1 = aspSolver->gen.cyclicPlan(brokenPlan1, false);
 	aspSolver->registerQuery(queryString1);
 
-//	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
-//	string queryString2 = aspSolver->gen.brokenPlan(brokenPlan2, false);
-//	aspSolver->registerQuery(queryString2);
-//
-//	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
-//	string queryString3 = aspSolver->gen.brokenPlan(brokenPlan3, false);
-//	aspSolver->registerQuery(queryString3);
+	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
+	string queryString2 = aspSolver->gen.cyclicPlan(brokenPlan2, false);
+	aspSolver->registerQuery(queryString2);
+
+	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
+	string queryString3 = aspSolver->gen.cyclicPlan(brokenPlan3, false);
+	aspSolver->registerQuery(queryString3);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -262,8 +261,8 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 	}
 
 	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
-//	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
-//	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -314,8 +313,11 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1455093185652];
-	string queryString = aspSolver->gen.brokenPlan(brokenPlan, false);
-	aspSolver->registerQuery(queryString);
+	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan, false);
+	aspSolver->registerQuery(queryString1);
+
+	string queryString2 = aspSolver->gen.cyclicPlan(brokenPlan, false);
+	aspSolver->registerQuery(queryString2);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -326,7 +328,8 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrue(queryString)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(queryString1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan->getName() << "' should NOT contain a cycle.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

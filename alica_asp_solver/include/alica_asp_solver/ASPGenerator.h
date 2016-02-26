@@ -39,6 +39,7 @@ namespace alica
 			string transition(Transition* t, bool dotTerminated = true);
 			string synchronisation(SyncTransition* sync, bool dotTerminated = true);
 			string brokenPlan(Plan* s, bool dotTerminated = true);
+			string cyclicPlan(Plan* s, bool dotTerminated = true);
 			string brokenState(State* s, bool dotTerminated = true);
 			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
 			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);

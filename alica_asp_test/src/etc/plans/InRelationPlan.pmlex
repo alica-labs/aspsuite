@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="InRelationPlan.pml#1456731537186"/>
+    <value xPos="45" yPos="31" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="InRelationPlan.pml#1456731505906"/>
+    <value width="306" height="208"/>
+  </extensions>
+  <extensions>
+    <key href="InRelationPlan.pml#1456731537187"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="InRelationPlan.pml#1456731822708"/>
+    <value xPos="56" yPos="-13"/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

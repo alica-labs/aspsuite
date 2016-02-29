@@ -17,6 +17,7 @@
 #include <engine/model/PlanType.h>
 #include <engine/model/Transition.h>
 #include <engine/model/SyncTransition.h>
+#include <engine/model/Condition.h>
 
 namespace alica
 {
@@ -27,8 +28,8 @@ namespace alica
 		public:
 			ASPGenerator(const void* wildcard_pointer, string wildcard_string);
 
+			// UNARY PREDICATES
 			string plan(Plan* p, bool dotTerminated = true);
-			string rootPlan(Plan* p, bool dotTerminated = true);
 			string entryPoint(EntryPoint* ep, bool dotTerminated = true);
 			string state(State* s, bool dotTerminated = true);
 			string task(Task* t, bool dotTerminated = true);
@@ -43,11 +44,13 @@ namespace alica
 			string brokenState(State* s, bool dotTerminated = true);
 			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
 			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);
+			string neglocal(Condition* cond, bool dotTerminated = true);
 
+
+			// BINARY PREDICATES
 			string hasTask(Plan* p, Task* t, bool dotTerminated = true);
 			string hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated = true);
 			string hasMaxCardinality(EntryPoint* ep, int maxCard, bool dotTerminated = true);
-			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
 			string hasState(Plan* p, State* s, bool dotTerminated = true);
 			string hasInitialState(EntryPoint* ep, State* s, bool dotTerminated = true);
 			string hasPlan(State* s, Plan* p, bool dotTerminated = true);
@@ -59,6 +62,14 @@ namespace alica
 			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
 
 
+			// TERNARY PREDICATES
+			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
+
+
+			// RULES
+			string conditionHolds(Condition* cond);
+
+
 			string get(Plan* p);
 			string get(EntryPoint* ep);
 			string get(State* s);
@@ -66,6 +77,7 @@ namespace alica
 			string get(PlanType* pt);
 			string get(Transition* t);
 			string get(SyncTransition* sync);
+			string get(Condition* cond);
 
 		private:
 			// maps from id to asp string for all ALICA elements

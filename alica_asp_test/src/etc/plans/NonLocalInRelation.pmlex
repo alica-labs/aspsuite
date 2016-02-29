@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="NonLocalInRelation.pml#1456730912738"/>
+    <value xPos="110" yPos="49" width="157" height="86" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="NonLocalInRelation.pml#1456730912737"/>
+    <value width="430" height="389"/>
+  </extensions>
+  <extensions>
+    <key href="NonLocalInRelation.pml#1456730912739"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="InRelationPlan.pml#1456731505906"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="NonLocalInRelation.pml#1456731546744"/>
+    <value xPos="144" yPos="261"/>
+  </extensions>
+  <extensions>
+    <key href="NonLocalInRelation.pml#1456731550573"/>
+    <value xPos="99" yPos="225" width="166" height="86" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="ReferencedPlan.pml#1456731591075"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

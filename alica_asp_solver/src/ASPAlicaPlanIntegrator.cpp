@@ -17,6 +17,7 @@
 #include <engine/model/Task.h>
 #include <engine/model/EntryPoint.h>
 #include <engine/model/SyncTransition.h>
+#include <engine/model/PreCondition.h>
 
 using namespace std;
 
@@ -69,6 +70,14 @@ namespace alica
 			// add the plan
 			this->clingo->add("planBase", {}, gen->plan(p));
 
+			// TODO: add pre- and run-time condition of plan
+			if (p->getPreCondition() &&
+					p->getPreCondition()->isEnabled() &&
+					p->getPreCondition()->getConditionString() != "")
+			{
+				this->clingo->add("planBase", {},  gen->conditionHolds(p->getPreCondition()));
+			}
+
 			// add entry points and their tasks
 			for (auto& idEntryPointPair : p->getEntryPoints())
 			{
@@ -78,6 +87,7 @@ namespace alica
 				// add task
 				// TODO: what is, if we add the task two or more times to planBase?
 				// TODO: should I also integrate the IDLE Task ?
+				// - for runtime evaluation this should be part of the ALICA background knowledge
 				this->clingo->add("planBase", {}, gen->task(task));
 				this->clingo->add("planBase", {}, gen->hasTask(p, task));
 

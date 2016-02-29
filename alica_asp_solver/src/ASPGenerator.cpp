@@ -93,6 +93,12 @@ namespace alica
 			return "brokenSynchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::neglocal(Condition* cond, bool dotTerminated)
+		{
+			return "nonlocal(" + get(cond) + (dotTerminated ? ")." : ")");
+		}
+
+
 		// BINARY Predicates
 
 		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
@@ -161,6 +167,15 @@ namespace alica
 		string ASPGenerator::hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated)
 		{
 			return "hasEntryPoint(" + get(p) + ", " + get(t) + ", " + get(ep) + (dotTerminated ? ")." : ")");
+		}
+
+
+		// RULES
+
+		string ASPGenerator::conditionHolds(Condition* cond)
+		{
+			cout << "holds(" + get(cond) + ") :- " + cond->getConditionString() << endl;
+			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
 		}
 
 
@@ -252,6 +267,19 @@ namespace alica
 			if (iter == this->elements.end())
 			{
 				return this->elements[sync->getId()] = "sync" + std::to_string(sync->getId());
+			}
+			return iter->second;
+		}
+
+		string ASPGenerator::get(Condition* cond)
+		{
+			if (sync == this->wildcard_pointer)
+				return this->wildcard_string;
+
+			auto&& iter = this->elements.find(cond->getId());
+			if (iter == this->elements.end())
+			{
+				return this->elements[cond->getId()] = "cond" + std::to_string(cond->getId());
 			}
 			return iter->second;
 		}

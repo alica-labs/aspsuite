@@ -228,6 +228,7 @@ namespace alica
 				//std::vector<Gringo::AtomState const *> atomStates;
 
 				// determine the domain of the query predicate
+				cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
 				auto it = clingoModel.out.domains.find(queryMapPair.first.sig());
 				if (it == clingoModel.out.domains.end())
 				{

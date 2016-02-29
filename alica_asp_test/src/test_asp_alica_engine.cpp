@@ -336,3 +336,34 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
+TEST_F(AspAlicaEngine, nonLocalInRelation)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "NonLocalInRelation", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	alica::Condition* nonLocalCondition = (alica::Condition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
+	string queryString = aspSolver->gen.neglocal(nonLocalCondition, false);
+	cout << queryString << endl;
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The condition '" << nonLocalCondition->getName() << "' should be -local(cond).";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}

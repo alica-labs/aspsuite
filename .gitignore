@@ -1,0 +1,5 @@
+
+#ignoring temp files from vim
+*~
+*.swp
+*.swo

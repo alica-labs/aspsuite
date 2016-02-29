@@ -2,7 +2,7 @@
  * ASPGenerator.h
  *
  *  Created on: Jan 11, 2016
- *      Author: emmeda
+ *      Author: Stephan Opfer
  */
 
 #ifndef SRC_ASPGENERATOR_H_

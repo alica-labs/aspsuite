@@ -8,7 +8,6 @@ rootPlan(P) :- plan(P), not hasParentPlan(P, X) : plan(X), X!=P.
 %Transitivity of hasParentPlan
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), planType(PT), hasState(Parent, S), hasPlanType(S, PT), hasRealisation(PT, Child).
-%hasParentPlan(Child, Parent) :- hasParentPlan(Child, MidPlan), hasParentPlan(MidPlan, Parent), Child!=Parent.
 
 % Success and Failure States are subsets of Terminal States, which are subsets of States.
 terminalState(S) :- successState(S).
@@ -30,9 +29,18 @@ isReachableFrom(S2,S1) :- state(S1), state(S2), transition(T), hasInState(T,S1),
 isReachableFrom(S2,EP) :- state(S1), state(S2), entryPoint(EP), hasInitialState(EP,S1), isReachableFrom(S2,S1).
 isReachableFrom(S3,S1) :- state(S1), state(S2), state(S3), isReachableFrom(S2,S1), isReachableFrom(S3,S2).
 
-%%%%% General realtions for plan base 
+% TODO: every plan has exactly one pre- and runtime condition, which is at least T
 
-in(A,P,T,S) :- agent(A), plan(P), task(T), state(S), hasTask(P,T), hasState(P,S), entryPoint(E), hasEntryPoint(P,T,E), isReachableFrom(S,E), isIn(A,S).
+% TODO: every transition exactly one has a pre-condition, which is at least T
+
+% TODO: every terminal state has exactly one post-condition, which is at least T
+
+%pre and runtime plan conditions
+local(C) :- inCond(C,in(A,P,T,S)), hasPreCondition(P,C).
+
+%transition pre condition
+% TODO: check the necessity of locality of pre-conditions of transition in hendriks diss
+local(C) :- inCond(C,in(A,P,T,X)), hasTransition(P,T), hasPreCondition(T,C).
 
 %%%%% Conditions for well-formed ALICA programs
 
@@ -63,6 +71,9 @@ brokenTerminalState(S) :- terminalState(S), PostConditionCnt = #count{PostC : ha
 brokenPlanTaskPair(P, T) :- plan(P), task(T), hasTask(P,T), EntryPointCnt = #count{E : hasEntryPoint(P,T,E), entryPoint(E)}, EntryPointCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), InitialStateCnt = #count{S : hasInitialState(E,S)}, InitialStateCnt > 1.
 
+% Each state is only reachable from exactly one entry point.
+brokenState(S) :- state(S), ReachableEntryPointCnt = #count{EP: isReachableFrom(S,EP), entryPoint(EP)}, ReachableEntryPointCnt != 1.
+
 %% CARDINALITIES
 
 % All plan-task pairs have a valid cardinality interval associated. 
@@ -82,28 +93,32 @@ cyclicPlan(P) :- plan(P), not cycleFree(P).
 % There is at most one root plan.
 brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.
 
+%% CONDITIONS & IN-RELATION
 
-% The transitive closure of the parent-child relationship is asymmetric.
-%brokenPlan(P) :- plan(P), hasParentPlan(P,P).
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), not hasState(P,S).
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), not hasTask(P,T).
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), hasEntryPoint(P,T,E), not isReachableFrom(S,E).
 
-% Each state is only reachable from exactly one entry point.
-brokenState(S) :- state(S), ReachableEntryPointCnt = #count{EP: isReachableFrom(S,EP), entryPoint(EP)}, ReachableEntryPointCnt != 1.
-						 
+% there shoudn't be an unbound in relation, cause otherwise it is not possible to check whether it is local
+unbound(in(A,P,T,S)) :- in(A,P,T,S).
+
+% TODO: rules for non local in-predicates
 
 
-%%%%% Plan base axioms
+
+%%%%% General plan base axioms
+
+inCond(C,in(A,P,T,S)) :- pb(in(A,P,T,S)), agent(A), plan(P), task(T), state(S).
+
+%%%%% Conditions for well-formed plan base
 
 % An agent can only occupy one state per plan
-brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : isIn(A,S), state(S), hasState(P,S)}, IsInStateCnt != 1.  
+brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.  %this needs to be tested
  
 % An agent can only execute one plan per plantype
-brokenPlanBase(A) :- agent(A), planType(PT), InPlanTypePlanCnt = #count{P : hasRealisation(PT,P), plan(P), state(S), hasState(P,S), isIn(A,S)}, InPlanTypePlanCnt > 1.  
+% TODO: that does not work for plans which are inside a plantype and outside of the plantype in another plan, which is in the same plan-tree path (distinguishing these two instances of the same plan is only possible, if you consider the length of the path in the tree to the corresponding instance).
+brokenPlanBase(A) :- agent(A), planType(PT), InPlanTypePlanCnt = #count{P : hasRealisation(PT,P), plan(P), pb(in(A,P,T,S))}, InPlanTypePlanCnt > 1.
 
 % The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasEntryPoint(P,T,E), isIn(A,S), hasTask(P,T), hasState(P,S), not isReachableFrom(S,E).
+brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), pb(in(A,P,T,S)), not isReachableFrom(S,E).
 
-%%%%% Locality of In-Predicate
-
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), in(A,P,T,S), not hasState(P,S).
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), in(A,P,T,S), not hasTask(P,T).
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), in(A,P,T,S), hasEntryPoint(P,T,E), not isReachableFrom(S,E).

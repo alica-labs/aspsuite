@@ -67,6 +67,7 @@ namespace alica
 			return "synchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
+
 		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
 		{
 			return "brokenPlan(" + get(p) + (dotTerminated ? ")." : ")");
@@ -76,7 +77,6 @@ namespace alica
 		{
 			return "cyclicPlan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
-
 
 		string ASPGenerator::brokenState(State* s, bool dotTerminated)
 		{
@@ -174,7 +174,6 @@ namespace alica
 
 		string ASPGenerator::conditionHolds(Condition* cond)
 		{
-			cout << "holds(" + get(cond) + ") :- " + cond->getConditionString() << endl;
 			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
 		}
 

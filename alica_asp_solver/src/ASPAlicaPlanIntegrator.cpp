@@ -75,6 +75,7 @@ namespace alica
 					p->getPreCondition()->isEnabled() &&
 					p->getPreCondition()->getConditionString() != "")
 			{
+				cout << "ASP-Integrator: " << gen->conditionHolds(p->getPreCondition()) << endl;
 				this->clingo->add("planBase", {},  gen->conditionHolds(p->getPreCondition()));
 			}
 

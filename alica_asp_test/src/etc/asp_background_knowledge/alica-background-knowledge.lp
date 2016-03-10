@@ -38,6 +38,8 @@ isReachableFrom(S3,S1) :- state(S1), state(S2), state(S3), isReachableFrom(S2,S1
 %pre and runtime plan conditions
 local(C) :- inCond(C,in(A,P,T,S)), hasPreCondition(P,C).
 
+agentInState(A,S) :- inCond(cond1456731822708, in(A,p1456731591075, tsk1225112227903, S)), state(S), agent(A).
+
 %transition pre condition
 % TODO: check the necessity of locality of pre-conditions of transition in hendriks diss
 local(C) :- inCond(C,in(A,P,T,X)), hasTransition(P,T), hasPreCondition(T,C).
@@ -102,13 +104,13 @@ brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond
 % there shoudn't be an unbound in relation, cause otherwise it is not possible to check whether it is local
 unbound(in(A,P,T,S)) :- in(A,P,T,S).
 
-% TODO: rules for non local in-predicates
+% TODO: rules for non-local conditions
 
-
+nonlocal(C) :- condition(C), not local(C).
 
 %%%%% General plan base axioms
 
-inCond(C,in(A,P,T,S)) :- pb(in(A,P,T,S)), agent(A), plan(P), task(T), state(S).
+inCond(C,in(A,P,T,S)) :- pb(in(A,P,T,S)), agent(A), plan(P), task(T), state(S), condition(C).
 
 %%%%% Conditions for well-formed plan base
 

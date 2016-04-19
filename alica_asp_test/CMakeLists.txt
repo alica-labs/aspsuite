@@ -48,7 +48,11 @@ catkin_add_gtest(alica_asp-test
 )
 
 
-message("[alica_asp_test] catkin_LIBRARIES: ${catkin_LIBRARIES}")
-target_link_libraries(alica_asp-test ${catkin_LIBRARIES})
+#message("[alica_asp_test] catkin_LIBRARIES: ${catkin_LIBRARIES}")
+find_library(clingo_shared_LIBRARIES clingo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(program_opts_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(clasp_shared_LIBRARIES clasp_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(gringo_shared_LIBRARIES gringo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+target_link_libraries(alica_asp-test ${catkin_LIBRARIES} ${clingo_shared_LIBRARIES} ${program_opts_shared_LIBRARIES} ${clasp_shared_LIBRARIES} ${gringo_shared_LIBRARIES})
 
-add_dependencies(alica_asp-test ${catkin_LIBRARIES})
+add_dependencies(alica_asp-test ${catkin_LIBRARIES} clingo_shared program_opts_shared clasp_shared gringo_shared)

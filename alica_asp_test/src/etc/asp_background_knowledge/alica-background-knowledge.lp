@@ -35,7 +35,7 @@ isReachableFrom(S3,S1) :- state(S1), state(S2), state(S3), isReachableFrom(S2,S1
 
 % TODO: every terminal state has exactly one post-condition, which is at least T
 
-%pre and runtime plan conditions
+%pre- and run-time plan conditions
 local(C) :- inCond(C,in(A,P,T,S)), hasPreCondition(P,C).
 
 agentInState(A,S) :- inCond(cond1456731822708, in(A,p1456731591075, tsk1225112227903, S)), state(S), agent(A).
@@ -83,7 +83,7 @@ brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCar
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The sum of the minimum cardinalities of a child plan is large than the maximum cardinality of the parents entry point		 
+% The sum of the minimum cardinalities of a child plan is larger than the maximum cardinality of the parents entry point		 
 brokenPlan(ChildPlan) :- plan(ChildPlan), SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)}, plan(ParentPlan), entryPoint(ParentEntrypoint), hasMaxCardinality(ParentEntrypoint, ParentMax), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), state(ParentState), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), SumOfChildPlanMinCard > ParentMax. 						 
 
 %% CYCLES

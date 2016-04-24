@@ -63,7 +63,7 @@ add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES} clingo_shared program_opts_
 #message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
 
 find_library(clingo_shared_LIBRARIES clingo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
-find_library(program_opts_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(program_opts_shared_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
 find_library(clasp_shared_LIBRARIES clasp_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
 find_library(gringo_shared_LIBRARIES gringo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
 #message("[alica-asp-solver] clingo_shared_LIBRARIES: ${clingo_shared_LIBRARIES}")

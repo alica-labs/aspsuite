@@ -38,11 +38,9 @@ isReachableFrom(S3,S1) :- state(S1), state(S2), state(S3), isReachableFrom(S2,S1
 %pre- and run-time plan conditions
 local(C) :- inCond(C,in(A,P,T,S)), hasPreCondition(P,C).
 
-agentInState(A,S) :- inCond(cond1456731822708, in(A,p1456731591075, tsk1225112227903, S)), state(S), agent(A).
-
 %transition pre condition
 % TODO: check the necessity of locality of pre-conditions of transition in hendriks diss
-local(C) :- inCond(C,in(A,P,T,X)), hasTransition(P,T), hasPreCondition(T,C).
+local(C) :- inCond(C,in(A,P,T,S)), hasTransition(P,Trans), hasPreCondition(Trans,C).
 
 %%%%% Conditions for well-formed ALICA programs
 

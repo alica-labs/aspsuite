@@ -17,7 +17,10 @@
 #include <engine/model/Task.h>
 #include <engine/model/EntryPoint.h>
 #include <engine/model/SyncTransition.h>
+#include <engine/model/RuntimeCondition.h>
 #include <engine/model/PreCondition.h>
+
+#include <regex>
 
 using namespace std;
 
@@ -57,7 +60,7 @@ namespace alica
 		{
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
-			{// already processed
+			{ // already processed
 				return;
 			}
 			else
@@ -71,13 +74,7 @@ namespace alica
 			this->clingo->add("planBase", {}, gen->plan(p));
 
 			// TODO: add pre- and run-time condition of plan
-			if (p->getPreCondition() &&
-					p->getPreCondition()->isEnabled() &&
-					p->getPreCondition()->getConditionString() != "")
-			{
-				cout << "ASP-Integrator: " << gen->conditionHolds(p->getPreCondition()) << endl;
-				this->clingo->add("planBase", {},  gen->conditionHolds(p->getPreCondition()));
-			}
+			this->processPreCondition(p->getPreCondition());
 
 			// add entry points and their tasks
 			for (auto& idEntryPointPair : p->getEntryPoints())
@@ -151,7 +148,8 @@ namespace alica
 								this->processPlan(childPlan);
 							}
 						}
-						else if (alica::BehaviourConfiguration* childBehaviourConf = dynamic_cast<alica::BehaviourConfiguration*>(abstractChildPlan))
+						else if (alica::BehaviourConfiguration* childBehaviourConf =
+								dynamic_cast<alica::BehaviourConfiguration*>(abstractChildPlan))
 						{
 							// TODO: Handle BehaviourConfigurations
 						}
@@ -186,6 +184,41 @@ namespace alica
 					this->clingo->add("planBase", {}, gen->hasSynchedTransition(syncTransition, transition));
 				}
 				// TODO: maybe it is nice to have the timeouts of a sync transition
+			}
+		}
+
+		void ASPAlicaPlanIntegrator::processPreCondition(PreCondition* cond)
+		{
+			if (!cond || !cond->isEnabled())
+			{
+				return;
+			}
+
+			// alica program facts
+			this->clingo->add("planBase", {}, gen->preCondition(cond));
+			if (Plan* plan = dynamic_cast<Plan*>(cond->getAbstractPlan()))
+			{
+				this->clingo->add("planBase", {}, gen->hasPreCondition(plan, cond));
+			}
+
+			// asp encoded precondition
+			if (cond->getConditionString() != "")
+			{
+				const string& condString = cond->getConditionString();
+
+				cout << "ASP-Integrator: " << gen->preConditionHolds(cond) << endl;
+				this->clingo->add("planBase", {}, gen->preConditionHolds(cond));
+
+				// analysis of asp encoded precondition, because of non-local in relations
+				std::regex words_regex("((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+(\\w*))(\\s*)){2}\\)");
+				auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
+				auto words_end = std::sregex_iterator();
+
+				for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+					std::smatch match = *i;
+					std::string match_str = match.str();
+					std::cout <<"ASPAlicaPlanInegrator: MATCH>>>>>>"<< match_str << "<<<<<<" << std::endl;;
+				}
 			}
 		}
 

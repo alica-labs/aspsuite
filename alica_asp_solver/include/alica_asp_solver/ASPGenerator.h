@@ -18,6 +18,7 @@
 #include <engine/model/Transition.h>
 #include <engine/model/SyncTransition.h>
 #include <engine/model/Condition.h>
+#include <engine/model/PreCondition.h>
 
 namespace alica
 {
@@ -39,12 +40,13 @@ namespace alica
 			string successRequired(EntryPoint* ep, bool dotTerminated = true);
 			string transition(Transition* t, bool dotTerminated = true);
 			string synchronisation(SyncTransition* sync, bool dotTerminated = true);
+			string preCondition(PreCondition* cond, bool dotTerminated = true);
 			string brokenPlan(Plan* s, bool dotTerminated = true);
 			string cyclicPlan(Plan* s, bool dotTerminated = true);
 			string brokenState(State* s, bool dotTerminated = true);
 			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
 			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);
-			string neglocal(Condition* cond, bool dotTerminated = true);
+			string neglocal(PreCondition* cond, bool dotTerminated = true);
 
 
 			// BINARY PREDICATES
@@ -56,6 +58,7 @@ namespace alica
 			string hasPlan(State* s, Plan* p, bool dotTerminated = true);
 			string hasPlanType(State* s, PlanType* pt, bool dotTerminated = true);
 			string hasRealisation(PlanType* pt, Plan* p, bool dotTerminated = true);
+			string hasPreCondition(Plan* p, PreCondition* cond, bool dotTerminated = true);
 			string hasInTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
@@ -67,7 +70,7 @@ namespace alica
 
 
 			// RULES
-			string conditionHolds(Condition* cond);
+			string preConditionHolds(PreCondition* cond);
 
 
 			string get(Plan* p);
@@ -77,7 +80,7 @@ namespace alica
 			string get(PlanType* pt);
 			string get(Transition* t);
 			string get(SyncTransition* sync);
-			string get(Condition* cond);
+			string get(PreCondition* cond);
 
 		private:
 			// maps from id to asp string for all ALICA elements

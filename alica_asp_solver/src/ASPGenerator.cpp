@@ -73,7 +73,6 @@ namespace alica
 			return "preCondition(" + get(cond) + (dotTerminated ? ")." : ")");
 		}
 
-
 		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
 		{
 			return "brokenPlan(" + get(p) + (dotTerminated ? ")." : ")");
@@ -171,11 +170,33 @@ namespace alica
 			return "brokenPlanTaskPair(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::inRefPlan(PreCondition* c, string plan, bool dotTerminated)
+		{
+			return "inRefPlan(" + get(c) + ", " + plan + (dotTerminated ? ")." : ")");
+		}
+
 		// TERNARY Predicates
 
 		string ASPGenerator::hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated)
 		{
 			return "hasEntryPoint(" + get(p) + ", " + get(t) + ", " + get(ep) + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::inRefPlanTask(PreCondition* c, string plan, string task, bool dotTerminated)
+		{
+			return "inRefPlanTask(" + get(c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::inRefPlanState(PreCondition* c, string plan, string state, bool dotTerminated)
+		{
+			return "inRefPlanState(" + get(c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
+		}
+
+		// QUATERNARY Predicates
+
+		string ASPGenerator::inRefPlanTaskState(PreCondition* c, string plan, string task, string state, bool dotTerminated)
+		{
+			return "inRefPlanTaskState(" + get(c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
 		}
 
 		// RULES

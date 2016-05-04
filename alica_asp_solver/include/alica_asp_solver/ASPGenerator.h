@@ -63,10 +63,16 @@ namespace alica
 			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
 			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
+			string inRefPlan(PreCondition* c, string plan, bool dotTerminated = true);
 
 
 			// TERNARY PREDICATES
 			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
+			string inRefPlanTask(PreCondition* c, string plan, string task, bool dotTerminated = true);
+			string inRefPlanState(PreCondition* c, string plan, string state, bool dotTerminated = true);
+
+			// QUATERNARY PREDICATES
+			string inRefPlanTaskState(PreCondition* c, string plan, string task, string state, bool dotTerminated = true);
 
 
 			// RULES

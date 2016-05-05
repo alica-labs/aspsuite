@@ -9,6 +9,10 @@ rootPlan(P) :- plan(P), not hasParentPlan(P, X) : plan(X), X!=P.
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), planType(PT), hasState(Parent, S), hasPlanType(S, PT), hasRealisation(PT, Child).
 
+% PreConditions and Run-time Conditions are subsets of Conditions.
+condition(C) :- preCondition(C).
+condition(C) :- runtimeCondition(C).
+
 % Success and Failure States are subsets of Terminal States, which are subsets of States.
 terminalState(S) :- successState(S).
 terminalState(S) :- failureState(S).
@@ -34,14 +38,8 @@ isReachableFrom(S3,S1) :- isReachableFrom(S2,S1), isReachableFrom(S3,S2).
 
 % TODO: every terminal state has exactly one post-condition, which is at least T
 
-%pre and runtime plan conditions
-local(C) :- inCond(C,in(A,P,T,S)), hasPreCondition(P,C).
-
-agentInState(A,S) :- inCond(cond1456731822708, in(A,p1456731591075, tsk1225112227903, S)), state(S), agent(A).
-
-%transition pre condition
-% TODO: check the necessity of locality of pre-conditions of transition in hendriks diss
-local(C) :- inCond(C,in(A,P,T,X)), hasTransition(P,T), hasPreCondition(T,C).
+%pre- and run-time plan conditions
+local(C) :- inRefPlan(C,P), hasPreCondition(P,C).
 
 %%%%% Conditions for well-formed ALICA programs
 
@@ -83,7 +81,7 @@ brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCar
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The sum of the minimum cardinalities of a child plan is large than the maximum cardinality of the parents entry point		 
+% The sum of the minimum cardinalities of a child plan is larger than the maximum cardinality of the parents entry point		 
 brokenPlan(ChildPlan) :- plan(ChildPlan), SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)}, plan(ParentPlan), entryPoint(ParentEntrypoint), hasMaxCardinality(ParentEntrypoint, ParentMax), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), state(ParentState), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), SumOfChildPlanMinCard > ParentMax. 						 
 
 %% CYCLES
@@ -95,17 +93,14 @@ cyclicPlan(P) :- plan(P), not cycleFree(P).
 % There is at most one root plan.
 brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.
 
-%% CONDITIONS & IN-RELATION
+%% CONDITIONS & IN-PREDICATES
 
-brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), not hasState(P,S).
-brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), not hasTask(P,T).
-brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inCond(C, in(A,P,T,S)), hasEntryPoint(P,T,E), not isReachableFrom(S,E).
+% Valid relations between the parameters of in predicates
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inRefPlanState(C,P,S), not hasState(P,S).
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inRefPlanTask(C,P,T), not hasTask(P,T).
+brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inRefPlanTaskState(C,P,T,S), hasEntryPoint(P,T,E), not isReachableFrom(S,E).
 
-% there shoudn't be an unbound in relation, cause otherwise it is not possible to check whether it is local
-unbound(in(A,P,T,S)) :- in(A,P,T,S).
-
-% TODO: rules for non-local conditions
-
+% rules for non-local conditions
 nonlocal(C) :- condition(C), not local(C).
 
 %%%%% General plan base axioms

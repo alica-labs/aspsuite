@@ -347,7 +347,7 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	alica::Condition* nonLocalCondition = (alica::Condition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
+	alica::PreCondition* nonLocalCondition = (alica::PreCondition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
 	string queryString = aspSolver->gen.neglocal(nonLocalCondition, false);
 	cout << queryString << endl;
 	aspSolver->registerQuery(queryString);

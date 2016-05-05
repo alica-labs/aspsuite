@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(alica_asp_solver)
-
+ 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -12,6 +12,7 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
 find_package(catkin REQUIRED COMPONENTS
   alica_engine 
   clingo_cpp
@@ -58,6 +59,14 @@ add_library(${PROJECT_NAME}
     src/ASPGenerator.cpp
 )
 
+add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES} clingo_shared program_opts_shared clasp_shared gringo_shared)
 #message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES})
+
+find_library(clingo_shared_LIBRARIES clingo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(program_opts_shared_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(clasp_shared_LIBRARIES clasp_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+find_library(gringo_shared_LIBRARIES gringo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+#message("[alica-asp-solver] clingo_shared_LIBRARIES: ${clingo_shared_LIBRARIES}")
+
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${clingo_shared_LIBRARIES} ${program_opts_shared_LIBRARIES} ${clasp_shared_LIBRARIES} ${gringo_shared_LIBRARIES})
+

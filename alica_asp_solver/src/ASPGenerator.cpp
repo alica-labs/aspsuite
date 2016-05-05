@@ -11,9 +11,10 @@ namespace alica
 {
 	namespace reasoner
 	{
-		ASPGenerator::ASPGenerator(const void* wildcard_pointer, string wildcard_string)
-			: wildcard_pointer(wildcard_pointer), wildcard_string(wildcard_string)
-		{}
+		ASPGenerator::ASPGenerator(const void* wildcard_pointer, string wildcard_string) :
+				wildcard_pointer(wildcard_pointer), wildcard_string(wildcard_string)
+		{
+		}
 
 		// UNARY Predicates
 
@@ -67,6 +68,10 @@ namespace alica
 			return "synchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::preCondition(PreCondition* cond, bool dotTerminated)
+		{
+			return "preCondition(" + get(cond) + (dotTerminated ? ")." : ")");
+		}
 
 		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
 		{
@@ -93,11 +98,10 @@ namespace alica
 			return "brokenSynchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::neglocal(Condition* cond, bool dotTerminated)
+		string ASPGenerator::neglocal(PreCondition* cond, bool dotTerminated)
 		{
 			return "nonlocal(" + get(cond) + (dotTerminated ? ")." : ")");
 		}
-
 
 		// BINARY Predicates
 
@@ -141,6 +145,11 @@ namespace alica
 			return "hasRealisation(" + get(pt) + ", " + get(p) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::hasPreCondition(Plan* p, PreCondition* cond, bool dotTerminated)
+		{
+			return "hasPreCondition(" + get(p) + ", " + get(cond) + (dotTerminated ? ")." : ")");
+		}
+
 		string ASPGenerator::hasInTransition(State* s, Transition* t, bool dotTerminated)
 		{
 			return "hasInTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
@@ -161,6 +170,10 @@ namespace alica
 			return "brokenPlanTaskPair(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::inRefPlan(PreCondition* c, string plan, bool dotTerminated)
+		{
+			return "inRefPlan(" + get(c) + ", " + plan + (dotTerminated ? ")." : ")");
+		}
 
 		// TERNARY Predicates
 
@@ -169,14 +182,29 @@ namespace alica
 			return "hasEntryPoint(" + get(p) + ", " + get(t) + ", " + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::inRefPlanTask(PreCondition* c, string plan, string task, bool dotTerminated)
+		{
+			return "inRefPlanTask(" + get(c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::inRefPlanState(PreCondition* c, string plan, string state, bool dotTerminated)
+		{
+			return "inRefPlanState(" + get(c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
+		}
+
+		// QUATERNARY Predicates
+
+		string ASPGenerator::inRefPlanTaskState(PreCondition* c, string plan, string task, string state, bool dotTerminated)
+		{
+			return "inRefPlanTaskState(" + get(c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
+		}
 
 		// RULES
 
-		string ASPGenerator::conditionHolds(Condition* cond)
+		string ASPGenerator::preConditionHolds(PreCondition* cond)
 		{
 			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
 		}
-
 
 		// LITERALS
 
@@ -270,7 +298,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(Condition* cond)
+		string ASPGenerator::get(PreCondition* cond)
 		{
 			if (sync == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -278,11 +306,10 @@ namespace alica
 			auto&& iter = this->elements.find(cond->getId());
 			if (iter == this->elements.end())
 			{
-				return this->elements[cond->getId()] = "cond" + std::to_string(cond->getId());
+				return this->elements[cond->getId()] = "preCond" + std::to_string(cond->getId());
 			}
 			return iter->second;
 		}
 	}
 }
-
 

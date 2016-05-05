@@ -16,6 +16,7 @@ using namespace std;
 namespace alica
 {
 	class Plan;
+	class PreCondition;
 
 	namespace reasoner
 	{
@@ -35,6 +36,7 @@ namespace alica
 
 		private:
 			void processPlan(Plan* p);
+			void processPreCondition(PreCondition* cond);
 			ASPGenerator* gen;
 			shared_ptr<ClingoLib> clingo;
 

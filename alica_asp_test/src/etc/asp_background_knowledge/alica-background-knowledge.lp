@@ -24,10 +24,9 @@ hasOutTransition(S,T) :- hasInState(T,S).
 hasInState(T,S) :- hasOutTransition(S,T).
 
 % Reachability of states within plans
-isReachableFrom(S,EP) :- state(S), entryPoint(EP), hasInitialState(EP,S).
-isReachableFrom(S2,S1) :- state(S1), state(S2), transition(T), hasInState(T,S1), hasOutState(T,S2).
-isReachableFrom(S2,EP) :- state(S1), state(S2), entryPoint(EP), hasInitialState(EP,S1), isReachableFrom(S2,S1).
-isReachableFrom(S3,S1) :- state(S1), state(S2), state(S3), isReachableFrom(S2,S1), isReachableFrom(S3,S2).
+isReachableFrom(S,EP) :- hasInitialState(EP,S).
+isReachableFrom(S2,S1) :- hasInState(T,S1), hasOutState(T,S2).
+isReachableFrom(S3,S1) :- isReachableFrom(S2,S1), isReachableFrom(S3,S2).
 
 % TODO: every plan has exactly one pre- and runtime condition, which is at least T
 
@@ -64,6 +63,7 @@ brokenTerminalState(S) :- hasTerminalState(P, S), not hasState(P,S).
 
 % Terminal states do not include sub-plans or behaviours
 brokenTerminalState(S) :- terminalState(S), hasPlan(S,P).
+brokenTerminalState(S) :- terminalState(S), hasPlanType(S,PT).
 brokenTerminalState(S) :- terminalState(S), hasBehaviour(S,B).
 
 % There is a postcondition associated with each success and failure state. 
@@ -73,7 +73,7 @@ brokenTerminalState(S) :- terminalState(S), PostConditionCnt = #count{PostC : ha
 brokenPlanTaskPair(P, T) :- plan(P), task(T), hasTask(P,T), EntryPointCnt = #count{E : hasEntryPoint(P,T,E), entryPoint(E)}, EntryPointCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), InitialStateCnt = #count{S : hasInitialState(E,S)}, InitialStateCnt > 1.
 
-% Each state is only reachable from exactly one entry point.
+% Each state is reachable from exactly one entry point.
 brokenState(S) :- state(S), ReachableEntryPointCnt = #count{EP: isReachableFrom(S,EP), entryPoint(EP)}, ReachableEntryPointCnt != 1.
 
 %% CARDINALITIES

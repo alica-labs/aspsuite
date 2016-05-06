@@ -47,6 +47,7 @@ namespace alica
 			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
 			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);
 			string neglocal(PreCondition* cond, bool dotTerminated = true);
+			string runningPlan(long rpCount, bool dotTerminated = true);
 
 
 			// BINARY PREDICATES
@@ -64,6 +65,7 @@ namespace alica
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
 			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
 			string inRefPlan(PreCondition* c, string plan, bool dotTerminated = true);
+			string hasPlanInstance(Plan* p, long runningPlanCount, bool dotTerminated = true);
 
 
 			// TERNARY PREDICATES
@@ -87,10 +89,13 @@ namespace alica
 			string get(Transition* t);
 			string get(SyncTransition* sync);
 			string get(PreCondition* cond);
+			string get(string prefix, long rpCount);
 
 		private:
 			// maps from id to asp string for all ALICA elements
 			std::map<long, string> elements;
+			// maps from id to asp string for all instance elements
+			std::map<long, string> instanceElements;
 
 			const void* wildcard_pointer;
 			string wildcard_string;

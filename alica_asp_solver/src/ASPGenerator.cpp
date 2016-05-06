@@ -103,6 +103,11 @@ namespace alica
 			return "nonlocal(" + get(cond) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::runningPlan(long rpCount, bool dotTerminated)
+		{
+			return "runningPlan(" + get("rp", rpCount) + (dotTerminated ? ")." : ")");
+		}
+
 		// BINARY Predicates
 
 		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
@@ -173,6 +178,11 @@ namespace alica
 		string ASPGenerator::inRefPlan(PreCondition* c, string plan, bool dotTerminated)
 		{
 			return "inRefPlan(" + get(c) + ", " + plan + (dotTerminated ? ")." : ")");
+		}
+
+		string ASPGenerator::hasPlanInstance(Plan* p, long runningPlanCount, bool dotTerminated)
+		{
+			return "hasPlanInstance(" + get(p) + ", " + get("rp", runningPlanCount) + (dotTerminated ? ")." : ")");
 		}
 
 		// TERNARY Predicates
@@ -300,7 +310,7 @@ namespace alica
 
 		string ASPGenerator::get(PreCondition* cond)
 		{
-			if (sync == this->wildcard_pointer)
+			if (cond == this->wildcard_pointer)
 				return this->wildcard_string;
 
 			auto&& iter = this->elements.find(cond->getId());
@@ -310,6 +320,19 @@ namespace alica
 			}
 			return iter->second;
 		}
+
+		string ASPGenerator::get(string prefix, long rpCount)
+		{
+			if (prefix == "")
+				return this->wildcard_string;
+
+			auto&& iter = this->elements.find(rpCount);
+			if (iter == this->elements.end())
+			{
+				return this->elements[rpCount] = prefix + std::to_string(rpCount);
+			}
+			return iter->second;
+		}
+
 	}
 }
-

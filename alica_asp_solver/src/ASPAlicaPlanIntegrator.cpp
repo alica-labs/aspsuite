@@ -33,6 +33,7 @@ namespace alica
 		{
 			this->clingo = clingo;
 			this->gen = gen;
+			this->instanceElementCounter = 0;
 		}
 
 		ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
@@ -61,11 +62,17 @@ namespace alica
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
 			{ // already processed
+				this->instanceElementCounter++;
+				this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementCounter));
+				this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementCounter));
 				return;
 			}
 			else
 			{
 				processedPlanIds.push_back(currentPlanId);
+				this->instanceElementCounter++;
+				this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementCounter));
+				this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementCounter));
 			}
 
 			cout << "ASPAlicaPlanIntegrator: processing plan " << p->getName() << " (ID: " << p->getId() << ")" << endl;

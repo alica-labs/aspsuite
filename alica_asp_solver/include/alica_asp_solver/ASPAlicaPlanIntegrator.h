@@ -41,6 +41,8 @@ namespace alica
 			shared_ptr<ClingoLib> clingo;
 
 			vector<long> processedPlanIds;
+
+			long instanceElementCounter;
 		};
 
 	} /* namespace reasoner */

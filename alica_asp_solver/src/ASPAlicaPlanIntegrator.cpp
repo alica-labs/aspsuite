@@ -301,5 +301,22 @@ namespace alica
 			}
 		}
 
+		void ASPAlicaPlanIntegrator::processRuntimeCondition(RuntimeCondition* cond)
+		{
+			if (!cond)
+			{
+				return;
+			}
+
+			// alica program facts
+			this->clingo->add("planBase", {}, gen->runtimeCondition(cond));
+			if (Plan* plan = dynamic_cast<Plan*>(cond->getAbstractPlan()))
+			{
+				this->clingo->add("planBase", {}, gen->hasRuntimeCondition(plan, cond));
+			}
+
+			//TODO
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */

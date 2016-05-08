@@ -19,6 +19,7 @@
 #include <engine/model/SyncTransition.h>
 #include <engine/model/Condition.h>
 #include <engine/model/PreCondition.h>
+#include <engine/model/RuntimeCondition.h>
 
 namespace alica
 {
@@ -41,6 +42,7 @@ namespace alica
 			string transition(Transition* t, bool dotTerminated = true);
 			string synchronisation(SyncTransition* sync, bool dotTerminated = true);
 			string preCondition(PreCondition* cond, bool dotTerminated = true);
+			string runtimeCondition(RuntimeCondition* cond, bool dotTerminated = true);
 			string brokenPlan(Plan* s, bool dotTerminated = true);
 			string cyclicPlan(Plan* s, bool dotTerminated = true);
 			string brokenState(State* s, bool dotTerminated = true);
@@ -60,6 +62,7 @@ namespace alica
 			string hasPlanType(State* s, PlanType* pt, bool dotTerminated = true);
 			string hasRealisation(PlanType* pt, Plan* p, bool dotTerminated = true);
 			string hasPreCondition(Plan* p, PreCondition* cond, bool dotTerminated = true);
+			string hasRuntimeCondition(Plan* p, RuntimeCondition* cond, bool dotTerminated = true);
 			string hasInTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
@@ -79,6 +82,7 @@ namespace alica
 
 			// RULES
 			string preConditionHolds(PreCondition* cond);
+			string runtimeConditionHolds(RuntimeCondition* cond);
 
 
 			string get(Plan* p);
@@ -89,6 +93,7 @@ namespace alica
 			string get(Transition* t);
 			string get(SyncTransition* sync);
 			string get(PreCondition* cond);
+			string get(RuntimeCondition* cond);
 			string get(string prefix, long rpCount);
 
 		private:

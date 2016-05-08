@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(alica_asp_solver)
- 
+  
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -59,7 +59,7 @@ add_library(${PROJECT_NAME}
     src/ASPGenerator.cpp
 )
 
-message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
+#message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
 
 #find_library(clingo_shared_LIBRARIES clingo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
 #find_library(program_opts_shared_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)

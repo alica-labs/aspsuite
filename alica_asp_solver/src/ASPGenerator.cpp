@@ -108,6 +108,12 @@ namespace alica
 			return "runningPlan(" + get("rp", rpCount) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::runtimeCondition(RuntimeCondition* cond, bool dotTerminated)
+		{
+			return "runtimeCondition(" + get(cond) + (dotTerminated ? ")." : ")");
+		}
+
+
 		// BINARY Predicates
 
 		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
@@ -185,6 +191,12 @@ namespace alica
 			return "hasPlanInstance(" + get(p) + ", " + get("rp", runningPlanCount) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::hasRuntimeCondition(Plan* p, RuntimeCondition* cond, bool dotTerminated)
+		{
+			return "hasRunningPlan(" + get(p) + ", " + get(cond) + (dotTerminated ? ")." : ")");
+		}
+
+
 		// TERNARY Predicates
 
 		string ASPGenerator::hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated)
@@ -212,6 +224,12 @@ namespace alica
 		// RULES
 
 		string ASPGenerator::preConditionHolds(PreCondition* cond)
+		{
+			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
+		}
+
+
+		string ASPGenerator::runtimeConditionHolds(RuntimeCondition* cond)
 		{
 			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
 		}
@@ -330,6 +348,19 @@ namespace alica
 			if (iter == this->elements.end())
 			{
 				return this->elements[rpCount] = prefix + std::to_string(rpCount);
+			}
+			return iter->second;
+		}
+
+		string ASPGenerator::get(RuntimeCondition* cond)
+		{
+			if (cond == this->wildcard_pointer)
+				return this->wildcard_string;
+
+			auto&& iter = this->elements.find(cond->getId());
+			if (iter == this->elements.end())
+			{
+				return this->elements[cond->getId()] = "runtimeCond" + std::to_string(cond->getId());
 			}
 			return iter->second;
 		}

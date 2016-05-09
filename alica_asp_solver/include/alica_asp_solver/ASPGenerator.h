@@ -43,13 +43,16 @@ namespace alica
 			string synchronisation(SyncTransition* sync, bool dotTerminated = true);
 			string preCondition(PreCondition* cond, bool dotTerminated = true);
 			string runtimeCondition(RuntimeCondition* cond, bool dotTerminated = true);
+			string runningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
+
 			string brokenPlan(Plan* s, bool dotTerminated = true);
-			string cyclicPlan(Plan* s, bool dotTerminated = true);
+			string cyclic(Plan* p, bool dotTerminated = true);
+			string cycleFree(Plan* p, bool dotTerminated = true);
 			string brokenState(State* s, bool dotTerminated = true);
 			string brokenEntryPoint(EntryPoint* e, bool dotTerminated = true);
 			string brokenSynchronisation(SyncTransition* sync, bool dotTerminated = true);
 			string neglocal(PreCondition* cond, bool dotTerminated = true);
-			string runningPlan(long rpCount, bool dotTerminated = true);
+			string brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
 
 
 			// BINARY PREDICATES
@@ -68,8 +71,8 @@ namespace alica
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
 			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
 			string inRefPlan(PreCondition* c, string plan, bool dotTerminated = true);
-			string hasPlanInstance(Plan* p, long runningPlanCount, bool dotTerminated = true);
-
+			string hasPlanInstance(Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
+			string hasRunningPlan(State* s, uint64_t instanceElementHash, bool dotTerminated = true);
 
 			// TERNARY PREDICATES
 			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
@@ -94,7 +97,7 @@ namespace alica
 			string get(SyncTransition* sync);
 			string get(PreCondition* cond);
 			string get(RuntimeCondition* cond);
-			string get(string prefix, long rpCount);
+			string get(string prefix, uint64_t instanceElementHash);
 
 		private:
 			// maps from id to asp string for all ALICA elements

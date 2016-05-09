@@ -15,6 +15,10 @@
 
 #include  "Plans/Min3AgentPlan1453033506291.h"
 
+#include  "Plans/UpperPlanInPlantype1462793904808.h"
+
+#include  "Plans/LowerPlanInPlantype1462793912377.h"
+
 #include  "Plans/CyclePlanC1453033651069.h"
 
 #include  "Plans/CyclePlanA1453033636578.h"
@@ -24,6 +28,8 @@
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
 #include  "Plans/NonLocalInRelation1456730912737.h"
+
+#include  "Plans/IndirectReusePlanInPlantype1462793790517.h"
 
 #include  "Plans/ReusePlanWithoutCycle1455093185652.h"
 
@@ -75,6 +81,14 @@ namespace alica
                 return make_shared<UtilityFunction1453033506291>();
                 break;
 
+            case 1462793904808:
+                return make_shared<UtilityFunction1462793904808>();
+                break;
+
+            case 1462793912377:
+                return make_shared<UtilityFunction1462793912377>();
+                break;
+
             case 1453033651069:
                 return make_shared<UtilityFunction1453033651069>();
                 break;
@@ -93,6 +107,10 @@ namespace alica
 
             case 1456730912737:
                 return make_shared<UtilityFunction1456730912737>();
+                break;
+
+            case 1462793790517:
+                return make_shared<UtilityFunction1462793790517>();
                 break;
 
             case 1455093185652:

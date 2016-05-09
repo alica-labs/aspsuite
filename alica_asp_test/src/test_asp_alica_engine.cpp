@@ -15,6 +15,7 @@
 #include <engine/PlanBase.h>
 #include <engine/model/Plan.h>
 #include <engine/model/State.h>
+#include <engine/model/PlanType.h>
 #include <engine/constraintmodul/ConstraintQuery.h>
 #include <engine/IPlanParser.h>
 
@@ -216,8 +217,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033506291];
-	string queryString = aspSolver->gen.brokenPlan(brokenPlan, false);
+	string queryString = aspSolver->gen.brokenRunningPlan(14591650580097367597ul, false);
 	aspSolver->registerQuery(queryString);
 
 	if (!aspSolver->validatePlan(plan))
@@ -225,7 +225,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << brokenPlan->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The running plan 'rp" << to_string(14591650580097367597ul) << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -244,15 +244,15 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
-	string queryString1 = aspSolver->gen.cyclicPlan(brokenPlan1, false);
+	string queryString1 = aspSolver->gen.cyclic(brokenPlan1, false);
 	aspSolver->registerQuery(queryString1);
 
 	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
-	string queryString2 = aspSolver->gen.cyclicPlan(brokenPlan2, false);
+	string queryString2 = aspSolver->gen.cyclic(brokenPlan2, false);
 	aspSolver->registerQuery(queryString2);
 
 	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
-	string queryString3 = aspSolver->gen.cyclicPlan(brokenPlan3, false);
+	string queryString3 = aspSolver->gen.cyclic(brokenPlan3, false);
 	aspSolver->registerQuery(queryString3);
 
 	if (!aspSolver->validatePlan(plan))
@@ -316,7 +316,7 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan, false);
 	aspSolver->registerQuery(queryString1);
 
-	string queryString2 = aspSolver->gen.cyclicPlan(brokenPlan, false);
+	string queryString2 = aspSolver->gen.cyclic(brokenPlan, false);
 	aspSolver->registerQuery(queryString2);
 
 	if (!aspSolver->validatePlan(plan))
@@ -362,6 +362,37 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 	}
 
 	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The condition '" << nonLocalCondition->getName() << "' should be -local(cond).";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "IndirectReusePlanInPlantype", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	string queryString = aspSolver->gen.cycleFree(plan, false);
+
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << plan->getName() << "' should be free of cycles.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

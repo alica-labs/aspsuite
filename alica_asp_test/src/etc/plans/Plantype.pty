@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<alica:PlanType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:alica="http:///de.uni_kassel.vs.cn" id="1462793823849" name="Plantype" comment="" masterPlan="false" utilityFunction="" utilityThreshold="0.1" destinationPath="">
+  <plans id="1462793949101" name="MISSING_NAME" comment="" activated="true">
+    <plan>UpperPlanInPlantype.pml#1462793904808</plan>
+  </plans>
+</alica:PlanType>

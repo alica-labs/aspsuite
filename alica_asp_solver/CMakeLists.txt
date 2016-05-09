@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   alica_engine 
   clingo_cpp
   system_config
+  system_util
   fsystem
 )
 

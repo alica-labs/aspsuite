@@ -14,6 +14,10 @@
 
 #include  "Plans/Min3AgentPlan1453033506291.h"
 
+#include  "Plans/UpperPlanInPlantype1462793904808.h"
+
+#include  "Plans/LowerPlanInPlantype1462793912377.h"
+
 #include  "Plans/CyclePlanC1453033651069.h"
 
 #include  "Plans/CyclePlanA1453033636578.h"
@@ -23,6 +27,8 @@
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
 #include  "Plans/NonLocalInRelation1456730912737.h"
+
+#include  "Plans/IndirectReusePlanInPlantype1462793790517.h"
 
 #include  "Plans/ReusePlanWithoutCycle1455093185652.h"
 

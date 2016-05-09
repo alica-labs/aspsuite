@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="IndirectReusePlanInPlantype.pml#1462793790518"/>
+    <value xPos="170" yPos="98" width="81" height="67" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="IndirectReusePlanInPlantype.pml#1462793790517"/>
+    <value width="510" height="354"/>
+  </extensions>
+  <extensions>
+    <key href="IndirectReusePlanInPlantype.pml#1462793790519"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="Plantype.pty#1462793823849"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

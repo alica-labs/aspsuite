@@ -15,6 +15,10 @@
 
 #include  "Plans/constraints/Min3AgentPlan1453033506291Constraints.h"
 
+#include  "Plans/constraints/UpperPlanInPlantype1462793904808Constraints.h"
+
+#include  "Plans/constraints/LowerPlanInPlantype1462793912377Constraints.h"
+
 #include  "Plans/constraints/CyclePlanC1453033651069Constraints.h"
 
 #include  "Plans/constraints/CyclePlanA1453033636578Constraints.h"
@@ -24,6 +28,8 @@
 #include  "Plans/constraints/HierarchicalInconsistentCardinalities1453033407259Constraints.h"
 
 #include  "Plans/constraints/NonLocalInRelation1456730912737Constraints.h"
+
+#include  "Plans/constraints/IndirectReusePlanInPlantype1462793790517Constraints.h"
 
 #include  "Plans/constraints/ReusePlanWithoutCycle1455093185652Constraints.h"
 

@@ -44,7 +44,8 @@ namespace alica
 
 			vector<long> processedPlanIds;
 
-			long instanceElementCounter;
+
+			uint64_t instanceElementHash;
 		};
 
 	} /* namespace reasoner */

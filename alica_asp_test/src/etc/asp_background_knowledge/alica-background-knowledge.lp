@@ -82,13 +82,23 @@ brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCar
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
 % The sum of the minimum cardinalities of a child plan is larger than the maximum cardinality of the parents entry point		 
-brokenPlan(ChildPlan) :- plan(ChildPlan), SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)}, plan(ParentPlan), entryPoint(ParentEntrypoint), hasMaxCardinality(ParentEntrypoint, ParentMax), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), state(ParentState), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), SumOfChildPlanMinCard > ParentMax. 						 
+brokenRunningPlan(ChildRP) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), hasPlanInstance(ChildPlan, ChildRP), hasRunningPlan(ParentState, ChildRP),
+	hasMaxCardinality(ParentEntrypoint, ParentMax),
+	SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)},
+	SumOfChildPlanMinCard > ParentMax. 
+	
+brokenRunningPlan(ChildRP) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasPlanType(ParentState, ParentPlanType), hasRealisation(ParentPlanType, ChildPlan), hasPlanInstance(ChildPlan, ChildRP), hasRunningPlan(ParentState, ChildRP),
+	hasMaxCardinality(ParentEntrypoint, ParentMax),
+	SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)},
+	SumOfChildPlanMinCard > ParentMax. 								
+	
+	%TODO: Think about recursive sound plans -> "SumOfChildPlanMinCard > ParentMin."
 
 %% CYCLES
 
 % Cycles are not allowed in the plan hierarchy
 cycleFree(P) :- plan(P), cycleFree(Parent):hasParentPlan(P,Parent).
-cyclicPlan(P) :- plan(P), not cycleFree(P).
+cyclic(P) :- plan(P), not cycleFree(P).
 
 % There is at most one root plan.
 brokenPlan(P1) :- rootPlan(P1), rootPlan(P2), P1 != P2.

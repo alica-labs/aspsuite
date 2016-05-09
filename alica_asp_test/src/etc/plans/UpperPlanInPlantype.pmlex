@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="UpperPlanInPlantype.pml#1462793904809"/>
+    <value xPos="120" yPos="49" width="81" height="67" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="UpperPlanInPlantype.pml#1462793904808"/>
+    <value xPos="215" yPos="129" width="461" height="328"/>
+  </extensions>
+  <extensions>
+    <key href="UpperPlanInPlantype.pml#1462793904810"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="LowerPlanInPlantype.pml#1462793912377"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

@@ -20,6 +20,7 @@
 #include <engine/model/RuntimeCondition.h>
 #include <engine/model/PreCondition.h>
 
+#include <CustomHashes.h>
 #include <regex>
 
 using namespace std;
@@ -33,7 +34,7 @@ namespace alica
 		{
 			this->clingo = clingo;
 			this->gen = gen;
-			this->instanceElementCounter = 0;
+			this->instanceElementHash = 0;
 		}
 
 		ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
@@ -45,6 +46,10 @@ namespace alica
 			this->processedPlanIds.clear();
 
 			// Start recursive integration of plan tree
+			this->instanceElementHash = supplementary::CustomHashes::FNV_OFFSET ^ p->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
+			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
+			this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementHash));
 			this->processPlan(p);
 
 			// Ground the created plan base
@@ -62,18 +67,10 @@ namespace alica
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
 			{ // already processed
-				this->instanceElementCounter++;
-				this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementCounter));
-				this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementCounter));
 				return;
 			}
-			else
-			{
-				processedPlanIds.push_back(currentPlanId);
-				this->instanceElementCounter++;
-				this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementCounter));
-				this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementCounter));
-			}
+
+			processedPlanIds.push_back(currentPlanId);
 
 			cout << "ASPAlicaPlanIntegrator: processing plan " << p->getName() << " (ID: " << p->getId() << ")" << endl;
 
@@ -142,6 +139,12 @@ namespace alica
 						{
 							this->clingo->add("planBase", {}, gen->hasPlan(state, childPlan));
 
+							this->instanceElementHash = this->instanceElementHash ^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+							cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
+							this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
+							this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
+							this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+
 							this->processPlan(childPlan);
 						}
 						else if (alica::PlanType* childPlanType = dynamic_cast<alica::PlanType*>(abstractChildPlan))
@@ -152,6 +155,13 @@ namespace alica
 							for (auto& childPlan : childPlanType->getPlans())
 							{
 								this->clingo->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan));
+
+								this->instanceElementHash = this->instanceElementHash ^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+								cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
+								this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
+								this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
+								this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+
 								this->processPlan(childPlan);
 							}
 						}

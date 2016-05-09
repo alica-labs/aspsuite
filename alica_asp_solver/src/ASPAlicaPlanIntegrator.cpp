@@ -46,7 +46,8 @@ namespace alica
 			this->processedPlanIds.clear();
 
 			// Start recursive integration of plan tree
-			this->instanceElementHash = supplementary::CustomHashes::FNV_OFFSET ^ p->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			this->instanceElementHash = supplementary::CustomHashes::FNV_OFFSET
+					^ p->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
 			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
 			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
 			this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementHash));
@@ -79,6 +80,7 @@ namespace alica
 
 			// TODO: add pre- and run-time condition of plan
 			this->processPreCondition(p->getPreCondition());
+			this->processRuntimeCondition(p->getRuntimeCondition());
 
 			// add entry points and their tasks
 			for (auto& idEntryPointPair : p->getEntryPoints())
@@ -139,11 +141,7 @@ namespace alica
 						{
 							this->clingo->add("planBase", {}, gen->hasPlan(state, childPlan));
 
-							this->instanceElementHash = this->instanceElementHash ^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-							cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
-							this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
-							this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
-							this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+							handleRunningPlan(childPlan, state);
 
 							this->processPlan(childPlan);
 						}
@@ -156,11 +154,7 @@ namespace alica
 							{
 								this->clingo->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan));
 
-								this->instanceElementHash = this->instanceElementHash ^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-								cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
-								this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
-								this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
-								this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+								handleRunningPlan(childPlan, state);
 
 								this->processPlan(childPlan);
 							}
@@ -169,6 +163,10 @@ namespace alica
 								dynamic_cast<alica::BehaviourConfiguration*>(abstractChildPlan))
 						{
 							// TODO: Handle BehaviourConfigurations
+							this->clingo->add("planBase", {}, gen->behaviourConf(childBehaviourConf));
+							this->clingo->add("planBase", {}, gen->hasBehaviourConf(state, childBehaviourConf));
+							// TODO behaviour necessary ?
+							// TODO handle pre- and runtime condition of beh conf
 						}
 					}
 				}
@@ -313,6 +311,7 @@ namespace alica
 
 		void ASPAlicaPlanIntegrator::processRuntimeCondition(RuntimeCondition* cond)
 		{
+			//TODO finish RuntimeCondition
 			if (!cond)
 			{
 				return;
@@ -325,7 +324,107 @@ namespace alica
 				this->clingo->add("planBase", {}, gen->hasRuntimeCondition(plan, cond));
 			}
 
-			//TODO
+			if (cond->getConditionString() != "")
+			{
+				const string& condString = cond->getConditionString();
+
+				cout << "ASP-Integrator: " << gen->runtimeConditionHolds(cond) << endl;
+				this->clingo->add("planBase", {}, gen->runtimeConditionHolds(cond));
+
+				// analysis of asp encoded precondition, because of non-local in relations
+				std::regex words_regex(
+						"((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+(\\w*))(\\s*)){2}\\)");
+				auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
+				auto words_end = std::sregex_iterator();
+
+				for (std::sregex_iterator i = words_begin; i != words_end; ++i)
+				{
+					std::smatch match = *i;
+					std::string inPredicateString = match.str();
+					std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
+					;
+
+					size_t start = inPredicateString.find(',');
+					size_t end = string::npos;
+					string plan = "";
+					string task = "";
+					string state = "";
+
+					// plan
+					if (start != string::npos)
+					{
+						end = inPredicateString.find(',', start + 1);
+						if (end != string::npos)
+						{
+							plan = inPredicateString.substr(start + 1, end - start - 1);
+							this->clingo->add("planBase", {}, gen->inRefPlan(cond, plan));
+
+							std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
+						}
+					}
+
+					// task
+					start = end + 1;
+					if (start != string::npos)
+					{
+						end = inPredicateString.find(',', start);
+						if (end != string::npos)
+						{
+							task = inPredicateString.substr(start, end - start);
+							task = supplementary::Configuration::trim(task);
+							std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
+
+							if (islower(task.at(0)))
+							{
+								this->clingo->add("planBase", {}, gen->inRefPlanTask(cond, plan, task));
+							}
+							else
+							{
+								task = "";
+							}
+						}
+					}
+
+					// state
+					start = end + 1;
+					if (start != string::npos)
+					{
+						end = inPredicateString.find(')', start);
+						if (end != string::npos)
+						{
+							state = inPredicateString.substr(start, end - start);
+							state = supplementary::Configuration::trim(state);
+							std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
+
+							if (islower(state.at(0)))
+							{
+								this->clingo->add("planBase", {}, gen->inRefPlanState(cond, plan, state));
+							}
+							else
+							{
+								state = "";
+							}
+						}
+					}
+
+					// plan, task, state
+					if (task != "" && state != "")
+					{
+						this->clingo->add("planBase", {}, gen->inRefPlanTaskState(cond, plan, task, state));
+					}
+				}
+			}
+
+		}
+
+		void ASPAlicaPlanIntegrator::handleRunningPlan(Plan* childPlan, State* state)
+		{
+			this->instanceElementHash = this->instanceElementHash
+					^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
+			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
+			this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
+			this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
 		}
 
 	} /* namespace reasoner */

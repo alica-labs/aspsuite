@@ -27,17 +27,13 @@ find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_p
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS src/etc/Expr/include
-#  LIBRARIES alica_asp_test
   CATKIN_DEPENDS cmake_modules alica_engine alica_dummy_proxy alica_asp_solver clingo_cpp
-  #DEPENDS
 )
 
 ###########
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 
 include_directories(src/etc/Expr/include  ${catkin_INCLUDE_DIRS})
 
@@ -48,11 +44,6 @@ catkin_add_gtest(alica_asp-test
 )
 
 
-#message("[alica_asp_test] catkin_LIBRARIES: ${catkin_LIBRARIES}")
-#find_library(clingo_shared_LIBRARIES clingo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
-#find_library(program_opts_shared_LIBRARIES program_opts_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
-#find_library(clasp_shared_LIBRARIES clasp_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
-#find_library(gringo_shared_LIBRARIES gringo_shared PATH ${CATKIN_DEVEL_PREFIX}/lib)
+message("[alica_asp_test] catkin_LIBRARIES: ${catkin_LIBRARIES}")
 target_link_libraries(alica_asp-test ${catkin_LIBRARIES})
-
-add_dependencies(alica_asp-test ${catkin_LIBRARIES} clingo_shared program_opts_shared clasp_shared gringo_shared)
+add_dependencies(alica_asp-test ${catkin_LIBRARIES})# clingo_shared program_opts_shared clasp_shared gringo_shared)

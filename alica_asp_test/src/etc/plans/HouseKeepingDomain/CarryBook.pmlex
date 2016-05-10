@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="CarryBook.pml#1462889438750"/>
+    <value xPos="83" yPos="85" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="CarryBook.pml#1462889426092"/>
+    <value width="454" height="321"/>
+  </extensions>
+  <extensions>
+    <key href="CarryBook.pml#1462889438751"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CarryBook.pml#1462889683880"/>
+    <value xPos="9" yPos="-22"/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

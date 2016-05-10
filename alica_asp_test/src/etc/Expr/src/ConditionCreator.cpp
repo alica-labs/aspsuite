@@ -12,6 +12,8 @@
 
 #include  "Plans/CyclePlanA1453033636578.h"
 
+#include  "Plans/HouseKeepingDomain/CarryBook1462889426092.h"
+
 #include  "Plans/ReferencedPlan1456731591075.h"
 
 #include  "Plans/LocalInconsistentCardinalities1453033347284.h"
@@ -21,6 +23,8 @@
 #include  "Plans/CyclePlanC1453033651069.h"
 
 #include  "Plans/SingleUnconnectedState1452783421979.h"
+
+#include  "Plans/HouseKeepingDomain/CarryBookMaster1462889118325.h"
 
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
@@ -63,6 +67,12 @@ namespace alica
             case 1455035907819:
 
                 return make_shared<TransitionCondition1455035907819>();
+
+                break;
+
+            case 1462889683880:
+
+                return make_shared<PreCondition1462889683880>();
 
                 break;
 

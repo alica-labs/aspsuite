@@ -261,7 +261,7 @@ namespace alica
 		void ASPAlicaPlanIntegrator::handleRunningPlan(Plan* childPlan, State* state)
 		{
 			this->instanceElementHash = this->instanceElementHash
-					^ childPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+					^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
 			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
 			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
 			this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));

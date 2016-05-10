@@ -17,19 +17,17 @@
 
 #include  "Plans/LocalInconsistentCardinalities1453033347284.h"
 
-#include  "Plans/InconsistenCardinalities1462879046488.h"
-
 #include  "Plans/InRelationPlan1456731505906.h"
 
 #include  "Plans/CyclePlanC1453033651069.h"
-
-#include  "Plans/CorrectCardPlan1462879199379.h"
 
 #include  "Plans/SingleUnconnectedState1452783421979.h"
 
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
 #include  "Plans/ReusePlanWithoutCycle1455093185652.h"
+
+#include  "Plans/InconsistentCardinalities1462886292442.h"
 
 #include  "Plans/UnconnectedStateMachine1452783558494.h"
 
@@ -91,20 +89,12 @@ namespace alica
                 return make_shared<UtilityFunction1453033347284>();
                 break;
 
-            case 1462879046488:
-                return make_shared<UtilityFunction1462879046488>();
-                break;
-
             case 1456731505906:
                 return make_shared<UtilityFunction1456731505906>();
                 break;
 
             case 1453033651069:
                 return make_shared<UtilityFunction1453033651069>();
-                break;
-
-            case 1462879199379:
-                return make_shared<UtilityFunction1462879199379>();
                 break;
 
             case 1452783421979:
@@ -117,6 +107,10 @@ namespace alica
 
             case 1455093185652:
                 return make_shared<UtilityFunction1455093185652>();
+                break;
+
+            case 1462886292442:
+                return make_shared<UtilityFunction1462886292442>();
                 break;
 
             case 1452783558494:

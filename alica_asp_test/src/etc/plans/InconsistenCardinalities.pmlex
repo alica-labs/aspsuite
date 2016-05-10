@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="InconsistenCardinalities.pml#1462879046489"/>
+    <value xPos="98" yPos="85" width="81" height="67" collapsed="false"/>
+  </extensions>
+  <extensions>
+    <key href="InconsistenCardinalities.pml#1462879046488"/>
+    <value width="513" height="323"/>
+  </extensions>
+  <extensions>
+    <key href="InconsistenCardinalities.pml#1462879046490"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="BrokenCardPlan.pml#1462879159773"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CorrectCardPlan.pml#1462879199379"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

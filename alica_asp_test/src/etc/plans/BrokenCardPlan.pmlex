@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="BrokenCardPlan.pml#1462879191636"/>
+    <value xPos="105" yPos="107" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="BrokenCardPlan.pml#1462879159773"/>
+    <value width="544" height="380"/>
+  </extensions>
+  <extensions>
+    <key href="BrokenCardPlan.pml#1462879191637"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

@@ -19,6 +19,7 @@
 #include <engine/model/SyncTransition.h>
 #include <engine/model/RuntimeCondition.h>
 #include <engine/model/PreCondition.h>
+#include <engine/model/Condition.h>
 
 #include <CustomHashes.h>
 #include <regex>
@@ -225,87 +226,7 @@ namespace alica
 				this->clingo->add("planBase", {}, gen->preConditionHolds(cond));
 
 				// analysis of asp encoded precondition, because of non-local in relations
-				std::regex words_regex(
-						"((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+(\\w*))(\\s*)){2}\\)");
-				auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
-				auto words_end = std::sregex_iterator();
-
-				for (std::sregex_iterator i = words_begin; i != words_end; ++i)
-				{
-					std::smatch match = *i;
-					std::string inPredicateString = match.str();
-					std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
-					;
-
-					size_t start = inPredicateString.find(',');
-					size_t end = string::npos;
-					string plan = "";
-					string task = "";
-					string state = "";
-
-					// plan
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(',', start + 1);
-						if (end != string::npos)
-						{
-							plan = inPredicateString.substr(start + 1, end - start - 1);
-							this->clingo->add("planBase", {}, gen->inRefPlan(cond, plan));
-
-							std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
-						}
-					}
-
-					// task
-					start = end + 1;
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(',', start);
-						if (end != string::npos)
-						{
-							task = inPredicateString.substr(start, end - start);
-							task = supplementary::Configuration::trim(task);
-							std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
-
-							if (islower(task.at(0)))
-							{
-								this->clingo->add("planBase", {}, gen->inRefPlanTask(cond, plan, task));
-							}
-							else
-							{
-								task = "";
-							}
-						}
-					}
-
-					// state
-					start = end + 1;
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(')', start);
-						if (end != string::npos)
-						{
-							state = inPredicateString.substr(start, end - start);
-							state = supplementary::Configuration::trim(state);
-							std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
-
-							if (islower(state.at(0)))
-							{
-								this->clingo->add("planBase", {}, gen->inRefPlanState(cond, plan, state));
-							}
-							else
-							{
-								state = "";
-							}
-						}
-					}
-
-					// plan, task, state
-					if (task != "" && state != "")
-					{
-						this->clingo->add("planBase", {}, gen->inRefPlanTaskState(cond, plan, task, state));
-					}
-				}
+				handleCondString(condString, "preCond", cond);
 			}
 		}
 
@@ -332,87 +253,7 @@ namespace alica
 				this->clingo->add("planBase", {}, gen->runtimeConditionHolds(cond));
 
 				// analysis of asp encoded precondition, because of non-local in relations
-				std::regex words_regex(
-						"((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+(\\w*))(\\s*)){2}\\)");
-				auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
-				auto words_end = std::sregex_iterator();
-
-				for (std::sregex_iterator i = words_begin; i != words_end; ++i)
-				{
-					std::smatch match = *i;
-					std::string inPredicateString = match.str();
-					std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
-					;
-
-					size_t start = inPredicateString.find(',');
-					size_t end = string::npos;
-					string plan = "";
-					string task = "";
-					string state = "";
-
-					// plan
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(',', start + 1);
-						if (end != string::npos)
-						{
-							plan = inPredicateString.substr(start + 1, end - start - 1);
-							this->clingo->add("planBase", {}, gen->inRefPlan(cond, plan));
-
-							std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
-						}
-					}
-
-					// task
-					start = end + 1;
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(',', start);
-						if (end != string::npos)
-						{
-							task = inPredicateString.substr(start, end - start);
-							task = supplementary::Configuration::trim(task);
-							std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
-
-							if (islower(task.at(0)))
-							{
-								this->clingo->add("planBase", {}, gen->inRefPlanTask(cond, plan, task));
-							}
-							else
-							{
-								task = "";
-							}
-						}
-					}
-
-					// state
-					start = end + 1;
-					if (start != string::npos)
-					{
-						end = inPredicateString.find(')', start);
-						if (end != string::npos)
-						{
-							state = inPredicateString.substr(start, end - start);
-							state = supplementary::Configuration::trim(state);
-							std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
-
-							if (islower(state.at(0)))
-							{
-								this->clingo->add("planBase", {}, gen->inRefPlanState(cond, plan, state));
-							}
-							else
-							{
-								state = "";
-							}
-						}
-					}
-
-					// plan, task, state
-					if (task != "" && state != "")
-					{
-						this->clingo->add("planBase", {}, gen->inRefPlanTaskState(cond, plan, task, state));
-					}
-				}
+				handleCondString(condString, "runtimeCond", cond);
 			}
 
 		}
@@ -425,6 +266,83 @@ namespace alica
 			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
 			this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
 			this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+		}
+
+		void ASPAlicaPlanIntegrator::handleCondString(const string& condString, string prefix, Condition* cond)
+		{
+			// analysis of asp encoded precondition, because of non-local in relations
+			std::regex words_regex(
+					"((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+(\\w*))(\\s*)){2}\\)");
+			auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
+			auto words_end = std::sregex_iterator();
+			for (std::sregex_iterator i = words_begin; i != words_end; ++i)
+			{
+				std::smatch match = *i;
+				std::string inPredicateString = match.str();
+				std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
+				;
+				size_t start = inPredicateString.find(',');
+				size_t end = string::npos;
+				string plan = "";
+				string task = "";
+				string state = "";
+				// plan
+				if (start != string::npos)
+				{
+					end = inPredicateString.find(',', start + 1);
+					if (end != string::npos)
+					{
+						plan = inPredicateString.substr(start + 1, end - start - 1);
+						this->clingo->add("planBase", {}, gen->inRefPlan(prefix, cond, plan));
+						std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
+					}
+				}
+				// task
+				start = end + 1;
+				if (start != string::npos)
+				{
+					end = inPredicateString.find(',', start);
+					if (end != string::npos)
+					{
+						task = inPredicateString.substr(start, end - start);
+						task = supplementary::Configuration::trim(task);
+						std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
+						if (islower(task.at(0)))
+						{
+							this->clingo->add("planBase", {}, gen->inRefPlanTask(prefix, cond, plan, task));
+						}
+						else
+						{
+							task = "";
+						}
+					}
+				}
+				// state
+				start = end + 1;
+				if (start != string::npos)
+				{
+					end = inPredicateString.find(')', start);
+					if (end != string::npos)
+					{
+						state = inPredicateString.substr(start, end - start);
+						state = supplementary::Configuration::trim(state);
+						std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
+						if (islower(state.at(0)))
+						{
+							this->clingo->add("planBase", {}, gen->inRefPlanState(prefix, cond, plan, state));
+						}
+						else
+						{
+							state = "";
+						}
+					}
+				}
+				// plan, task, state
+				if (task != "" && state != "")
+				{
+					this->clingo->add("planBase", {}, gen->inRefPlanTaskState(prefix, cond, plan, task, state));
+				}
+			}
 		}
 
 	} /* namespace reasoner */

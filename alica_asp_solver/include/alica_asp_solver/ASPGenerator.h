@@ -72,22 +72,18 @@ namespace alica
 			string hasOutTransition(State* s, Transition* t, bool dotTerminated = true);
 			string hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated = true);
 			string brokenPlanTaskPair(Plan* p, Task*t, bool dotTerminated = true);
-			string inRefPlan(PreCondition* c, string plan, bool dotTerminated = true);
-			string inRefPlan(RuntimeCondition* c, string plan, bool dotTerminated = true);
+			string inRefPlan(string prefix, Condition* c, string plan, bool dotTerminated = true);
 			string hasPlanInstance(Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasRunningPlan(State* s, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasBehaviourConf(State* s, BehaviourConfiguration* behConf, bool dotTerminated = true);
 
 			// TERNARY PREDICATES
 			string hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated = true);
-			string inRefPlanTask(PreCondition* c, string plan, string task, bool dotTerminated = true);
-			string inRefPlanState(PreCondition* c, string plan, string state, bool dotTerminated = true);
-			string inRefPlanTask(RuntimeCondition* c, string plan, string task, bool dotTerminated = true);
-			string inRefPlanState(RuntimeCondition* c, string plan, string state, bool dotTerminated = true);
+			string inRefPlanTask(string prefix, Condition* c, string plan, string task, bool dotTerminated = true);
+			string inRefPlanState(string prefix, Condition* c, string plan, string state, bool dotTerminated = true);
 
 			// QUATERNARY PREDICATES
-			string inRefPlanTaskState(PreCondition* c, string plan, string task, string state, bool dotTerminated = true);
-			string inRefPlanTaskState(RuntimeCondition* c, string plan, string task, string state, bool dotTerminated = true);
+			string inRefPlanTaskState(string prefix, Condition* c, string plan, string task, string state, bool dotTerminated = true);
 
 			// RULES
 			string preConditionHolds(PreCondition* cond);
@@ -101,8 +97,7 @@ namespace alica
 			string get(PlanType* pt);
 			string get(Transition* t);
 			string get(SyncTransition* sync);
-			string get(PreCondition* cond);
-			string get(RuntimeCondition* cond);
+			string get(string prefix, Condition* cond);
 			string get(string prefix, uint64_t instanceElementHash);
 			string get(BehaviourConfiguration* behConf);
 

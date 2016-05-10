@@ -18,6 +18,7 @@ namespace alica
 	class Plan;
 	class PreCondition;
 	class RuntimeCondition;
+	class Condition;
 	class State;
 
 	namespace reasoner
@@ -41,6 +42,7 @@ namespace alica
 			void processPreCondition(PreCondition* cond);
 			void processRuntimeCondition(RuntimeCondition* cond);
 			void handleRunningPlan(Plan* childPlan, State* state);
+			void handleCondString(const string& condString, string prefix, Condition* cond);
 
 			ASPGenerator* gen;
 			shared_ptr<ClingoLib> clingo;

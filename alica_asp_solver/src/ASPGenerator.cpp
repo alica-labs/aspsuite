@@ -70,7 +70,7 @@ namespace alica
 
 		string ASPGenerator::preCondition(PreCondition* cond, bool dotTerminated)
 		{
-			return "preCondition(" + get(cond) + (dotTerminated ? ")." : ")");
+			return "preCondition(" + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
@@ -105,7 +105,7 @@ namespace alica
 
 		string ASPGenerator::neglocal(PreCondition* cond, bool dotTerminated)
 		{
-			return "nonlocal(" + get(cond) + (dotTerminated ? ")." : ")");
+			return "nonlocal(" + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::runningPlan(uint64_t instanceElementHash, bool dotTerminated)
@@ -115,7 +115,7 @@ namespace alica
 
 		string ASPGenerator::runtimeCondition(RuntimeCondition* cond, bool dotTerminated)
 		{
-			return "runtimeCondition(" + get(cond) + (dotTerminated ? ")." : ")");
+			return "runtimeCondition(" + get("runtimeCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated)
@@ -174,7 +174,7 @@ namespace alica
 
 		string ASPGenerator::hasPreCondition(Plan* p, PreCondition* cond, bool dotTerminated)
 		{
-			return "hasPreCondition(" + get(p) + ", " + get(cond) + (dotTerminated ? ")." : ")");
+			return "hasPreCondition(" + get(p) + ", " + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::hasInTransition(State* s, Transition* t, bool dotTerminated)
@@ -197,14 +197,9 @@ namespace alica
 			return "brokenPlanTaskPair(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlan(PreCondition* c, string plan, bool dotTerminated)
+		string ASPGenerator::inRefPlan(string prefix, Condition* c, string plan, bool dotTerminated)
 		{
-			return "inRefPlan(" + get(c) + ", " + plan + (dotTerminated ? ")." : ")");
-		}
-
-		string ASPGenerator::inRefPlan(RuntimeCondition* c, string plan, bool dotTerminated)
-		{
-			return "inRefPlan(" + get(c) + ", " + plan + (dotTerminated ? ")." : ")");
+			return "inRefPlan(" + get(prefix, c) + ", " + plan + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::hasPlanInstance(Plan* p, uint64_t instanceElementHash, bool dotTerminated)
@@ -214,7 +209,7 @@ namespace alica
 
 		string ASPGenerator::hasRuntimeCondition(Plan* p, RuntimeCondition* cond, bool dotTerminated)
 		{
-			return "hasRuntimeCondition(" + get(p) + ", " + get(cond) + (dotTerminated ? ")." : ")");
+			return "hasRuntimeCondition(" + get(p) + ", " + get("runtimeCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::hasRunningPlan(State* s, uint64_t instanceElementHash, bool dotTerminated)
@@ -234,50 +229,33 @@ namespace alica
 			return "hasEntryPoint(" + get(p) + ", " + get(t) + ", " + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlanTask(PreCondition* c, string plan, string task, bool dotTerminated)
+		string ASPGenerator::inRefPlanTask(string prefix, Condition* c, string plan, string task, bool dotTerminated)
 		{
-			return "inRefPlanTask(" + get(c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
+			return "inRefPlanTask(" + get(prefix, c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlanState(PreCondition* c, string plan, string state, bool dotTerminated)
+		string ASPGenerator::inRefPlanState(string prefix, Condition* c, string plan, string state, bool dotTerminated)
 		{
-			return "inRefPlanState(" + get(c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
-		}
-
-		string ASPGenerator::inRefPlanTask(RuntimeCondition* c, string plan, string task, bool dotTerminated)
-		{
-			return "inRefPlanTask(" + get(c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
-		}
-
-		string ASPGenerator::inRefPlanState(RuntimeCondition* c, string plan, string state, bool dotTerminated)
-		{
-			return "inRefPlanState(" + get(c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
+			return "inRefPlanState(" + get(prefix, c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
 		}
 
 		// QUATERNARY Predicates
 
-		string ASPGenerator::inRefPlanTaskState(PreCondition* c, string plan, string task, string state, bool dotTerminated)
+		string ASPGenerator::inRefPlanTaskState(string prefix, Condition* c, string plan, string task, string state, bool dotTerminated)
 		{
-			return "inRefPlanTaskState(" + get(c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
-		}
-
-		string ASPGenerator::inRefPlanTaskState(RuntimeCondition* c, string plan, string task, string state,
-																			bool dotTerminated)
-		{
-			return "inRefPlanTaskState(" + get(c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
+			return "inRefPlanTaskState(" + get(prefix, c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
 		}
 
 		// RULES
 
 		string ASPGenerator::preConditionHolds(PreCondition* cond)
 		{
-			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
+			return "holds(" + get("preCond", cond) + ") :- " + cond->getConditionString();
 		}
-
 
 		string ASPGenerator::runtimeConditionHolds(RuntimeCondition* cond)
 		{
-			return "holds(" + get(cond) + ") :- " + cond->getConditionString();
+			return "holds(" + get("runtimeCond", cond) + ") :- " + cond->getConditionString();
 		}
 
 		// LITERALS
@@ -372,32 +350,6 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(PreCondition* cond)
-		{
-			if (cond == this->wildcard_pointer)
-				return this->wildcard_string;
-
-			auto&& iter = this->elements.find(cond->getId());
-			if (iter == this->elements.end())
-			{
-				return this->elements[cond->getId()] = "preCond" + std::to_string(cond->getId());
-			}
-			return iter->second;
-		}
-
-		string ASPGenerator::get(RuntimeCondition* cond)
-		{
-			if (cond == this->wildcard_pointer)
-				return this->wildcard_string;
-
-			auto&& iter = this->elements.find(cond->getId());
-			if (iter == this->elements.end())
-			{
-				return this->elements[cond->getId()] = "runtimeCond" + std::to_string(cond->getId());
-			}
-			return iter->second;
-		}
-
 		string ASPGenerator::get(string prefix, uint64_t instanceElementHash)
 		{
 			if (prefix == "")
@@ -407,6 +359,19 @@ namespace alica
 			if (iter == this->instanceElements.end())
 			{
 				return this->instanceElements[instanceElementHash] = prefix + std::to_string(instanceElementHash);
+			}
+			return iter->second;
+		}
+
+		string ASPGenerator::get(string prefix, Condition* cond)
+		{
+			if (cond == this->wildcard_pointer)
+				return this->wildcard_string;
+
+			auto&& iter = this->elements.find(cond->getId());
+			if (iter == this->elements.end())
+			{
+				return this->elements[cond->getId()] = prefix + std::to_string(cond->getId());
 			}
 			return iter->second;
 		}

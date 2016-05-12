@@ -13,7 +13,9 @@
 
 #include  "Plans/CyclePlanA1453033636578.h"
 
-#include  "Plans/HouseKeepingDomain/CarryBook1462889426092.h"
+#include  "Plans/Assistance/CarryBookMaster1462889118325.h"
+
+#include  "Plans/Assistance/CarryBook1462889426092.h"
 
 #include  "Plans/ReferencedPlan1456731591075.h"
 
@@ -24,8 +26,6 @@
 #include  "Plans/CyclePlanC1453033651069.h"
 
 #include  "Plans/SingleUnconnectedState1452783421979.h"
-
-#include  "Plans/HouseKeepingDomain/CarryBookMaster1462889118325.h"
 
 #include  "Plans/HierarchicalInconsistentCardinalities1453033407259.h"
 
@@ -85,6 +85,10 @@ namespace alica
                 return make_shared<UtilityFunction1453033636578>();
                 break;
 
+            case 1462889118325:
+                return make_shared<UtilityFunction1462889118325>();
+                break;
+
             case 1462889426092:
                 return make_shared<UtilityFunction1462889426092>();
                 break;
@@ -107,10 +111,6 @@ namespace alica
 
             case 1452783421979:
                 return make_shared<UtilityFunction1452783421979>();
-                break;
-
-            case 1462889118325:
-                return make_shared<UtilityFunction1462889118325>();
                 break;
 
             case 1453033407259:

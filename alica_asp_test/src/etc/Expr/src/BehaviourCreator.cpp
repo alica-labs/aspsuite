@@ -3,6 +3,8 @@ using namespace std;
 #include "BehaviourCreator.h"
 #include "engine/BasicBehaviour.h"
 
+#include  "Plans/Assistance/Carry.h"
+
 namespace alica
 {
 
@@ -18,6 +20,11 @@ namespace alica
     {
         switch (behaviourConfId)
         {
+
+            case 1463077955666:
+
+                return make_shared<Carry>();
+                break;
 
             default:
                 cerr << "BehaviourCreator: Unknown behaviour requested: " << behaviourConfId << endl;

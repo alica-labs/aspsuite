@@ -2,7 +2,7 @@
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
     <key href="CarryBook.pml#1462889438750"/>
-    <value xPos="83" yPos="85" width="81" height="67"/>
+    <value xPos="83" yPos="85" width="81" height="67" collapsed="false"/>
   </extensions>
   <extensions>
     <key href="CarryBook.pml#1462889426092"/>
@@ -15,5 +15,9 @@
   <extensions>
     <key href="CarryBook.pml#1462889683880"/>
     <value xPos="9" yPos="-22"/>
+  </extensions>
+  <extensions>
+    <key href="Carry.beh#1463077955666"/>
+    <value/>
   </extensions>
 </uiextensionmodel:PmlUiExtensionMap>

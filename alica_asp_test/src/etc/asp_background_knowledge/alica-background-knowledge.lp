@@ -5,7 +5,7 @@
 % A plan without parents is a root plan.
 rootPlan(P) :- plan(P), not hasParentPlan(P, X) : plan(X), X!=P.
 
-%Transitivity of hasParentPlan
+% Transitivity of hasParentPlan
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), hasState(Parent, S), hasPlan(S, Child).
 hasParentPlan(Child, Parent) :- plan(Parent), plan(Child), planType(PT), hasState(Parent, S), hasPlanType(S, PT), hasRealisation(PT, Child).
 

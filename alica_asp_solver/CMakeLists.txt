@@ -60,6 +60,6 @@ add_library(${PROJECT_NAME}
     src/ASPGenerator.cpp
 )
 
-message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
+#message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES})# clingo_shared program_opts_shared clasp_shared gringo_shared)

@@ -35,7 +35,6 @@ namespace alica
 		{
 			this->clingo = clingo;
 			this->gen = gen;
-			this->instanceElementHash = 0;
 		}
 
 		ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
@@ -46,13 +45,15 @@ namespace alica
 		{
 			this->processedPlanIds.clear();
 
+			/* Creates running plan instance of root plan and must
+			 * be called before processPlan(p), in order to have the
+			 * instanceElementHash correctly calculated for all child
+			 * plans.
+			 */
+			uint64_t instanceElementHash = this->handleRunningPlan(p, nullptr, 0);
+
 			// Start recursive integration of plan tree
-			this->instanceElementHash = supplementary::CustomHashes::FNV_OFFSET
-					^ p->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
-			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
-			this->clingo->add("planBase", {}, gen->hasPlanInstance(p, this->instanceElementHash));
-			this->processPlan(p);
+			this->processPlan(p, instanceElementHash);
 
 			// Ground the created plan base
 			this->clingo->ground( { {"planBase", {}}}, nullptr);
@@ -64,7 +65,7 @@ namespace alica
 		 * @param Plan p.
 		 * @return Returns true, if the processed plan is a tree.
 		 */
-		void ASPAlicaPlanIntegrator::processPlan(Plan* p)
+		void ASPAlicaPlanIntegrator::processPlan(Plan* p, uint64_t instanceElementHash)
 		{
 			long currentPlanId = p->getId();
 			if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
@@ -142,9 +143,9 @@ namespace alica
 						{
 							this->clingo->add("planBase", {}, gen->hasPlan(state, childPlan));
 
-							handleRunningPlan(childPlan, state);
+							instanceElementHash = handleRunningPlan(childPlan, state, instanceElementHash);
 
-							this->processPlan(childPlan);
+							this->processPlan(childPlan, instanceElementHash);
 						}
 						else if (alica::PlanType* childPlanType = dynamic_cast<alica::PlanType*>(abstractChildPlan))
 						{
@@ -155,9 +156,9 @@ namespace alica
 							{
 								this->clingo->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan));
 
-								handleRunningPlan(childPlan, state);
+								instanceElementHash = handleRunningPlan(childPlan, state, instanceElementHash);
 
-								this->processPlan(childPlan);
+								this->processPlan(childPlan, instanceElementHash);
 							}
 						}
 						else if (alica::BehaviourConfiguration* childBehaviourConf =
@@ -258,14 +259,22 @@ namespace alica
 
 		}
 
-		void ASPAlicaPlanIntegrator::handleRunningPlan(Plan* childPlan, State* state)
+		uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(Plan* plan, State* state, uint64_t instanceElementHash)
 		{
-			this->instanceElementHash = this->instanceElementHash
-					^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-			cout << "[ASPAlicaPlanIntegrator::loadPlanTree]" << this->instanceElementHash << endl;
-			this->clingo->add("planBase", {}, gen->runningPlan(this->instanceElementHash));
-			this->clingo->add("planBase", {}, gen->hasPlanInstance(childPlan, this->instanceElementHash));
-			this->clingo->add("planBase", {}, gen->hasRunningPlan(state, this->instanceElementHash));
+			if (state == nullptr) // case for the root plan (which is not inside a state)
+			{
+				instanceElementHash = supplementary::CustomHashes::FNV_OFFSET
+						^ plan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+				this->clingo->add("planBase", {}, gen->hasPlanInstance(plan, instanceElementHash));
+			}
+			else // case for all other plans (which are always inside some state)
+			{
+				instanceElementHash = instanceElementHash ^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+				this->clingo->add("planBase", {}, gen->hasRunningPlan(state, instanceElementHash));
+			}
+
+			this->clingo->add("planBase", {}, gen->hasPlanInstance(plan, instanceElementHash));
+			this->clingo->add("planBase", {}, gen->runningPlan(instanceElementHash));
 		}
 
 		void ASPAlicaPlanIntegrator::handleCondString(const string& condString, string prefix, Condition* cond)

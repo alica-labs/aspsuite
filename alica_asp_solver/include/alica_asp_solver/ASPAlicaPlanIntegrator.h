@@ -38,19 +38,16 @@ namespace alica
 			void loadPlanTree(Plan* p);
 
 		private:
-			void processPlan(Plan* p);
+			void processPlan(Plan* p, uint64_t instanceElementHash);
 			void processPreCondition(PreCondition* cond);
 			void processRuntimeCondition(RuntimeCondition* cond);
-			void handleRunningPlan(Plan* childPlan, State* state);
+			uint64_t handleRunningPlan(Plan* childPlan, State* state, uint64_t instanceElementHash);
 			void handleCondString(const string& condString, string prefix, Condition* cond);
 
 			ASPGenerator* gen;
 			shared_ptr<ClingoLib> clingo;
 
 			vector<long> processedPlanIds;
-
-
-			uint64_t instanceElementHash;
 		};
 
 	} /* namespace reasoner */

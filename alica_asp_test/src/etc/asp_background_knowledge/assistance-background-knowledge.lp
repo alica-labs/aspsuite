@@ -17,3 +17,9 @@ overload(A) :- agent(A), ObjectCount = #count{O : on(O, A), carriableObject(O)},
 
 %An object can be carried by at most one agent.
 multipleCarry(O) :- carriableObject(O), AgentCount = #count{A : on(O, A), agent(A)}, AgentCount > 1.
+
+% Facts for testing
+book(b).
+agent(a).
+on(b, a).
+

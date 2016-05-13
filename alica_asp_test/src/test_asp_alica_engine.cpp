@@ -218,7 +218,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = aspSolver->gen.brokenRunningPlan(14695984337881541968ul, false);
+	string queryString = aspSolver->gen.brokenRunningPlan(9963469656531404948ul, false);
 	aspSolver->registerQuery(queryString);
 
 	if (!aspSolver->validatePlan(plan))
@@ -226,7 +226,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The running plan 'rp" << to_string(14695984337881541968ul)
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The running plan 'rp" << to_string(9963469656531404948ul)
 			<< "' should be broken.";
 
 	// stop time measurement and report
@@ -419,24 +419,13 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = aspSolver->gen.brokenRunningPlan(14695982138858284394ul, false);
+	string brokenRunningMasterPlan = aspSolver->gen.brokenRunningPlan(1922052048482545739ul, false);
+	string brokenRunningPlan1 = aspSolver->gen.brokenRunningPlan(15086528525391303969ul, false);
+	string brokenRunningPlan2 = aspSolver->gen.brokenRunningPlan(15111675455840117750ul, false);
 
-	aspSolver->registerQuery(queryString);
-
-	if (!aspSolver->validatePlan(plan))
-	{
-		cout << "ASPAlicaTest: No Model found!" << endl;
-	}
-	else
-	{
-		aspSolver->printStats();
-	}
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The runningplan '" << to_string(14695982138858284394ul)
-			<< "' should be broken.";
-
-	queryString = aspSolver->gen.brokenRunningPlan(1893175574616393372ul, false);
-
-	aspSolver->registerQuery(queryString);
+	aspSolver->registerQuery(brokenRunningMasterPlan);
+	aspSolver->registerQuery(brokenRunningPlan1);
+	aspSolver->registerQuery(brokenRunningPlan2);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -447,24 +436,13 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrue(queryString)) << "The runningplan '" << to_string(1893175574616393372ul)
-			<< "' should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(brokenRunningMasterPlan)) << "The query '" << brokenRunningMasterPlan
+			<< "' (instance of master plan) should be false.";
+	EXPECT_TRUE(aspSolver->isTrue(brokenRunningPlan1)) << "The query '" << brokenRunningPlan1
+			<< "' should be true.";
+	EXPECT_FALSE(aspSolver->isTrue(brokenRunningPlan2)) << "The query '" << brokenRunningPlan2
+			<< "' should be false.";
 
-	queryString = aspSolver->gen.brokenRunningPlan(1922052048482545739ul, false);
-
-	aspSolver->registerQuery(queryString);
-
-	if (!aspSolver->validatePlan(plan))
-	{
-		cout << "ASPAlicaTest: No Model found!" << endl;
-	}
-	else
-	{
-		aspSolver->printStats();
-	}
-
-	EXPECT_FALSE(aspSolver->isTrue(queryString)) << "The runningplan '" << to_string(1922052048482545739ul)
-			<< "' should not be broken.";
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;

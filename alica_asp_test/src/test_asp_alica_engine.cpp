@@ -56,7 +56,6 @@ protected:
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
-		//std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
 		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
 
 		// "1" stands for the ASPSolver in this test suite only!
@@ -454,6 +453,7 @@ TEST_F(AspAlicaEngine, multipleObjectCarry)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+
 	supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
 	string assistanceBackgroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("assistanceBackgroundKnowledgeFile", NULL);
 	assistanceBackgroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
@@ -484,4 +484,10 @@ TEST_F(AspAlicaEngine, multipleObjectCarry)
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+int main(int argc, char **argv)
+{
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

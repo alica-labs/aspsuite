@@ -1,19 +1,29 @@
-#program assistanceBackground.
+#program alicaBackground.
 
 % Facts for testing
 book(harryPotter1).
-agent(donatello, raphael, leonardo).
-on(harryPotter1, a).
+book(harryPotter2).
+book(harryPotter3).
+agent(donatello).
+agent(raphael).
+agent(leonardo).
+on(harryPotter1, donatello).
+on(harryPotter1, raphael).
+on(harryPotter2, leonardo).
+on(harryPotter3, leonardo).
+
+in(donatello, p1462889426092, tsk1225112227903, s1462889438750).
+in(raphael, p1462889426092, tsk1225112227903, s1462889438750).
+in(leonardo, p1462889426092, tsk1225112227903, s1462889438750).
 
 % General Knowlege in an Robotic Assistance Domain (Service Robotic)
 
 % Each entity is a thing
 thing(O) :- largeThing(O).
 thing(O) :- smallThing(O).
-thing(O) :- book(O).
-thing(O) :- cup(O).
-thing(O) :- glas(O).
-thing(O) :- table(O).
+smallThing(O) :- book(O).
+smallThing(O) :- cup(O).
+smallThing(O) :- glas(O).
 largeThing(O) :- table(O).
 
 % An agent carries an object when its on top of it
@@ -23,7 +33,8 @@ carries(A, O) :- on(O, A).
 overloaded(A) :- agent(A), ThingCount = #count{O : on(O, A)}, ThingCount > 1.
 
 % By default a thing is a small thing
-smallThing(O) :- thing(O), non largeThing(O).
+smallThing(O) :- thing(O), not largeThing(O).
 
 % A small object can only be carried by one agent.
 inconsistent(O) :- smallThing(O), carries(A1, O), carries(A2, O), A1 != A2.
+

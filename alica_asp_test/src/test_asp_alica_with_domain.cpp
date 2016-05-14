@@ -97,7 +97,7 @@ TEST_F(AspAlicaEngineWithDomain, multipleObjectCarry)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = aspSolver->gen.cycleFree(plan, false);
+	string queryString = "inconsistent(harryPotter1)";
 
 	aspSolver->registerQuery(queryString);
 
@@ -110,7 +110,46 @@ TEST_F(AspAlicaEngineWithDomain, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << plan->getName() << "' should be free of cycles.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngineWithDomain, overloaded)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+
+	supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
+	string assistanceBackgroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("assistanceBackgroundKnowledgeFile", NULL);
+	assistanceBackgroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+																				assistanceBackgroundKnowledgeFile);
+	cout << "ASPSolver: " << assistanceBackgroundKnowledgeFile << endl;
+	aspSolver->load(assistanceBackgroundKnowledgeFile);
+
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	string queryString = "overloaded(leonardo)";
+
+	aspSolver->registerQuery(queryString);
+
+	if (!aspSolver->validatePlan(plan))
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The agent can't carry by more than one thing.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

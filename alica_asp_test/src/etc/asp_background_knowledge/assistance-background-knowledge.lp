@@ -7,14 +7,18 @@ book(harryPotter3).
 agent(donatello).
 agent(raphael).
 agent(leonardo).
+agent(michelangelo).
+table(desk1).
 on(harryPotter1, donatello).
 on(harryPotter1, raphael).
 on(harryPotter2, leonardo).
 on(harryPotter3, leonardo).
+on(desk1, michelangelo).
 
 in(donatello, p1462889426092, tsk1225112227903, s1462889438750).
 in(raphael, p1462889426092, tsk1225112227903, s1462889438750).
 in(leonardo, p1462889426092, tsk1225112227903, s1462889438750).
+in(michelangelo, p1462889426092, tsk1225112227903, s1462889438750).
 
 % General Knowlege in an Robotic Assistance Domain (Service Robotic)
 
@@ -26,11 +30,14 @@ smallThing(O) :- cup(O).
 smallThing(O) :- glas(O).
 largeThing(O) :- table(O).
 
-% An agent carries an object when its on top of it
-carries(A, O) :- on(O, A).
+% An agent carries an object when its on top of it and its not too big to carry
+carries(A, O) :- on(O, A), not largeThing(O).
 
 % An agent can carry at most one object
 overloaded(A) :- agent(A), ThingCount = #count{O : on(O, A)}, ThingCount > 1.
+
+%An Agwnt can't carry a large object
+overloaded(A) :- agent(A), on(O, A), largeThing(O).
 
 % By default a thing is a small thing
 smallThing(O) :- thing(O), not largeThing(O).

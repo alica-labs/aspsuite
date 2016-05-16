@@ -3,6 +3,8 @@ using namespace std;
 #include "BehaviourCreator.h"
 #include "engine/BasicBehaviour.h"
 
+#include  "Plans/Assistance/HandOver.h"
+
 #include  "Plans/Assistance/Carry.h"
 
 namespace alica
@@ -20,6 +22,11 @@ namespace alica
     {
         switch (behaviourConfId)
         {
+
+            case 1463404677134:
+
+                return make_shared<HandOver>();
+                break;
 
             case 1463077955666:
 

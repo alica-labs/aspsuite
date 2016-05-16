@@ -62,7 +62,7 @@ brokenTerminalState(S) :- hasTerminalState(P, S), not hasState(P,S).
 % Terminal states do not include sub-plans or behaviours
 brokenTerminalState(S) :- terminalState(S), hasPlan(S,P).
 brokenTerminalState(S) :- terminalState(S), hasPlanType(S,PT).
-brokenTerminalState(S) :- terminalState(S), hasBehaviour(S,B).
+brokenTerminalState(S) :- terminalState(S), hasBehaviourConf(S,B).
 
 % There is a postcondition associated with each success and failure state. 
 brokenTerminalState(S) :- terminalState(S), PostConditionCnt = #count{PostC : hasPostCondition(S,PostC), postCondition(PostC)}, PostConditionCnt != 1.
@@ -120,12 +120,17 @@ inCond(C,in(A,P,T,S)) :- pb(in(A,P,T,S)), agent(A), plan(P), task(T), state(S), 
 %%%%% Conditions for well-formed plan base
 
 % An agent can only occupy one state per plan
-brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.  %this needs to be tested
- 
+%brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.  %this needs to be tested
+%brokenPlanBase(A, IsInStateCnt, P) :- agent(A),plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.
+brokenPlanBase(A) :- agent(A), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), plan(P), task(T)}, IsInStateCnt != 1. 
+
 % An agent can only execute one plan per plantype
 % TODO: that does not work for plans which are inside a plantype and outside of the plantype in another plan, which is in the same plan-tree path (distinguishing these two instances of the same plan is only possible, if you consider the length of the path in the tree to the corresponding instance).
 brokenPlanBase(A) :- agent(A), planType(PT), InPlanTypePlanCnt = #count{P : hasRealisation(PT,P), plan(P), pb(in(A,P,T,S))}, InPlanTypePlanCnt > 1.
 
 % The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
 brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), pb(in(A,P,T,S)), not isReachableFrom(S,E).
+
+%Behaviour related
+executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBehaviourConf(S, B), pb(in(A, P, T, S)).
 

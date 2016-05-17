@@ -1,4 +1,4 @@
-#program alicaBackground.
+#program assistanceBackground.
 
 % Facts for testing
 book(harryPotter1).

@@ -1,26 +1,5 @@
 #program assistanceBackground.
 
-% Facts for testing
-book(harryPotter1).
-book(harryPotter2).
-book(harryPotter3).
-agent(donatello).
-agent(raphael).
-agent(leonardo).
-agent(michelangelo).
-table(desk1).
-on(harryPotter1, donatello).
-on(harryPotter1, raphael).
-on(harryPotter2, leonardo).
-on(harryPotter3, leonardo).
-on(desk1, michelangelo).
-
-pb(in(donatello, p1462889426092, tsk1225112227903, s1462889438750)).
-pb(in(donatello, p1462889426092, tsk1225112227903, s1463404627637)).
-pb(in(raphael, p1462889426092, tsk1225112227903, s1462889438750)).
-pb(in(leonardo, p1462889426092, tsk1225112227903, s1462889438750)).
-pb(in(michelangelo, p1462889426092, tsk1225112227903, s1462889438750)).
-
 % General Knowlege in an Robotic Assistance Domain (Service Robotic)
 
 % Each entity is a thing

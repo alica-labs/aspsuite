@@ -134,3 +134,13 @@ brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasTas
 %Behaviour related
 executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBehaviourConf(S, B), pb(in(A, P, T, S)).
 
+
+%Related to recursiveSound  needs to be tested
+
+ok(ParentPlan) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasState(ParentPlan, ParentState), hasPlan(ParentState, ChildPlan), preCondition(C), hasPreCondition(ChildPlan, C), not -holds(C).
+
+ 
+
+
+
+

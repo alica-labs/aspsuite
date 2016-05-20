@@ -220,7 +220,8 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 
 	aspSolver->registerQuery(queryString);
 
-	if (!aspSolver->validatePlan(plan))
+	bool modelFound = aspSolver->validatePlan(plan);
+	if (!modelFound)
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}

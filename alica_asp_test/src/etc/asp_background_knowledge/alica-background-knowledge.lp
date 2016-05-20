@@ -139,7 +139,9 @@ executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBeh
 
 ok(ParentPlan) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasState(ParentPlan, ParentState), hasPlan(ParentState, ChildPlan), preCondition(C), hasPreCondition(ChildPlan, C), not -holds(C).
 
- 
+recursiveSound(ChildPlan) :- recursiveSound(ParentPlan), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasState(ParentPlan, ParentState), hasPlan(ParentState, ChildPlan).
+
+holds(C, RP) :- recursiveSound(P), hasPlanInstance(P, RP),  not brokenRunningPlan(RP), hasPreCondition(P, C).  
 
 
 

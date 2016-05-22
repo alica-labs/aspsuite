@@ -46,6 +46,7 @@ namespace alica
 
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
+			cout << "ASPSolver: grounding " << endl;
 			this->clingo->ground(std::forward<Gringo::Control::GroundVec const &>(vec),
 									std::forward<Gringo::Any&&>(context));
 		}

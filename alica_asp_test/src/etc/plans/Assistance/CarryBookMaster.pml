@@ -6,6 +6,9 @@
   <states id="1462889170425" name="CarryBookState2" comment="" entryPoint="1462889160670">
     <plans xsi:type="alica:Plan">CarryBook.pml#1462889426092</plans>
   </states>
+  <states id="1464027526248" name="TestState" comment="" entryPoint="1464027518192">
+    <plans xsi:type="alica:Plan">InnerPlan.pml#1464027589619</plans>
+  </states>
   <entryPoints id="1462889118327" name="Attack" comment="" successRequired="false" minCardinality="1" maxCardinality="1">
     <task>../../Misc/taskrepository.tsk#1222613952469</task>
     <state>#1462889118326</state>
@@ -13,5 +16,9 @@
   <entryPoints id="1462889160670" name="Defend" comment="" successRequired="false" minCardinality="1" maxCardinality="2147483647">
     <task>../../Misc/taskrepository.tsk#1225115406909</task>
     <state>#1462889170425</state>
+  </entryPoints>
+  <entryPoints id="1464027518192" name="NewEntryPoint" comment="" successRequired="false" minCardinality="0" maxCardinality="2147483647">
+    <task>../../Misc/taskrepository.tsk#1225112227903</task>
+    <state>#1464027526248</state>
   </entryPoints>
 </alica:Plan>

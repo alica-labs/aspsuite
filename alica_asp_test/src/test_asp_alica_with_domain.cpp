@@ -210,19 +210,17 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	cout << "ASPSolver: " << assistanceTestFactsFile << endl;
 	aspSolver->load(assistanceTestFactsFile);
 
-
+	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	//string queryString = "brokenPlanBase(donatello)";
-	string queryString = "test(preCond1463404630976)";
+	string queryString = "brokenPlanBase(donatello)";
 
 	aspSolver->registerQuery(queryString);
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	bool modelFound = aspSolver->validatePlan(plan);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	if (!modelFound)
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;

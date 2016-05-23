@@ -6,7 +6,7 @@
   </extensions>
   <extensions>
     <key href="CarryBookMaster.pml#1462889118325"/>
-    <value width="483" height="384"/>
+    <value width="662" height="568"/>
   </extensions>
   <extensions>
     <key href="CarryBookMaster.pml#1462889118327"/>
@@ -22,6 +22,18 @@
   </extensions>
   <extensions>
     <key href="CarryBook.pml#1462889426092"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="CarryBookMaster.pml#1464027518192"/>
+    <value xPos="-27" yPos="232"/>
+  </extensions>
+  <extensions>
+    <key href="CarryBookMaster.pml#1464027526248"/>
+    <value xPos="197" yPos="345" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="InnerPlan.pml#1464027589619"/>
     <value/>
   </extensions>
 </uiextensionmodel:PmlUiExtensionMap>

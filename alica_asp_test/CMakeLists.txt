@@ -36,6 +36,7 @@ catkin_package(
 
 include_directories(src/etc/Expr/include  ${catkin_INCLUDE_DIRS})
 
+
 file(GLOB_RECURSE alica_asp-test_SOURCES "src/*.cpp" "src/etc/Expr/src/*.cpp")
 catkin_add_gtest(alica_asp-test 
   ${alica_asp-test_SOURCES}

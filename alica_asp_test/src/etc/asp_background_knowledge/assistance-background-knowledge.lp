@@ -24,9 +24,3 @@ smallThing(O) :- thing(O), not largeThing(O).
 
 % A small object can only be carried by one agent.
 inconsistent(O) :- smallThing(O), carries(A1, O), carries(A2, O), A1 != A2.
-
-% Recursive sound related still needs to be tested
-
-test(C) :- preCondition(C).
-
-%notHolds(C) :- preCondition(C), smallThing(T), agent(A), carries(A, T).

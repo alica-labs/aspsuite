@@ -1,13 +1,8 @@
 #program assistanceTestFacts.
 
 % Facts for testing
-book(harryPotter1).
-book(harryPotter2).
-book(harryPotter3).
-agent(donatello).
-agent(raphael).
-agent(leonardo).
-agent(michelangelo).
+book(harryPotter1; harryPotter2; harryPotter3).
+agent(donatello; raphael; leonardo; michelangelo).
 table(desk1).
 on(harryPotter1, donatello).
 on(harryPotter1, raphael).
@@ -21,4 +16,4 @@ pb(in(raphael, p1462889426092, tsk1225112227903, s1462889438750)).
 pb(in(leonardo, p1462889426092, tsk1225112227903, s1462889438750)).
 pb(in(michelangelo, p1462889426092, tsk1225112227903, s1462889438750)).
 
-recursiveSound(p1462889118325).
+sound(p1462889118325).

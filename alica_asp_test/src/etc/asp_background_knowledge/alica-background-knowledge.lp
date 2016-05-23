@@ -135,13 +135,23 @@ brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasTas
 executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBehaviourConf(S, B), pb(in(A, P, T, S)).
 
 
-%Related to recursiveSound  needs to be tested
+%Related to 
+% perfectly (all agents are allocated) 
+% complete (one plan for each plantype is executed) 
+% recursive (recursivly down the plan hierarchy) 
+% sound ()
+% plans.
 
-ok(ParentPlan) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasState(ParentPlan, ParentState), hasPlan(ParentState, ChildPlan), preCondition(C), hasPreCondition(ChildPlan, C), hasPlanInstance(ChildPlan, RP), not -holds(C, RP).
 
-recursiveSound(ChildPlan) :- recursiveSound(ParentPlan), hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasState(ParentPlan, ParentState), hasPlan(ParentState, ChildPlan), preCondition(C), hasPlanInstance(ChildPlan, RP), not -holds(C, RP).
+holds(C, RP) :- sound(P), plan(P), hasPlanInstance(P, RP), hasPreCondition(P,C).
 
-holds(C, RP) :- recursiveSound(P), hasPlanInstance(P, RP),  not brokenRunningPlan(RP), hasPreCondition(P, C).  
+% works only for direct child-parent plans
+holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), hasPreCondition(ChildP,ChildC) : plan(P), preCondition(ChildC), hasEntryPoint(P, T, EP), hasInitialState(EP, S), hasPlan(S, ChildP), hasRunningPlan(S, ChildRP), sound(P).
 
-%-holds(C, RP) :- preCondition(C), runningPlan(RP), recursiveSound(P), hasPlanInstance(P, RP).
+
+
+
+
+
+
 

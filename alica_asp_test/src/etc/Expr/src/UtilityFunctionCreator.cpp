@@ -15,6 +15,8 @@
 
 #include  "Plans/CyclePlanA1453033636578.h"
 
+#include  "Plans/Assistance/ThirdInnerPlan1464091819666.h"
+
 #include  "Plans/Assistance/CarryBookMaster1462889118325.h"
 
 #include  "Plans/Assistance/CarryBook1462889426092.h"
@@ -91,6 +93,10 @@ namespace alica
 
             case 1453033636578:
                 return make_shared<UtilityFunction1453033636578>();
+                break;
+
+            case 1464091819666:
+                return make_shared<UtilityFunction1464091819666>();
                 break;
 
             case 1462889118325:

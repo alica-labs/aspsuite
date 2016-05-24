@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ASCII"?>
+<uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
+  <extensions>
+    <key href="ThirdInnerPlan.pml#1464091833199"/>
+    <value xPos="93" yPos="43" width="81" height="67"/>
+  </extensions>
+  <extensions>
+    <key href="ThirdInnerPlan.pml#1464091819666"/>
+    <value width="404" height="251"/>
+  </extensions>
+  <extensions>
+    <key href="ThirdInnerPlan.pml#1464091833200"/>
+    <value/>
+  </extensions>
+</uiextensionmodel:PmlUiExtensionMap>

@@ -143,7 +143,7 @@ executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBeh
 % plans.
 
 
-%holds(C, RP) :- sound(P), plan(P), hasPlanInstance(P, RP), hasPreCondition(P,C).
+holds(C, RP) :- sound(P), plan(P), hasPlanInstance(P, RP), hasPreCondition(P,C).
 
 % works only for direct child-parent plans
 %holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), preCondition(ChildC),hasPreCondition(ChildP,ChildC) : plan(P), hasEntryPoint(P, T, EP), hasInitialState(EP, S), hasPlan(S, ChildP), hasRunningPlan(S, ChildRP), sound(P).

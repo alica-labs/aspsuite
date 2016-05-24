@@ -2,14 +2,18 @@
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
     <key href="SecondInnerPlan.pml#1464027640744"/>
-    <value/>
+    <value xPos="114" yPos="120" width="81" height="67"/>
   </extensions>
   <extensions>
     <key href="SecondInnerPlan.pml#1464027620934"/>
-    <value/>
+    <value width="661" height="483"/>
   </extensions>
   <extensions>
     <key href="SecondInnerPlan.pml#1464027640745"/>
     <value/>
+  </extensions>
+  <extensions>
+    <key href="SecondInnerPlan.pml#1464080078059"/>
+    <value xPos="17" yPos="-25"/>
   </extensions>
 </uiextensionmodel:PmlUiExtensionMap>

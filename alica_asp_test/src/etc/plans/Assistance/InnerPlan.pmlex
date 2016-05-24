@@ -2,7 +2,7 @@
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
     <key href="InnerPlan.pml#1464027605607"/>
-    <value xPos="70" yPos="105" width="81" height="67"/>
+    <value xPos="70" yPos="105" width="81" height="67" collapsed="false"/>
   </extensions>
   <extensions>
     <key href="InnerPlan.pml#1464027589619"/>

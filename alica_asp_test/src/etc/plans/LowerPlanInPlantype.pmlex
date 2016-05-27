@@ -2,7 +2,7 @@
 <uiextensionmodel:PmlUiExtensionMap xmlns:uiextensionmodel="http:///de.uni_kassel.vs.cn/planDesigner/pmlextension/uiextensionmodel">
   <extensions>
     <key href="LowerPlanInPlantype.pml#1462793923280"/>
-    <value xPos="130" yPos="68" width="81" height="67"/>
+    <value xPos="130" yPos="68" width="81" height="67" collapsed="false"/>
   </extensions>
   <extensions>
     <key href="LowerPlanInPlantype.pml#1462793912377"/>
@@ -10,6 +10,10 @@
   </extensions>
   <extensions>
     <key href="LowerPlanInPlantype.pml#1462793923281"/>
+    <value/>
+  </extensions>
+  <extensions>
+    <key href="IndirectReusePlanInPlantype.pml#1462793790517"/>
     <value/>
   </extensions>
 </uiextensionmodel:PmlUiExtensionMap>

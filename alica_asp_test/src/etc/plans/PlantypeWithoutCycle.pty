@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<alica:PlanType xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:alica="http:///de.uni_kassel.vs.cn" id="1464355946605" name="PlantypeWithoutCycle" comment="" masterPlan="false" utilityFunction="" utilityThreshold="0.1" destinationPath="">
+  <plans id="1464355964324" name="MISSING_NAME" comment="" activated="true">
+    <plan>Min3AgentPlan.pml#1453033506291</plan>
+  </plans>
+</alica:PlanType>

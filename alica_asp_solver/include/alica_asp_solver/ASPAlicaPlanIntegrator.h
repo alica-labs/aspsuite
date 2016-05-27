@@ -20,6 +20,7 @@ namespace alica
 	class RuntimeCondition;
 	class Condition;
 	class State;
+	class PlanType;
 
 	namespace reasoner
 	{
@@ -41,7 +42,9 @@ namespace alica
 			void processPlan(Plan* p, uint64_t instanceElementHash);
 			void processPreCondition(PreCondition* cond);
 			void processRuntimeCondition(RuntimeCondition* cond);
+			uint64_t handleRunningPlan(Plan* rootPlan);
 			uint64_t handleRunningPlan(Plan* childPlan, State* state, uint64_t instanceElementHash);
+			uint64_t handleRunningPlan(Plan* childPlan, State* state, PlanType* planType, uint64_t instanceElementHash);
 			void handleCondString(const string& condString, string prefix, Condition* cond);
 
 			ASPGenerator* gen;

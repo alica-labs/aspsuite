@@ -81,18 +81,19 @@ brokenEntryPoint(E) :- entryPoint(E), MinCardinalityCnt = #count{Min : hasMinCar
 brokenEntryPoint(E) :- entryPoint(E), MaxCardinalityCnt = #count{Max : hasMaxCardinality(E,Max)}, MaxCardinalityCnt != 1.
 brokenEntryPoint(E) :- entryPoint(E), hasMinCardinality(E, Min), hasMaxCardinality(E, Max), Min > Max.
 
-% The sum of the minimum cardinalities of a child plan is larger than the maximum cardinality of the parents entry point		 
+% The sum of the minimum cardinalities of a child plan is larger than the maximum cardinality of the parents entry point
+
+% - Check cardinalities for plans
 brokenRunningPlan(ChildRP) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasPlan(ParentState, ChildPlan), hasPlanInstance(ChildPlan, ChildRP), hasRunningPlan(ParentState, ChildRP),
 	hasMaxCardinality(ParentEntrypoint, ParentMax),
 	SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)},
-	SumOfChildPlanMinCard > ParentMax. 
+	SumOfChildPlanMinCard > ParentMax.
 	
+% - Check cardinalities for plan types
 brokenRunningPlan(ChildRP) :- hasEntryPoint(ParentPlan, ParentTask, ParentEntryPoint), isReachableFrom(ParentState, ParentEntrypoint), hasPlanType(ParentState, ParentPlanType), hasRealisation(ParentPlanType, ChildPlan), hasPlanInstance(ChildPlan, ChildRP), hasRunningPlan(ParentState, ChildRP),
 	hasMaxCardinality(ParentEntrypoint, ParentMax),
 	SumOfChildPlanMinCard = #sum { ChildMin : entryPoint(ChildEntryPoint), hasMinCardinality(ChildEntryPoint,ChildMin), hasEntryPoint(ChildPlan, ChildTask, ChildEntryPoint)},
-	SumOfChildPlanMinCard > ParentMax. 								
-	
-	%TODO: Think about recursive sound plans -> "SumOfChildPlanMinCard > ParentMin."
+	SumOfChildPlanMinCard > ParentMax.
 
 %% CYCLES
 
@@ -113,42 +114,37 @@ brokenCondition(C) :- agent(A), plan(P), task(T), state(S), condition(C), inRefP
 % rules for non-local conditions
 nonlocal(C) :- condition(C), not local(C).
 
-%%%%% General plan base axioms
-
-inCond(C,in(A,P,T,S)) :- pb(in(A,P,T,S)), agent(A), plan(P), task(T), state(S), condition(C).
-
-%%%%% Conditions for well-formed plan base
-
-% An agent can only occupy one state per plan
-%brokenPlanBase(A) :- agent(A), plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.  %this needs to be tested
-%brokenPlanBase(A, IsInStateCnt, P) :- agent(A),plan(P), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), task(T)}, IsInStateCnt != 1.
-brokenPlanBase(A) :- agent(A), IsInStateCnt = #count{S : pb(in(A,P,T,S)), state(S), plan(P), task(T)}, IsInStateCnt != 1. 
-
-% An agent can only execute one plan per plantype
-% TODO: that does not work for plans which are inside a plantype and outside of the plantype in another plan, which is in the same plan-tree path (distinguishing these two instances of the same plan is only possible, if you consider the length of the path in the tree to the corresponding instance).
-brokenPlanBase(A) :- agent(A), planType(PT), InPlanTypePlanCnt = #count{P : hasRealisation(PT,P), plan(P), pb(in(A,P,T,S))}, InPlanTypePlanCnt > 1.
-
-% The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
-brokenPlanBase(A) :- agent(A), plan(P), task(T), state(S), entryPoint(E), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), pb(in(A,P,T,S)), not isReachableFrom(S,E).
-
-%Behaviour related
-executes(A, B) :- agent(A), plan(P), task(T), state(S), behaviourConf(B), hasBehaviourConf(S, B), pb(in(A, P, T, S)).
-
-
-%Related to 
+%%
+% Related to 
 % perfectly (all agents are allocated) 
 % complete (one plan for each plantype is executed) 
 % recursive (recursivly down the plan hierarchy) 
 % sound ()
 % plans.
 
-
 holds(C, RP) :- sound(P), plan(P), hasPlanInstance(P, RP), hasPreCondition(P,C).
+
+holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), hasPreCondition(ChildP,ChildC), runningPlan(ChildRP) : plan(P), hasParentPlan(ChildP, P), hasEntryPoint(P, T, EP), hasInitialState(EP, S), hasPlan(S, ChildP), hasRunningPlan(S, ChildRP), sound(P).
+
 holds(C, RP) :- sound(P), plan(P), hasPlanInstance(P, RP), hasRuntimeCondition(P,C).
 
-% works only for direct child-parent plans
-holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), hasPreCondition(ChildP,ChildC), runningPlan(ChildRP) : plan(P), hasParentPlan(ChildP, P), hasEntryPoint(P, T, EP), hasInitialState(EP, S), hasPlan(S, ChildP), hasRunningPlan(S, ChildRP), sound(P).
 holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), hasRuntimeCondition(ChildP,ChildC), runningPlan(ChildRP) : plan(P), hasParentPlan(ChildP, P), hasEntryPoint(P, T, EP), hasInitialState(EP, S), hasPlan(S, ChildP), hasRunningPlan(S, ChildRP), sound(P).
+
+%%%%% General plan base axioms
+
+%%%%% Conditions for well-formed plan base 
+% These rules are relevant at run-time
+
+% An agent can only occupy one state per plan 
+%brokenPlanBase(A) :- agent(A), runningPlan(RP), IsInStateCnt = #count{S : in(A,RP,T,S)}, IsInStateCnt > 1.
+
+% An agent can only execute one plan per plantype
+brokenPlanBase(A, InPlanTypePlanCnt) :- agent(A), InPlanTypePlanCnt = #count{RP : in(A,RP,T,S), planType(PT), hasRealisation(PT,P), hasPlanInstance(P,RP), hasRunningPlan(ParentS, RP), hasPlanType(ParentS, PT)}, InPlanTypePlanCnt > 1.
+
+% The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
+%brokenPlanBase(A) :- agent(A), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), hasPlanInstance(P,RP), in(A,RP,T,S), not isReachableFrom(S,E).
+
+
 
 
 

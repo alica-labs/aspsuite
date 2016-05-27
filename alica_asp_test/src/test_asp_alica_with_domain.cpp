@@ -95,7 +95,7 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 	string assistanceTestFactsFile = (*sc)["ASPSolver"]->get<string>("assistanceTestFactsFile", NULL);
 	assistanceTestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), assistanceTestFactsFile);
-	cout << "ASPSolver: " << assistanceTestFactsFile << endl;
+
 	aspSolver->load(assistanceTestFactsFile);
 
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
@@ -105,9 +105,16 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = "brokenPlanBase(donatello)";
+	string queryString1 = "brokenPlanBase(donatello)";
+	string queryString2 = "brokenPlanBase(leonardo)";
+	string queryString3 = "brokenPlanBase(raphael)";
+	string queryString4 = "brokenPlanBase(michelangelo)";
 
-	aspSolver->registerQuery(queryString);
+	aspSolver->registerQuery(queryString1);
+	aspSolver->registerQuery(queryString2);
+	aspSolver->registerQuery(queryString3);
+	aspSolver->registerQuery(queryString4);
+
 	bool modelFound = aspSolver->validatePlan(plan);
 	if (!modelFound)
 	{
@@ -118,7 +125,49 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The planbase of agent donatello should be broken.";
+	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The planbase of agent donatello should be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(queryString2)) << "The planbase of agent leonardo should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(queryString3)) << "The planbase of agent raphael should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrue(queryString4)) << "The planbase of agent michelangelo should not be broken.";
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}
+
+TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "ReusePlanFromPlantypeWithoutCycle", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	string assistanceTestFactsFile = (*sc)["ASPSolver"]->get<string>("assistanceTestFactsFile", NULL);
+	assistanceTestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), assistanceTestFactsFile);
+
+	aspSolver->load(assistanceTestFactsFile);
+
+	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	string queryString1 = "brokenPlanBase(donatello)";
+
+	aspSolver->registerQuery(queryString1);
+
+	bool modelFound = aspSolver->validatePlan(plan);
+	if (!modelFound)
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_FALSE(aspSolver->isTrue(queryString1)) << "The plan base of agent donatello should not be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

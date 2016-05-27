@@ -128,8 +128,6 @@ namespace alica
 			return "behaviourConf(" + get(behConf) + (dotTerminated ? ")." : ")");
 		}
 
-
-
 		// BINARY Predicates
 
 		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
@@ -217,6 +215,11 @@ namespace alica
 			return "hasRunningPlan(" + get(s) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
+		string ASPGenerator::hasRunningRealisation(PlanType* pt, uint64_t instanceElementHash, bool dotTerminated)
+		{
+			return "hasRunningRealisation(" + get(pt) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
+		}
+
 		string ASPGenerator::hasBehaviourConf(State* s, BehaviourConfiguration* behConf, bool dotTerminated)
 		{
 			return "hasBehaviourConf(" + get(s) + ", " + get(behConf) + (dotTerminated ? ")." : ")");
@@ -241,9 +244,11 @@ namespace alica
 
 		// QUATERNARY Predicates
 
-		string ASPGenerator::inRefPlanTaskState(string prefix, Condition* c, string plan, string task, string state, bool dotTerminated)
+		string ASPGenerator::inRefPlanTaskState(string prefix, Condition* c, string plan, string task, string state,
+												bool dotTerminated)
 		{
-			return "inRefPlanTaskState(" + get(prefix, c) + ", " + plan +  ", " + task + ", " + state + (dotTerminated ? ")." : ")");
+			return "inRefPlanTaskState(" + get(prefix, c) + ", " + plan + ", " + task + ", " + state
+					+ (dotTerminated ? ")." : ")");
 		}
 
 		// RULES

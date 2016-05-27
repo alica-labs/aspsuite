@@ -75,6 +75,7 @@ namespace alica
 			string inRefPlan(string prefix, Condition* c, string plan, bool dotTerminated = true);
 			string hasPlanInstance(Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasRunningPlan(State* s, uint64_t instanceElementHash, bool dotTerminated = true);
+			string hasRunningRealisation(PlanType* pt, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasBehaviourConf(State* s, BehaviourConfiguration* behConf, bool dotTerminated = true);
 
 			// TERNARY PREDICATES

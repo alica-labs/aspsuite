@@ -50,7 +50,7 @@ namespace alica
 			 * instanceElementHash correctly calculated for all child
 			 * plans.
 			 */
-			uint64_t instanceElementHash = this->handleRunningPlan(p, nullptr, 0);
+			uint64_t instanceElementHash = this->handleRunningPlan(p);
 
 			// Start recursive integration of plan tree
 			this->processPlan(p, instanceElementHash);
@@ -157,7 +157,7 @@ namespace alica
 							{
 								this->clingo->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan));
 
-								instanceElementHash = handleRunningPlan(childPlan, state, instanceElementHash);
+								instanceElementHash = handleRunningPlan(childPlan, state, childPlanType, instanceElementHash);
 
 								this->processPlan(childPlan, instanceElementHash);
 							}
@@ -260,23 +260,33 @@ namespace alica
 
 		}
 
+		uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(Plan* rootPlan)
+		{
+			uint64_t instanceElementHash = supplementary::CustomHashes::FNV_OFFSET
+						^ rootPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			this->clingo->add("planBase", {}, gen->hasPlanInstance(rootPlan, instanceElementHash));
+			this->clingo->add("planBase", {}, gen->runningPlan(instanceElementHash));
+			return instanceElementHash;
+		}
+
+
 		uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(Plan* plan, State* state, uint64_t instanceElementHash)
 		{
-			if (state == nullptr) // case for the root plan (which is not inside a state)
-			{
-				instanceElementHash = supplementary::CustomHashes::FNV_OFFSET
-						^ plan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-				this->clingo->add("planBase", {}, gen->hasPlanInstance(plan, instanceElementHash));
-			}
-			else // case for all other plans (which are always inside some state)
-			{
-				instanceElementHash = instanceElementHash ^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
-				this->clingo->add("planBase", {}, gen->hasRunningPlan(state, instanceElementHash));
-			}
-
+			instanceElementHash = instanceElementHash ^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			this->clingo->add("planBase", {}, gen->hasRunningPlan(state, instanceElementHash));
 			this->clingo->add("planBase", {}, gen->hasPlanInstance(plan, instanceElementHash));
 			this->clingo->add("planBase", {}, gen->runningPlan(instanceElementHash));
+			return instanceElementHash;
 		}
+
+		uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(Plan* plan, State* state, PlanType* planType, uint64_t instanceElementHash)
+		{
+			instanceElementHash = instanceElementHash ^ planType->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+			instanceElementHash = handleRunningPlan(plan, state, instanceElementHash);
+			this->clingo->add("planBase", {}, gen->hasRunningRealisation(planType, instanceElementHash));
+			return instanceElementHash;
+		}
+
 
 		void ASPAlicaPlanIntegrator::handleCondString(const string& condString, string prefix, Condition* cond)
 		{

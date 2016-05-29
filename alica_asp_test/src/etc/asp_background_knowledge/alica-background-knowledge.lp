@@ -136,13 +136,13 @@ holds(ChildC, ChildRP) :- hasPlanInstance(ChildP, ChildRP), hasRuntimeCondition(
 % These rules are relevant at run-time
 
 % An agent can only occupy one state per plan 
-%brokenPlanBase(A) :- agent(A), runningPlan(RP), IsInStateCnt = #count{S : in(A,RP,T,S)}, IsInStateCnt > 1.
+brokenPlanBase(A) :- agent(A), runningPlan(RP), IsInStateCnt = #count{S : in(A,RP,T,S)}, IsInStateCnt > 1.
 
 % An agent can only execute one plan per plantype
-brokenPlanBase(A, InPlanTypePlanCnt) :- agent(A), InPlanTypePlanCnt = #count{RP : in(A,RP,T,S), planType(PT), hasRealisation(PT,P), hasPlanInstance(P,RP), hasRunningPlan(ParentS, RP), hasPlanType(ParentS, PT)}, InPlanTypePlanCnt > 1.
+brokenPlanBase(A) :- agent(A), InPlanTypePlanCnt = #count{RP : in(A,RP,T,S), planType(PT), hasRealisation(PT,P), hasPlanInstance(P,RP), hasRunningPlan(ParentS, RP), hasRunningRealisation(PT, RP)}, InPlanTypePlanCnt > 1.
 
 % The state occupied by an agent must be reachable (isReachableFrom) by its corresponding plan-task pair
-%brokenPlanBase(A) :- agent(A), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), hasPlanInstance(P,RP), in(A,RP,T,S), not isReachableFrom(S,E).
+brokenPlanBase(A) :- agent(A), hasTask(P,T), hasState(P,S), hasEntryPoint(P,T,E), hasPlanInstance(P,RP), in(A,RP,T,S), not isReachableFrom(S,E).
 
 
 

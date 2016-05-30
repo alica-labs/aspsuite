@@ -50,6 +50,7 @@ namespace alica
 			bool isTrue(const string& queryValue);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool onModel(Gringo::Model const &m);
+			bool solve();
 			bool registerQuery(const string& query);
 			alica::reasoner::ASPGenerator gen;
 

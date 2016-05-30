@@ -56,7 +56,6 @@ namespace alica
 			this->processPlan(p, instanceElementHash);
 
 			// Ground the created plan base
-			cout << "ASPIntegrator: grounding." << endl;
 			this->clingo->ground( { {"planBase", {}}}, nullptr);
 			this->clingo->ground( { {"alicaBackground", {}}}, nullptr);
 		}

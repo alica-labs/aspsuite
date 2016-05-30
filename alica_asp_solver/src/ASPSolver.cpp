@@ -46,7 +46,6 @@ namespace alica
 
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
-			cout << "ASPSolver: grounding " << endl;
 			this->clingo->ground(std::forward<Gringo::Control::GroundVec const &>(vec),
 									std::forward<Gringo::Any&&>(context));
 		}
@@ -186,6 +185,20 @@ namespace alica
 		{
 			// TODO necessary for integration into the alica engine
 			return nullptr; //make_shared<SolverVariable>();
+		}
+
+
+		bool ASPSolver::solve()
+		{
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+			if (result == Gringo::SolveResult::SAT)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		/**
@@ -347,11 +360,11 @@ namespace alica
 
 			stringstream ss;
 			ss << "Solve Statistics:" << endl;
-			ss << "TOTAL Time: " << claspFacade->summary().totalTime<< endl;
-			ss << "CPU Time: " << claspFacade->summary().cpuTime<< endl;
-			ss << "SAT Time: " << (claspFacade->summary().satTime*1000.0) << endl;
-			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime*1000.0)<< endl;
-			ss << "SOLVE Time: " << (claspFacade->summary().solveTime*1000.0)<< endl;
+			ss << "TOTAL Time: " << claspFacade->summary().totalTime << endl;
+			ss << "CPU Time: " << claspFacade->summary().cpuTime << endl;
+			ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << endl;
+			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime * 1000.0) << endl;
+			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << endl;
 
 			cout << ss.str() << flush;
 		}

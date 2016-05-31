@@ -3,4 +3,4 @@
 %%%%% FACTS FOR TESTING %%%%%
 
 disconnected(a,b).
-equal(b,c).
+disconnected(b,c).

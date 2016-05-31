@@ -56,7 +56,7 @@ protected:
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
-		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "-n 0", nullptr};
 
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
@@ -101,7 +101,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = "inconsistent(harryPotter1)";
+	string queryString = "partialOverlapping(a,c)";
 
 	aspSolver->registerQuery(queryString);
 

@@ -50,9 +50,36 @@ namespace alica
 									std::forward<Gringo::Any&&>(context));
 		}
 
-		Gringo::Value ASPSolver::createQueryValue(std::string const &queryString)
+		vector<Gringo::Value> ASPSolver::createQueryValues(std::string const &query)
 		{
-			return this->gringoModule.parseValue(queryString);
+			vector<Gringo::Value> ret;
+			size_t start = 0;
+			size_t end = string::npos;
+			string currentQuery = "";
+			if (query.find(",") != string::npos)
+			{
+				while (start != string::npos)
+				{
+					end = query.find(")", start);
+					if (end == string::npos)
+					{
+						break;
+					}
+					currentQuery = query.substr(start, end - start + 1);
+					currentQuery = supplementary::Configuration::trim(currentQuery);
+					ret.push_back(this->gringoModule.parseValue(currentQuery));
+					start = query.find(",", end);
+					if (start != string::npos)
+					{
+						start += 1;
+					}
+				}
+			}
+			else
+			{
+				ret.push_back(this->gringoModule.parseValue(query));
+			}
+			return ret;
 		}
 
 		bool ASPSolver::isTrue(Gringo::Value queryValue)
@@ -68,24 +95,36 @@ namespace alica
 			}
 		}
 
-		bool ASPSolver::isTrue(const string& queryValue)
+		bool ASPSolver::isTrue(const string& query)
 		{
-			return this->isTrue(this->gringoModule.parseValue(queryValue));
+			auto queryValues = createQueryValues(query);
+			bool ret = true;
+			for (Gringo::Value queryValue : queryValues)
+			{
+				ret &= this->isTrue(queryValue);
+			}
+			return ret;
 		}
 
 		bool ASPSolver::registerQuery(const string& query)
 		{
-			Gringo::Value queryValue = this->gringoModule.parseValue(query);
-			auto entry = this->registeredQueries.find(queryValue);
-			if (entry == this->registeredQueries.end())
+			auto queryValues = createQueryValues(query);
+			bool ret = true;
+			for (Gringo::Value queryValue : queryValues)
 			{
-				this->registeredQueries.emplace(queryValue, vector<Gringo::Value>());
-				return true;
+				//Gringo::Value queryValue = this->gringoModule.parseValue(query);
+				auto entry = this->registeredQueries.find(queryValue);
+				if (entry == this->registeredQueries.end())
+				{
+					this->registeredQueries.emplace(queryValue, vector<Gringo::Value>());
+					ret &= true;
+				}
+				else
+				{
+					ret &= false;
+				}
 			}
-			else
-			{
-				return false;
-			}
+			return ret;
 		}
 
 		std::vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
@@ -186,7 +225,6 @@ namespace alica
 			// TODO necessary for integration into the alica engine
 			return nullptr; //make_shared<SolverVariable>();
 		}
-
 
 		bool ASPSolver::solve()
 		{

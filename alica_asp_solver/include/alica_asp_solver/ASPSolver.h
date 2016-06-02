@@ -45,7 +45,7 @@ namespace alica
 			void disableWarnings(bool noWarns);
 			void load(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
-			Gringo::Value createQueryValue(std::string const &queryString);
+			vector<Gringo::Value> createQueryValues(std::string const &queryString);
 			bool isTrue(Gringo::Value queryValue);
 			bool isTrue(const string& queryValue);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);

@@ -53,11 +53,11 @@ namespace alica
 		vector<Gringo::Value> ASPSolver::createQueryValues(std::string const &query)
 		{
 			vector<Gringo::Value> ret;
-			size_t start = 0;
-			size_t end = string::npos;
-			string currentQuery = "";
-			if (query.find(",") != string::npos)
+			if (query.find(",") != string::npos && query.find(";") == string::npos)
 			{
+				size_t start = 0;
+				size_t end = string::npos;
+				string currentQuery = "";
 				while (start != string::npos)
 				{
 					end = query.find(")", start);
@@ -69,6 +69,28 @@ namespace alica
 					currentQuery = supplementary::Configuration::trim(currentQuery);
 					ret.push_back(this->gringoModule.parseValue(currentQuery));
 					start = query.find(",", end);
+					if (start != string::npos)
+					{
+						start += 1;
+					}
+				}
+			}
+			else if (query.find(";") != string::npos)
+			{
+				size_t start = 0;
+				size_t end = string::npos;
+				string currentQuery = "";
+				while (start != string::npos)
+				{
+					end = query.find(")", start);
+					if (end == string::npos)
+					{
+						break;
+					}
+					currentQuery = query.substr(start, end - start + 1);
+					currentQuery = supplementary::Configuration::trim(currentQuery);
+					ret.push_back(this->gringoModule.parseValue(currentQuery));
+					start = query.find(";", end);
 					if (start != string::npos)
 					{
 						start += 1;
@@ -172,9 +194,10 @@ namespace alica
 		{
 			auto queryValues = createQueryValues(query);
 			bool ret = false;
+			bool temp = true;
 			for (Gringo::Value queryValue : queryValues)
 			{
-				ret |= this->isTrue(queryValue);
+				temp &= this->isTrue(queryValue);
 			}
 			return ret;
 		}
@@ -239,6 +262,7 @@ namespace alica
 
 		bool ASPSolver::solve()
 		{
+			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
@@ -258,7 +282,7 @@ namespace alica
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 			this->planIntegrator->loadPlanTree(plan);
-
+			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
@@ -282,6 +306,7 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
+			this->currentModels.push_back(clingoModel);
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)
 			{

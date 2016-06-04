@@ -47,7 +47,8 @@ namespace alica
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(std::string const &queryString);
 			bool isTrue(Gringo::Value queryValue);
-			bool isTrue(const string& queryValue);
+			bool isTrueForAtLeastOneModel(const string& queryValue);
+			bool isTrueForAllModels(const string& queryValue);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool onModel(Gringo::Model const &m);
 			bool solve();

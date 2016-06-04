@@ -95,7 +95,7 @@ namespace alica
 			}
 		}
 
-		bool ASPSolver::isTrue(const string& query)
+		bool ASPSolver::isTrueForAllModels(const string& query)
 		{
 			auto queryValues = createQueryValues(query);
 			bool ret = true;
@@ -166,6 +166,17 @@ namespace alica
 					{});
 
 			return gringoValues;
+		}
+
+		bool ASPSolver::isTrueForAtLeastOneModel(const string& query)
+		{
+			auto queryValues = createQueryValues(query);
+			bool ret = false;
+			for (Gringo::Value queryValue : queryValues)
+			{
+				ret |= this->isTrue(queryValue);
+			}
+			return ret;
 		}
 
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)

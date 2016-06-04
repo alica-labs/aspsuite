@@ -115,7 +115,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
+	EXPECT_TRUE(aspSolver->isTrueForAtLeastOneModel(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

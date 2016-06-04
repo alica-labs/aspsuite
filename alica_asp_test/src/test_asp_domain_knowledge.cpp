@@ -119,7 +119,7 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -156,7 +156,7 @@ TEST_F(ASPDomainKnowledge, overloaded)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The agent can't carry by more than one thing.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The agent can't carry by more than one thing.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -193,7 +193,7 @@ TEST_F(ASPDomainKnowledge, largeObject)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The agent can't carry a large thing.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The agent can't carry a large thing.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

@@ -125,10 +125,10 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The planbase of agent donatello should be broken.";
-	EXPECT_FALSE(aspSolver->isTrue(queryString2)) << "The planbase of agent leonardo should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrue(queryString3)) << "The planbase of agent raphael should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrue(queryString4)) << "The planbase of agent michelangelo should not be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The planbase of agent donatello should be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString2)) << "The planbase of agent leonardo should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString3)) << "The planbase of agent raphael should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString4)) << "The planbase of agent michelangelo should not be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -167,7 +167,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrue(queryString1)) << "The plan base of agent donatello should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString1)) << "The plan base of agent donatello should not be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

@@ -98,7 +98,7 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The state '" << brokenState->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The state '" << brokenState->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -125,7 +125,7 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The EntryPoint '" << brokenEntryPoint->getId()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The EntryPoint '" << brokenEntryPoint->getId()
 			<< "' should be broken";
 
 	// stop time measurement and report
@@ -156,7 +156,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
 			<< "'.";
 
 	// stop time measurement and report
@@ -196,10 +196,10 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The state '" << brokenState1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The state '" << brokenState2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The state '" << brokenState3->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString4)) << "The state '" << brokenState4->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The state '" << brokenState1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The state '" << brokenState2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString3)) << "The state '" << brokenState3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString4)) << "The state '" << brokenState4->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -225,7 +225,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The running plan 'rp" << to_string(14695984337881541968ul)
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The running plan 'rp" << to_string(14695984337881541968ul)
 			<< "' should be broken.";
 
 	// stop time measurement and report
@@ -261,9 +261,9 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -296,9 +296,9 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString1)) << "The synchronisation '" << brokenSynchronisation1->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The synchronisation '" << brokenSynchronisation1->getName()
 			<< "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrue(queryString2)) << "The synchronisation '" << brokenSynchronisation2->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The synchronisation '" << brokenSynchronisation2->getName()
 			<< "' should be broken.";
 
 	// stop time measurement and report
@@ -333,8 +333,8 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrue(queryString1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
-	EXPECT_FALSE(aspSolver->isTrue(queryString2)) << "The plan '" << brokenPlan->getName()
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString2)) << "The plan '" << brokenPlan->getName()
 			<< "' should NOT contain a cycle.";
 
 	// stop time measurement and report
@@ -368,7 +368,7 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The condition '" << nonLocalCondition->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The condition '" << nonLocalCondition->getName()
 			<< "' should be -local(cond).";
 
 	// stop time measurement and report
@@ -400,7 +400,7 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << plan->getName() << "' should contain a cycle.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The plan '" << plan->getName() << "' should contain a cycle.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -431,7 +431,7 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrue(queryString)) << "The plan '" << plan->getName() << "' should be free of cycles.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The plan '" << plan->getName() << "' should be free of cycles.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -466,11 +466,11 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrue(brokenRunningMasterPlan)) << "The query '" << brokenRunningMasterPlan
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningMasterPlan)) << "The query '" << brokenRunningMasterPlan
 			<< "' (instance of master plan) should be false.";
-	EXPECT_TRUE(aspSolver->isTrue(brokenRunningPlan1)) << "The query '" << brokenRunningPlan1
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(brokenRunningPlan1)) << "The query '" << brokenRunningPlan1
 			<< "' should be true.";
-	EXPECT_FALSE(aspSolver->isTrue(brokenRunningPlan2)) << "The query '" << brokenRunningPlan2
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningPlan2)) << "The query '" << brokenRunningPlan2
 			<< "' should be false.";
 
 	// stop time measurement and report

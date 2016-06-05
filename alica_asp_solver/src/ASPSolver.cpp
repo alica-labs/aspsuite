@@ -193,13 +193,63 @@ namespace alica
 		bool ASPSolver::isTrueForAtLeastOneModel(const string& query)
 		{
 			auto queryValues = createQueryValues(query);
-			bool ret = false;
-			bool temp = true;
-			for (Gringo::Value queryValue : queryValues)
+			bool temp = false;
+			bool result = true;
+			for (auto model : this->currentModels)
 			{
-				temp &= this->isTrue(queryValue);
+				cout << "ASPSOLVER: MODEL" << endl;
+				for (auto &atom : model.atoms(Gringo::Model::SHOWN))
+				{
+					std::cout << atom << " ";
+				}
+				std::cout << std::endl;
+				result = true;
+				cout << "AspSOlver: in model" << endl;
+				for (auto& queryMapPair : this->registeredQueries)
+				{
+					temp = false;
+					queryMapPair.second.clear();
+
+					//std::vector<Gringo::AtomState const *> atomStates;
+
+					// determine the domain of the query predicate
+					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
+					auto it = model.out.domains.find(queryMapPair.first.sig());
+					if (it == model.out.domains.end())
+					{
+						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+						continue;
+					}
+
+					for (auto& domainPair : it->second.domain)
+					{
+							//cout << "ASPSolver: Inside domain-loop!" << endl;
+
+						if (&(domainPair.second) && model.model->isTrue(model.lp.getLiteral(domainPair.second.uid())))
+						{
+							cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+							if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
+							{
+											cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								temp = true;
+								queryMapPair.second.push_back(domainPair.first);
+							}
+							else
+							{
+//								cout << "ASPSolver: Literal '" << domainPair.first << "' didnt match!" << endl;
+							}
+						}
+//						cout << "ASPSolver: outside if" << endl;
+					}
+					result &= temp;
+				}
+				if(result == true)
+				{
+					return true;
+				}
 			}
-			return ret;
+			return false;
 		}
 
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
@@ -306,7 +356,9 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
-			this->currentModels.push_back(clingoModel);
+			cout << "ASPSolver: saving model" << endl;
+			ClingoModel temp = ClingoModel(clingoModel.lp, clingoModel.out, clingoModel.ctx, clingoModel.model);
+			this->currentModels.push_back(temp);
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)
 			{

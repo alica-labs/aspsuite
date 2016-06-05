@@ -101,7 +101,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = "disconnected(a, c) ; externallyConnected(a, c) ; partialOverlapping(a, c) ; tangentialProperPart(a, c) ; nonTangentialProperPart(a, c) ; inverseTangentialProperPart(a, c) ; inverseNonTangentialProperPart(a, c) ; equal(a, c)";
+	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b) ";
 	aspSolver->registerQuery(queryString);
 
 	if (!aspSolver->solve())

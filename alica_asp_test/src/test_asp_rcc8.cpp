@@ -101,7 +101,8 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
+//	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
+	string queryString = "disconnected(b,c), disconnected(a,b)";
 	aspSolver->registerQuery(queryString);
 
 	if (!aspSolver->solve())
@@ -113,7 +114,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAtLeastOneModel(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

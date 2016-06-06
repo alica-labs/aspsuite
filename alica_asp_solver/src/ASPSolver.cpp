@@ -120,12 +120,63 @@ namespace alica
 		bool ASPSolver::isTrueForAllModels(const string& query)
 		{
 			auto queryValues = createQueryValues(query);
-			bool ret = true;
-			for (Gringo::Value queryValue : queryValues)
+			bool temp = false;
+			bool result = true;
+			for (auto model : this->currentModels)
 			{
-				ret &= this->isTrue(queryValue);
+#ifdef ASPSolver_DEBUG
+				cout << "ASPSOLVER: MODEL" << endl;
+				for (auto &atom : model)
+				{
+					std::cout << atom << " ";
+				}
+				std::cout << std::endl;
+#endif
+				result = true;
+				cout << "ASPSolver: Literals ";
+				for (auto& queryMapPair : this->registeredQueries)
+				{
+					if(find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+					{
+						continue;
+					}
+					temp = false;
+					queryMapPair.second.clear();
+
+					// determine the domain of the query predicate
+					//					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
+
+					for (auto it : model)
+					{
+						//						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
+
+						if (this->checkMatchValues(&queryMapPair.first, &it))
+						{
+							cout << "'" << queryMapPair.first << "' ";
+							temp = true;
+							queryMapPair.second.push_back(queryMapPair.first);
+						}
+						else
+						{
+							//								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
+						}
+					}
+					result &= temp;
+				}
+				cout << "matched!" << endl;
 			}
-			return ret;
+			return result;
+
+
+//
+//
+//			auto queryValues = createQueryValues(query);
+//			bool ret = true;
+//			for (Gringo::Value queryValue : queryValues)
+//			{
+//				ret &= this->isTrue(queryValue);
+//			}
+//			return ret;
 		}
 
 		bool ASPSolver::registerQuery(const string& query)
@@ -197,43 +248,46 @@ namespace alica
 			bool result = true;
 			for (auto model : this->currentModels)
 			{
+#ifdef ASPSolver_DEBUG
 				cout << "ASPSOLVER: MODEL" << endl;
 				for (auto &atom : model)
 				{
 					std::cout << atom << " ";
 				}
 				std::cout << std::endl;
+#endif
 				result = true;
-				cout << "AspSOlver: in model" << endl;
+				cout << "ASPSolver: Literals ";
 				for (auto& queryMapPair : this->registeredQueries)
 				{
+					if(find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+					{
+						continue;
+					}
 					temp = false;
 					queryMapPair.second.clear();
 
-					//std::vector<Gringo::AtomState const *> atomStates;
-
 					// determine the domain of the query predicate
-					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
+//					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
 
-					for (auto& it : model)
+					for (auto it : model)
 					{
-						//cout << "ASPSolver: Inside domain-loop!" << endl;
-						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
+//						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
 
-//						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
-//						{
-//							cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-//							temp = true;
-//							queryMapPair.second.push_back(domainPair.first);
-//						}
-//						else
-//						{
-////								cout << "ASPSolver: Literal '" << domainPair.first << "' didnt match!" << endl;
-//						}
-//						cout << "ASPSolver: outside if" << endl;
+						if (this->checkMatchValues(&queryMapPair.first, &it))
+						{
+							cout << "'" << queryMapPair.first << "' ";
+							temp = true;
+							queryMapPair.second.push_back(queryMapPair.first);
+						}
+						else
+						{
+//								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
+						}
 					}
 					result &= temp;
 				}
+				cout << "matched!" << endl;
 				if (result == true)
 				{
 					return true;
@@ -346,8 +400,6 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
-			cout << "ASPSolver: saving model" << endl;
-			//ClingoModel temp = ClingoModel(clingoModel.lp, clingoModel.out, clingoModel.ctx, clingoModel.model);
 			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)

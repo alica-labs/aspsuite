@@ -198,7 +198,7 @@ namespace alica
 			for (auto model : this->currentModels)
 			{
 				cout << "ASPSOLVER: MODEL" << endl;
-				for (auto &atom : model.atoms(Gringo::Model::SHOWN))
+				for (auto &atom : model)
 				{
 					std::cout << atom << " ";
 				}
@@ -214,37 +214,27 @@ namespace alica
 
 					// determine the domain of the query predicate
 					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
-					auto it = model.out.domains.find(queryMapPair.first.sig());
-					if (it == model.out.domains.end())
+
+					for (auto& it : model)
 					{
-						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
+						//cout << "ASPSolver: Inside domain-loop!" << endl;
+						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
 
-					for (auto& domainPair : it->second.domain)
-					{
-							//cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second) && model.model->isTrue(model.lp.getLiteral(domainPair.second.uid())))
-						{
-							cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
-							{
-											cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								temp = true;
-								queryMapPair.second.push_back(domainPair.first);
-							}
-							else
-							{
-//								cout << "ASPSolver: Literal '" << domainPair.first << "' didnt match!" << endl;
-							}
-						}
+//						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
+//						{
+//							cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+//							temp = true;
+//							queryMapPair.second.push_back(domainPair.first);
+//						}
+//						else
+//						{
+////								cout << "ASPSolver: Literal '" << domainPair.first << "' didnt match!" << endl;
+//						}
 //						cout << "ASPSolver: outside if" << endl;
 					}
 					result &= temp;
 				}
-				if(result == true)
+				if (result == true)
 				{
 					return true;
 				}
@@ -357,8 +347,8 @@ namespace alica
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
 			cout << "ASPSolver: saving model" << endl;
-			ClingoModel temp = ClingoModel(clingoModel.lp, clingoModel.out, clingoModel.ctx, clingoModel.model);
-			this->currentModels.push_back(temp);
+			//ClingoModel temp = ClingoModel(clingoModel.lp, clingoModel.out, clingoModel.ctx, clingoModel.model);
+			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
 			bool foundSomething = false;
 			for (auto& queryMapPair : this->registeredQueries)
 			{

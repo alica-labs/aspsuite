@@ -70,7 +70,8 @@ namespace alica
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
-			vector<ClingoModel> currentModels;
+			vector<Gringo::ValVec> currentModels;
+
 
 
 			// key=queries, value=vector<true predicates in the last model>

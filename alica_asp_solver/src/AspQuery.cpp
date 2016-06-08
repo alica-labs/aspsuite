@@ -12,6 +12,12 @@ namespace alica
 	namespace reasoner
 	{
 
+		AspQuery::AspQuery()
+		{
+			this->queryString = "empty";
+			this->lifeTime = 1;
+		}
+
 		AspQuery::AspQuery(string queryString)
 		{
 			this->queryString = queryString;
@@ -26,7 +32,6 @@ namespace alica
 
 		AspQuery::~AspQuery()
 		{
-			// TODO Auto-generated destructor stub
 		}
 
 		vector<Gringo::ValVec> AspQuery::getCurrentModels()
@@ -46,7 +51,7 @@ namespace alica
 
 		void AspQuery::setLifeTime(int lifeTime)
 		{
-			this->lifeTime = lifeTime;
+				this->lifeTime = lifeTime;
 		}
 
 		string AspQuery::getQueryString()
@@ -62,6 +67,14 @@ namespace alica
 				return true;
 			}
 			return false;
+		}
+
+		void AspQuery::reduceLifeTime()
+		{
+			if (this->lifeTime > 0)
+			{
+				this->lifeTime--;
+			}
 		}
 
 	} /* namespace reasoner */

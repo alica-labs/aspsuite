@@ -136,7 +136,7 @@ namespace alica
 				cout << "ASPSolver: Literals ";
 				for (auto& queryMapPair : this->registeredQueries)
 				{
-					if(find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
 					{
 						continue;
 					}
@@ -166,7 +166,6 @@ namespace alica
 				cout << "matched!" << endl;
 			}
 			return result;
-
 
 //
 //
@@ -260,7 +259,7 @@ namespace alica
 				cout << "ASPSolver: Literals ";
 				for (auto& queryMapPair : this->registeredQueries)
 				{
-					if(find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
 					{
 						continue;
 					}
@@ -294,6 +293,38 @@ namespace alica
 				}
 			}
 			return false;
+		}
+
+		bool ASPSolver::registerQuery(shared_ptr<AspQuery> query)
+		{
+			bool ret = true;
+			auto entry = find(this->regQueries.begin(), this->regQueries.end(), query);
+			if (entry == this->regQueries.end())
+			{
+				this->regQueries.push_back(query);
+				ret &= true;
+			}
+			else
+			{
+				ret &= false;
+			}
+			return ret;
+		}
+
+		bool ASPSolver::unRegisterQuery(shared_ptr<AspQuery> query)
+		{
+			bool ret = true;
+			auto entry = find(this->regQueries.begin(), this->regQueries.end(), query);
+			if (entry == this->regQueries.end())
+			{
+				this->regQueries.erase(entry);
+				ret &= true;
+			}
+			else
+			{
+				ret &= false;
+			}
+			return ret;
 		}
 
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)

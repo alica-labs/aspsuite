@@ -10,6 +10,7 @@
 
 #include "ASPAlicaPlanIntegrator.h"
 #include "ASPGenerator.h"
+#include "AspQuery.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <SystemConfig.h>
@@ -53,6 +54,8 @@ namespace alica
 			bool onModel(Gringo::Model const &m);
 			bool solve();
 			bool registerQuery(const string& query);
+			bool registerQuery(shared_ptr<AspQuery> query);
+			bool unRegisterQuery(shared_ptr<AspQuery> query);
 			alica::reasoner::ASPGenerator gen;
 
 
@@ -76,6 +79,7 @@ namespace alica
 
 			// key=queries, value=vector<true predicates in the last model>
 			map<Gringo::Value, vector<Gringo::Value>> registeredQueries;
+			vector<shared_ptr<AspQuery>> regQueries;
 
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 		};

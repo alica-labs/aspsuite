@@ -11,8 +11,11 @@ from gringo import Fun
 
 def main(prg):
 	prg.ground([("bird", [2])])
-	prg.ground([("backgroundKnowledge", [])])
+	print("test1")
 	prg.solve()
+	print("test2")
 	prg.assign_external(Fun("a", [2]), True)
+	print("test3")
 	prg.solve()
+	print("test4")
 #end.

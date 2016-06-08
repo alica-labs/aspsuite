@@ -14,8 +14,13 @@ from gringo import Fun
 
 def main(prg):
 	prg.ground([("fact1", [])])
+	print("test1")
 	prg.ground([("backgroundKnowledge", [])])
+	print("test2")
 	prg.solve()
+	print("test3")
 	prg.ground([("fact2", [])])
+	print("test4")
 	prg.solve()
+	print("test5")
 #end.

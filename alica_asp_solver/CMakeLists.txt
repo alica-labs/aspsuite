@@ -58,6 +58,7 @@ add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
     src/ASPAlicaPlanIntegrator.cpp
     src/ASPGenerator.cpp
+    src/AspQuery.cpp
 )
 
 #message("[alica-asp-solver] catkin_LIBRARIES: ${catkin_LIBRARIES}")

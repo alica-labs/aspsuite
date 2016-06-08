@@ -21,6 +21,7 @@ namespace alica
 		class AspQuery
 		{
 		public:
+			AspQuery();
 			AspQuery(string queryString);
 			AspQuery(string queryString, int lifeTime);
 			virtual ~AspQuery();
@@ -30,10 +31,14 @@ namespace alica
 			void setLifeTime(int lifeTime);
 			string getQueryString();
 			bool setQueryString(string queryString);
+			void reduceLifeTime();
 
 		private:
 			string queryString;
 			vector<Gringo::ValVec> currentModels;
+			// lifeTime == 1 => query is used once
+			// lifeTime == x => query is used x times
+			// LifeTime == -1 => query is used util unregistered
 			int lifeTime;
 
 		};

@@ -26,8 +26,8 @@ namespace alica
 			AspQuery(ASPSolver* solver, string queryString);
 			AspQuery(ASPSolver* solver, string queryString, int lifeTime);
 			virtual ~AspQuery();
-			vector<Gringo::ValVec> getCurrentModels();
-			void setCurrentModels(vector<Gringo::ValVec> currentModels);
+			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
+			void setCurrentModels(shared_ptr<vector<Gringo::ValVec>> currentModels);
 			int getLifeTime();
 			void setLifeTime(int lifeTime);
 			string getQueryString();
@@ -35,18 +35,18 @@ namespace alica
 			void reduceLifeTime();
 			bool isSatisfied();
 			void setSatisfied(bool satisfied);
-			map<Gringo::Value, Gringo::ValVec> getSatisfiedPredicates();
-			void saveSatisfiedPredicate(Gringo::Value, Gringo::ValVec);
+			map<Gringo::Value, vector<Gringo::ValVec>> getSatisfiedPredicates();
+			void saveSatisfiedPredicate(Gringo::Value key, Gringo::ValVec valueVector);
 			bool isDisjunction();
 			vector<Gringo::Value> getQueryValues();
 
 		private:
 			string queryString;
 			ASPSolver* solver;
-			vector<Gringo::ValVec> currentModels;
+			shared_ptr<vector<Gringo::ValVec>> currentModels;
 			vector<Gringo::Value> queryValues;
-			// key=query value, value= model which satisfies query
-			map<Gringo::Value, Gringo::ValVec> satisfiedPredicates;
+			// key=query value, value=model which satisfies query
+			map<Gringo::Value, vector<Gringo::ValVec>> satisfiedPredicates;
 			// lifeTime == 1 => query is used once
 			// lifeTime == x => query is used x times
 			// LifeTime == -1 => query is used util unregistered

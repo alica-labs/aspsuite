@@ -369,10 +369,10 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
-			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
 			bool foundSomething = false;
 			for (auto& query : this->regQueries)
 			{
+				query->getCurrentModels()->push_back(m.atoms(Gringo::Model::SHOWN));
 				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				// determine the domain of the query predicate
@@ -399,7 +399,8 @@ namespace alica
 							{
 								//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
-								query->getSatisfiedPredicates().at(queryValue).push_back(domainPair.first);
+								query->saveSatisfiedPredicate(queryValue, m.atoms(Gringo::Model::SHOWN));
+								break;
 								//atomStates.push_back(&(domainPair.second));
 							}
 							else

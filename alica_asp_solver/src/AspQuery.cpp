@@ -18,41 +18,52 @@ namespace alica
 		{
 			this->queryString = "empty";
 			this->lifeTime = 1;
+			this->solver = solver;
 			this->satisfied = false;
 			this->disjunction = false;
-			this->solver = solver;
+			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString)
 		{
 			this->queryString = queryString;
 			this->lifeTime = 1;
+			this->solver = solver;
 			this->satisfied = false;
 			this->disjunction = false;
-			this->solver = solver;
 			this->queryValues = this->createQueryValues(queryString);
+			for(auto value : this->queryValues)
+			{
+				this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+			}
+			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, int lifeTime)
 		{
 			this->queryString = queryString;
 			this->lifeTime = lifeTime;
+			this->solver = solver;
 			this->satisfied = false;
 			this->disjunction = false;
-			this->solver = solver;
 			this->queryValues = this->createQueryValues(queryString);
+			for(auto value : this->queryValues)
+			{
+				this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+			}
+			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
 
 		AspQuery::~AspQuery()
 		{
 		}
 
-		vector<Gringo::ValVec> AspQuery::getCurrentModels()
+		shared_ptr<vector<Gringo::ValVec>> AspQuery::getCurrentModels()
 		{
 			return this->currentModels;
 		}
 
-		void AspQuery::setCurrentModels(vector<Gringo::ValVec> currentModels)
+		void AspQuery::setCurrentModels(shared_ptr<vector<Gringo::ValVec>> currentModels)
 		{
 			this->currentModels = currentModels;
 		}
@@ -78,6 +89,10 @@ namespace alica
 			{
 				this->queryString = queryString;
 				this->queryValues = this->createQueryValues(queryString);
+				for(auto value : this->queryValues)
+				{
+					this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+				}
 				return true;
 			}
 			return false;
@@ -101,13 +116,18 @@ namespace alica
 			this->satisfied = satisfied;
 		}
 
-		map<Gringo::Value, Gringo::ValVec> AspQuery::getSatisfiedPredicates()
+		map<Gringo::Value, vector<Gringo::ValVec>> AspQuery::getSatisfiedPredicates()
 		{
 			return this->satisfiedPredicates;
 		}
 
-		void AspQuery::saveSatisfiedPredicate(Gringo::Value, Gringo::ValVec)
+		void AspQuery::saveSatisfiedPredicate(Gringo::Value key, Gringo::ValVec valueVector)
 		{
+			auto entry = this->satisfiedPredicates.find(key);
+			if (entry != this->satisfiedPredicates.end())
+			{
+				entry->second.push_back(valueVector);
+			}
 		}
 
 		bool AspQuery::isDisjunction()

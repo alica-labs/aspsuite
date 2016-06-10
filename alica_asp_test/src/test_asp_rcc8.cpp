@@ -104,7 +104,8 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 
 //	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
 	string queryString = "disconnected(b,c), disconnected(a,b)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, 1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																								1);
 	//aspSolver->registerQuery(queryString);
 	aspSolver->registerQuery(queryObject);
 
@@ -117,7 +118,13 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The book harryPotter1 should be carried by more than one agent.";
+	cout << "Solver: " << queryObject->getSatisfiedPredicates().size() << endl;
+	for (auto test : queryObject->getSatisfiedPredicates())
+	{
+		cout << "Solver1: " << test.second.size() << endl;
+	}
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString))
+			<< "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

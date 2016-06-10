@@ -21,6 +21,7 @@
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
+#include <alica_asp_solver/AspQuery.h>
 
 class ASPRCC8 : public ::testing::Test
 {
@@ -103,9 +104,11 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 
 //	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
 	string queryString = "disconnected(b,c), disconnected(a,b)";
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, 1);
+	//aspSolver->registerQuery(queryString);
+	aspSolver->registerQuery(queryObject);
 
-	if (!aspSolver->solve())
+	if (!aspSolver->solveQueryObject())
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}

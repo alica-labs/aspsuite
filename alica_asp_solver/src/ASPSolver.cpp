@@ -19,7 +19,8 @@ namespace alica
 		ASPSolver::ASPSolver(AlicaEngine* ae, std::vector<char const*> args) :
 				IConstraintSolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
 		{
-			this->clingo = make_shared<ClingoLib>(gringoModule, args.size() - 2, args.data());
+			this->gringoModule = new DefaultGringoModule();
+			this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
 
 			this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(clingo, &this->gen);
 
@@ -36,7 +37,7 @@ namespace alica
 
 		ASPSolver::~ASPSolver()
 		{
-
+			delete this->gringoModule;
 		}
 
 		void ASPSolver::load(string filename)
@@ -67,7 +68,7 @@ namespace alica
 					}
 					currentQuery = query.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					ret.push_back(this->gringoModule.parseValue(currentQuery));
+					ret.push_back(this->gringoModule->parseValue(currentQuery));
 					start = query.find(",", end);
 					if (start != string::npos)
 					{
@@ -89,7 +90,7 @@ namespace alica
 					}
 					currentQuery = query.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					ret.push_back(this->gringoModule.parseValue(currentQuery));
+					ret.push_back(this->gringoModule->parseValue(currentQuery));
 					start = query.find(";", end);
 					if (start != string::npos)
 					{
@@ -99,7 +100,7 @@ namespace alica
 			}
 			else
 			{
-				ret.push_back(this->gringoModule.parseValue(query));
+				ret.push_back(this->gringoModule->parseValue(query));
 			}
 			return ret;
 		}
@@ -325,6 +326,93 @@ namespace alica
 				ret &= false;
 			}
 			return ret;
+		}
+
+		DefaultGringoModule* ASPSolver::getGringoModule()
+		{
+			return this->gringoModule;
+		}
+
+		const void* ASPSolver::getWildcardPointer()
+		{
+			return WILDCARD_POINTER;
+		}
+
+		const string& ASPSolver::getWildcardString()
+		{
+			return WILDCARD_STRING;
+		}
+
+		bool ASPSolver::solveQueryObject()
+		{
+			this->currentModels.clear();
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModelQueryObject, this, std::placeholders::_1), {});
+			if (result == Gringo::SolveResult::SAT)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		bool ASPSolver::onModelQueryObject(const Gringo::Model& m)
+		{
+#ifdef ASPSolver_DEBUG
+			cout << "ASPSolver: Found the following model:" << endl;
+			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+			{
+				std::cout << atom << " ";
+			}
+			std::cout << std::endl;
+#endif
+
+			ClingoModel& clingoModel = (ClingoModel&)m;
+			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
+			bool foundSomething = false;
+			for (auto& query : this->regQueries)
+			{
+				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
+
+				// determine the domain of the query predicate
+				for (auto queryValue : query->getQueryValues()	)
+				{
+					cout << "ASPSolver::onModel: " << queryValue << endl;
+					auto it = clingoModel.out.domains.find(queryValue.sig());
+					if (it == clingoModel.out.domains.end())
+					{
+						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+						continue;
+					}
+
+					for (auto& domainPair : it->second.domain)
+					{
+						//	cout << "ASPSolver: Inside domain-loop!" << endl;
+
+						if (&(domainPair.second)
+								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+						{
+							//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+							if (this->checkMatchValues(&queryValue, &domainPair.first))
+							{
+								//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								foundSomething = true;
+								query->getSatisfiedPredicates().at(queryValue).push_back(domainPair.first);
+								//atomStates.push_back(&(domainPair.second));
+							}
+							else
+							{
+								//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+
+							}
+						}
+					}
+				}
+			}
+
+			return foundSomething;
 		}
 
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)

@@ -119,6 +119,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	}
 
 	cout << "Solver: " << queryObject->getSatisfiedPredicates().size() << endl;
+	cout << "Solver: " << queryObject->getCurrentModels()->size() << endl;
 	for (auto test : queryObject->getSatisfiedPredicates())
 	{
 		cout << "Solver1: " << test.second.size() << endl;

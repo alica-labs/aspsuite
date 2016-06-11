@@ -346,7 +346,8 @@ namespace alica
 		bool ASPSolver::solveQueryObject()
 		{
 			this->currentModels.clear();
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModelQueryObject, this, std::placeholders::_1), {});
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModelQueryObject, this, std::placeholders::_1),
+												{});
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -376,7 +377,7 @@ namespace alica
 				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				// determine the domain of the query predicate
-				for (auto queryValue : query->getQueryValues()	)
+				for (auto queryValue : query->getQueryValues())
 				{
 					cout << "ASPSolver::onModel: " << queryValue << endl;
 					auto it = clingoModel.out.domains.find(queryValue.sig());
@@ -443,6 +444,57 @@ namespace alica
 					return false;
 			}
 
+			return true;
+		}
+
+		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<AspQuery> query)
+		{
+			if (query->isDisjunction())
+			{
+				for (auto queryValue : query->getSatisfiedPredicates())
+				{
+					if (queryValue.second.size() == 0)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			else
+			{
+				for (auto queryValue : query->getSatisfiedPredicates())
+				{
+					if (queryValue.second.size() == 0)
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		bool ASPSolver::isTrueForAllModels(shared_ptr<AspQuery> query)
+		{
+			if (query->isDisjunction())
+			{
+				for (auto queryValue : query->getSatisfiedPredicates())
+				{
+					if (queryValue.second.size() == 0)
+					{
+						return false;
+					}
+				}
+			}
+			else
+			{
+				for (auto queryValue : query->getSatisfiedPredicates())
+				{
+					if (queryValue.second.size() != query->getCurrentModels()->size())
+					{
+						return false;
+					}
+				}
+			}
 			return true;
 		}
 

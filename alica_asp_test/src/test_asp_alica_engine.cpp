@@ -91,14 +91,16 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 
 	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783421980];
 	string queryString = aspSolver->gen.brokenState(brokenState, false);
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The state '" << brokenState->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The state '" << brokenState->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -118,14 +120,16 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 
 	alica::EntryPoint* brokenEntryPoint = (alica::EntryPoint*)(*ae->getPlanParser()->getParsedElements())[1453033347286];
 	string queryString = aspSolver->gen.brokenEntryPoint(brokenEntryPoint, false);
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The EntryPoint '" << brokenEntryPoint->getId()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The EntryPoint '" << brokenEntryPoint->getId()
 			<< "' should be broken";
 
 	// stop time measurement and report
@@ -149,14 +153,16 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 															false);
 
 	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
 			<< "'.";
 
 	// stop time measurement and report
@@ -177,29 +183,37 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 
 	alica::State* brokenState1 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783558495];
 	string queryString1 = aspSolver->gen.brokenState(brokenState1, false);
-	aspSolver->registerQuery(queryString1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																									1);
+	aspSolver->registerQuery(queryObject1);
 
 	alica::State* brokenState2 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783576711];
 	string queryString2 = aspSolver->gen.brokenState(brokenState2, false);
-	aspSolver->registerQuery(queryString2);
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+																									1);
+	aspSolver->registerQuery(queryObject2);
 
 	alica::State* brokenState3 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783579086];
 	string queryString3 = aspSolver->gen.brokenState(brokenState3, false);
-	aspSolver->registerQuery(queryString3);
+	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3,
+																									1);
+	aspSolver->registerQuery(queryObject3);
 
 	alica::State* brokenState4 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783583119];
 	string queryString4 = aspSolver->gen.brokenState(brokenState4, false);
-	aspSolver->registerQuery(queryString4);
+	shared_ptr<alica::reasoner::AspQuery> queryObject4 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString4,
+																									1);
+	aspSolver->registerQuery(queryObject4);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The state '" << brokenState1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The state '" << brokenState2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString3)) << "The state '" << brokenState3->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString4)) << "The state '" << brokenState4->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The state '" << brokenState1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The state '" << brokenState2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject3)) << "The state '" << brokenState3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject4)) << "The state '" << brokenState4->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -218,14 +232,16 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	string queryString = aspSolver->gen.brokenRunningPlan(14695984337881541968ul, false);
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The running plan 'rp" << to_string(14695984337881541968ul)
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The running plan 'rp" << to_string(14695984337881541968ul)
 			<< "' should be broken.";
 
 	// stop time measurement and report
@@ -246,24 +262,30 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 
 	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
 	string queryString1 = aspSolver->gen.cyclic(brokenPlan1, false);
-	aspSolver->registerQuery(queryString1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																									1);
+	aspSolver->registerQuery(queryObject1);
 
 	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan2, false);
-	aspSolver->registerQuery(queryString2);
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+																									1);
+	aspSolver->registerQuery(queryObject2);
 
 	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
 	string queryString3 = aspSolver->gen.cyclic(brokenPlan3, false);
-	aspSolver->registerQuery(queryString3);
+	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3,
+																									1);
+	aspSolver->registerQuery(queryObject3);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -284,21 +306,25 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 	alica::SyncTransition* brokenSynchronisation1 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString1 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation1, false);
-	aspSolver->registerQuery(queryString1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																									1);
+	aspSolver->registerQuery(queryObject1);
 
 	alica::SyncTransition* brokenSynchronisation2 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString2 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation2, false);
-	aspSolver->registerQuery(queryString2);
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+																									1);
+	aspSolver->registerQuery(queryObject2);
 
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The synchronisation '" << brokenSynchronisation1->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The synchronisation '" << brokenSynchronisation1->getName()
 			<< "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString2)) << "The synchronisation '" << brokenSynchronisation2->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The synchronisation '" << brokenSynchronisation2->getName()
 			<< "' should be broken.";
 
 	// stop time measurement and report
@@ -319,10 +345,14 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 
 	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1455093185652];
 	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan, false);
-	aspSolver->registerQuery(queryString1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																									1);
+	aspSolver->registerQuery(queryObject1);
 
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan, false);
-	aspSolver->registerQuery(queryString2);
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+																									1);
+	aspSolver->registerQuery(queryObject2);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -333,8 +363,8 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString2)) << "The plan '" << brokenPlan->getName()
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject2)) << "The plan '" << brokenPlan->getName()
 			<< "' should NOT contain a cycle.";
 
 	// stop time measurement and report
@@ -357,7 +387,9 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 			(alica::PreCondition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
 	string queryString = aspSolver->gen.neglocal(nonLocalCondition, false);
 	cout << queryString << endl;
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -368,7 +400,7 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The condition '" << nonLocalCondition->getName()
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The condition '" << nonLocalCondition->getName()
 			<< "' should be -local(cond).";
 
 	// stop time measurement and report
@@ -388,8 +420,9 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	string queryString = aspSolver->gen.cyclic(plan, false);
-
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -400,7 +433,7 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The plan '" << plan->getName() << "' should contain a cycle.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The plan '" << plan->getName() << "' should contain a cycle.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -419,8 +452,9 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	string queryString = aspSolver->gen.cycleFree(plan, false);
-
-	aspSolver->registerQuery(queryString);
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																									1);
+	aspSolver->registerQuery(queryObject);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -431,7 +465,7 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString)) << "The plan '" << plan->getName() << "' should be free of cycles.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The plan '" << plan->getName() << "' should be free of cycles.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -452,10 +486,15 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 	string brokenRunningMasterPlan = aspSolver->gen.brokenRunningPlan(1922052048482545739ul, false);
 	string brokenRunningPlan1 = aspSolver->gen.brokenRunningPlan(14695982138858284394ul, false);
 	string brokenRunningPlan2 = aspSolver->gen.brokenRunningPlan(1893175574616393372ul, false);
-
-	aspSolver->registerQuery(brokenRunningMasterPlan);
-	aspSolver->registerQuery(brokenRunningPlan1);
-	aspSolver->registerQuery(brokenRunningPlan2);
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningMasterPlanObject = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningMasterPlan,
+																									1);
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan1Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan1,
+																									1);
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan2Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan2,
+																									1);
+	aspSolver->registerQuery(brokenRunningMasterPlanObject);
+	aspSolver->registerQuery(brokenRunningPlan1Object);
+	aspSolver->registerQuery(brokenRunningPlan2Object);
 
 	if (!aspSolver->validatePlan(plan))
 	{
@@ -466,11 +505,11 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningMasterPlan)) << "The query '" << brokenRunningMasterPlan
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningMasterPlanObject)) << "The query '" << brokenRunningMasterPlan
 			<< "' (instance of master plan) should be false.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(brokenRunningPlan1)) << "The query '" << brokenRunningPlan1
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(brokenRunningPlan1Object)) << "The query '" << brokenRunningPlan1
 			<< "' should be true.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningPlan2)) << "The query '" << brokenRunningPlan2
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningPlan2Object)) << "The query '" << brokenRunningPlan2
 			<< "' should be false.";
 
 	// stop time measurement and report

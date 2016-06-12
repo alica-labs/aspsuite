@@ -19,7 +19,6 @@ namespace alica
 			this->queryString = "empty";
 			this->lifeTime = 1;
 			this->solver = solver;
-			this->satisfied = false;
 			this->disjunction = false;
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
@@ -29,12 +28,11 @@ namespace alica
 			this->queryString = queryString;
 			this->lifeTime = 1;
 			this->solver = solver;
-			this->satisfied = false;
 			this->disjunction = false;
 			this->queryValues = this->createQueryValues(queryString);
 			for(auto value : this->queryValues)
 			{
-				this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
@@ -44,12 +42,11 @@ namespace alica
 			this->queryString = queryString;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
-			this->satisfied = false;
 			this->disjunction = false;
 			this->queryValues = this->createQueryValues(queryString);
 			for(auto value : this->queryValues)
 			{
-				this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
@@ -91,7 +88,7 @@ namespace alica
 				this->queryValues = this->createQueryValues(queryString);
 				for(auto value : this->queryValues)
 				{
-					this->satisfiedPredicates.emplace(value, vector<Gringo::ValVec>());
+					this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 				}
 				return true;
 			}
@@ -106,25 +103,15 @@ namespace alica
 			}
 		}
 
-		bool AspQuery::isSatisfied()
+		map<Gringo::Value, vector<Gringo::ValVec>> AspQuery::getPredicateModelMap()
 		{
-			return this->satisfied;
+			return this->predicateModelMap;
 		}
 
-		void AspQuery::setSatisfied(bool satisfied)
+		void AspQuery::savePredicateModelPair(Gringo::Value key, Gringo::ValVec valueVector)
 		{
-			this->satisfied = satisfied;
-		}
-
-		map<Gringo::Value, vector<Gringo::ValVec>> AspQuery::getSatisfiedPredicates()
-		{
-			return this->satisfiedPredicates;
-		}
-
-		void AspQuery::saveSatisfiedPredicate(Gringo::Value key, Gringo::ValVec valueVector)
-		{
-			auto entry = this->satisfiedPredicates.find(key);
-			if (entry != this->satisfiedPredicates.end())
+			auto entry = this->predicateModelMap.find(key);
+			if (entry != this->predicateModelMap.end())
 			{
 				entry->second.push_back(valueVector);
 			}
@@ -138,6 +125,42 @@ namespace alica
 		vector<Gringo::Value> AspQuery::getQueryValues()
 		{
 			return this->queryValues;
+		}
+
+		string AspQuery::toString()
+		{
+			stringstream ss;
+			ss << "QueryString: " << this->queryString << "\n";
+			ss << "Predicates with models: " << "\n";
+			for(auto pair : this->predicateModelMap)
+			{
+				ss << "\tPredicate: " << pair.first << "\n";
+				for(auto models : pair.second)
+				{
+					ss << "\t\t Model: ";
+					for(auto predicate : models)
+					{
+						ss << predicate << " ";
+					}
+					ss << "\n";
+				}
+			}
+			ss << (this->disjunction ? "Query is disjubction." : "Query is konjunction.") << "\n";
+			ss << "Query will be used " << this->lifeTime << "times again.\n";
+			return ss.str();
+		}
+
+		shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > AspQuery::getSattisfiedPredicates()
+		{
+			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > ret = make_shared<map<Gringo::Value, vector<Gringo::ValVec> > >();
+			for(auto pair : this->predicateModelMap)
+			{
+				if(pair.second.size() > 0)
+				{
+					ret->emplace(pair);
+				}
+			}
+			return ret;
 		}
 
 		vector<Gringo::Value> AspQuery::createQueryValues(const std::string& queryString)

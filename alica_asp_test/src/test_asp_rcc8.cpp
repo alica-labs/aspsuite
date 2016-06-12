@@ -109,7 +109,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	//aspSolver->registerQuery(queryString);
 	aspSolver->registerQuery(queryObject);
 
-	if (!aspSolver->solveQueryObject())
+	if (!aspSolver->solve())
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
@@ -118,13 +118,8 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	cout << "Solver: " << queryObject->getSatisfiedPredicates().size() << endl;
-	cout << "Solver: " << queryObject->getCurrentModels()->size() << endl;
-	for (auto test : queryObject->getSatisfiedPredicates())
-	{
-		cout << "Solver1: " << test.second.size() << endl;
-	}
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString))
+	cout << queryObject->toString() << endl;
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
 			<< "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report

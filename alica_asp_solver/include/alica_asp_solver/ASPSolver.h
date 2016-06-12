@@ -47,17 +47,17 @@ namespace alica
 			void load(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(std::string const &queryString);
-			bool isTrue(Gringo::Value queryValue);
-			bool isTrueForAtLeastOneModel(const string& queryValue);
-			bool isTrueForAllModels(const string& queryValue);
+//			bool isTrue(Gringo::Value queryValue);
+//			bool isTrueForAtLeastOneModel(const string& queryValue);
+//			bool isTrueForAllModels(const string& queryValue);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
 			bool isTrueForAllModels(shared_ptr<AspQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
+//			bool onModel(Gringo::Model const &m);
 			bool onModel(Gringo::Model const &m);
-			bool onModelQueryObject(Gringo::Model const &m);
+//			bool solve();
 			bool solve();
-			bool solveQueryObject();
-			bool registerQuery(const string& query);
+//			bool registerQuery(const string& query);
 			bool registerQuery(shared_ptr<AspQuery> query);
 			bool unRegisterQuery(shared_ptr<AspQuery> query);
 			alica::reasoner::ASPGenerator gen;
@@ -85,10 +85,12 @@ namespace alica
 
 
 			// key=queries, value=vector<true predicates in the last model>
-			map<Gringo::Value, vector<Gringo::Value>> registeredQueries;
-			vector<shared_ptr<AspQuery>> regQueries;
+			//map<Gringo::Value, vector<Gringo::Value>> registeredQueries;
+			vector<shared_ptr<AspQuery>> registeredQueries;
 
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
+			void reduceRegisteredQueriesLifeTime();
+			void removeDeadQueries();
 		};
 
 	} /* namespace reasoner */

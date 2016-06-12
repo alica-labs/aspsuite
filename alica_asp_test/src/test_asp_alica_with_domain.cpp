@@ -110,10 +110,18 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	string queryString3 = "brokenPlanBase(raphael)";
 	string queryString4 = "brokenPlanBase(michelangelo)";
 
-	aspSolver->registerQuery(queryString1);
-	aspSolver->registerQuery(queryString2);
-	aspSolver->registerQuery(queryString3);
-	aspSolver->registerQuery(queryString4);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																									1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+																									1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3,
+																									1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject4 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString4,
+																									1);
+	aspSolver->registerQuery(queryObject1);
+	aspSolver->registerQuery(queryObject2);
+	aspSolver->registerQuery(queryObject3);
+	aspSolver->registerQuery(queryObject4);
 
 	bool modelFound = aspSolver->validatePlan(plan);
 	if (!modelFound)
@@ -125,10 +133,10 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryString1)) << "The planbase of agent donatello should be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString2)) << "The planbase of agent leonardo should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString3)) << "The planbase of agent raphael should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString4)) << "The planbase of agent michelangelo should not be broken.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The planbase of agent donatello should be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject2)) << "The planbase of agent leonardo should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject3)) << "The planbase of agent raphael should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject4)) << "The planbase of agent michelangelo should not be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
@@ -155,7 +163,9 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 
 	string queryString1 = "brokenPlanBase(donatello)";
 
-	aspSolver->registerQuery(queryString1);
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+																										1);
+	aspSolver->registerQuery(queryObject1);
 
 	bool modelFound = aspSolver->validatePlan(plan);
 	if (!modelFound)
@@ -167,7 +177,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 		aspSolver->printStats();
 	}
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryString1)) << "The plan base of agent donatello should not be broken.";
+	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan base of agent donatello should not be broken.";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

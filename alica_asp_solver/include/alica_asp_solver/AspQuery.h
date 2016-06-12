@@ -33,12 +33,12 @@ namespace alica
 			string getQueryString();
 			bool setQueryString(string queryString);
 			void reduceLifeTime();
-			bool isSatisfied();
-			void setSatisfied(bool satisfied);
-			map<Gringo::Value, vector<Gringo::ValVec>> getSatisfiedPredicates();
-			void saveSatisfiedPredicate(Gringo::Value key, Gringo::ValVec valueVector);
+			map<Gringo::Value, vector<Gringo::ValVec>> getPredicateModelMap();
+			void savePredicateModelPair(Gringo::Value key, Gringo::ValVec valueVector);
 			bool isDisjunction();
 			vector<Gringo::Value> getQueryValues();
+			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec>>> getSattisfiedPredicates();
+			string toString();
 
 		private:
 			string queryString;
@@ -46,12 +46,11 @@ namespace alica
 			shared_ptr<vector<Gringo::ValVec>> currentModels;
 			vector<Gringo::Value> queryValues;
 			// key=query value, value=model which satisfies query
-			map<Gringo::Value, vector<Gringo::ValVec>> satisfiedPredicates;
+			map<Gringo::Value, vector<Gringo::ValVec>> predicateModelMap;
 			// lifeTime == 1 => query is used once
 			// lifeTime == x => query is used x times
 			// LifeTime == -1 => query is used util unregistered
 			int lifeTime;
-			bool satisfied;
 			bool disjunction;
 			vector<Gringo::Value> createQueryValues(std::string const &queryString);
 

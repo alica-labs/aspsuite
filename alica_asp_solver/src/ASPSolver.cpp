@@ -105,100 +105,90 @@ namespace alica
 			return ret;
 		}
 
-		bool ASPSolver::isTrue(Gringo::Value queryValue)
-		{
-			auto entry = this->registeredQueries.find(queryValue);
-			if (entry != this->registeredQueries.end() && entry->second.size() > 0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+//		bool ASPSolver::isTrue(Gringo::Value queryValue)
+//		{
+//			auto entry = this->registeredQueries.find(queryValue);
+//			if (entry != this->registeredQueries.end() && entry->second.size() > 0)
+//			{
+//				return true;
+//			}
+//			else
+//			{
+//				return false;
+//			}
+//		}
 
-		bool ASPSolver::isTrueForAllModels(const string& query)
-		{
-			auto queryValues = createQueryValues(query);
-			bool temp = false;
-			bool result = true;
-			for (auto model : this->currentModels)
-			{
-#ifdef ASPSolver_DEBUG
-				cout << "ASPSOLVER: MODEL" << endl;
-				for (auto &atom : model)
-				{
-					std::cout << atom << " ";
-				}
-				std::cout << std::endl;
-#endif
-				result = true;
-				cout << "ASPSolver: Literals ";
-				for (auto& queryMapPair : this->registeredQueries)
-				{
-					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
-					{
-						continue;
-					}
-					temp = false;
-					queryMapPair.second.clear();
-
-					// determine the domain of the query predicate
-					//					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
-
-					for (auto it : model)
-					{
-						//						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
-
-						if (this->checkMatchValues(&queryMapPair.first, &it))
-						{
-							cout << "'" << queryMapPair.first << "' ";
-							temp = true;
-							queryMapPair.second.push_back(queryMapPair.first);
-						}
-						else
-						{
-							//								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
-						}
-					}
-					result &= temp;
-				}
-				cout << "matched!" << endl;
-			}
-			return result;
-
+//		bool ASPSolver::isTrueForAllModels(const string& query)
+//		{
+//			auto queryValues = createQueryValues(query);
+//			bool temp = false;
+//			bool result = true;
+//			for (auto model : this->currentModels)
+//			{
+//#ifdef ASPSolver_DEBUG
+//				cout << "ASPSOLVER: MODEL" << endl;
+//				for (auto &atom : model)
+//				{
+//					std::cout << atom << " ";
+//				}
+//				std::cout << std::endl;
+//#endif
+//				result = true;
+//				cout << "ASPSolver: Literals ";
+//				for (auto& queryMapPair : this->registeredQueries)
+//				{
+//					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+//					{
+//						continue;
+//					}
+//					temp = false;
+//					queryMapPair.second.clear();
 //
+//					// determine the domain of the query predicate
+//					//					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
 //
+//					for (auto it : model)
+//					{
+//						//						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
+//
+//						if (this->checkMatchValues(&queryMapPair.first, &it))
+//						{
+//							cout << "'" << queryMapPair.first << "' ";
+//							temp = true;
+//							queryMapPair.second.push_back(queryMapPair.first);
+//						}
+//						else
+//						{
+//							//								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
+//						}
+//					}
+//					result &= temp;
+//				}
+//				cout << "matched!" << endl;
+//			}
+//			return result;
+//		}
+
+//		bool ASPSolver::registerQuery(const string& query)
+//		{
 //			auto queryValues = createQueryValues(query);
 //			bool ret = true;
 //			for (Gringo::Value queryValue : queryValues)
 //			{
-//				ret &= this->isTrue(queryValue);
+//				//Gringo::Value queryValue = this->gringoModule.parseValue(query);
+//				auto entry = this->registeredQueries.find(queryValue);
+//				if (entry == this->registeredQueries.end())
+//				{
+//					this->registeredQueries.emplace(queryValue, vector<Gringo::Value>());
+//					ret &= true;
+//				}
+//				else
+//				{
+//					ret &= false;
+//				}
 //			}
 //			return ret;
-		}
-
-		bool ASPSolver::registerQuery(const string& query)
-		{
-			auto queryValues = createQueryValues(query);
-			bool ret = true;
-			for (Gringo::Value queryValue : queryValues)
-			{
-				//Gringo::Value queryValue = this->gringoModule.parseValue(query);
-				auto entry = this->registeredQueries.find(queryValue);
-				if (entry == this->registeredQueries.end())
-				{
-					this->registeredQueries.emplace(queryValue, vector<Gringo::Value>());
-					ret &= true;
-				}
-				else
-				{
-					ret &= false;
-				}
-			}
-			return ret;
-		}
+//		}
 
 		std::vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
 		{
@@ -241,68 +231,68 @@ namespace alica
 			return gringoValues;
 		}
 
-		bool ASPSolver::isTrueForAtLeastOneModel(const string& query)
-		{
-			auto queryValues = createQueryValues(query);
-			bool temp = false;
-			bool result = true;
-			for (auto model : this->currentModels)
-			{
-#ifdef ASPSolver_DEBUG
-				cout << "ASPSOLVER: MODEL" << endl;
-				for (auto &atom : model)
-				{
-					std::cout << atom << " ";
-				}
-				std::cout << std::endl;
-#endif
-				result = true;
-				cout << "ASPSolver: Literals ";
-				for (auto& queryMapPair : this->registeredQueries)
-				{
-					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
-					{
-						continue;
-					}
-					temp = false;
-					queryMapPair.second.clear();
-
-					// determine the domain of the query predicate
-//					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
-
-					for (auto it : model)
-					{
-//						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
-
-						if (this->checkMatchValues(&queryMapPair.first, &it))
-						{
-							cout << "'" << queryMapPair.first << "' ";
-							temp = true;
-							queryMapPair.second.push_back(queryMapPair.first);
-						}
-						else
-						{
-//								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
-						}
-					}
-					result &= temp;
-				}
-				cout << "matched!" << endl;
-				if (result == true)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
+//		bool ASPSolver::isTrueForAtLeastOneModel(const string& query)
+//		{
+//			auto queryValues = createQueryValues(query);
+//			bool temp = false;
+//			bool result = true;
+//			for (auto model : this->currentModels)
+//			{
+//#ifdef ASPSolver_DEBUG
+//				cout << "ASPSOLVER: MODEL" << endl;
+//				for (auto &atom : model)
+//				{
+//					std::cout << atom << " ";
+//				}
+//				std::cout << std::endl;
+//#endif
+//				result = true;
+//				cout << "ASPSolver: Literals ";
+//				for (auto& queryMapPair : this->registeredQueries)
+//				{
+//					if (find(queryValues.begin(), queryValues.end(), queryMapPair.first) == queryValues.end())
+//					{
+//						continue;
+//					}
+//					temp = false;
+//					queryMapPair.second.clear();
+//
+//					// determine the domain of the query predicate
+////					cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
+//
+//					for (auto it : model)
+//					{
+////						cout << "ASPSolver: Found true literal '" << it << "'" << endl;
+//
+//						if (this->checkMatchValues(&queryMapPair.first, &it))
+//						{
+//							cout << "'" << queryMapPair.first << "' ";
+//							temp = true;
+//							queryMapPair.second.push_back(queryMapPair.first);
+//						}
+//						else
+//						{
+////								cout << "ASPSolver: Literal '" << it << "' didnt match!" << endl;
+//						}
+//					}
+//					result &= temp;
+//				}
+//				cout << "matched!" << endl;
+//				if (result == true)
+//				{
+//					return true;
+//				}
+//			}
+//			return false;
+//		}
 
 		bool ASPSolver::registerQuery(shared_ptr<AspQuery> query)
 		{
 			bool ret = true;
-			auto entry = find(this->regQueries.begin(), this->regQueries.end(), query);
-			if (entry == this->regQueries.end())
+			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
+			if (entry == this->registeredQueries.end())
 			{
-				this->regQueries.push_back(query);
+				this->registeredQueries.push_back(query);
 				ret &= true;
 			}
 			else
@@ -315,10 +305,10 @@ namespace alica
 		bool ASPSolver::unRegisterQuery(shared_ptr<AspQuery> query)
 		{
 			bool ret = true;
-			auto entry = find(this->regQueries.begin(), this->regQueries.end(), query);
-			if (entry == this->regQueries.end())
+			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
+			if (entry == this->registeredQueries.end())
 			{
-				this->regQueries.erase(entry);
+				this->registeredQueries.erase(entry);
 				ret &= true;
 			}
 			else
@@ -343,10 +333,10 @@ namespace alica
 			return WILDCARD_STRING;
 		}
 
-		bool ASPSolver::solveQueryObject()
+		bool ASPSolver::solve()
 		{
 			this->currentModels.clear();
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModelQueryObject, this, std::placeholders::_1),
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),
 												{});
 			if (result == Gringo::SolveResult::SAT)
 			{
@@ -358,7 +348,7 @@ namespace alica
 			}
 		}
 
-		bool ASPSolver::onModelQueryObject(const Gringo::Model& m)
+		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: Found the following model:" << endl;
@@ -370,8 +360,9 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
+			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
 			bool foundSomething = false;
-			for (auto& query : this->regQueries)
+			for (auto& query : this->registeredQueries)
 			{
 				query->getCurrentModels()->push_back(m.atoms(Gringo::Model::SHOWN));
 				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
@@ -400,7 +391,7 @@ namespace alica
 							{
 								//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
-								query->saveSatisfiedPredicate(queryValue, m.atoms(Gringo::Model::SHOWN));
+								query->savePredicateModelPair(queryValue, m.atoms(Gringo::Model::SHOWN));
 								break;
 								//atomStates.push_back(&(domainPair.second));
 							}
@@ -451,7 +442,7 @@ namespace alica
 		{
 			if (query->isDisjunction())
 			{
-				for (auto queryValue : query->getSatisfiedPredicates())
+				for (auto queryValue : query->getPredicateModelMap())
 				{
 					if (queryValue.second.size() == 0)
 					{
@@ -462,7 +453,7 @@ namespace alica
 			}
 			else
 			{
-				for (auto queryValue : query->getSatisfiedPredicates())
+				for (auto queryValue : query->getPredicateModelMap())
 				{
 					if (queryValue.second.size() == 0)
 					{
@@ -477,7 +468,7 @@ namespace alica
 		{
 			if (query->isDisjunction())
 			{
-				for (auto queryValue : query->getSatisfiedPredicates())
+				for (auto queryValue : query->getPredicateModelMap())
 				{
 					if (queryValue.second.size() == 0)
 					{
@@ -487,7 +478,7 @@ namespace alica
 			}
 			else
 			{
-				for (auto queryValue : query->getSatisfiedPredicates())
+				for (auto queryValue : query->getPredicateModelMap())
 				{
 					if (queryValue.second.size() != query->getCurrentModels()->size())
 					{
@@ -526,19 +517,19 @@ namespace alica
 			return nullptr; //make_shared<SolverVariable>();
 		}
 
-		bool ASPSolver::solve()
-		{
-			this->currentModels.clear();
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
-			if (result == Gringo::SolveResult::SAT)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+//		bool ASPSolver::solve()
+//		{
+//			this->currentModels.clear();
+//			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+//			if (result == Gringo::SolveResult::SAT)
+//			{
+//				return true;
+//			}
+//			else
+//			{
+//				return false;
+//			}
+//		}
 
 		/**
 		 * Validates the well-formedness of a given plan.
@@ -560,62 +551,81 @@ namespace alica
 			}
 		}
 
-		bool ASPSolver::onModel(Gringo::Model const &m)
+//		bool ASPSolver::onModel(Gringo::Model const &m)
+//		{
+//#ifdef ASPSolver_DEBUG
+//			cout << "ASPSolver: Found the following model:" << endl;
+//			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+//			{
+//				std::cout << atom << " ";
+//			}
+//			std::cout << std::endl;
+//#endif
+//
+//			ClingoModel& clingoModel = (ClingoModel&)m;
+//			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
+//			bool foundSomething = false;
+//			for (auto& queryMapPair : this->registeredQueries)
+//			{
+//				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
+//
+//				queryMapPair.second.clear();
+//				//std::vector<Gringo::AtomState const *> atomStates;
+//
+//				// determine the domain of the query predicate
+//				cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
+//				auto it = clingoModel.out.domains.find(queryMapPair.first.sig());
+//				if (it == clingoModel.out.domains.end())
+//				{
+//					cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+//					continue;
+//				}
+//
+//				for (auto& domainPair : it->second.domain)
+//				{
+//					//	cout << "ASPSolver: Inside domain-loop!" << endl;
+//
+//					if (&(domainPair.second)
+//							&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+//					{
+//						//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+//
+//						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
+//						{
+//							//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+//							foundSomething = true;
+//							queryMapPair.second.push_back(domainPair.first);
+//							//atomStates.push_back(&(domainPair.second));
+//						}
+//						else
+//						{
+//							//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+//
+//						}
+//					}
+//				}
+//			}
+//
+//			return foundSomething;
+//		}
+
+		void ASPSolver::reduceRegisteredQueriesLifeTime()
 		{
-#ifdef ASPSolver_DEBUG
-			cout << "ASPSolver: Found the following model:" << endl;
-			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+			for (auto query : this->registeredQueries)
 			{
-				std::cout << atom << " ";
+				query->reduceLifeTime();
 			}
-			std::cout << std::endl;
-#endif
+		}
 
-			ClingoModel& clingoModel = (ClingoModel&)m;
-			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
-			bool foundSomething = false;
-			for (auto& queryMapPair : this->registeredQueries)
+		void ASPSolver::removeDeadQueries()
+		{
+			for (auto query : this->registeredQueries)
 			{
-				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
-
-				queryMapPair.second.clear();
-				//std::vector<Gringo::AtomState const *> atomStates;
-
-				// determine the domain of the query predicate
-				cout << "ASPSolver::onModel: " << queryMapPair.first << endl;
-				auto it = clingoModel.out.domains.find(queryMapPair.first.sig());
-				if (it == clingoModel.out.domains.end())
+				if(query->getLifeTime() == 0)
 				{
-					cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-					continue;
-				}
-
-				for (auto& domainPair : it->second.domain)
-				{
-					//	cout << "ASPSolver: Inside domain-loop!" << endl;
-
-					if (&(domainPair.second)
-							&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-					{
-						//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-						if (this->checkMatchValues(&queryMapPair.first, &domainPair.first))
-						{
-							//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-							foundSomething = true;
-							queryMapPair.second.push_back(domainPair.first);
-							//atomStates.push_back(&(domainPair.second));
-						}
-						else
-						{
-							//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-
-						}
-					}
+					this->unRegisterQuery(query);
 				}
 			}
-
-			return foundSomething;
 		}
 
 		const long long ASPSolver::getSolvingTime()

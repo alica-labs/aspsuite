@@ -335,9 +335,14 @@ namespace alica
 
 		bool ASPSolver::solve()
 		{
-			this->currentModels.clear();
+			cout << "AspSolver: before removeDeadQueries" << endl;
+			this->removeDeadQueries();
+			cout << "AspSolver: after removeDeadQueries" << endl;
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),
 												{});
+			cout << "AspSolver: after solved" << endl;
+			this->reduceRegisteredQueriesLifeTime();
+			cout << "AspSolver: after reduceRegisteredQueriesLifeTime" << endl;
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -350,6 +355,7 @@ namespace alica
 
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
+			cout << "AspSolver: begin of on model" << endl;
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: Found the following model:" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
@@ -380,31 +386,30 @@ namespace alica
 
 					for (auto& domainPair : it->second.domain)
 					{
-						//	cout << "ASPSolver: Inside domain-loop!" << endl;
+							cout << "ASPSolver: Inside domain-loop!" << endl;
 
 						if (&(domainPair.second)
 								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 						{
-							//			cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
 
 							if (this->checkMatchValues(&queryValue, &domainPair.first))
 							{
-								//			cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
 								query->savePredicateModelPair(queryValue, m.atoms(Gringo::Model::SHOWN));
 								break;
-								//atomStates.push_back(&(domainPair.second));
 							}
 							else
 							{
-								//				cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
 
 							}
 						}
 					}
 				}
 			}
-
+			cout << "AspSolver: end of on Model" << endl;
 			return foundSomething;
 		}
 

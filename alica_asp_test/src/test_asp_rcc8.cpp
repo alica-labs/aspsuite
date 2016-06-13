@@ -92,18 +92,22 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	string rcc8TestFactsFile = (*sc)["ASPSolver"]->get<string>("rcc8TestFactsFile", NULL);
-	rcc8TestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rcc8TestFactsFile);
-	cout << "ASPSolver: " << rcc8TestFactsFile << endl;
-	aspSolver->load(rcc8TestFactsFile);
-	aspSolver->ground( { {"rcc8TestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
+//	string rcc8TestFactsFile = (*sc)["ASPSolver"]->get<string>("rcc8TestFactsFile", NULL);
+//	rcc8TestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rcc8TestFactsFile);
+//	cout << "ASPSolver: " << rcc8TestFactsFile << endl;
+	string rrc8DepartmentFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentFile", NULL);
+	rrc8DepartmentFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentFile);
+	cout << "ASPSolver: " << rrc8DepartmentFile << endl;
+	aspSolver->load(rrc8DepartmentFile);
+	aspSolver->ground( { {"distributed_systems_rooms", {}}}, nullptr);
+//	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
 
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 //	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
-	string queryString = "disconnected(b,c), disconnected(a,b)";
+	//string queryString = "disconnected(b,c); disconnected(a,b)";
+	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																								1);
 	//aspSolver->registerQuery(queryString);
@@ -119,7 +123,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	}
 
 	cout << queryObject->toString() << endl;
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+	EXPECT_TRUE(aspSolver->isTrueForAtLeastOneModel(queryObject))
 			<< "The book harryPotter1 should be carried by more than one agent.";
 
 	// stop time measurement and report

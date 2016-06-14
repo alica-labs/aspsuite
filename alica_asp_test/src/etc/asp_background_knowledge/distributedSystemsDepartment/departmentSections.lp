@@ -1,57 +1,67 @@
 #program department_sections.
 
-%%%% studentArea
 externallyConnected(studentArea, mainHallA).
-disconnected(studentArea, mainHallB).
-disconnected(studentArea, workshop).
-disconnected(studentArea, offices).
-disconnected(studentArea, utility).
-disconnected(studentArea, organization).
+%externallyConnected(mainHallA, studentArea).
 
-%%%% workshop
 externallyConnected(workshop, mainHallA).
-disconnected(studentArea, mainHallB).
-disconnected(workshop, studentArea).
-disconnected(workshop, offices).
-disconnected(workshop, utility).
-disconnected(workshop, organization).
+%externallyConnected(mainHallA, workshop).
 
-%%%% offices
 externallyConnected(offices, mainHallA).
+%externallyConnected(mainHallA, offices).
+
 externallyConnected(offices, mainHallB).
+%externallyConnected(mainHallB, offices).
+
 externallyConnected(offices, utility).
-disconnected(offices, workshop).
-disconnected(offices, studentArea).
-disconnected(offices, organization).
+%externallyConnected(utility, offices).
 
-%%%% mainHallA 
-externallyConnected(mainHallA, studentArea).
 externallyConnected(mainHallA, mainHallB).
-externallyConnected(mainHallA, workshop).
-externallyConnected(mainHallA, offices).
-disconnected(mainHallA, utility).
-disconnected(mainHallA, organization).
+%externallyConnected(mainHallB, mainHallA).
 
-%%%% mainHallB 
-externallyConnected(mainHallB, mainHallA).
-externallyConnected(mainHallB, offices).
 externallyConnected(mainHallB, utility).
+%externallyConnected(utility, mainHallB).
+
 externallyConnected(mainHallB, organization).
-disconnected(mainHallB, studentArea).
-disconnected(mainHallB, workshop).
+%externallyConnected(organization, mainHallB).
 
-%%%% utility
-externallyConnected(utility, mainHallB).
 externallyConnected(utility, organization).
-externallyConnected(utility, offices).
-disconnected(utility, workshop).
-disconnected(utility, studentArea).
-disconnected(utility, mainHallA).
+%externallyConnected(organization, utility).
 
-%%%% organization
-externallyConnected(organization, mainHallB).
-externallyConnected(organization, utility).
-disconnected(organization, mainHallA).
-disconnected(organization, workshop).
-disconnected(organization, offices).
-disconnected(organization, studentArea).
+
+
+disconnected(studentArea, mainHallB).
+%disconnected(mainHallB, studentArea).
+
+disconnected(studentArea, workshop).
+%disconnected(workshop, studentArea).
+
+disconnected(studentArea, offices).
+%disconnected(offices, studentArea).
+
+disconnected(studentArea, utility).
+%disconnected(utility, studentArea).
+
+disconnected(studentArea, organization).
+%disconnected(organization, studentArea).
+
+disconnected(workshop, mainHallB).
+%disconnected(mainHallB, workshop).
+
+disconnected(workshop, offices).
+%disconnected(offices, workshop).
+
+disconnected(workshop, utility).
+%disconnected(utility, workshop).
+
+disconnected(workshop, organization).
+%disconnected(organization, workshop).
+
+disconnected(offices, organization).
+%disconnected(organization, offices).
+
+disconnected(mainHallA, utility).
+%disconnected(utility, mainHallA).
+
+disconnected(mainHallA, organization).
+%disconnected(organization, mainHallA).
+

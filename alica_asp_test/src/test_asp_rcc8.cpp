@@ -95,11 +95,11 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 //	string rcc8TestFactsFile = (*sc)["ASPSolver"]->get<string>("rcc8TestFactsFile", NULL);
 //	rcc8TestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rcc8TestFactsFile);
 //	cout << "ASPSolver: " << rcc8TestFactsFile << endl;
-	string rrc8DepartmentFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentFile", NULL);
-	rrc8DepartmentFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentFile);
-	cout << "ASPSolver: " << rrc8DepartmentFile << endl;
-	aspSolver->load(rrc8DepartmentFile);
-	aspSolver->ground( { {"distributed_systems_rooms", {}}}, nullptr);
+	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
+	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentSectionFile);
+	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
+	aspSolver->load(rrc8DepartmentSectionFile);
+	aspSolver->ground( { {"department_sections", {}}}, nullptr);
 	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
 
 	// start time measurement

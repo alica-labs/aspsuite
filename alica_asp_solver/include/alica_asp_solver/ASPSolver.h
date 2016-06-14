@@ -91,6 +91,9 @@ namespace alica
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceRegisteredQueriesLifeTime();
 			void removeDeadQueries();
+#ifdef ASPSolver_DEBUG
+			int modelCount;
+#endif
 		};
 
 	} /* namespace reasoner */

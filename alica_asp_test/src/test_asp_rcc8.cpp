@@ -100,7 +100,7 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	cout << "ASPSolver: " << rrc8DepartmentFile << endl;
 	aspSolver->load(rrc8DepartmentFile);
 	aspSolver->ground( { {"distributed_systems_rooms", {}}}, nullptr);
-//	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
+	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
 
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();

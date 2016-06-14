@@ -33,6 +33,9 @@ namespace alica
 																					alicaBackGroundKnowledgeFile);
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
+#ifdef ASPSolver_DEBUG
+			this->modelCount = 0;
+#endif
 		}
 
 		ASPSolver::~ASPSolver()
@@ -357,7 +360,8 @@ namespace alica
 		{
 			cout << "AspSolver: begin of on model" << endl;
 #ifdef ASPSolver_DEBUG
-			cout << "ASPSolver: Found the following model:" << endl;
+			this->modelCount++;
+			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
 				std::cout << atom << " ";
@@ -380,29 +384,29 @@ namespace alica
 					auto it = clingoModel.out.domains.find(queryValue.sig());
 					if (it == clingoModel.out.domains.end())
 					{
-						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+//						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
 						continue;
 					}
 
 					for (auto& domainPair : it->second.domain)
 					{
-							cout << "ASPSolver: Inside domain-loop!" << endl;
+//							cout << "ASPSolver: Inside domain-loop!" << endl;
 
 						if (&(domainPair.second)
 								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 						{
-										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+//										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
 
 							if (this->checkMatchValues(&queryValue, &domainPair.first))
 							{
-										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+//										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
 								query->savePredicateModelPair(queryValue, m.atoms(Gringo::Model::SHOWN));
 								break;
 							}
 							else
 							{
-											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+//											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
 
 							}
 						}

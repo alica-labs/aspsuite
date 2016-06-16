@@ -145,7 +145,7 @@ namespace alica
 					ss << "\n";
 				}
 			}
-			ss << (this->disjunction ? "Query is disjubction." : "Query is konjunction.") << "\n";
+			ss << (this->disjunction ? "Query is disjubction." : "Query is conjunction.") << "\n";
 			ss << "Query will be used " << this->lifeTime << "times again.\n";
 			return ss.str();
 		}

@@ -177,7 +177,7 @@ namespace alica
 				int counter = 0;
 				for(auto predicate : this->queryValues)
 				{
-					ss << "queryHolds(query" << this << counter << ") :-" << predicate.string() << ".";
+					ss << "queryHolds(query" << this << counter << ") :-" << predicate << ".";
 					this->rules.push_back(ss.str());
 					counter++;
 					ss.clear();
@@ -189,6 +189,11 @@ namespace alica
 				ss << "queryHolds(query" << this << ") :- " << this->queryString << ".";
 				this->rules.push_back(ss.str());
 			}
+		}
+
+		vector<string> AspQuery::getRules()
+		{
+			return this->rules;
 		}
 
 		vector<Gringo::Value> AspQuery::createQueryValues(const std::string& queryString)

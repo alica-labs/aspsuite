@@ -40,6 +40,7 @@ namespace alica
 			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec>>> getSattisfiedPredicates();
 			string toString();
 			void createRules();
+			vector<string> getRules();
 
 		private:
 			string queryString;

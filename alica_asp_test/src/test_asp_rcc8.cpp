@@ -123,3 +123,55 @@ TEST_F(ASPRCC8, CompositionTable)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
+
+TEST_F(ASPRCC8, DeisjunctionInQuery)
+{
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
+			<< "Unable to initialise the ALICA Engine!";
+
+	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+
+	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
+	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentSectionFile);
+	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
+	aspSolver->load(rrc8DepartmentSectionFile);
+	aspSolver->ground( { {"department_sections", {}}}, nullptr);
+	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
+
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+
+	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+																								1);
+	queryObject->createRules();
+	aspSolver->registerQuery(queryObject);
+	if (!aspSolver->solve())
+	{
+		cout << "ASPAlicaTest: No Model found!" << endl;
+	}
+	else
+	{
+		aspSolver->printStats();
+	}
+
+	EXPECT_TRUE(queryObject->isDisjunction())
+				<< "The query should be a disjunction.";
+
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
+
+	EXPECT_TRUE(queryObject->getRules().size() == 2)
+			<< "The query should create 2 ruless but contains "<< queryObject->getRules().size() <<".";
+
+	EXPECT_TRUE(queryObject->getLifeTime() == 0)
+			<< "The query should be expired but lifetime is:" << queryObject->getLifeTime() <<".";
+
+	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0)
+			<< "There shouldn't be any query left but there are " << aspSolver->getRegisteredQueries().size() << " left.";
+
+
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+}

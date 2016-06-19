@@ -169,7 +169,7 @@ namespace alica
 		{
 			bool ret = true;
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
-			if (entry == this->registeredQueries.end())
+			if (entry != this->registeredQueries.end())
 			{
 				this->registeredQueries.erase(entry);
 				ret &= true;
@@ -198,10 +198,10 @@ namespace alica
 
 		bool ASPSolver::solve()
 		{
-			this->removeDeadQueriesAndReduceLifeTime();
+			this->reduceLifeTime();
 			this->currentModels.clear();
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1),
-												{});
+			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -388,9 +388,10 @@ namespace alica
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 			this->planIntegrator->loadPlanTree(plan);
-			this->removeDeadQueriesAndReduceLifeTime();
+			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -401,15 +402,27 @@ namespace alica
 			}
 		}
 
-		void ASPSolver::removeDeadQueriesAndReduceLifeTime()
+		void ASPSolver::removeDeadQueries()
 		{
 			for (auto query : this->registeredQueries)
 			{
-				if(query->getLifeTime() == 0)
+				if (query->getLifeTime() == 0)
 				{
 					this->unRegisterQuery(query);
 				}
-				else
+			}
+		}
+
+		vector<shared_ptr<AspQuery> > ASPSolver::getRegisteredQueries()
+		{
+			return this->registeredQueries;
+		}
+
+		void ASPSolver::reduceLifeTime()
+		{
+			for (auto query : this->registeredQueries)
+			{
+				if (query->getLifeTime() > 0)
 				{
 					query->reduceLifeTime();
 				}

@@ -85,16 +85,13 @@ protected:
 	}
 };
 
-TEST_F(ASPRCC8, multipleObjectCarry)
+TEST_F(ASPRCC8, CompositionTable)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-//	string rcc8TestFactsFile = (*sc)["ASPSolver"]->get<string>("rcc8TestFactsFile", NULL);
-//	rcc8TestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rcc8TestFactsFile);
-//	cout << "ASPSolver: " << rcc8TestFactsFile << endl;
 	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
 	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentSectionFile);
 	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
@@ -105,14 +102,11 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
-//	string queryString = "disconnected(a,c), disconnected(b,c), disconnected(a,b)";
-	//string queryString = "disconnected(b,c); disconnected(a,b)";
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																								1);
-	//aspSolver->registerQuery(queryString);
+	queryObject->createRules();
 	aspSolver->registerQuery(queryObject);
-
 	if (!aspSolver->solve())
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
@@ -122,9 +116,8 @@ TEST_F(ASPRCC8, multipleObjectCarry)
 		aspSolver->printStats();
 	}
 
-	cout << queryObject->toString() << endl;
-	EXPECT_TRUE(aspSolver->isTrueForAtLeastOneModel(queryObject))
-			<< "The book harryPotter1 should be carried by more than one agent.";
+	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
 	// stop time measurement and report
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

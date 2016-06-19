@@ -39,12 +39,14 @@ namespace alica
 			vector<Gringo::Value> getQueryValues();
 			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec>>> getSattisfiedPredicates();
 			string toString();
+			void createRules();
 
 		private:
 			string queryString;
 			ASPSolver* solver;
 			shared_ptr<vector<Gringo::ValVec>> currentModels;
 			vector<Gringo::Value> queryValues;
+			vector<string> rules;
 			// key=query value, value=model which satisfies query
 			map<Gringo::Value, vector<Gringo::ValVec>> predicateModelMap;
 			// lifeTime == 1 => query is used once

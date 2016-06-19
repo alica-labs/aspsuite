@@ -89,8 +89,7 @@ namespace alica
 			vector<shared_ptr<AspQuery>> registeredQueries;
 
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
-			void reduceRegisteredQueriesLifeTime();
-			void removeDeadQueries();
+			void removeDeadQueriesAndReduceLifeTime();
 #ifdef ASPSolver_DEBUG
 			int modelCount;
 #endif

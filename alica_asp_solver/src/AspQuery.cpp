@@ -30,7 +30,7 @@ namespace alica
 			this->solver = solver;
 			this->disjunction = false;
 			this->queryValues = this->createQueryValues(queryString);
-			for(auto value : this->queryValues)
+			for (auto value : this->queryValues)
 			{
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
@@ -44,7 +44,7 @@ namespace alica
 			this->solver = solver;
 			this->disjunction = false;
 			this->queryValues = this->createQueryValues(queryString);
-			for(auto value : this->queryValues)
+			for (auto value : this->queryValues)
 			{
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
@@ -86,7 +86,7 @@ namespace alica
 			{
 				this->queryString = queryString;
 				this->queryValues = this->createQueryValues(queryString);
-				for(auto value : this->queryValues)
+				for (auto value : this->queryValues)
 				{
 					this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 				}
@@ -132,13 +132,13 @@ namespace alica
 			stringstream ss;
 			ss << "QueryString: " << this->queryString << "\n";
 			ss << "Predicates with models: " << "\n";
-			for(auto pair : this->predicateModelMap)
+			for (auto pair : this->predicateModelMap)
 			{
 				ss << "\tPredicate: " << pair.first << "\n";
-				for(auto models : pair.second)
+				for (auto models : pair.second)
 				{
 					ss << "\t\t Model: ";
-					for(auto predicate : models)
+					for (auto predicate : models)
 					{
 						ss << predicate << " ";
 					}
@@ -146,21 +146,49 @@ namespace alica
 				}
 			}
 			ss << (this->disjunction ? "Query is disjubction." : "Query is conjunction.") << "\n";
-			ss << "Query will be used " << this->lifeTime << "times again.\n";
+			ss << "Query will be used " << this->lifeTime << " times again.\n";
+			ss << "Rules:" << "\n";
+			for(auto rule : this->rules)
+			{
+				ss << "\t" << rule << "\n";
+			}
 			return ss.str();
 		}
 
 		shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > AspQuery::getSattisfiedPredicates()
 		{
-			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > ret = make_shared<map<Gringo::Value, vector<Gringo::ValVec> > >();
-			for(auto pair : this->predicateModelMap)
+			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > ret = make_shared<
+					map<Gringo::Value, vector<Gringo::ValVec> > >();
+			for (auto pair : this->predicateModelMap)
 			{
-				if(pair.second.size() > 0)
+				if (pair.second.size() > 0)
 				{
 					ret->emplace(pair);
 				}
 			}
 			return ret;
+		}
+
+		void AspQuery::createRules()
+		{
+			if (this->isDisjunction())
+			{
+				stringstream ss;
+				int counter = 0;
+				for(auto predicate : this->queryValues)
+				{
+					ss << "queryHolds(query" << this << counter << ") :-" << predicate.string() << ".";
+					this->rules.push_back(ss.str());
+					counter++;
+					ss.clear();
+				}
+			}
+			else
+			{
+				stringstream ss;
+				ss << "queryHolds(query" << this << ") :- " << this->queryString << ".";
+				this->rules.push_back(ss.str());
+			}
 		}
 
 		vector<Gringo::Value> AspQuery::createQueryValues(const std::string& queryString)

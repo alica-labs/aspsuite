@@ -33,6 +33,7 @@ protected:
 	alica::ConditionCreator* cc;
 	alica::UtilityFunctionCreator* uc;
 	alica::ConstraintCreator* crc;
+	std::chrono::_V2::system_clock::time_point start;
 
 	virtual void SetUp()
 	{
@@ -59,6 +60,7 @@ protected:
 
 		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=0", nullptr};
 
+		start = std::chrono::high_resolution_clock::now(); // start time measurement
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
@@ -74,6 +76,10 @@ protected:
 
 	virtual void TearDown()
 	{
+		// stop time measurement and report
+		std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+		cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms"
+				<< endl;
 		ae->shutdown();
 		sc->shutdown();
 		delete ae->getIAlicaClock();
@@ -93,14 +99,17 @@ TEST_F(ASPRCC8, CompositionTable)
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
 	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
-	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentSectionFile);
+	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+																		rrc8DepartmentSectionFile);
 	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
 	aspSolver->load(rrc8DepartmentSectionFile);
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
 	aspSolver->ground( { {"department_sections", {}}}, nullptr);
 	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
 
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
@@ -119,9 +128,6 @@ TEST_F(ASPRCC8, CompositionTable)
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
 TEST_F(ASPRCC8, DisjunctionInQuery)
@@ -132,14 +138,17 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
 	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
-	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), rrc8DepartmentSectionFile);
+	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+																		rrc8DepartmentSectionFile);
 	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
 	aspSolver->load(rrc8DepartmentSectionFile);
+	// start time measurement
+	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
 	aspSolver->ground( { {"department_sections", {}}}, nullptr);
 	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+	// stop time measurement and report
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
 
 	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
@@ -155,23 +164,17 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 		aspSolver->printStats();
 	}
 
-	EXPECT_TRUE(queryObject->isDisjunction())
-				<< "The query should be a disjunction.";
+	EXPECT_TRUE(queryObject->isDisjunction()) << "The query should be a disjunction.";
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
-	EXPECT_TRUE(queryObject->getRules().size() == 2)
-			<< "The query should create 2 ruless but contains "<< queryObject->getRules().size() <<".";
+	EXPECT_TRUE(queryObject->getRules().size() == 2) << "The query should create 2 ruless but contains "
+			<< queryObject->getRules().size() << ".";
 
-	EXPECT_TRUE(queryObject->getLifeTime() == 0)
-			<< "The query should be expired but lifetime is:" << queryObject->getLifeTime() <<".";
+	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"
+			<< queryObject->getLifeTime() << ".";
 
-	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0)
-			<< "There shouldn't be any query left but there are " << aspSolver->getRegisteredQueries().size() << " left.";
-
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0) << "There shouldn't be any query left but there are "
+			<< aspSolver->getRegisteredQueries().size() << " left.";
 }

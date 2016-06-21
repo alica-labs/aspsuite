@@ -198,11 +198,10 @@ namespace alica
 
 		bool ASPSolver::solve()
 		{
-			//TODO fix
-//			this->reduceLifeTime();
+			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
-//			this->removeDeadQueries();
+			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -389,10 +388,10 @@ namespace alica
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 			this->planIntegrator->loadPlanTree(plan);
-//			this->reduceLifeTime();
+			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
-//			this->removeDeadQueries();
+			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -405,12 +404,17 @@ namespace alica
 
 		void ASPSolver::removeDeadQueries()
 		{
+			vector<shared_ptr<AspQuery>> toRemove;
 			for (auto query : this->registeredQueries)
 			{
 				if (query->getLifeTime() == 0)
 				{
-					this->unRegisterQuery(query);
+					toRemove.push_back(query);
 				}
+			}
+			for(auto query : toRemove)
+			{
+				this->unRegisterQuery(query);
 			}
 		}
 

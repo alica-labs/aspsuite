@@ -124,7 +124,7 @@ TEST_F(ASPRCC8, CompositionTable)
 	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
-TEST_F(ASPRCC8, DeisjunctionInQuery)
+TEST_F(ASPRCC8, DisjunctionInQuery)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 			<< "Unable to initialise the ALICA Engine!";

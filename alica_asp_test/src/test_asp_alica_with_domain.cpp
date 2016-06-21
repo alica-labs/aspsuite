@@ -32,6 +32,7 @@ protected:
 	alica::ConditionCreator* cc;
 	alica::UtilityFunctionCreator* uc;
 	alica::ConstraintCreator* crc;
+	std::chrono::_V2::system_clock::time_point start;
 
 	virtual void SetUp()
 	{
@@ -57,6 +58,7 @@ protected:
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
 		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+		start = std::chrono::high_resolution_clock::now();// start time measurement
 
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
@@ -73,6 +75,9 @@ protected:
 
 	virtual void TearDown()
 	{
+		// stop time measurement and report
+		std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+		cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 		ae->shutdown();
 		sc->shutdown();
 		delete ae->getIAlicaClock();
@@ -102,9 +107,6 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
-
 	string queryString1 = "brokenPlanBase(donatello)";
 	string queryString2 = "brokenPlanBase(leonardo)";
 	string queryString3 = "brokenPlanBase(raphael)";
@@ -123,8 +125,9 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	aspSolver->registerQuery(queryObject3);
 	aspSolver->registerQuery(queryObject4);
 
-	bool modelFound = aspSolver->validatePlan(plan);
-	if (!modelFound)
+	// start time measurement for grounding
+	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
+	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
@@ -132,15 +135,13 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	{
 		aspSolver->printStats();
 	}
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The planbase of agent donatello should be broken.";
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject2)) << "The planbase of agent leonardo should not be broken.";
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject3)) << "The planbase of agent raphael should not be broken.";
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject4)) << "The planbase of agent michelangelo should not be broken.";
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
 TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
@@ -167,8 +168,9 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 																										1);
 	aspSolver->registerQuery(queryObject1);
 
-	bool modelFound = aspSolver->validatePlan(plan);
-	if (!modelFound)
+	// start time measurement for grounding
+	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
+	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
@@ -176,10 +178,8 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 	{
 		aspSolver->printStats();
 	}
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan base of agent donatello should not be broken.";
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }

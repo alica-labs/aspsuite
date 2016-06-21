@@ -32,6 +32,7 @@ protected:
 	alica::ConditionCreator* cc;
 	alica::UtilityFunctionCreator* uc;
 	alica::ConstraintCreator* crc;
+	std::chrono::_V2::system_clock::time_point start;
 
 	virtual void SetUp()
 	{
@@ -58,6 +59,7 @@ protected:
 
 		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
 
+		start = std::chrono::high_resolution_clock::now();// start time measurement
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
@@ -73,6 +75,9 @@ protected:
 
 	virtual void TearDown()
 	{
+		// stop time measurement and report
+		std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+		cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 		ae->shutdown();
 		sc->shutdown();
 		delete ae->getIAlicaClock();
@@ -83,7 +88,6 @@ protected:
 		delete crc;
 	}
 };
-
 
 /**
  * Tests the assistance domain specific knowledge
@@ -103,15 +107,14 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
-
 	string queryString = "inconsistent(harryPotter1)";
 
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																									1);
 	aspSolver->registerQuery(queryObject);
 
+	// start time measurement for grounding
+	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
@@ -120,12 +123,10 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 	{
 		aspSolver->printStats();
 	}
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The book harryPotter1 should be carried by more than one agent.";
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
 TEST_F(ASPDomainKnowledge, overloaded)
@@ -151,6 +152,8 @@ TEST_F(ASPDomainKnowledge, overloaded)
 																										1);
 	aspSolver->registerQuery(queryObject);
 
+	// start time measurement for grounding
+	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
@@ -159,12 +162,10 @@ TEST_F(ASPDomainKnowledge, overloaded)
 	{
 		aspSolver->printStats();
 	}
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The agent can't carry by more than one thing.";
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }
 
 TEST_F(ASPDomainKnowledge, largeObject)
@@ -181,15 +182,14 @@ TEST_F(ASPDomainKnowledge, largeObject)
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
-
 	string queryString = "overloaded(michelangelo)";
 
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																										1);
 	aspSolver->registerQuery(queryObject);
 
+	// start time measurement for grounding
+	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
@@ -198,10 +198,8 @@ TEST_F(ASPDomainKnowledge, largeObject)
 	{
 		aspSolver->printStats();
 	}
+	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The agent can't carry a large thing.";
-
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
 }

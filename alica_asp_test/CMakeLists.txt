@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(alica_asp_test)
-  
+    
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -Wall ${CMAKE_CXX_FLAGS}")
 if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
@@ -13,8 +13,8 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+##find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_proxy alica_asp_solver msl_expressions msl_worldmodel)
 find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_proxy alica_asp_solver)
-
 
 ###################################
 ## catkin specific configuration ##

@@ -198,10 +198,11 @@ namespace alica
 
 		bool ASPSolver::solve()
 		{
-			this->reduceLifeTime();
+			//TODO fix
+//			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
-			this->removeDeadQueries();
+//			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -388,10 +389,10 @@ namespace alica
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 			this->planIntegrator->loadPlanTree(plan);
-			this->reduceLifeTime();
+//			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
-			this->removeDeadQueries();
+//			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -511,11 +512,11 @@ namespace alica
 
 			stringstream ss;
 			ss << "Solve Statistics:" << endl;
-			ss << "TOTAL Time: " << claspFacade->summary().totalTime << endl;
-			ss << "CPU Time: " << claspFacade->summary().cpuTime << endl;
-			ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << endl;
-			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime * 1000.0) << endl;
-			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << endl;
+			ss << "TOTAL Time: " << claspFacade->summary().totalTime << "s" << endl;
+			ss << "CPU Time: " << claspFacade->summary().cpuTime << "s" << endl;
+			ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << "ms"<< endl;
+			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime * 1000.0) << "ms" << endl;
+			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms"<< endl;
 
 			cout << ss.str() << flush;
 		}

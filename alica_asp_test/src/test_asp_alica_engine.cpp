@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-
+#include <ros/ros.h>
 #include <SystemConfig.h>
 
 // ALICA Additional Modules
@@ -32,6 +32,7 @@ protected:
 	alica::ConditionCreator* cc;
 	alica::UtilityFunctionCreator* uc;
 	alica::ConstraintCreator* crc;
+	std::chrono::_V2::system_clock::time_point start;
 
 	virtual void SetUp()
 	{
@@ -57,9 +58,15 @@ protected:
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
 		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
-
+		start = std::chrono::high_resolution_clock::now();
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
+		//TODO: is needed for AspAlicaEngine, validateWM16
+//		vector<char*> test;
+//		string bla ="hallo";
+//		test.push_back((char*)bla.c_str());
+//		int number = 1;
+//		ros::init(number,test.data(),"test");
 	}
 
 	virtual void TearDown()
@@ -78,6 +85,47 @@ protected:
 /**
  * Tests the validation of ALICA plans
  */
+//TEST_F(AspAlicaEngine, validateWM16)
+//{
+//	//TODO how to get this test running
+//  // - start roscore
+//	// - uncomment the lines in setup
+//	// - add msl_expressions msl_worldmodel to find package in CMakeList
+//	// - replace include and src in alica_asp_test/src/etc/Expr with the ones from msl_expressions
+//	// - replace nase folder in alica_asp_test/src/etc/ with the one from cnc-msl and put in missing configs
+//
+//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "WM16", ".", false))
+//			<< "Unable to initialise the ALICA Engine!";
+//	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+//	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+//	// start time measurement
+//
+//	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1413992564409];
+//	string queryString = aspSolver->gen.brokenState(brokenState, false);
+//	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+//																									1);
+//	aspSolver->registerQuery(queryObject);
+//
+//
+//	std::chrono::_V2::system_clock::time_point start1 = std::chrono::high_resolution_clock::now();
+//	auto ret = aspSolver->validatePlan(plan);
+//	std::chrono::_V2::system_clock::time_point end1 = std::chrono::high_resolution_clock::now();
+//	cout << "Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end1 - start1).count() << " ms" << endl;
+//	if (!ret)
+//	{
+//		cout << "ASPAlicaTest: No Model found!" << endl;
+//	}
+//	else
+//	{
+//		aspSolver->printStats();
+//	}
+//
+//	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject)) << "The state '" << brokenState->getName() << "' should be broken.";
+//
+//	// stop time measurement and report
+//	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+//	cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+//}
 TEST_F(AspAlicaEngine, singleUnconnectedState)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "Roleset", "SingleUnconnectedState", ".", false))

@@ -91,7 +91,7 @@ protected:
 	}
 };
 
-TEST_F(ASPRCC8, CompositionTable)
+TEST_F(ASPRCC8, Department)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
@@ -178,3 +178,46 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0) << "There shouldn't be any query left but there are "
 			<< aspSolver->getRegisteredQueries().size() << " left.";
 }
+
+
+//TODO this is a full test of the RCC8 composition table with 64 test facts which results in over 750000 models
+//TEST_F(ASPRCC8, RCC8CompositionTable)
+//{
+//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
+//			<< "Unable to initialise the ALICA Engine!";
+//
+//	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+//
+//	string rcc8TestFactsFile = (*sc)["ASPSolver"]->get<string>("rcc8TestFactsFile", NULL);
+//	rcc8TestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+//																rcc8TestFactsFile);
+//	cout << "ASPSolver: " << rcc8TestFactsFile << endl;
+//	aspSolver->load(rcc8TestFactsFile);
+//	// start time measurement
+//	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
+//	aspSolver->ground( { {"rcc8TestFacts", {}}}, nullptr);
+//	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
+//	// stop time measurement and report
+//	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+//	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
+//
+//	string queryString = "disconnected(b16,c16), disconnected(a14,c14)";
+//	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+//																								1);
+//	queryObject->createRules();
+//	aspSolver->registerQuery(queryObject);
+//	if (!aspSolver->solve())
+//	{
+//		cout << "ASPAlicaTest: No Model found!" << endl;
+//	}
+//	else
+//	{
+//		aspSolver->printStats();
+//	}
+//
+//	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+//			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
+//
+//}
+
+

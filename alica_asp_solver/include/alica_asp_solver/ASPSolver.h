@@ -76,6 +76,7 @@ namespace alica
 			static const void* getWildcardPointer();
 			static const string& getWildcardString();
 			vector<shared_ptr<AspQuery> > getRegisteredQueries();
+			shared_ptr<ClingoLib> getClingo();
 
 		private:
 			shared_ptr<ClingoLib> clingo;

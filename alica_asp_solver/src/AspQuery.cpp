@@ -196,6 +196,19 @@ namespace alica
 			return this->rules;
 		}
 
+		void AspQuery::addRule(string domainName, string rule)
+		{
+			this->solver->getClingo()->add(domainName, {}, rule);
+		}
+
+		void AspQuery::addRules(string domainName)
+		{
+			for(auto rule : this->rules)
+			{
+				this->solver->getClingo()->add(domainName, {}, rule);
+			}
+		}
+
 		vector<Gringo::Value> AspQuery::createQueryValues(const std::string& queryString)
 		{
 			vector<Gringo::Value> ret;
@@ -253,3 +266,4 @@ namespace alica
 
 	} /* namespace reasoner */
 } /* namespace alica */
+

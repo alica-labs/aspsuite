@@ -41,6 +41,8 @@ namespace alica
 			string toString();
 			void createRules();
 			vector<string> getRules();
+			void addRule(string domainName, string rule);
+			void addRules(string domainName);
 
 		private:
 			string queryString;

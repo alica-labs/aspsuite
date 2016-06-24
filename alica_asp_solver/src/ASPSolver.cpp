@@ -423,6 +423,11 @@ namespace alica
 			return this->registeredQueries;
 		}
 
+		shared_ptr<ClingoLib> ASPSolver::getClingo()
+		{
+			return this->clingo;
+		}
+
 		void ASPSolver::reduceLifeTime()
 		{
 			for (auto query : this->registeredQueries)

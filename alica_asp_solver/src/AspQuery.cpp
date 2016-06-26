@@ -21,6 +21,7 @@ namespace alica
 			this->solver = solver;
 			this->disjunction = false;
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->counter = 0;
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString)
@@ -35,6 +36,7 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->counter = 0;
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, int lifeTime)
@@ -49,6 +51,7 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->counter = 0;
 		}
 
 		AspQuery::~AspQuery()
@@ -58,11 +61,6 @@ namespace alica
 		shared_ptr<vector<Gringo::ValVec>> AspQuery::getCurrentModels()
 		{
 			return this->currentModels;
-		}
-
-		void AspQuery::setCurrentModels(shared_ptr<vector<Gringo::ValVec>> currentModels)
-		{
-			this->currentModels = currentModels;
 		}
 
 		int AspQuery::getLifeTime()
@@ -148,9 +146,23 @@ namespace alica
 			ss << (this->disjunction ? "Query is disjubction." : "Query is conjunction.") << "\n";
 			ss << "Query will be used " << this->lifeTime << " times again.\n";
 			ss << "Rules:" << "\n";
-			for(auto rule : this->rules)
+			for (auto rule : this->rules)
 			{
 				ss << "\t" << rule << "\n";
+			}
+			ss << "Rules with models:" << "\n";
+			for (auto rule : this->ruleModelMap)
+			{
+				ss << "\tRule: " << rule.first << "\n";
+				for (auto models : rule.second)
+				{
+					ss << "\t\t Model: ";
+					for (auto predicate : models)
+					{
+						ss << predicate << " ";
+					}
+					ss << "\n";
+				}
 			}
 			return ss.str();
 		}
@@ -169,26 +181,34 @@ namespace alica
 			return ret;
 		}
 
-		void AspQuery::createRules()
+		void AspQuery::createRules(string domainName)
 		{
 			if (this->isDisjunction())
 			{
 				stringstream ss;
-				int counter = 0;
-				for(auto predicate : this->queryValues)
+				string tmp = "";
+				for (auto predicate : this->queryValues)
 				{
-					ss << "queryHolds(query" << this << counter << ") :-" << predicate << ".";
-					this->rules.push_back(ss.str());
+					ss << "queryHolds(query" << this << counter << ")";
+					tmp = ss.str();
+					ss << " :- " << predicate << ".";
+					this->addRule(domainName, ss.str(), tmp);
 					counter++;
-					ss.clear();
+					ss.str("");
 				}
 			}
 			else
 			{
 				stringstream ss;
-				ss << "queryHolds(query" << this << ") :- " << this->queryString << ".";
-				this->rules.push_back(ss.str());
+				string tmp = "";
+				ss << "queryHolds(query" << this << counter << ")";
+				tmp = ss.str();
+				ss << " :- " << this->queryString << ".";
+				this->addRule(domainName, ss.str(), tmp);
+				counter++;
+				ss.str("");
 			}
+			this->solver->ground( { {domainName, {}}}, nullptr);
 		}
 
 		vector<string> AspQuery::getRules()
@@ -196,16 +216,54 @@ namespace alica
 			return this->rules;
 		}
 
-		void AspQuery::addRule(string domainName, string rule)
+		void AspQuery::addRule(string domainName, string rule, string ruleIdentifier)
 		{
 			this->solver->getClingo()->add(domainName, {}, rule);
+			this->rules.push_back(rule);
+
+			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(ruleIdentifier),
+										vector<Gringo::ValVec>());
 		}
 
-		void AspQuery::addRules(string domainName)
+		void AspQuery::addRuleAndGround(string domainName, string rule)
 		{
-			for(auto rule : this->rules)
+			stringstream ss;
+			string tmp = "";
+			ss << "queryHolds(query" << this << counter << ")";
+			tmp = ss.str();
+			counter++;
+			rule = tmp + ", " + rule;
+			this->solver->getClingo()->add(domainName, {}, rule);
+			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::ValVec>());
+			this->rules.push_back(rule);
+			this->solver->ground( { {domainName, {}}}, nullptr);
+		}
+
+		map<Gringo::Value, vector<Gringo::ValVec> > AspQuery::getRuleModelMap()
+		{
+			return this->ruleModelMap;
+		}
+
+		shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > AspQuery::getSattisfiedRules()
+		{
+			shared_ptr<map<Gringo::Value, vector<Gringo::ValVec> > > ret = make_shared<
+					map<Gringo::Value, vector<Gringo::ValVec> > >();
+			for (auto pair : this->ruleModelMap)
 			{
-				this->solver->getClingo()->add(domainName, {}, rule);
+				if (pair.second.size() > 0)
+				{
+					ret->emplace(pair);
+				}
+			}
+			return ret;
+		}
+
+		void AspQuery::saveRuleModelPair(Gringo::Value key, Gringo::ValVec valueVector)
+		{
+			auto entry = this->ruleModelMap.find(key);
+			if (entry != this->ruleModelMap.end())
+			{
+				entry->second.push_back(valueVector);
 			}
 		}
 

@@ -114,7 +114,7 @@ TEST_F(ASPRCC8, Department)
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																								1);
-	queryObject->createRules();
+	queryObject->createRules("department_sections");
 	aspSolver->registerQuery(queryObject);
 	if (!aspSolver->solve())
 	{
@@ -125,6 +125,7 @@ TEST_F(ASPRCC8, Department)
 		aspSolver->printStats();
 	}
 
+	cout << queryObject->toString() << endl;
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
@@ -153,7 +154,8 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
 																								1);
-	queryObject->createRules();
+	queryObject->createRules("department_sections");
+	queryObject->addRuleAndGround("department_sections", "c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
 	aspSolver->registerQuery(queryObject);
 	if (!aspSolver->solve())
 	{
@@ -169,7 +171,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
-	EXPECT_TRUE(queryObject->getRules().size() == 2) << "The query should create 2 ruless but contains "
+	EXPECT_TRUE(queryObject->getRules().size() == 3) << "The query should create 3 ruless but contains "
 			<< queryObject->getRules().size() << ".";
 
 	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"
@@ -177,6 +179,8 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 
 	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0) << "There shouldn't be any query left but there are "
 			<< aspSolver->getRegisteredQueries().size() << " left.";
+
+	cout << queryObject->toString() << endl;
 }
 
 

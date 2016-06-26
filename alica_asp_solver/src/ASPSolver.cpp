@@ -267,6 +267,40 @@ namespace alica
 						}
 					}
 				}
+				for (auto rule : query->getRuleModelMap())
+				{
+					cout << "ASPSolver::onModel: " << rule.first << endl;
+					auto it = clingoModel.out.domains.find(rule.first.sig());
+					if (it == clingoModel.out.domains.end())
+					{
+//						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+						continue;
+					}
+
+					for (auto& domainPair : it->second.domain)
+					{
+//							cout << "ASPSolver: Inside domain-loop!" << endl;
+
+						if (&(domainPair.second)
+								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+						{
+//										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+							if (this->checkMatchValues(&rule.first, &domainPair.first))
+							{
+//										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								foundSomething = true;
+								query->saveRuleModelPair(rule.first, m.atoms(Gringo::Model::SHOWN));
+								break;
+							}
+							else
+							{
+//											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+
+							}
+						}
+					}
+				}
 			}
 			return foundSomething;
 		}
@@ -324,6 +358,13 @@ namespace alica
 					}
 				}
 			}
+			for (auto queryValue : query->getRuleModelMap())
+			{
+				if (queryValue.second.size() == 0)
+				{
+					return false;
+				}
+			}
 			return true;
 		}
 
@@ -347,6 +388,13 @@ namespace alica
 					{
 						return false;
 					}
+				}
+			}
+			for (auto queryValue : query->getRuleModelMap())
+			{
+				if (queryValue.second.size() == 0)
+				{
+					return false;
 				}
 			}
 			return true;
@@ -412,7 +460,7 @@ namespace alica
 					toRemove.push_back(query);
 				}
 			}
-			for(auto query : toRemove)
+			for (auto query : toRemove)
 			{
 				this->unRegisterQuery(query);
 			}
@@ -523,9 +571,9 @@ namespace alica
 			ss << "Solve Statistics:" << endl;
 			ss << "TOTAL Time: " << claspFacade->summary().totalTime << "s" << endl;
 			ss << "CPU Time: " << claspFacade->summary().cpuTime << "s" << endl;
-			ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << "ms"<< endl;
+			ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << "ms" << endl;
 			ss << "UNSAT Time: " << (claspFacade->summary().unsatTime * 1000.0) << "ms" << endl;
-			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms"<< endl;
+			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms" << endl;
 
 			cout << ss.str() << flush;
 		}

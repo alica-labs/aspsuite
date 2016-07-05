@@ -141,7 +141,7 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 
 	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783421980];
 	string queryString = aspSolver->gen.brokenState(brokenState, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -171,7 +171,7 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 
 	alica::EntryPoint* brokenEntryPoint = (alica::EntryPoint*)(*ae->getPlanParser()->getParsedElements())[1453033347286];
 	string queryString = aspSolver->gen.brokenEntryPoint(brokenEntryPoint, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -205,7 +205,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 															false);
 
 	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -236,25 +236,25 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 
 	alica::State* brokenState1 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783558495];
 	string queryString1 = aspSolver->gen.brokenState(brokenState1, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::State* brokenState2 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783576711];
 	string queryString2 = aspSolver->gen.brokenState(brokenState2, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject2);
 
 	alica::State* brokenState3 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783579086];
 	string queryString3 = aspSolver->gen.brokenState(brokenState3, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3,
+	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject3);
 
 	alica::State* brokenState4 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783583119];
 	string queryString4 = aspSolver->gen.brokenState(brokenState4, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject4 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString4,
+	shared_ptr<alica::reasoner::AspQuery> queryObject4 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString4, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject4);
 
@@ -286,7 +286,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.brokenRunningPlan(14695984337881541968ul, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -317,19 +317,19 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 
 	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
 	string queryString1 = aspSolver->gen.cyclic(brokenPlan1, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan2, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject2);
 
 	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
 	string queryString3 = aspSolver->gen.cyclic(brokenPlan3, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3,
+	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject3);
 
@@ -362,14 +362,14 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 	alica::SyncTransition* brokenSynchronisation1 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString1 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation1, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::SyncTransition* brokenSynchronisation2 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString2 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation2, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject2);
 
@@ -402,12 +402,12 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 
 	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1455093185652];
 	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1,
+	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject1);
 
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2,
+	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject2);
 
@@ -441,7 +441,7 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 			(alica::PreCondition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
 	string queryString = aspSolver->gen.neglocal(nonLocalCondition, false);
 	cout << queryString << endl;
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -471,7 +471,7 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.cyclic(plan, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -500,7 +500,7 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.cycleFree(plan, false);
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -531,11 +531,11 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 	string brokenRunningMasterPlan = aspSolver->gen.brokenRunningPlan(1922052048482545739ul, false);
 	string brokenRunningPlan1 = aspSolver->gen.brokenRunningPlan(14695982138858284394ul, false);
 	string brokenRunningPlan2 = aspSolver->gen.brokenRunningPlan(1893175574616393372ul, false);
-	shared_ptr<alica::reasoner::AspQuery> brokenRunningMasterPlanObject = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningMasterPlan,
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningMasterPlanObject = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningMasterPlan, "planBase",
 																									1);
-	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan1Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan1,
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan1Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan1, "planBase",
 																									1);
-	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan2Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan2,
+	shared_ptr<alica::reasoner::AspQuery> brokenRunningPlan2Object = make_shared<alica::reasoner::AspQuery>(aspSolver, brokenRunningPlan2, "planBase",
 																									1);
 	aspSolver->registerQuery(brokenRunningMasterPlanObject);
 	aspSolver->registerQuery(brokenRunningPlan1Object);

@@ -22,9 +22,8 @@ namespace alica
 		class AspQuery
 		{
 		public:
-			AspQuery(ASPSolver* solver);
-			AspQuery(ASPSolver* solver, string queryString);
-			AspQuery(ASPSolver* solver, string queryString, int lifeTime);
+			AspQuery(ASPSolver* solver, string queryString, string domainName);
+			AspQuery(ASPSolver* solver, string queryString, string domainName, int lifeTime);
 			virtual ~AspQuery();
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
 			int getLifeTime();
@@ -43,10 +42,18 @@ namespace alica
 			string toString();
 			void createRules(string domainName);
 			vector<string> getRules();
-			void addRuleAndGround(string domainName, string rule);
+			void addRule(string domainName, string rule, bool ground);
+			string getDomainName();
+			void setDomainName(string domainName);
+			ASPSolver* getSolver();
 
 		private:
-			void addRule(string domainName, string rule, string ruleIdentifier);
+			void createRule(string domainName, string rule, string ruleIdentifier);
+			/**
+			 * queryString is used to ask the solver if specific predicates are true.
+			 * predicates are seperated by "," meaning all of them will be in the same rule and ";"
+			 * meaning that there is arule for every predicate
+			 */
 			string queryString;
 			ASPSolver* solver;
 			shared_ptr<vector<Gringo::ValVec>> currentModels;
@@ -62,7 +69,8 @@ namespace alica
 			int lifeTime;
 			bool disjunction;
 			int counter;
-			vector<Gringo::Value> createQueryValues(std::string const &queryString);
+			string domainName;
+			vector<Gringo::Value> createQueryValues(std::string queryString);
 
 		};
 

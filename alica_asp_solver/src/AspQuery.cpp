@@ -14,19 +14,10 @@ namespace alica
 	namespace reasoner
 	{
 
-		AspQuery::AspQuery(ASPSolver* solver)
-		{
-			this->queryString = "empty";
-			this->lifeTime = 1;
-			this->solver = solver;
-			this->disjunction = false;
-			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			this->counter = 0;
-		}
-
-		AspQuery::AspQuery(ASPSolver* solver, string queryString)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string domainName)
 		{
 			this->queryString = queryString;
+			this->domainName = domainName;
 			this->lifeTime = 1;
 			this->solver = solver;
 			this->disjunction = false;
@@ -39,9 +30,10 @@ namespace alica
 			this->counter = 0;
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, int lifeTime)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string domainName, int lifeTime)
 		{
 			this->queryString = queryString;
+			this->domainName = domainName;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -192,7 +184,7 @@ namespace alica
 					ss << "queryHolds(query" << this << counter << ")";
 					tmp = ss.str();
 					ss << " :- " << predicate << ".";
-					this->addRule(domainName, ss.str(), tmp);
+					this->createRule(domainName, ss.str(), tmp);
 					counter++;
 					ss.str("");
 				}
@@ -204,7 +196,7 @@ namespace alica
 				ss << "queryHolds(query" << this << counter << ")";
 				tmp = ss.str();
 				ss << " :- " << this->queryString << ".";
-				this->addRule(domainName, ss.str(), tmp);
+				this->createRule(domainName, ss.str(), tmp);
 				counter++;
 				ss.str("");
 			}
@@ -216,8 +208,12 @@ namespace alica
 			return this->rules;
 		}
 
-		void AspQuery::addRule(string domainName, string rule, string ruleIdentifier)
+		void AspQuery::createRule(string domainName, string rule, string ruleIdentifier)
 		{
+			if (ruleIdentifier.compare(""))
+			{
+
+			}
 			this->solver->getClingo()->add(domainName, {}, rule);
 			this->rules.push_back(rule);
 
@@ -225,7 +221,7 @@ namespace alica
 										vector<Gringo::ValVec>());
 		}
 
-		void AspQuery::addRuleAndGround(string domainName, string rule)
+		void AspQuery::addRule(string domainName, string rule, bool ground)
 		{
 			stringstream ss;
 			string tmp = "";
@@ -236,7 +232,10 @@ namespace alica
 			this->solver->getClingo()->add(domainName, {}, rule);
 			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::ValVec>());
 			this->rules.push_back(rule);
-			this->solver->ground( { {domainName, {}}}, nullptr);
+			if (ground)
+			{
+				this->solver->ground( { {domainName, {}}}, nullptr);
+			}
 		}
 
 		map<Gringo::Value, vector<Gringo::ValVec> > AspQuery::getRuleModelMap()
@@ -267,7 +266,7 @@ namespace alica
 			}
 		}
 
-		vector<Gringo::Value> AspQuery::createQueryValues(const std::string& queryString)
+		vector<Gringo::Value> AspQuery::createQueryValues(std::string queryString)
 		{
 			vector<Gringo::Value> ret;
 			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
@@ -290,6 +289,22 @@ namespace alica
 					{
 						start += 1;
 					}
+				}
+				//TODO find better way
+				if (queryString.find(ASPSolver::WILDCARD_STRING) == string::npos)
+				{
+					stringstream ss;
+					string tmp = "";
+					string rule = "";
+					ss << "queryHolds(query" << this << counter << ")";
+					tmp = ss.str();
+					counter++;
+					rule = tmp + " :- " + queryString + ".";
+//				cout << rule << endl;
+					this->solver->getClingo()->add(this->domainName, {}, rule);
+					this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp),
+												vector<Gringo::ValVec>());
+					this->rules.push_back(rule);
 				}
 			}
 			else if (queryString.find(";") != string::npos)
@@ -320,6 +335,21 @@ namespace alica
 				ret.push_back(this->solver->getGringoModule()->parseValue(queryString));
 			}
 			return ret;
+		}
+
+		string AspQuery::getDomainName()
+		{
+			return this->domainName;
+		}
+
+		void AspQuery::setDomainName(string domainName)
+		{
+			this->domainName = domainName;
+		}
+
+		ASPSolver* AspQuery::getSolver()
+		{
+			return this->solver;
 		}
 
 	} /* namespace reasoner */

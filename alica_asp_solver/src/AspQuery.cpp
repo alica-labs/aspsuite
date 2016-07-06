@@ -300,11 +300,28 @@ namespace alica
 					tmp = ss.str();
 					counter++;
 					rule = tmp + " :- " + queryString + ".";
-//				cout << rule << endl;
+					cout << rule << endl;
 					this->solver->getClingo()->add(this->domainName, {}, rule);
 					this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp),
 												vector<Gringo::ValVec>());
 					this->rules.push_back(rule);
+				}
+				else
+				{
+//					stringstream ss;
+//					string tmp = "";
+//					string rule = "";
+//					ss << "queryHolds(query" << this << counter << ")";
+//					tmp = ss.str();
+//					counter++;
+//					rule = tmp + " :- " + queryString + ".";
+//					int pos = rule.find(ASPSolver::WILDCARD_STRING);
+//					rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
+//					cout << rule << endl;
+//					this->solver->getClingo()->add(this->domainName, {}, rule);
+//					this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp),
+//												vector<Gringo::ValVec>());
+//					this->rules.push_back(rule);
 				}
 			}
 			else if (queryString.find(";") != string::npos)

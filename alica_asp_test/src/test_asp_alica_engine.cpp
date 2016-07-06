@@ -207,6 +207,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
+	aspSolver->getClingo()->ground({ {"planBase", {}}}, nullptr);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding

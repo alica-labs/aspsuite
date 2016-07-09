@@ -7,6 +7,8 @@
 
 #include "alica_asp_solver/ASPSolver.h"
 #include "engine/model/Plan.h"
+#include "engine/model/Variable.h"
+#include <AutoDiff.h>
 
 namespace alica
 {
@@ -425,7 +427,8 @@ namespace alica
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
 			// TODO necessary for integration into the alica engine
-			return nullptr; //make_shared<SolverVariable>();
+			return make_shared<autodiff::Variable>();
+//			return nullptr; //make_shared<SolverVariable>();
 		}
 
 		/**

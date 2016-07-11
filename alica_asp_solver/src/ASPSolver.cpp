@@ -35,6 +35,7 @@ namespace alica
 																					alicaBackGroundKnowledgeFile);
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 			this->clingo->load(alicaBackGroundKnowledgeFile);
+			this->queryCounter = 0;
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -431,6 +432,18 @@ namespace alica
 //			return nullptr; //make_shared<SolverVariable>();
 		}
 
+		void ASPSolver::integrateRules()
+		{
+			for (auto query : this->registeredQueries)
+			{
+				for (auto rule : query->getRules())
+				{
+					this->clingo->add("planBase", {}, rule);
+				}
+			}
+			this->clingo->ground( { {"planBase", {}}}, nullptr);
+		}
+
 		/**
 		 * Validates the well-formedness of a given plan.
 		 *
@@ -439,6 +452,7 @@ namespace alica
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
 			this->planIntegrator->loadPlanTree(plan);
+			this->integrateRules();
 			this->reduceLifeTime();
 			this->currentModels.clear();
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
@@ -533,6 +547,11 @@ namespace alica
 			return claspFacade->summary().enumerated();
 		}
 
+		int ASPSolver::getQueryCounter()
+		{
+			this->queryCounter++;
+			return this->queryCounter;
+		}
 		const long ASPSolver::getAtomCount()
 		{
 			auto claspFacade = this->clingo->clasp;

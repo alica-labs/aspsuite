@@ -77,6 +77,7 @@ namespace alica
 			static const string& getWildcardString();
 			vector<shared_ptr<AspQuery> > getRegisteredQueries();
 			shared_ptr<ClingoLib> getClingo();
+			int getQueryCounter();
 
 		private:
 			shared_ptr<ClingoLib> clingo;
@@ -93,6 +94,8 @@ namespace alica
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void removeDeadQueries();
 			void reduceLifeTime();
+			void integrateRules();
+			int queryCounter;
 #ifdef ASPSolver_DEBUG
 			int modelCount;
 #endif

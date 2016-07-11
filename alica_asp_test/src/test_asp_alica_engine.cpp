@@ -174,7 +174,6 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
-
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
@@ -187,7 +186,7 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
-
+	cout << queryObject->toString() << endl;
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The EntryPoint '" << brokenEntryPoint->getId()
 			<< "' should be broken";
 }
@@ -207,9 +206,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
 																									1);
-	aspSolver->getClingo()->ground({ {"planBase", {}}}, nullptr);
 	aspSolver->registerQuery(queryObject);
-
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))

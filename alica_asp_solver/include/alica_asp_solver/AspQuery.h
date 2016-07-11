@@ -68,9 +68,9 @@ namespace alica
 			// LifeTime == -1 => query is used util unregistered
 			int lifeTime;
 			bool disjunction;
-			int counter;
 			string domainName;
 			vector<Gringo::Value> createQueryValues(std::string queryString);
+			void generateRules(string queryString);
 
 		};
 

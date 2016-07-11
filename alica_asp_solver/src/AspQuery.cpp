@@ -27,7 +27,6 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			this->counter = 0;
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, string domainName, int lifeTime)
@@ -43,7 +42,6 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::ValVec>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			this->counter = 0;
 		}
 
 		AspQuery::~AspQuery()
@@ -181,11 +179,10 @@ namespace alica
 				string tmp = "";
 				for (auto predicate : this->queryValues)
 				{
-					ss << "queryHolds(query" << this << counter << ")";
+					ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
 					tmp = ss.str();
 					ss << " :- " << predicate << ".";
 					this->createRule(domainName, ss.str(), tmp);
-					counter++;
 					ss.str("");
 				}
 			}
@@ -193,11 +190,10 @@ namespace alica
 			{
 				stringstream ss;
 				string tmp = "";
-				ss << "queryHolds(query" << this << counter << ")";
+				ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
 				tmp = ss.str();
 				ss << " :- " << this->queryString << ".";
 				this->createRule(domainName, ss.str(), tmp);
-				counter++;
 				ss.str("");
 			}
 			this->solver->ground( { {domainName, {}}}, nullptr);
@@ -225,9 +221,8 @@ namespace alica
 		{
 			stringstream ss;
 			string tmp = "";
-			ss << "queryHolds(query" << this << counter << ")";
+			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
 			tmp = ss.str();
-			counter++;
 			rule = tmp + ", " + rule;
 			this->solver->getClingo()->add(domainName, {}, rule);
 			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::ValVec>());
@@ -266,6 +261,28 @@ namespace alica
 			}
 		}
 
+		void AspQuery::generateRules(string queryString)
+		{
+			//TODO find better way
+			stringstream ss;
+			string tmp = "";
+			string rule = "";
+			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
+			tmp = ss.str();
+			rule = tmp + " :- " + queryString + ".";
+			if (queryString.find(ASPSolver::WILDCARD_STRING) != string::npos)
+			{
+				int pos = rule.find(ASPSolver::WILDCARD_STRING);
+				rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
+			}
+			this->solver->getClingo()->add(this->domainName, {}, rule);
+			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::ValVec>());
+			this->rules.push_back(rule);
+
+			cout << rule << endl;
+
+		}
+
 		vector<Gringo::Value> AspQuery::createQueryValues(std::string queryString)
 		{
 			vector<Gringo::Value> ret;
@@ -291,38 +308,7 @@ namespace alica
 					}
 				}
 				//TODO find better way
-				if (queryString.find(ASPSolver::WILDCARD_STRING) == string::npos)
-				{
-					stringstream ss;
-					string tmp = "";
-					string rule = "";
-					ss << "queryHolds(query" << this << counter << ")";
-					tmp = ss.str();
-					counter++;
-					rule = tmp + " :- " + queryString + ".";
-					cout << rule << endl;
-					this->solver->getClingo()->add(this->domainName, {}, rule);
-					this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp),
-												vector<Gringo::ValVec>());
-					this->rules.push_back(rule);
-				}
-				else
-				{
-//					stringstream ss;
-//					string tmp = "";
-//					string rule = "";
-//					ss << "queryHolds(query" << this << counter << ")";
-//					tmp = ss.str();
-//					counter++;
-//					rule = tmp + " :- " + queryString + ".";
-//					int pos = rule.find(ASPSolver::WILDCARD_STRING);
-//					rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
-//					cout << rule << endl;
-//					this->solver->getClingo()->add(this->domainName, {}, rule);
-//					this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp),
-//												vector<Gringo::ValVec>());
-//					this->rules.push_back(rule);
-				}
+				generateRules(queryString);
 			}
 			else if (queryString.find(";") != string::npos)
 			{
@@ -339,6 +325,7 @@ namespace alica
 					}
 					currentQuery = queryString.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
+					generateRules(currentQuery);
 					ret.push_back(this->solver->getGringoModule()->parseValue(currentQuery));
 					start = queryString.find(";", end);
 					if (start != string::npos)
@@ -349,6 +336,7 @@ namespace alica
 			}
 			else
 			{
+				generateRules(queryString);
 				ret.push_back(this->solver->getGringoModule()->parseValue(queryString));
 			}
 			return ret;

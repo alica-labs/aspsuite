@@ -114,8 +114,8 @@ TEST_F(ASPRCC8, Department)
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,"department_sections",
 																								1);
-	queryObject->createRules("department_sections");
 	aspSolver->registerQuery(queryObject);
+	aspSolver->ground( { {"department_sections", {}}}, nullptr);
 	if (!aspSolver->solve())
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;

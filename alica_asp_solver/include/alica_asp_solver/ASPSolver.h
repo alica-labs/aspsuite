@@ -47,17 +47,11 @@ namespace alica
 			void load(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(std::string const &queryString);
-//			bool isTrue(Gringo::Value queryValue);
-//			bool isTrueForAtLeastOneModel(const string& queryValue);
-//			bool isTrueForAllModels(const string& queryValue);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
 			bool isTrueForAllModels(shared_ptr<AspQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
-//			bool onModel(Gringo::Model const &m);
 			bool onModel(Gringo::Model const &m);
-//			bool solve();
 			bool solve();
-//			bool registerQuery(const string& query);
 			bool registerQuery(shared_ptr<AspQuery> query);
 			bool unRegisterQuery(shared_ptr<AspQuery> query);
 			alica::reasoner::ASPGenerator gen;

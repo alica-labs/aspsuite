@@ -259,7 +259,7 @@ namespace alica
 							{
 //										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
-								query->savePredicateModelPair(queryValue, m.atoms(Gringo::Model::SHOWN));
+								query->saveStaisfiedPredicate(queryValue, domainPair.first);
 								break;
 							}
 							else
@@ -293,7 +293,7 @@ namespace alica
 							{
 //										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
-								query->saveRuleModelPair(rule.first, m.atoms(Gringo::Model::SHOWN));
+								query->saveRuleModelPair(rule.first, domainPair.first);
 								break;
 							}
 							else

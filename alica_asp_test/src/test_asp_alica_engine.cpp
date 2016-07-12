@@ -219,7 +219,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
-
+	cout << queryObject->toString() << endl;
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
 			<< "'.";
 }

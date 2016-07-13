@@ -41,8 +41,8 @@ namespace alica
 			bool getSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls,
 								vector<void*>& results);
 			shared_ptr<SolverVariable> createVariable(long id);
-			bool validatePlan(Plan* plan);
 
+			bool validatePlan(Plan* plan);
 			void disableWarnings(bool noWarns);
 			void load(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);

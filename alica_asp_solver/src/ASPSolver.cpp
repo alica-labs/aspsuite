@@ -428,8 +428,8 @@ namespace alica
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
 			// TODO necessary for integration into the alica engine
-			return make_shared<autodiff::Variable>();
-//			return nullptr; //make_shared<SolverVariable>();
+			return make_shared<SolverVariable>();
+//			return nullptr; //;
 		}
 
 		void ASPSolver::integrateRules()

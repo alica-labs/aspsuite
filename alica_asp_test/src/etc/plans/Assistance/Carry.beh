@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="ASCII"?>
 <alica:Behaviour xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:alica="http:///de.uni_kassel.vs.cn" id="1463077939671" name="Carry" comment="" destinationPath="Plans/Assistance">
-  <configurations id="1463077955666" name="CarryDefault" comment="" masterPlan="false" utilityFunction="" utilityThreshold="0.1" destinationPath="" deferring="0" frequency="30" eventDriven="false"/>
+  <configurations id="1463077955666" name="CarryDefault" comment="" masterPlan="false" utilityFunction="" utilityThreshold="0.1" destinationPath="" deferring="0" frequency="30" eventDriven="false">
+    <vars id="1468416170652" name="BookVar" comment="" Type=""/>
+  </configurations>
 </alica:Behaviour>

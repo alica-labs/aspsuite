@@ -10,6 +10,7 @@ namespace alica
     public:
         DomainBehaviour(string name);
         virtual ~DomainBehaviour();
+
     };
 } /* namespace alica */
 

@@ -39,6 +39,8 @@ add_library(${PROJECT_NAME}
     src/ASPAlicaPlanIntegrator.cpp
     src/ASPGenerator.cpp
     src/AspQuery.cpp
+    src/Variable.cpp
+    src/Term.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

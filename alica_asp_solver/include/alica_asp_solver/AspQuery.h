@@ -22,8 +22,8 @@ namespace alica
 		class AspQuery
 		{
 		public:
-			AspQuery(ASPSolver* solver, string queryString, string domainName);
-			AspQuery(ASPSolver* solver, string queryString, string domainName, int lifeTime);
+			AspQuery(ASPSolver* solver, string queryString, string pragrammSection);
+			AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime);
 			virtual ~AspQuery();
 
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
@@ -33,8 +33,8 @@ namespace alica
 			void reduceLifeTime();
 
 			ASPSolver* getSolver();
-			string getDomainName();
-			void setDomainName(string domainName);
+			string getPragrammSection();
+			void setPragrammSection(string pragrammSection);
 			string getQueryString();
 			bool setQueryString(string queryString);
 			vector<Gringo::Value> getQueryValues();
@@ -49,7 +49,7 @@ namespace alica
 			void saveStaisfiedPredicate(Gringo::Value key, Gringo::Value value);
 
 			vector<string> getRules();
-			void addRule(string domainName, string rule, bool ground);
+			void addRule(string pragrammSection, string rule, bool ground);
 
 			string toString();
 
@@ -73,7 +73,7 @@ namespace alica
 			// LifeTime == -1 => query is used util unregistered
 			int lifeTime;
 			bool disjunction;
-			string domainName;
+			string pragrammSection;
 			vector<Gringo::Value> createQueryValues(std::string queryString);
 			void generateRules(string queryString);
 

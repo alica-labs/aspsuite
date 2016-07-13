@@ -14,10 +14,10 @@ namespace alica
 	namespace reasoner
 	{
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string domainName)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection)
 		{
 			this->queryString = queryString;
-			this->domainName = domainName;
+			this->pragrammSection = pragrammSection;
 			this->lifeTime = 1;
 			this->solver = solver;
 			this->disjunction = false;
@@ -29,10 +29,10 @@ namespace alica
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string domainName, int lifeTime)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime)
 		{
 			this->queryString = queryString;
-			this->domainName = domainName;
+			this->pragrammSection = pragrammSection;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -140,7 +140,7 @@ namespace alica
 				int pos = rule.find(ASPSolver::WILDCARD_STRING);
 				rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
 			}
-			this->solver->getClingo()->add(this->domainName, {}, rule);
+			this->solver->getClingo()->add(this->pragrammSection, {}, rule);
 			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
 			this->rules.push_back(rule);
 
@@ -253,14 +253,14 @@ namespace alica
 			return ss.str();
 		}
 
-		string AspQuery::getDomainName()
+		string AspQuery::getPragrammSection()
 		{
-			return this->domainName;
+			return this->pragrammSection;
 		}
 
-		void AspQuery::setDomainName(string domainName)
+		void AspQuery::setPragrammSection(string pragrammSection)
 		{
-			this->domainName = domainName;
+			this->pragrammSection = pragrammSection;
 		}
 
 		ASPSolver* AspQuery::getSolver()

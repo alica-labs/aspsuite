@@ -8,7 +8,7 @@
 #include "alica_asp_solver/ASPSolver.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
-#include <AutoDiff.h>
+#include "alica_asp_solver/Variable.h"
 
 namespace alica
 {
@@ -414,12 +414,12 @@ namespace alica
 //			grOpts_.wNoFileIncluded = value;
 		}
 
-		bool ASPSolver::existsSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
+		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
 		{
 			return false;
 		}
 
-		bool ASPSolver::getSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls,
+		bool ASPSolver::getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls,
 									vector<void*>& results)
 		{
 			return false;
@@ -428,7 +428,7 @@ namespace alica
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
 			// TODO necessary for integration into the alica engine
-			return make_shared<SolverVariable>();
+			return make_shared<alica::reasoner::Variable>();
 //			return nullptr; //;
 		}
 

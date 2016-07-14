@@ -10,18 +10,20 @@
 
 #include <engine/constraintmodul/SolverTerm.h>
 #include <string>
+#include <memory>
 
 namespace alica
 {
 	namespace reasoner
 	{
 
-		class Term : public SolverTerm
+		class Term : public std::enable_shared_from_this<Term>, public alica::SolverTerm
 		{
 		public:
 			Term();
 			virtual ~Term();
 			std::string rule;
+			std::string backgroundFile;
 		};
 
 	} /* namespace reasoner */

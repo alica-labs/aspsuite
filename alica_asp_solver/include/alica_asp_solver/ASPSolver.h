@@ -14,6 +14,7 @@
 #include <engine/constraintmodul/IConstraintSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <SystemConfig.h>
+#include "engine/model/Variable.h"
 
 #include <memory>
 #include <vector>
@@ -37,8 +38,8 @@ namespace alica
 			ASPSolver(AlicaEngine* ae, std::vector<char const*> args);
 			virtual ~ASPSolver();
 
-			bool existsSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls);
-			bool getSolution(vector<Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls,
+			bool existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls);
+			bool getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls,
 								vector<void*>& results);
 			shared_ptr<SolverVariable> createVariable(long id);
 

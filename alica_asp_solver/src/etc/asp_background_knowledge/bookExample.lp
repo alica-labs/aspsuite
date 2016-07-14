@@ -1,8 +1,5 @@
 #program bookExample.
 
-agent(leonardo).
-agent(donatello).
-
 book(atificialIntelligence).
 book(snowWhite).
 book(rapunzel).

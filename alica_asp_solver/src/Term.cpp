@@ -14,13 +14,12 @@ namespace alica
 
 		Term::Term()
 		{
-			// TODO Auto-generated constructor stub
-
+			this->backgroundFile = "";
+			this->rule = "";
 		}
 
 		Term::~Term()
 		{
-			// TODO Auto-generated destructor stub
 		}
 
 	} /* namespace reasoner */

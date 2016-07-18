@@ -20,10 +20,22 @@ namespace alica
 		class Term : public std::enable_shared_from_this<Term>, public alica::SolverTerm
 		{
 		public:
-			Term();
+			Term(int lifeTime = 1);
 			virtual ~Term();
+			bool setRule(std::string rule);
+			std::string getRuleHead();
+			std::string getRuleBody();
+			std::string getBackGroundFileName();
+			void setBackgroundFileName(std::string backgroundFile);
+			int getLifeTime();
+			std::string getRule();
+
+		private :
 			std::string rule;
+			std::string head;
+			std::string body;
 			std::string backgroundFile;
+			int lifeTime;
 		};
 
 	} /* namespace reasoner */

@@ -8,11 +8,27 @@
 #include <alica_asp_solver/AspQuery.h>
 #include <alica_asp_solver/ASPSolver.h>
 #include <clingo/clingocontrol.hh>
+#include <regex>
 
 namespace alica
 {
 	namespace reasoner
 	{
+
+		AspQuery::AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime)
+		{
+			this->queryString = "";
+			this->pragrammSection = pragrammSection;
+			this->lifeTime = lifeTime;
+			this->solver = solver;
+			this->disjunction = false;
+			this->queryValues = this->createQueryValues(queryString);
+			for (auto value : this->queryValues)
+			{
+				this->predicateModelMap.emplace(value, vector<Gringo::Value>());
+			}
+			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection)
 		{
@@ -64,14 +80,6 @@ namespace alica
 				entry->second.push_back(value);
 			}
 		}
-//		void AspQuery::savePredicateModelPair(Gringo::Value key, Gringo::ValVec valueVector)
-//		{
-//			auto entry = this->predicateModelMap.find(key);
-//			if (entry != this->predicateModelMap.end())
-//			{
-//				entry->second.push_back(valueVector);
-//			}
-//		}
 
 		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > AspQuery::getSattisfiedPredicates()
 		{
@@ -126,6 +134,15 @@ namespace alica
 			}
 		}
 
+		void AspQuery::saveHeadValuePair(Gringo::Value key, Gringo::Value value)
+		{
+			auto entry = this->headValues.find(key);
+			if (entry != this->headValues.end())
+			{
+				entry->second.push_back(value);
+			}
+		}
+
 		void AspQuery::generateRules(string queryString)
 		{
 			//TODO find better way
@@ -148,9 +165,85 @@ namespace alica
 
 		}
 
+		vector<Gringo::Value> AspQuery::createHeadQueryValues(std::string queryString)
+		{
+			vector<string> valuesToParse;
+			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
+			{
+				size_t start = 0;
+				size_t end = string::npos;
+				string currentQuery = "";
+				while (start != string::npos)
+				{
+					end = queryString.find(")", start);
+					if (end == string::npos)
+					{
+						break;
+					}
+					currentQuery = queryString.substr(start, end - start + 1);
+					currentQuery = supplementary::Configuration::trim(currentQuery);
+					valuesToParse.push_back(currentQuery);
+					start = queryString.find(",", end);
+					if (start != string::npos)
+					{
+						start += 1;
+					}
+				}
+			}
+			else if (queryString.find(";") != string::npos)
+			{
+				this->disjunction = true;
+				size_t start = 0;
+				size_t end = string::npos;
+				string currentQuery = "";
+				while (start != string::npos)
+				{
+					end = queryString.find(")", start);
+					if (end == string::npos)
+					{
+						break;
+					}
+					currentQuery = queryString.substr(start, end - start + 1);
+					currentQuery = supplementary::Configuration::trim(currentQuery);
+					valuesToParse.push_back(currentQuery);
+					start = queryString.find(";", end);
+					if (start != string::npos)
+					{
+						start += 1;
+					}
+				}
+			}
+			else
+			{
+				valuesToParse.push_back(queryString);
+			}
+			vector<Gringo::Value> values;
+			std::regex words_regex("[A-Z]+(\\w*)");
+			for (auto value : valuesToParse)
+			{
+				cout << "Val: " << value << endl;
+				auto words_begin = std::sregex_iterator(value.begin(), value.end(), words_regex);
+				auto words_end = std::sregex_iterator();
+				while (words_begin != words_end)
+				{
+					std::smatch match = *words_begin;
+					std::string match_str = match.str();
+					value.replace(match.position(), match.length(), this->solver->WILDCARD_STRING);
+					words_begin = std::sregex_iterator(value.begin(), value.end(), words_regex);
+				}
+				auto val = this->solver->getGringoModule()->parseValue(value);
+				this->headValues.emplace(val, vector<Gringo::Value>());
+			}
+			return values;
+		}
+
 		vector<Gringo::Value> AspQuery::createQueryValues(std::string queryString)
 		{
 			vector<Gringo::Value> ret;
+			if (queryString.compare("") == 0)
+			{
+				return ret;
+			}
 			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
 			{
 				size_t start = 0;
@@ -248,7 +341,23 @@ namespace alica
 				{
 					ss << predicate << " ";
 				}
-					ss << "\n";
+				ss << "\n";
+			}
+			ss << "\tHeadValues:" << "\n";
+			for (auto value : this->headValues)
+			{
+				ss << "\t\t" << value.first << "\n";
+			}
+			ss << "\tHeadValues with models:" << "\n";
+			for (auto value : this->headValues)
+			{
+				ss << "\t\tRule: " << value.first << "\n";
+				ss << "\t\t\t Model: ";
+				for (auto predicate : value.second)
+				{
+					ss << predicate << " ";
+				}
+				ss << "\n";
 			}
 			return ss.str();
 		}
@@ -328,6 +437,10 @@ namespace alica
 			return this->rules;
 		}
 
+		map<Gringo::Value, vector<Gringo::Value>> AspQuery::getHeadValues()
+		{
+			return this->headValues;
+		}
 	} /* namespace reasoner */
 } /* namespace alica */
 

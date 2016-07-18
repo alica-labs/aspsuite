@@ -22,8 +22,9 @@ namespace alica
 		class AspQuery
 		{
 		public:
+			AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime = 1);
 			AspQuery(ASPSolver* solver, string queryString, string pragrammSection);
-			AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime);
+			AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime = 1);
 			virtual ~AspQuery();
 
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
@@ -42,14 +43,18 @@ namespace alica
 
 			map<Gringo::Value, vector<Gringo::Value>> getPredicateModelMap();
 			map<Gringo::Value, vector<Gringo::Value>> getRuleModelMap();
+			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSattisfiedRules();
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSattisfiedPredicates();
 
-			void saveRuleModelPair(Gringo::Value key, Gringo::Value valueVector);
+			void saveRuleModelPair(Gringo::Value key, Gringo::Value value);
 			void saveStaisfiedPredicate(Gringo::Value key, Gringo::Value value);
+			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
 
 			vector<string> getRules();
 			void addRule(string pragrammSection, string rule, bool ground);
+
+			vector<Gringo::Value> createHeadQueryValues(std::string queryString);
 
 			string toString();
 
@@ -68,6 +73,8 @@ namespace alica
 			map<Gringo::Value, vector<Gringo::Value>> predicateModelMap;
 			// key := rule , value := model which satisfies query
 			map<Gringo::Value, vector<Gringo::Value>> ruleModelMap;
+			// key := headValue , value := values which satisfies it
+			map<Gringo::Value, vector<Gringo::Value>> headValues;
 			// lifeTime == 1 => query is used once
 			// lifeTime == x => query is used x times
 			// LifeTime == -1 => query is used util unregistered

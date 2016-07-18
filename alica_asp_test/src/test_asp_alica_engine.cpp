@@ -267,7 +267,7 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 		aspSolver->printStats();
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The state '" << brokenState1->getName() << "' should be broken.";
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The state '" << brokenState2->getName() << "' should be broken.";
@@ -342,7 +342,7 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 		aspSolver->printStats();
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";

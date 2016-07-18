@@ -22,6 +22,7 @@
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
 #include <alica_asp_solver/AspQuery.h>
+#include <alica_asp_solver/Term.h>
 
 class ASPRCC8 : public ::testing::Test
 {
@@ -154,6 +155,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "department_sections",
 																								1);
+	auto values = queryObject->createHeadQueryValues("c(CountOfExCon)");
 	queryObject->addRule("department_sections", "c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.", true);
 	aspSolver->registerQuery(queryObject);
 	if (!aspSolver->solve())
@@ -164,7 +166,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	{
 		aspSolver->printStats();
 	}
-
+	aspSolver->removeDeadQueries();
 	EXPECT_TRUE(queryObject->isDisjunction()) << "The query should be a disjunction.";
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
@@ -186,6 +188,10 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 //TODO this is a full test of the RCC8 composition table with 64 test facts which results in over 750000 models
 //TEST_F(ASPRCC8, RCC8CompositionTable)
 //{
+//	alica::reasoner::Term term;
+//	term.setRule("freeFairyTailBook(X) :- book(X), genre(fairyTail), bookGenre(X, fairyTail), agent(Y), not on(X,Y).");
+//	cout << "Head: " << term.getRuleHead() << endl;
+//	cout << "Body: " << term.getRuleBody() << endl;
 //	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 //			<< "Unable to initialise the ALICA Engine!";
 //

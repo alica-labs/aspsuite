@@ -46,6 +46,7 @@ namespace alica
 			bool validatePlan(Plan* plan);
 			void disableWarnings(bool noWarns);
 			void load(string filename);
+			void loadFromConfig(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(std::string const &queryString);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
@@ -73,6 +74,7 @@ namespace alica
 			vector<shared_ptr<AspQuery> > getRegisteredQueries();
 			shared_ptr<ClingoLib> getClingo();
 			int getQueryCounter();
+			void removeDeadQueries();
 
 		private:
 			shared_ptr<ClingoLib> clingo;
@@ -87,7 +89,6 @@ namespace alica
 			vector<shared_ptr<AspQuery>> registeredQueries;
 
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
-			void removeDeadQueries();
 			void reduceLifeTime();
 			void integrateRules();
 			int queryCounter;

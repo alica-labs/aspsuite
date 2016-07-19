@@ -58,10 +58,10 @@ namespace alica
 		void ASPSolver::loadFromConfig(string filename)
 		{
 			supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-			string backGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
+			string backGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
 			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
 																				backGroundKnowledgeFile);
-			this->clingo->load(backGroundKnowledgeFile);
+			this->clingo->load(std::forward<string>(backGroundKnowledgeFile));
 		}
 
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
@@ -216,6 +216,7 @@ namespace alica
 		{
 			this->reduceLifeTime();
 			this->currentModels.clear();
+			this->modelCount = 0;
 			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
@@ -470,12 +471,11 @@ namespace alica
 			vector<shared_ptr<alica::reasoner::Term>> constraint;
 			int dim = vars.size();
 			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable>>>(dim);
-			this->validatePlan(this->ae->getPlanBase()->getMasterPlan());
+			this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
 			for (int i = 0; i < vars.size(); ++i)
 			{
 				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
 			}
-
 			for (auto& c : calls)
 			{
 				if (!(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()) != 0))
@@ -485,15 +485,16 @@ namespace alica
 				}
 				constraint.push_back(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()));
 			}
-
 			for (auto term : constraint)
 			{
 				shared_ptr<AspQuery> query = make_shared<AspQuery>(this, term->getBackGroundFileName(),
 																	term->getLifeTime());
 				this->loadFromConfig(term->getBackGroundFileName());
 				auto headValues = query->createHeadQueryValues(term->getRuleHead());
-				query->addRule(term->getBackGroundFileName(), term->getRule(), true);
+				cout << term->getRule() << endl;
+				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
 				this->registerQuery(query);
+				this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
 			}
 			auto satisfied = this->solve();
 			if (!satisfied)

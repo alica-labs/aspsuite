@@ -11,10 +11,10 @@ namespace alica
 {
 	namespace reasoner
 	{
-
+		int Variable::var_id = 0;
 		Variable::Variable()
 		{
-			// TODO Auto-generated constructor stub
+			ownId = var_id++;
 
 		}
 

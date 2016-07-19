@@ -11,17 +11,22 @@
 #include <engine/constraintmodul/SolverVariable.h>
 #include <string>
 #include <memory>
+#include "Term.h"
 
 namespace alica
 {
 	namespace reasoner
 	{
 
-		class Variable : public std::enable_shared_from_this<Variable>, public alica::SolverVariable
+		class Variable : public alica::reasoner::Term, public alica::SolverVariable
 		{
 		public:
 			Variable();
 			virtual ~Variable();
+
+		private:
+			int ownId;
+			static int var_id;
 		};
 
 	} /* namespace reasoner */

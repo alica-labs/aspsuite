@@ -221,16 +221,19 @@ namespace alica
 			std::regex words_regex("[A-Z]+(\\w*)");
 			for (auto value : valuesToParse)
 			{
-				cout << "Val: " << value << endl;
-				auto words_begin = std::sregex_iterator(value.begin(), value.end(), words_regex);
+				size_t begin = value.find("(");
+				size_t end = value.find(")");
+				string tmp = value.substr(begin, end - begin);
+				auto words_begin = std::sregex_iterator(tmp.begin(), tmp.end(), words_regex);
 				auto words_end = std::sregex_iterator();
 				while (words_begin != words_end)
 				{
 					std::smatch match = *words_begin;
 					std::string match_str = match.str();
-					value.replace(match.position(), match.length(), this->solver->WILDCARD_STRING);
-					words_begin = std::sregex_iterator(value.begin(), value.end(), words_regex);
+					tmp.replace(match.position(), match.length(), this->solver->WILDCARD_STRING);
+					words_begin = std::sregex_iterator(tmp.begin(), tmp.end(), words_regex);
 				}
+				value = value.replace(begin, end - begin, tmp);
 				auto val = this->solver->getGringoModule()->parseValue(value);
 				this->headValues.emplace(val, vector<Gringo::Value>());
 			}

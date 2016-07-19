@@ -32,6 +32,7 @@ namespace alica
 			{
 				return false;
 			}
+			this->rule = rule;
 			if (rule.find(":-") != std::string::npos)
 			{
 				size_t endOfHead = rule.find(":-");
@@ -71,7 +72,7 @@ namespace alica
 
 		std::string Term::getRule()
 		{
-			return rule;
+			return this->rule;
 		}
 	} /* namespace reasoner */
 } /* namespace alica */

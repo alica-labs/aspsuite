@@ -97,13 +97,13 @@ namespace alica
 
 		void AspQuery::addRule(string domainName, string rule, bool ground)
 		{
-			stringstream ss;
-			string tmp = "";
-			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
-			tmp = ss.str();
-			rule = tmp + ", " + rule;
+//			stringstream ss;
+//			string tmp = "";
+//			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
+//			tmp = ss.str();
+//			rule = tmp + ", " + rule;
 			this->solver->getClingo()->add(domainName, {}, rule);
-			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
+//			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
 			this->rules.push_back(rule);
 			if (ground)
 			{
@@ -165,7 +165,7 @@ namespace alica
 
 		}
 
-		vector<Gringo::Value> AspQuery::createHeadQueryValues(std::string queryString)
+		void AspQuery::createHeadQueryValues(std::string queryString)
 		{
 			vector<string> valuesToParse;
 			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
@@ -217,7 +217,6 @@ namespace alica
 			{
 				valuesToParse.push_back(queryString);
 			}
-			vector<Gringo::Value> values;
 			std::regex words_regex("[A-Z]+(\\w*)");
 			for (auto value : valuesToParse)
 			{
@@ -237,7 +236,6 @@ namespace alica
 				auto val = this->solver->getGringoModule()->parseValue(value);
 				this->headValues.emplace(val, vector<Gringo::Value>());
 			}
-			return values;
 		}
 
 		vector<Gringo::Value> AspQuery::createQueryValues(std::string queryString)

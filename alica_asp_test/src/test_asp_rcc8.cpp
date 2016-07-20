@@ -155,7 +155,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
 	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "department_sections",
 																								1);
-	auto values = queryObject->createHeadQueryValues("c(CountOfExCon)");
+	queryObject->createHeadQueryValues("c(CountOfExCon)");
 	queryObject->addRule("department_sections", "c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.", true);
 	aspSolver->registerQuery(queryObject);
 	if (!aspSolver->solve())

@@ -298,7 +298,7 @@ namespace alica
 			{
 				std::smatch match = *i;
 				std::string inPredicateString = match.str();
-				std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
+//				std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString << "<<<<<<" << std::endl;
 				;
 				size_t start = inPredicateString.find(',');
 				size_t end = string::npos;
@@ -313,7 +313,7 @@ namespace alica
 					{
 						plan = inPredicateString.substr(start + 1, end - start - 1);
 						this->clingo->add("planBase", {}, gen->inRefPlan(prefix, cond, plan));
-						std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
+//						std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan << "<<<<<<" << std::endl;
 					}
 				}
 				// task
@@ -325,7 +325,7 @@ namespace alica
 					{
 						task = inPredicateString.substr(start, end - start);
 						task = supplementary::Configuration::trim(task);
-						std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
+//						std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task << "<<<<<<" << std::endl;
 						if (islower(task.at(0)))
 						{
 							this->clingo->add("planBase", {}, gen->inRefPlanTask(prefix, cond, plan, task));
@@ -345,7 +345,7 @@ namespace alica
 					{
 						state = inPredicateString.substr(start, end - start);
 						state = supplementary::Configuration::trim(state);
-						std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
+//						std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" << state << "<<<<<<" << std::endl;
 						if (islower(state.at(0)))
 						{
 							this->clingo->add("planBase", {}, gen->inRefPlanState(prefix, cond, plan, state));

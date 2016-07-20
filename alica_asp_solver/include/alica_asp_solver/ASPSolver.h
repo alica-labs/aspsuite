@@ -92,6 +92,7 @@ namespace alica
 			void reduceLifeTime();
 			void integrateRules();
 			int queryCounter;
+			supplementary::SystemConfig* sc;
 #ifdef ASPSolver_DEBUG
 			int modelCount;
 #endif

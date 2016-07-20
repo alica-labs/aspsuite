@@ -54,7 +54,7 @@ namespace alica
 			vector<string> getRules();
 			void addRule(string pragrammSection, string rule, bool ground);
 
-			vector<Gringo::Value> createHeadQueryValues(std::string queryString);
+			void createHeadQueryValues(std::string queryString);
 
 			string toString();
 

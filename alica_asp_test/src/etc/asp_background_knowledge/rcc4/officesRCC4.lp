@@ -1,21 +1,21 @@
 #program offices_lp.
 
 %%%% the offices consists of the rooms 1407 1408A 1408B 1408C 1406A 1406B 1406C
-tangentialProperPart(r1407, offices).
-tangentialProperPart(r1408A, offices).
-tangentialProperPart(r1408B, offices).
-tangentialProperPart(r1408C, offices).
-tangentialProperPart(r1406A, offices).
-tangentialProperPart(r1406B, offices).
-tangentialProperPart(r1406C, offices).
+properPart(r1407, offices).
+properPart(r1408A, offices).
+properPart(r1408B, offices).
+properPart(r1408C, offices).
+properPart(r1406A, offices).
+properPart(r1406B, offices).
+properPart(r1406C, offices).
 
 %%%% the rooms which are part of the offices are in relation to each other
-externallyConnected(r1407, r1408A).
-externallyConnected(r1407, r1408B).
-externallyConnected(r1407, r1408C).
-externallyConnected(r1407, r1406A).
-externallyConnected(r1407, r1406B).
-externallyConnected(r1407, r1406C).
+partialOverlapping(r1407, r1408A).
+partialOverlapping(r1407, r1408B).
+partialOverlapping(r1407, r1408C).
+partialOverlapping(r1407, r1406A).
+partialOverlapping(r1407, r1406B).
+partialOverlapping(r1407, r1406C).
 disconnected(r1408A, r1408B).
 disconnected(r1408A, r1408C).
 disconnected(r1408A, r1406A).

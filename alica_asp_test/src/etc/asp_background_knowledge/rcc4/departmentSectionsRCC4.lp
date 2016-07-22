@@ -1,31 +1,31 @@
 #program department_sections.
 
-externallyConnected(studentArea, mainHallA).
-externallyConnected(mainHallA, studentArea).
+partialOverlapping(studentArea, mainHallA).
+partialOverlapping(mainHallA, studentArea).
 
-externallyConnected(workshop, mainHallA).
-externallyConnected(mainHallA, workshop).
+partialOverlapping(workshop, mainHallA).
+partialOverlapping(mainHallA, workshop).
 
-externallyConnected(offices, mainHallA).
-externallyConnected(mainHallA, offices).
+partialOverlapping(offices, mainHallA).
+partialOverlapping(mainHallA, offices).
 
-externallyConnected(offices, mainHallB).
-externallyConnected(mainHallB, offices).
+partialOverlapping(offices, mainHallB).
+partialOverlapping(mainHallB, offices).
 
-externallyConnected(offices, utility).
-externallyConnected(utility, offices).
+partialOverlapping(offices, utility).
+partialOverlapping(utility, offices).
 
-externallyConnected(mainHallA, mainHallB).
-externallyConnected(mainHallB, mainHallA).
+partialOverlapping(mainHallA, mainHallB).
+partialOverlapping(mainHallB, mainHallA).
 
-externallyConnected(mainHallB, utility).
-externallyConnected(utility, mainHallB).
+partialOverlapping(mainHallB, utility).
+partialOverlapping(utility, mainHallB).
 
-externallyConnected(mainHallB, organization).
-externallyConnected(organization, mainHallB).
+partialOverlapping(mainHallB, organization).
+partialOverlapping(organization, mainHallB).
 
-externallyConnected(utility, organization).
-externallyConnected(organization, utility).
+partialOverlapping(utility, organization).
+partialOverlapping(organization, utility).
 
 
 

@@ -45,6 +45,19 @@ namespace alica
 			return true;
 		}
 
+		void Term::addFact(std::string fact)
+		{
+			if(fact.find(".") == std::string::npos)
+			{
+				this->facts.push_back(fact + ".");
+			}
+			else
+			{
+				this->facts.push_back(fact);
+			}
+		}
+
+
 		std::string Term::getRuleHead()
 		{
 			return this->head;
@@ -76,5 +89,4 @@ namespace alica
 		}
 	} /* namespace reasoner */
 } /* namespace alica */
-
 

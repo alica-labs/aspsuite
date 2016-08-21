@@ -11,6 +11,7 @@
 #include <engine/constraintmodul/SolverTerm.h>
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace alica
 {
@@ -29,6 +30,7 @@ namespace alica
 			void setBackgroundFileName(std::string backgroundFile);
 			int getLifeTime();
 			std::string getRule();
+			void addFact(std::string fact);
 
 		private :
 			std::string rule;
@@ -36,6 +38,7 @@ namespace alica
 			std::string body;
 			std::string backgroundFile;
 			int lifeTime;
+			std::vector<std::string> facts;
 		};
 
 	} /* namespace reasoner */

@@ -87,6 +87,12 @@ namespace alica
 		{
 			return this->rule;
 		}
+
+		 std::vector<std::string> Term::getFacts()
+		{
+			return facts;
+		}
 	} /* namespace reasoner */
 } /* namespace alica */
+
 

@@ -474,6 +474,13 @@ namespace alica
 				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
 #endif
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
+				for(auto fact : term->getFacts())
+				{
+#ifdef ASPSolver_DEBUG
+				cout << "ASPSolver: Query contains fact: " << term->getRule() << endl;
+#endif
+					query->addRule(term->getBackGroundFileName(), fact, false);
+				}
 				this->registerQuery(query);
 				this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
 			}
@@ -512,6 +519,13 @@ namespace alica
 				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
 #endif
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
+				for(auto fact : term->getFacts())
+				{
+#ifdef ASPSolver_DEBUG
+				cout << "ASPSolver: Query contains fact: " << term->getRule() << endl;
+#endif
+					query->addRule(term->getBackGroundFileName(), fact, false);
+				}
 				this->registerQuery(query);
 				this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
 			}

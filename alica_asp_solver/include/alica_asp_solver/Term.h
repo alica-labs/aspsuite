@@ -31,6 +31,7 @@ namespace alica
 			int getLifeTime();
 			std::string getRule();
 			void addFact(std::string fact);
+			std::vector<std::string> getFacts();
 
 		private :
 			std::string rule;

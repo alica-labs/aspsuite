@@ -54,7 +54,7 @@ namespace alica
 			vector<string> getRules();
 			void addRule(string pragrammSection, string rule, bool ground);
 
-			void createHeadQueryValues(std::string queryString);
+			void createHeadQueryValues(string queryString);
 
 			string toString();
 
@@ -81,7 +81,7 @@ namespace alica
 			int lifeTime;
 			bool disjunction;
 			string pragrammSection;
-			vector<Gringo::Value> createQueryValues(std::string queryString);
+			vector<Gringo::Value> createQueryValues(string queryString);
 			void generateRules(string queryString);
 
 		};

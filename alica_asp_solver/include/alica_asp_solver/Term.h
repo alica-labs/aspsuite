@@ -13,33 +13,35 @@
 #include <memory>
 #include <vector>
 
+using namespace std;
+
 namespace alica
 {
 	namespace reasoner
 	{
 
-		class Term : public std::enable_shared_from_this<Term>, public alica::SolverTerm
+		class Term : public enable_shared_from_this<Term>, public alica::SolverTerm
 		{
 		public:
 			Term(int lifeTime = 1);
 			virtual ~Term();
-			bool setRule(std::string rule);
-			std::string getRuleHead();
-			std::string getRuleBody();
-			std::string getBackGroundFileName();
-			void setBackgroundFileName(std::string backgroundFile);
+			bool setRule(string rule);
+			string getRuleHead();
+			string getRuleBody();
+			string getBackGroundFileName();
+			void setBackgroundFileName(string backgroundFile);
 			int getLifeTime();
-			std::string getRule();
-			void addFact(std::string fact);
-			std::vector<std::string> getFacts();
+			string getRule();
+			void addFact(string fact);
+			vector<string> getFacts();
 
 		private :
-			std::string rule;
-			std::string head;
-			std::string body;
-			std::string backgroundFile;
+			string rule;
+			string head;
+			string body;
+			string backgroundFile;
 			int lifeTime;
-			std::vector<std::string> facts;
+			vector<string> facts;
 		};
 
 	} /* namespace reasoner */

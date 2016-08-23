@@ -21,6 +21,8 @@
 
 #define ASPSolver_DEBUG
 
+using namespace std;
+
 namespace alica
 {
 	class AlicaEngine;
@@ -48,7 +50,7 @@ namespace alica
 			void load(string filename);
 			void loadFromConfig(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
-			vector<Gringo::Value> createQueryValues(std::string const &queryString);
+			vector<Gringo::Value> createQueryValues(string const &queryString);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
 			bool isTrueForAllModels(shared_ptr<AspQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);

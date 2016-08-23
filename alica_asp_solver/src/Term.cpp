@@ -26,14 +26,14 @@ namespace alica
 		{
 		}
 
-		bool Term::setRule(std::string rule)
+		bool Term::setRule(string rule)
 		{
 			if (this->rule.compare("") != 0)
 			{
 				return false;
 			}
 			this->rule = rule;
-			if (rule.find(":-") != std::string::npos)
+			if (rule.find(":-") != string::npos)
 			{
 				size_t endOfHead = rule.find(":-");
 				size_t startOfBody = endOfHead + 2;
@@ -45,9 +45,9 @@ namespace alica
 			return true;
 		}
 
-		void Term::addFact(std::string fact)
+		void Term::addFact(string fact)
 		{
-			if(fact.find(".") == std::string::npos)
+			if(fact.find(".") == string::npos)
 			{
 				this->facts.push_back(fact + ".");
 			}
@@ -58,22 +58,22 @@ namespace alica
 		}
 
 
-		std::string Term::getRuleHead()
+		string Term::getRuleHead()
 		{
 			return this->head;
 		}
 
-		std::string Term::getRuleBody()
+		string Term::getRuleBody()
 		{
 			return this->body;
 		}
 
-		std::string Term::getBackGroundFileName()
+		string Term::getBackGroundFileName()
 		{
 			return this->backgroundFile;
 		}
 
-		void Term::setBackgroundFileName(std::string backgroundFile)
+		void Term::setBackgroundFileName(string backgroundFile)
 		{
 			this->backgroundFile = backgroundFile;
 		}
@@ -83,12 +83,12 @@ namespace alica
 			return lifeTime;
 		}
 
-		std::string Term::getRule()
+		string Term::getRule()
 		{
 			return this->rule;
 		}
 
-		 std::vector<std::string> Term::getFacts()
+		vector<string> Term::getFacts()
 		{
 			return facts;
 		}

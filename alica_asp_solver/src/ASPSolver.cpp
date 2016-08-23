@@ -22,7 +22,7 @@ namespace alica
 		const void* const ASPSolver::WILDCARD_POINTER = new int(0);
 		const string ASPSolver::WILDCARD_STRING = "wildcard";
 
-		ASPSolver::ASPSolver(AlicaEngine* ae, std::vector<char const*> args) :
+		ASPSolver::ASPSolver(AlicaEngine* ae, vector<char const*> args) :
 				IConstraintSolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
 		{
 			this->gringoModule = new DefaultGringoModule();
@@ -34,11 +34,12 @@ namespace alica
 
 			this->sc = supplementary::SystemConfig::getInstance();
 			// read alica background knowledge from static file
-			supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-			string alicaBackGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
-			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+			string alicaBackGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
+			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																					alicaBackGroundKnowledgeFile);
+#ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
+#endif
 			this->clingo->load(alicaBackGroundKnowledgeFile);
 			this->queryCounter = 0;
 #ifdef ASPSolver_DEBUG
@@ -53,25 +54,25 @@ namespace alica
 
 		void ASPSolver::load(string filename)
 		{
-			this->clingo->load(std::forward<string>(filename));
+			this->clingo->load(forward<string>(filename));
 		}
 
 		void ASPSolver::loadFromConfig(string filename)
 		{
 
-			string backGroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
+			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
+			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																				backGroundKnowledgeFile);
-			this->clingo->load(std::forward<string>(backGroundKnowledgeFile));
+			this->clingo->load(forward<string>(backGroundKnowledgeFile));
 		}
 
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
-			this->clingo->ground(std::forward<Gringo::Control::GroundVec const &>(vec),
-									std::forward<Gringo::Any&&>(context));
+			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec),
+									forward<Gringo::Any&&>(context));
 		}
 
-		vector<Gringo::Value> ASPSolver::createQueryValues(std::string const &query)
+		vector<Gringo::Value> ASPSolver::createQueryValues(string const &query)
 		{
 			vector<Gringo::Value> ret;
 			if (query.find(",") != string::npos && query.find(";") == string::npos)
@@ -125,23 +126,23 @@ namespace alica
 			return ret;
 		}
 
-		std::vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
+		vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
 		{
-			std::vector<Gringo::Value> gringoValues;
+			vector<Gringo::Value> gringoValues;
 
 			this->clingo->solve([queryValue, &gringoValues, this](Gringo::Model const &m)
 			{
-				//std::cout << "Inside Lambda!" << std::endl;
+				//cout << "Inside Lambda!" << endl;
 					ClingoModel& clingoModel = (ClingoModel&) m;
 					auto it = clingoModel.out.domains.find(queryValue.sig());
 
-					std::vector<Gringo::AtomState const *> atomStates;
+					vector<Gringo::AtomState const *> atomStates;
 					if (it != clingoModel.out.domains.end())
 					{
-						//std::cout << "In Loop" << std::endl;
+						//cout << "In Loop" << endl;
 						for (auto& domainPair : it->second.domain)
 						{
-							//std::cout << domainPair.first << " " << std::endl;
+							//cout << domainPair.first << " " << endl;
 							if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 							{
 								if (checkMatchValues(&queryValue, &domainPair.first))
@@ -155,9 +156,9 @@ namespace alica
 
 //					for (auto &gringoValue : gringoValues)
 //					{
-//						std::cout << gringoValue << " ";
+//						cout << gringoValue << " ";
 //					}
-//					std::cout << std::endl;
+//					cout << endl;
 
 					return true;
 				},
@@ -208,7 +209,7 @@ namespace alica
 			this->reduceLifeTime();
 			this->currentModels.clear();
 			this->modelCount = 0;
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
 				return true;
@@ -223,9 +224,9 @@ namespace alica
 			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
-				std::cout << atom << " ";
+				cout << atom << " ";
 			}
-			std::cout << std::endl;
+			cout << endl;
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
@@ -588,7 +589,7 @@ namespace alica
 			this->integrateRules();
 			this->reduceLifeTime();
 			this->currentModels.clear();
-			auto result = this->clingo->solve(std::bind(&ASPSolver::onModel, this, std::placeholders::_1), {});
+			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
 			{

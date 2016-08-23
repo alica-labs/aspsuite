@@ -97,13 +97,7 @@ namespace alica
 
 		void AspQuery::addRule(string domainName, string rule, bool ground)
 		{
-//			stringstream ss;
-//			string tmp = "";
-//			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
-//			tmp = ss.str();
-//			rule = tmp + ", " + rule;
 			this->solver->getClingo()->add(domainName, {}, rule);
-//			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
 			this->rules.push_back(rule);
 			if (ground)
 			{
@@ -165,7 +159,7 @@ namespace alica
 
 		}
 
-		void AspQuery::createHeadQueryValues(std::string queryString)
+		void AspQuery::createHeadQueryValues(string queryString)
 		{
 			vector<string> valuesToParse;
 			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
@@ -217,20 +211,20 @@ namespace alica
 			{
 				valuesToParse.push_back(queryString);
 			}
-			std::regex words_regex("[A-Z]+(\\w*)");
+			regex words_regex("[A-Z]+(\\w*)");
 			for (auto value : valuesToParse)
 			{
 				size_t begin = value.find("(");
 				size_t end = value.find(")");
 				string tmp = value.substr(begin, end - begin);
-				auto words_begin = std::sregex_iterator(tmp.begin(), tmp.end(), words_regex);
-				auto words_end = std::sregex_iterator();
+				auto words_begin = sregex_iterator(tmp.begin(), tmp.end(), words_regex);
+				auto words_end = sregex_iterator();
 				while (words_begin != words_end)
 				{
-					std::smatch match = *words_begin;
-					std::string match_str = match.str();
+					smatch match = *words_begin;
+					string match_str = match.str();
 					tmp.replace(match.position(), match.length(), this->solver->WILDCARD_STRING);
-					words_begin = std::sregex_iterator(tmp.begin(), tmp.end(), words_regex);
+					words_begin = sregex_iterator(tmp.begin(), tmp.end(), words_regex);
 				}
 				value = value.replace(begin, end - begin, tmp);
 				auto val = this->solver->getGringoModule()->parseValue(value);
@@ -238,7 +232,7 @@ namespace alica
 			}
 		}
 
-		vector<Gringo::Value> AspQuery::createQueryValues(std::string queryString)
+		vector<Gringo::Value> AspQuery::createQueryValues(string queryString)
 		{
 			vector<Gringo::Value> ret;
 			if (queryString.compare("") == 0)
@@ -299,6 +293,21 @@ namespace alica
 				ret.push_back(this->solver->getGringoModule()->parseValue(queryString));
 			}
 			return ret;
+		}
+
+		bool AspQuery::setQueryString(string queryString)
+		{
+			if (this->queryString.compare("empty") == 0)
+			{
+				this->queryString = queryString;
+				this->queryValues = this->createQueryValues(queryString);
+				for (auto value : this->queryValues)
+				{
+					this->predicateModelMap.emplace(value, vector<Gringo::Value>());
+				}
+				return true;
+			}
+			return false;
 		}
 
 		string AspQuery::toString()
@@ -396,21 +405,6 @@ namespace alica
 		string AspQuery::getQueryString()
 		{
 			return this->queryString;
-		}
-
-		bool AspQuery::setQueryString(string queryString)
-		{
-			if (this->queryString.compare("empty") == 0)
-			{
-				this->queryString = queryString;
-				this->queryValues = this->createQueryValues(queryString);
-				for (auto value : this->queryValues)
-				{
-					this->predicateModelMap.emplace(value, vector<Gringo::Value>());
-				}
-				return true;
-			}
-			return false;
 		}
 
 		map<Gringo::Value, vector<Gringo::Value>> AspQuery::getPredicateModelMap()

@@ -478,7 +478,7 @@ namespace alica
 				for(auto fact : term->getFacts())
 				{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << term->getRule() << endl;
+				cout << "ASPSolver: Query contains fact: " << fact << endl;
 #endif
 					query->addRule(term->getBackGroundFileName(), fact, false);
 				}
@@ -523,7 +523,7 @@ namespace alica
 				for(auto fact : term->getFacts())
 				{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << term->getRule() << endl;
+				cout << "ASPSolver: Query contains fact: " << fact << endl;
 #endif
 					query->addRule(term->getBackGroundFileName(), fact, false);
 				}

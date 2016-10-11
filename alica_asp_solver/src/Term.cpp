@@ -92,6 +92,11 @@ namespace alica
 		{
 			return facts;
 		}
+
+		void Term::setExternals(shared_ptr<map<string, bool>> externals)
+		{
+
+		}
 	} /* namespace reasoner */
 } /* namespace alica */
 

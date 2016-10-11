@@ -12,6 +12,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ namespace alica
 			string getRule();
 			void addFact(string fact);
 			vector<string> getFacts();
+			void setExternals(shared_ptr<map<string, bool>> externals);
 
 		private :
 			string rule;

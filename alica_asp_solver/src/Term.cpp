@@ -20,6 +20,7 @@ namespace alica
 			this->head = "";
 			this->body = "";
 			this->lifeTime = lifeTime;
+			this->externals = nullptr;
 		}
 
 		Term::~Term()
@@ -95,7 +96,12 @@ namespace alica
 
 		void Term::setExternals(shared_ptr<map<string, bool>> externals)
 		{
+			this->externals = externals;
+		}
 
+		shared_ptr<map<string, bool> > Term::getExternals()
+		{
+			return externals;
 		}
 	} /* namespace reasoner */
 } /* namespace alica */

@@ -34,7 +34,9 @@ namespace alica
 
 			this->sc = supplementary::SystemConfig::getInstance();
 			// read alica background knowledge from static file
-			string alicaBackGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile", NULL);
+			string alicaBackGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>("alicaBackgroundKnowledgeFile",
+			NULL);
+//			this->alreadyLoadad.push_back(alicaBackGroundKnowledgeFile);
 			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																					alicaBackGroundKnowledgeFile);
 #ifdef ASPSolver_DEBUG
@@ -66,10 +68,31 @@ namespace alica
 			this->clingo->load(forward<string>(backGroundKnowledgeFile));
 		}
 
+		void ASPSolver::loadFromConfigIfNotYetLoaded(string filename)
+		{
+//			bool alreadyIn = false;
+//			for (auto file : this->alreadyLoadad)
+//			{
+//				if (filename.compare(file) == 0)
+//				{
+//					alreadyIn = true;
+//					break;
+//				}
+//			}
+//			if (!alreadyIn)
+//			{
+//				string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
+//				this->alreadyLoadad.push_back(backGroundKnowledgeFile);
+//				backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
+//																					backGroundKnowledgeFile);
+//				this->clingo->load(forward<string>(backGroundKnowledgeFile));
+//			}
+
+		}
+
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
-			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec),
-									forward<Gringo::Any&&>(context));
+			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec), forward<Gringo::Any&&>(context));
 		}
 
 		vector<Gringo::Value> ASPSolver::createQueryValues(string const &query)
@@ -475,15 +498,34 @@ namespace alica
 				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
 #endif
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
-				for(auto fact : term->getFacts())
+				for (auto fact : term->getFacts())
 				{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << fact << endl;
+					cout << "ASPSolver: Query contains fact: " << fact << endl;
 #endif
 					query->addRule(term->getBackGroundFileName(), fact, false);
 				}
 				this->registerQuery(query);
+
 				this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
+
+				if (term->getExternals() != nullptr)
+				{
+					for (auto pair : *term->getExternals())
+					{
+						auto value = this->gringoModule->parseValue(pair.first);
+						if (pair.second)
+						{
+							this->clingo->assignExternal(value, Gringo::TruthValue::True);
+						}
+						else
+						{
+							this->clingo->assignExternal(value, Gringo::TruthValue::False);
+						}
+
+					}
+					this->clingo->update();
+				}
 			}
 			auto satisfied = this->solve();
 			this->removeDeadQueries();
@@ -520,15 +562,34 @@ namespace alica
 				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
 #endif
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
-				for(auto fact : term->getFacts())
+				for (auto fact : term->getFacts())
 				{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << fact << endl;
+					cout << "ASPSolver: Query contains fact: " << fact << endl;
 #endif
 					query->addRule(term->getBackGroundFileName(), fact, false);
 				}
 				this->registerQuery(query);
+
 				this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
+
+				if (term->getExternals() != nullptr)
+				{
+					for (auto pair : *term->getExternals())
+					{
+						auto value = this->gringoModule->parseValue(pair.first);
+						if (pair.second)
+						{
+							this->clingo->assignExternal(value, Gringo::TruthValue::True);
+						}
+						else
+						{
+							this->clingo->assignExternal(value, Gringo::TruthValue::False);
+						}
+
+					}
+					this->clingo->update();
+				}
 			}
 			auto satisfied = this->solve();
 			if (!satisfied)

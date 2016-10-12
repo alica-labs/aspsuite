@@ -49,6 +49,7 @@ namespace alica
 			void disableWarnings(bool noWarns);
 			void load(string filename);
 			void loadFromConfig(string filename);
+			void loadFromConfigIfNotYetLoaded(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(string const &queryString);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
@@ -83,8 +84,7 @@ namespace alica
 			DefaultGringoModule* gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
 			vector<Gringo::ValVec> currentModels;
-
-
+			vector<string> alreadyLoaded;
 
 			// key=queries, value=vector<true predicates in the last model>
 			//map<Gringo::Value, vector<Gringo::Value>> registeredQueries;

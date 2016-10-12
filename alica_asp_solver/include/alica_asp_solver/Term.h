@@ -36,6 +36,7 @@ namespace alica
 			void addFact(string fact);
 			vector<string> getFacts();
 			void setExternals(shared_ptr<map<string, bool>> externals);
+			shared_ptr<map<string, bool> > getExternals();
 
 		private :
 			string rule;
@@ -44,6 +45,7 @@ namespace alica
 			string backgroundFile;
 			int lifeTime;
 			vector<string> facts;
+			shared_ptr<map<string, bool>> externals;
 		};
 
 	} /* namespace reasoner */

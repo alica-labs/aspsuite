@@ -49,7 +49,7 @@ namespace alica
 			void disableWarnings(bool noWarns);
 			void load(string filename);
 			void loadFromConfig(string filename);
-			void loadFromConfigIfNotYetLoaded(string filename);
+			bool loadFromConfigIfNotYetLoaded(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(string const &queryString);
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
@@ -93,6 +93,9 @@ namespace alica
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();
+			int prepareSolution(std::vector<alica::Variable*>& vars,
+								std::vector<shared_ptr<ConstraintDescriptor> >& calls);
+
 			int queryCounter;
 			supplementary::SystemConfig* sc;
 #ifdef ASPSolver_DEBUG

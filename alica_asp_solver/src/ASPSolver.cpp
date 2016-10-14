@@ -44,6 +44,7 @@ namespace alica
 #endif
 			this->clingo->load(alicaBackGroundKnowledgeFile);
 			this->queryCounter = 0;
+			this->masterPlanLoaded = false;
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -214,21 +215,6 @@ namespace alica
 				return true;
 			}
 			return false;
-		}
-
-		DefaultGringoModule* ASPSolver::getGringoModule()
-		{
-			return this->gringoModule;
-		}
-
-		const void* ASPSolver::getWildcardPointer()
-		{
-			return WILDCARD_POINTER;
-		}
-
-		const string& ASPSolver::getWildcardString()
-		{
-			return WILDCARD_STRING;
 		}
 
 		bool ASPSolver::solve()
@@ -516,13 +502,16 @@ namespace alica
 			}
 		}
 
-
 		int ASPSolver::prepareSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
 		{
 			vector<shared_ptr<alica::reasoner::Term> > constraint;
 			int dim = vars.size();
 			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable> > >(dim);
-			this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
+			if (!this->masterPlanLoaded)
+			{
+				this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
+				this->masterPlanLoaded = true;
+			}
 			for (int i = 0; i < vars.size(); ++i)
 			{
 				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
@@ -542,7 +531,9 @@ namespace alica
 																	term->getLifeTime());
 				auto loaded = this->loadFromConfigIfNotYetLoaded(term->getBackGroundFileName());
 				query->createHeadQueryValues(term->getRuleHead());
+#ifdef ASPSolver_DEBUG
 				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
+#endif
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
 				for (auto fact : term->getFacts())
 				{
@@ -598,7 +589,11 @@ namespace alica
 		 */
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
-			this->planIntegrator->loadPlanTree(plan);
+			if(!this->masterPlanLoaded)
+			{
+				this->planIntegrator->loadPlanTree(plan);
+				this->masterPlanLoaded = true;
+			}
 			this->integrateRules();
 			this->reduceLifeTime();
 			this->currentModels.clear();
@@ -628,6 +623,21 @@ namespace alica
 			{
 				this->unRegisterQuery(query);
 			}
+		}
+
+		DefaultGringoModule* ASPSolver::getGringoModule()
+		{
+			return this->gringoModule;
+		}
+
+		const void* ASPSolver::getWildcardPointer()
+		{
+			return WILDCARD_POINTER;
+		}
+
+		const string& ASPSolver::getWildcardString()
+		{
+			return WILDCARD_STRING;
 		}
 
 		vector<shared_ptr<AspQuery> > ASPSolver::getRegisteredQueries()

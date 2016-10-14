@@ -47,20 +47,20 @@ namespace alica
 
 			bool validatePlan(Plan* plan);
 			void disableWarnings(bool noWarns);
-			void load(string filename);
-			void loadFromConfig(string filename);
 			bool loadFromConfigIfNotYetLoaded(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			vector<Gringo::Value> createQueryValues(string const &queryString);
+			bool onModel(Gringo::Model const &m);
+			bool solve();
+
+
 			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
 			bool isTrueForAllModels(shared_ptr<AspQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
-			bool onModel(Gringo::Model const &m);
-			bool solve();
 			bool registerQuery(shared_ptr<AspQuery> query);
 			bool unRegisterQuery(shared_ptr<AspQuery> query);
-			alica::reasoner::ASPGenerator gen;
-
+			int getQueryCounter();
+			void removeDeadQueries();
 
 			const long long getSolvingTime();
 			const long long getSatTime();
@@ -69,15 +69,14 @@ namespace alica
 			const long getAtomCount();
 			const long getBodiesCount();
 			const long getAuxAtomsCount();
-
 			void printStats();
+
+			alica::reasoner::ASPGenerator gen;
 			DefaultGringoModule* getGringoModule();
 			static const void* getWildcardPointer();
 			static const string& getWildcardString();
 			vector<shared_ptr<AspQuery> > getRegisteredQueries();
 			shared_ptr<ClingoLib> getClingo();
-			int getQueryCounter();
-			void removeDeadQueries();
 
 		private:
 			shared_ptr<ClingoLib> clingo;
@@ -86,16 +85,16 @@ namespace alica
 			vector<Gringo::ValVec> currentModels;
 			vector<string> alreadyLoaded;
 
-			// key=queries, value=vector<true predicates in the last model>
-			//map<Gringo::Value, vector<Gringo::Value>> registeredQueries;
 			vector<shared_ptr<AspQuery>> registeredQueries;
 
+			void load(string filename);
+			void loadFromConfig(string filename);
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();
 			int prepareSolution(std::vector<alica::Variable*>& vars,
 								std::vector<shared_ptr<ConstraintDescriptor> >& calls);
-
+			bool masterPlanLoaded;
 			int queryCounter;
 			supplementary::SystemConfig* sc;
 #ifdef ASPSolver_DEBUG

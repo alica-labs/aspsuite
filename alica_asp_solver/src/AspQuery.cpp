@@ -22,7 +22,6 @@ namespace alica
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
-			this->queryValues = this->createQueryValues(queryString);
 			for (auto value : this->queryValues)
 			{
 				this->predicateModelMap.emplace(value, vector<Gringo::Value>());

@@ -20,6 +20,7 @@
 #include <vector>
 
 #define ASPSolver_DEBUG
+//#define ASP_TEST_RELATED
 
 using namespace std;
 
@@ -49,7 +50,6 @@ namespace alica
 			void disableWarnings(bool noWarns);
 			bool loadFromConfigIfNotYetLoaded(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
-			vector<Gringo::Value> createQueryValues(string const &queryString);
 			bool onModel(Gringo::Model const &m);
 			bool solve();
 

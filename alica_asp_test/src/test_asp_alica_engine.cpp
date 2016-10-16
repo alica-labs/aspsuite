@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <ros/ros.h>
+//#include <ros/ros.h>
 #include <SystemConfig.h>
 
 // ALICA Additional Modules

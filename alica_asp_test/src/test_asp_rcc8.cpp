@@ -66,13 +66,7 @@ protected:
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-		string rcc8CompositionTableFile = (*sc)["ASPSolver"]->get<string>("rcc8CompositionTableFile",
-		NULL);
-		rcc8CompositionTableFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
-																			rcc8CompositionTableFile);
-		cout << "ASPSolver: " << rcc8CompositionTableFile << endl;
-		aspSolver->load(rcc8CompositionTableFile);
+		aspSolver->loadFromConfigIfNotYetLoaded("rcc8CompositionTableFile");
 	}
 
 	virtual void TearDown()
@@ -99,11 +93,7 @@ TEST_F(ASPRCC8, Department)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
-	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
-																		rrc8DepartmentSectionFile);
-	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
-	aspSolver->load(rrc8DepartmentSectionFile);
+	aspSolver->loadFromConfigIfNotYetLoaded("rrc8DepartmentSectionFile");
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
 	aspSolver->ground( { {"department_sections", {}}}, nullptr);
@@ -139,11 +129,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	string rrc8DepartmentSectionFile = (*sc)["ASPSolver"]->get<string>("rrc8DepartmentSectionFile", NULL);
-	rrc8DepartmentSectionFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
-																		rrc8DepartmentSectionFile);
-	cout << "ASPSolver: " << rrc8DepartmentSectionFile << endl;
-	aspSolver->load(rrc8DepartmentSectionFile);
+	aspSolver->loadFromConfigIfNotYetLoaded("rrc8DepartmentSectionFile");
 	// start time measurement
 	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
 	aspSolver->ground( { {"department_sections", {}}}, nullptr);

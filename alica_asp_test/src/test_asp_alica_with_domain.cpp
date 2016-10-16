@@ -64,13 +64,7 @@ protected:
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-		string assistanceBackgroundKnowledgeFile = (*sc)["ASPSolver"]->get<string>("assistanceBackgroundKnowledgeFile",
-		NULL);
-		assistanceBackgroundKnowledgeFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(),
-																					assistanceBackgroundKnowledgeFile);
-		cout << "ASPSolver: " << assistanceBackgroundKnowledgeFile << endl;
-		aspSolver->load(assistanceBackgroundKnowledgeFile);
+		aspSolver->loadFromConfigIfNotYetLoaded("assistanceBackgroundKnowledgeFile");
 	}
 
 	virtual void TearDown()
@@ -98,10 +92,8 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	string assistanceTestFactsFile = (*sc)["ASPSolver"]->get<string>("assistanceTestFactsFile", NULL);
-	assistanceTestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), assistanceTestFactsFile);
 
-	aspSolver->load(assistanceTestFactsFile);
+	aspSolver->loadFromConfigIfNotYetLoaded("assistanceTestFactsFile");
 
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
@@ -150,10 +142,8 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	string assistanceTestFactsFile = (*sc)["ASPSolver"]->get<string>("assistanceTestFactsFile", NULL);
-	assistanceTestFactsFile = supplementary::FileSystem::combinePaths((*sc).getConfigPath(), assistanceTestFactsFile);
 
-	aspSolver->load(assistanceTestFactsFile);
+	aspSolver->loadFromConfigIfNotYetLoaded("assistanceTestFactsFile");
 
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);

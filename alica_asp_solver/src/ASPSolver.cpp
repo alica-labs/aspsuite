@@ -27,6 +27,13 @@ namespace alica
 		{
 			this->gringoModule = new DefaultGringoModule();
 			this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
+			auto& conf = this->clingo->getConf();
+			auto root = conf.getRootKey();
+			auto key = conf.getSubKey(root, "solve.models");
+			conf.setKeyValue(key, "0");
+#ifdef SOLVER_OPTIONS
+			traverseOptions(conf, root, "");
+#endif
 
 			this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(clingo, &this->gen);
 
@@ -392,6 +399,24 @@ namespace alica
 		void ASPSolver::disableWarnings(bool value)
 		{
 			// TODO implement disableWarnings
+			if (value)
+			{
+				Gringo::message_printer()->disable(Gringo::Warnings::W_ATOM_UNDEFINED);
+				Gringo::message_printer()->disable(Gringo::Warnings::W_FILE_INCLUDED);
+				Gringo::message_printer()->disable(Gringo::Warnings::W_GLOBAL_VARIABLE);
+				Gringo::message_printer()->disable(Gringo::Warnings::W_OPERATION_UNDEFINED);
+				Gringo::message_printer()->disable(Gringo::Warnings::W_TOTAL);
+				Gringo::message_printer()->disable(Gringo::Warnings::W_VARIABLE_UNBOUNDED);
+			}
+			else
+			{
+				Gringo::message_printer()->enable(Gringo::Warnings::W_ATOM_UNDEFINED);
+				Gringo::message_printer()->enable(Gringo::Warnings::W_FILE_INCLUDED);
+				Gringo::message_printer()->enable(Gringo::Warnings::W_GLOBAL_VARIABLE);
+				Gringo::message_printer()->enable(Gringo::Warnings::W_OPERATION_UNDEFINED);
+				Gringo::message_printer()->enable(Gringo::Warnings::W_TOTAL);
+				Gringo::message_printer()->enable(Gringo::Warnings::W_VARIABLE_UNBOUNDED);
+			}
 //			grOpts_.wNoRedef = value;
 //			grOpts_.wNoCycle = value;
 //			grOpts_.wNoTermUndef = value;
@@ -402,6 +427,10 @@ namespace alica
 
 		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
 		{
+			auto& conf = this->clingo->getConf();
+			auto root = conf.getRootKey();
+			auto key = conf.getSubKey(root, "solve.models");
+			conf.setKeyValue(key, "1");
 			int dim = prepareSolution(vars, calls);
 			auto satisfied = this->solve();
 			this->removeDeadQueries();
@@ -411,6 +440,10 @@ namespace alica
 		bool ASPSolver::getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls,
 									vector<void*>& results)
 		{
+			auto& conf = this->clingo->getConf();
+			auto root = conf.getRootKey();
+			auto key = conf.getSubKey(root, "solve.models");
+			conf.setKeyValue(key, "0");
 			int dim = prepareSolution(vars, calls);
 			auto satisfied = this->solve();
 			if (!satisfied)

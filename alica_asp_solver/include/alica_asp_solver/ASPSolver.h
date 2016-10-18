@@ -21,6 +21,7 @@
 
 #define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
+//#define SOLVER_OPTIONS
 
 using namespace std;
 
@@ -101,6 +102,27 @@ namespace alica
 			int modelCount;
 #endif
 		};
+		template <class T>
+		void traverseOptions(T& conf, unsigned key, std::string accu) {
+		   int subKeys, arrLen;
+		   const char* help;
+		   conf.getKeyInfo(key, &subKeys, &arrLen, &help);
+		   if (arrLen > 0) {
+		     for (int i = 0; i != arrLen; ++i) {
+		       traverseOptions(conf, conf.getArrKey(key, i), accu +
+		std::to_string(i) + ".");
+		     }
+		   }
+		   else if (subKeys > 0) {
+		     for (int i = 0; i != subKeys; ++i) {
+		       const char* sk = conf.getSubKeyName(key, i);
+		       traverseOptions(conf, conf.getSubKey(key, sk), accu + sk);
+		     }
+		   }
+		   else {
+		     std::cout << accu << " -- " << (help ? help : "") << "\n";
+		   }
+		}
 
 	} /* namespace reasoner */
 } /* namespace alica */

@@ -21,6 +21,7 @@ namespace alica
 			this->body = "";
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
+			this->numberOfModels = "";
 		}
 
 		Term::~Term()
@@ -48,7 +49,7 @@ namespace alica
 
 		void Term::addFact(string fact)
 		{
-			if(fact.find(".") == string::npos)
+			if (fact.find(".") == string::npos)
 			{
 				this->facts.push_back(fact + ".");
 			}
@@ -57,7 +58,6 @@ namespace alica
 				this->facts.push_back(fact);
 			}
 		}
-
 
 		string Term::getRuleHead()
 		{
@@ -81,7 +81,7 @@ namespace alica
 
 		int Term::getLifeTime()
 		{
-			return lifeTime;
+			return this->lifeTime;
 		}
 
 		string Term::getRule()
@@ -91,7 +91,7 @@ namespace alica
 
 		vector<string> Term::getFacts()
 		{
-			return facts;
+			return this->facts;
 		}
 
 		void Term::setExternals(shared_ptr<map<string, bool>> externals)
@@ -101,9 +101,19 @@ namespace alica
 
 		shared_ptr<map<string, bool> > Term::getExternals()
 		{
-			return externals;
+			return this->externals;
 		}
+
+		string Term::getNumberOfModels()
+		{
+			return this->numberOfModels;
+		}
+
+		void Term::setNumberOfModels(string numberOfModels)
+		{
+			this->numberOfModels = numberOfModels;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
-
 

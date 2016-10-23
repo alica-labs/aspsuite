@@ -501,6 +501,13 @@ namespace alica
 			}
 			for (auto term : constraint)
 			{
+				if(term->getNumberOfModels().compare("") != 0)
+				{
+					auto& conf = this->clingo->getConf();
+					auto root = conf.getRootKey();
+					auto key = conf.getSubKey(root, "solve.models");
+					conf.setKeyValue(key, term->getNumberOfModels().c_str());
+				}
 				shared_ptr<AspQuery> query = make_shared<AspQuery>(this, term->getBackGroundFileName(),
 																	term->getLifeTime());
 				auto loaded = this->loadFromConfigIfNotYetLoaded(term->getBackGroundFileName());

@@ -37,8 +37,11 @@ namespace alica
 			vector<string> getFacts();
 			void setExternals(shared_ptr<map<string, bool>> externals);
 			shared_ptr<map<string, bool> > getExternals();
+			string getNumberOfModels();
+			void setNumberOfModels(string numberOfModels);
 
 		private :
+			string numberOfModels;
 			string rule;
 			string head;
 			string body;

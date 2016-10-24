@@ -45,7 +45,7 @@ namespace alica
 			NULL);
 			this->alreadyLoaded.push_back("alicaBackgroundKnowledgeFile");
 			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
-																					alicaBackGroundKnowledgeFile);
+																				alicaBackGroundKnowledgeFile);
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 #endif
@@ -109,7 +109,9 @@ namespace alica
 		{
 			this->reduceLifeTime();
 			this->currentModels.clear();
+#ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
+#endif
 			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			if (result == Gringo::SolveResult::SAT)
 			{
@@ -510,6 +512,7 @@ namespace alica
 				}
 				shared_ptr<AspQuery> query = make_shared<AspQuery>(this, term->getBackGroundFileName(),
 																	term->getLifeTime());
+
 				auto loaded = this->loadFromConfigIfNotYetLoaded(term->getBackGroundFileName());
 				query->createHeadQueryValues(term->getRuleHead());
 #ifdef ASPSolver_DEBUG

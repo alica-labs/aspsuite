@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#define ASPSolver_DEBUG
+//#define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
 //#define SOLVER_OPTIONS
 
@@ -85,7 +85,8 @@ namespace alica
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
 			vector<Gringo::ValVec> currentModels;
 			vector<string> alreadyLoaded;
-
+//			map<string, pair<Gringo::Value, bool>> assignedExternals;
+			map<string, bool> assignedExternals;
 			vector<shared_ptr<AspQuery>> registeredQueries;
 
 			void load(string filename);

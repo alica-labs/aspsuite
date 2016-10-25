@@ -45,7 +45,7 @@ namespace alica
 			NULL);
 			this->alreadyLoaded.push_back("alicaBackgroundKnowledgeFile");
 			alicaBackGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
-																				alicaBackGroundKnowledgeFile);
+																					alicaBackGroundKnowledgeFile);
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: " << alicaBackGroundKnowledgeFile << endl;
 #endif
@@ -503,7 +503,7 @@ namespace alica
 			}
 			for (auto term : constraint)
 			{
-				if(term->getNumberOfModels().compare("") != 0)
+				if (term->getNumberOfModels().compare("") != 0)
 				{
 					auto& conf = this->clingo->getConf();
 					auto root = conf.getRootKey();
@@ -521,7 +521,9 @@ namespace alica
 				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
 				for (auto fact : term->getFacts())
 				{
+#ifdef ASPSolver_DEBUG
 					cout << "ASPSolver: Query contains fact: " << fact << endl;
+#endif
 					query->addRule(term->getBackGroundFileName(), fact, false);
 				}
 				this->registerQuery(query);
@@ -531,16 +533,53 @@ namespace alica
 				}
 				if (term->getExternals() != nullptr)
 				{
-					for (auto pair : *term->getExternals())
+					for (auto p : *term->getExternals())
 					{
-						auto value = this->gringoModule->parseValue(pair.first);
-						if (pair.second)
+//						if (p.second)
+//						{
+//							this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+//															Gringo::TruthValue::True);
+//						}
+//						else
+//						{
+//							this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+//															Gringo::TruthValue::False);
+//						}
+						auto iter = assignedExternals.find(p.first);
+						if (iter == assignedExternals.end())
 						{
-							this->clingo->assignExternal(value, Gringo::TruthValue::True);
+							assignedExternals.emplace(p.first, p.second);
+							if (p.second)
+							{
+								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+																Gringo::TruthValue::True);
+							}
+							else
+							{
+								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+																Gringo::TruthValue::False);
+							}
 						}
 						else
 						{
-							this->clingo->assignExternal(value, Gringo::TruthValue::False);
+							if (p.second && iter->second == false)
+							{
+								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+																Gringo::TruthValue::True);
+								cout << "ASPSolver::changing door to true!" << endl;
+								iter->second = true;
+							}
+							else if (!p.second && iter->second == true)
+							{
+								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+																Gringo::TruthValue::False);
+								iter->second = false;
+								cout << "ASPSolver::changing door to false!" << endl;
+							}
+							else
+							{
+								continue;
+							}
 						}
 					}
 					this->clingo->update();

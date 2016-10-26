@@ -535,45 +535,36 @@ namespace alica
 				{
 					for (auto p : *term->getExternals())
 					{
-//						if (p.second)
-//						{
-//							this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
-//															Gringo::TruthValue::True);
-//						}
-//						else
-//						{
-//							this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
-//															Gringo::TruthValue::False);
-//						}
 						auto iter = assignedExternals.find(p.first);
 						if (iter == assignedExternals.end())
 						{
-							assignedExternals.emplace(p.first, p.second);
+							shared_ptr<Gringo::Value> val = make_shared<Gringo::Value>(this->gringoModule->parseValue(p.first));
+							assignedExternals.emplace(p.first, pair<shared_ptr<Gringo::Value>, bool>(val, p.second));
 							if (p.second)
 							{
-								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+								this->clingo->assignExternal(*val,
 																Gringo::TruthValue::True);
 							}
 							else
 							{
-								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+								this->clingo->assignExternal(*val,
 																Gringo::TruthValue::False);
 							}
 						}
 						else
 						{
-							if (p.second && iter->second == false)
+							if (p.second && iter->second.second == false)
 							{
-								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+								this->clingo->assignExternal(*(iter->second.first),
 																Gringo::TruthValue::True);
+								iter->second.second = true;
 								cout << "ASPSolver::changing door to true!" << endl;
-								iter->second = true;
 							}
-							else if (!p.second && iter->second == true)
+							else if (!p.second && iter->second.second == true)
 							{
-								this->clingo->assignExternal(this->gringoModule->parseValue(p.first),
+								this->clingo->assignExternal(*(iter->second.first),
 																Gringo::TruthValue::False);
-								iter->second = false;
+								iter->second.second = false;
 								cout << "ASPSolver::changing door to false!" << endl;
 							}
 							else
@@ -582,7 +573,6 @@ namespace alica
 							}
 						}
 					}
-					this->clingo->update();
 				}
 			}
 			return dim;

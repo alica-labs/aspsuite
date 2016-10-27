@@ -164,8 +164,8 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"
 			<< queryObject->getLifeTime() << ".";
 
-	EXPECT_TRUE(aspSolver->getRegisteredQueries().size() == 0) << "There shouldn't be any query left but there are "
-			<< aspSolver->getRegisteredQueries().size() << " left.";
+	EXPECT_TRUE(aspSolver->getRegisteredQueriesCount() == 0) << "There shouldn't be any query left but there are "
+			<< aspSolver->getRegisteredQueriesCount() << " left.";
 
 	cout << queryObject->toString() << endl;
 }

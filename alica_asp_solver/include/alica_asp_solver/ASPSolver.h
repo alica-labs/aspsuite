@@ -59,7 +59,8 @@ namespace alica
 			bool isTrueForAllModels(shared_ptr<AspQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool registerQuery(shared_ptr<AspQuery> query);
-			bool unRegisterQuery(shared_ptr<AspQuery> query);
+			bool unregisterQuery(shared_ptr<AspQuery> query);
+			int getRegisteredQueriesCount();
 			int getQueryCounter();
 			void removeDeadQueries();
 
@@ -76,7 +77,7 @@ namespace alica
 			DefaultGringoModule* getGringoModule();
 			static const void* getWildcardPointer();
 			static const string& getWildcardString();
-			vector<shared_ptr<AspQuery> > getRegisteredQueries();
+
 			shared_ptr<ClingoLib> getClingo();
 
 		private:

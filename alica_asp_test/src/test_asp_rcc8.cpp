@@ -118,7 +118,7 @@ TEST_F(ASPRCC8, Department)
 
 	cout << queryObject->toString() << endl;
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
-			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
+			<< "The studentArea should be externallyConnected to mainHallA and disconnected to mainHallB.";
 
 }
 

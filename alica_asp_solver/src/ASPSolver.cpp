@@ -535,11 +535,14 @@ namespace alica
 				{
 					for (auto p : *term->getExternals())
 					{
-						auto iter = assignedExternals.find(p.first);
-						if (iter == assignedExternals.end())
+						auto it = find_if(assignedExternals.begin(), assignedExternals.end(),
+						    [p](shared_ptr<AnnotatedExternal> element){ return element->getAspPredicate() == p.first;});
+//						auto iter = assignedExternals.find(p.first);
+						if (it == assignedExternals.end())
 						{
 							shared_ptr<Gringo::Value> val = make_shared<Gringo::Value>(this->gringoModule->parseValue(p.first));
-							assignedExternals.emplace(p.first, pair<shared_ptr<Gringo::Value>, bool>(val, p.second));
+							assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
+									//p.first, pair<shared_ptr<Gringo::Value>, bool>(val, p.second));
 							if (p.second)
 							{
 								this->clingo->assignExternal(*val,
@@ -553,18 +556,18 @@ namespace alica
 						}
 						else
 						{
-							if (p.second && iter->second.second == false)
+							if (p.second && !(*it)->getValue())
 							{
-								this->clingo->assignExternal(*(iter->second.first),
+								this->clingo->assignExternal(*((*it)->getGringoValue()),
 																Gringo::TruthValue::True);
-								iter->second.second = true;
+								(*it)->setValue(true);
 								cout << "ASPSolver::changing door to true!" << endl;
 							}
-							else if (!p.second && iter->second.second == true)
+							else if (!p.second && (*it)->getValue())
 							{
-								this->clingo->assignExternal(*(iter->second.first),
+								this->clingo->assignExternal(*((*it)->getGringoValue()),
 																Gringo::TruthValue::False);
-								iter->second.second = false;
+								(*it)->setValue(false);
 								cout << "ASPSolver::changing door to false!" << endl;
 							}
 							else

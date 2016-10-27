@@ -41,6 +41,7 @@ add_library(${PROJECT_NAME}
     src/AspQuery.cpp
     src/Variable.cpp
     src/Term.cpp
+    src/AnnotatedExternal.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

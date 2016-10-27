@@ -69,6 +69,7 @@ namespace alica
 			return this->body;
 		}
 
+		// TODO umbenennen in program section?
 		string Term::getBackGroundFileName()
 		{
 			return this->backgroundFile;

@@ -78,26 +78,20 @@ namespace alica
 
 		bool ASPSolver::loadFromConfigIfNotYetLoaded(string filename)
 		{
-			bool alreadyIn = false;
 			for (auto file : this->alreadyLoaded)
 			{
 				if (filename.compare(file) == 0)
 				{
-					alreadyIn = true;
 					return false;
-					break;
 				}
 			}
-			if (!alreadyIn)
-			{
-				string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-				this->alreadyLoaded.push_back(filename.c_str());
-				backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
-																					backGroundKnowledgeFile);
-				this->clingo->load(forward<string>(backGroundKnowledgeFile));
-				return true;
-			}
 
+			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
+			this->alreadyLoaded.push_back(filename.c_str());
+			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
+																				backGroundKnowledgeFile);
+			this->clingo->load(forward<string>(backGroundKnowledgeFile));
+			return true;
 		}
 
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
@@ -230,7 +224,7 @@ namespace alica
 
 							if (this->checkMatchValues(&value.first, &domainPair.first))
 							{
-								//																		cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
 								foundSomething = true;
 								query->saveHeadValuePair(value.first, domainPair.first);
 							}
@@ -246,6 +240,8 @@ namespace alica
 			return foundSomething;
 		}
 
+
+		// Old but keep it for a while
 		vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
 		{
 			vector<Gringo::Value> gringoValues;
@@ -292,7 +288,7 @@ namespace alica
 			return false;
 		}
 
-		bool ASPSolver::unRegisterQuery(shared_ptr<AspQuery> query)
+		bool ASPSolver::unregisterQuery(shared_ptr<AspQuery> query)
 		{
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry != this->registeredQueries.end())
@@ -339,7 +335,7 @@ namespace alica
 			{
 				for (auto queryValue : query->getPredicateModelMap())
 				{
-					if (queryValue.second.size() == 0)
+					if (queryValue.second.size() > 0)
 					{
 						return true;
 					}
@@ -398,10 +394,9 @@ namespace alica
 			return true;
 		}
 
-		void ASPSolver::disableWarnings(bool value)
+		void ASPSolver::disableWarnings(bool disable)
 		{
-			// TODO implement disableWarnings
-			if (value)
+			if (disable)
 			{
 				Gringo::message_printer()->disable(Gringo::Warnings::W_ATOM_UNDEFINED);
 				Gringo::message_printer()->disable(Gringo::Warnings::W_FILE_INCLUDED);
@@ -419,12 +414,6 @@ namespace alica
 				Gringo::message_printer()->enable(Gringo::Warnings::W_TOTAL);
 				Gringo::message_printer()->enable(Gringo::Warnings::W_VARIABLE_UNBOUNDED);
 			}
-//			grOpts_.wNoRedef = value;
-//			grOpts_.wNoCycle = value;
-//			grOpts_.wNoTermUndef = value;
-//			grOpts_.wNoAtomUndef = value;
-//			grOpts_.wNoNonMonotone = value;
-//			grOpts_.wNoFileIncluded = value;
 		}
 
 		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
@@ -510,6 +499,8 @@ namespace alica
 					auto key = conf.getSubKey(root, "solve.models");
 					conf.setKeyValue(key, term->getNumberOfModels().c_str());
 				}
+
+				// TODO probier alles im Konstruktor zu machen
 				shared_ptr<AspQuery> query = make_shared<AspQuery>(this, term->getBackGroundFileName(),
 																	term->getLifeTime());
 
@@ -637,7 +628,7 @@ namespace alica
 			}
 			for (auto query : toRemove)
 			{
-				this->unRegisterQuery(query);
+				this->unregisterQuery(query);
 			}
 		}
 
@@ -656,9 +647,9 @@ namespace alica
 			return WILDCARD_STRING;
 		}
 
-		vector<shared_ptr<AspQuery> > ASPSolver::getRegisteredQueries()
+		int ASPSolver::getRegisteredQueriesCount()
 		{
-			return this->registeredQueries;
+			return this->registeredQueries.size();
 		}
 
 		shared_ptr<ClingoLib> ASPSolver::getClingo()

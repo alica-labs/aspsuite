@@ -15,10 +15,38 @@ namespace alica
 	namespace reasoner
 	{
 
+		AspQuery::AspQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term)
+		{
+			this->queryString = "";
+			this->solver = solver;
+			this->term = term;
+			this->programmSection = term->getProgrammSection();
+			this->lifeTime = term->getLifeTime();
+			this->disjunction = false;
+			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			auto loaded = this->solver->loadFromConfigIfNotYetLoaded(this->term->getProgrammSection());
+			this->createHeadQueryValues(this->term->getRuleHead());
+#ifdef ASPSolver_DEBUG
+			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
+#endif
+			this->addRule(this->term->getProgrammSection(), this->term->getRule(), false);
+			for (auto fact : this->term->getFacts())
+			{
+#ifdef ASPSolver_DEBUG
+				cout << "ASPSolver: Query contains fact: " << fact << endl;
+#endif
+				this->addRule(this->term->getProgrammSection(), fact, false);
+			}
+			if (loaded)
+			{
+				this->solver->getClingo()->ground( { {this->term->getProgrammSection(), {}}}, nullptr);
+			}
+		}
+
 		AspQuery::AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime)
 		{
 			this->queryString = "";
-			this->pragrammSection = pragrammSection;
+			this->programmSection = pragrammSection;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -27,12 +55,13 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->term = nullptr;
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection)
 		{
 			this->queryString = queryString;
-			this->pragrammSection = pragrammSection;
+			this->programmSection = pragrammSection;
 			this->lifeTime = 1;
 			this->solver = solver;
 			this->disjunction = false;
@@ -42,12 +71,13 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->term = nullptr;
 		}
 
 		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime)
 		{
 			this->queryString = queryString;
-			this->pragrammSection = pragrammSection;
+			this->programmSection = pragrammSection;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -57,6 +87,7 @@ namespace alica
 				this->predicateModelMap.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			this->term = nullptr;
 		}
 
 		AspQuery::~AspQuery()
@@ -138,7 +169,6 @@ namespace alica
 
 		void AspQuery::generateRules(string queryString)
 		{
-			//TODO find better way
 			stringstream ss;
 			string tmp = "";
 			string rule = "";
@@ -150,7 +180,7 @@ namespace alica
 				int pos = rule.find(ASPSolver::WILDCARD_STRING);
 				rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
 			}
-			this->solver->getClingo()->add(this->pragrammSection, {}, rule);
+			this->solver->getClingo()->add(this->programmSection, {}, rule);
 			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
 			this->rules.push_back(rule);
 
@@ -259,7 +289,6 @@ namespace alica
 						start += 1;
 					}
 				}
-				//TODO find better way
 				generateRules(queryString);
 			}
 			else if (queryString.find(";") != string::npos)
@@ -371,14 +400,14 @@ namespace alica
 			return ss.str();
 		}
 
-		string AspQuery::getPragrammSection()
+		string AspQuery::getProgrammSection()
 		{
-			return this->pragrammSection;
+			return this->programmSection;
 		}
 
-		void AspQuery::setPragrammSection(string pragrammSection)
+		void AspQuery::setProgrammSection(string programmSection)
 		{
-			this->pragrammSection = pragrammSection;
+			this->programmSection = programmSection;
 		}
 
 		ASPSolver* AspQuery::getSolver()

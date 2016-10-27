@@ -87,10 +87,11 @@ namespace alica
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
 			vector<Gringo::ValVec> currentModels;
 			vector<string> alreadyLoaded;
-//			map<string, pair<shared_ptr<Gringo::Value>, bool>> assignedExternals;
-//			map<string, bool> assignedExternals;
 			vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 			vector<shared_ptr<AspQuery>> registeredQueries;
+			Gringo::ConfigProxy* conf;
+			unsigned int root;
+			unsigned int modelsKey;
 
 			void load(string filename);
 			void loadFromConfig(string filename);

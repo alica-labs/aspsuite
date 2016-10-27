@@ -29,8 +29,8 @@ namespace alica
 			bool setRule(string rule);
 			string getRuleHead();
 			string getRuleBody();
-			string getBackGroundFileName();
-			void setBackgroundFileName(string backgroundFile);
+			string getProgrammSection();
+			void setProgrammSection(string programmSection);
 			int getLifeTime();
 			string getRule();
 			void addFact(string fact);
@@ -45,7 +45,7 @@ namespace alica
 			string rule;
 			string head;
 			string body;
-			string backgroundFile;
+			string programmSection;
 			int lifeTime;
 			vector<string> facts;
 			shared_ptr<map<string, bool>> externals;

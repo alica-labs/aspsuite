@@ -27,10 +27,6 @@ namespace alica
 		{
 			this->gringoModule = new DefaultGringoModule();
 			this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
-			auto& conf = this->clingo->getConf();
-			auto root = conf.getRootKey();
-			auto key = conf.getSubKey(root, "solve.models");
-			conf.setKeyValue(key, "0");
 #ifdef SOLVER_OPTIONS
 			traverseOptions(conf, root, "");
 #endif
@@ -55,6 +51,10 @@ namespace alica
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
+			this->conf = &this->clingo->getConf();
+			this->root = this->conf->getRootKey();
+			this->modelsKey = this->conf->getSubKey(this->root, "solve.models");
+			this->conf->setKeyValue(this->modelsKey, "0");
 		}
 
 		ASPSolver::~ASPSolver()
@@ -240,7 +240,6 @@ namespace alica
 			return foundSomething;
 		}
 
-
 		// Old but keep it for a while
 		vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
 		{
@@ -418,10 +417,8 @@ namespace alica
 
 		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
 		{
-			auto& conf = this->clingo->getConf();
-			auto root = conf.getRootKey();
-			auto key = conf.getSubKey(root, "solve.models");
-			conf.setKeyValue(key, "1");
+
+			this->conf->setKeyValue(this->modelsKey, "1");
 			int dim = prepareSolution(vars, calls);
 			auto satisfied = this->solve();
 			this->removeDeadQueries();
@@ -431,10 +428,8 @@ namespace alica
 		bool ASPSolver::getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls,
 									vector<void*>& results)
 		{
-			auto& conf = this->clingo->getConf();
-			auto root = conf.getRootKey();
-			auto key = conf.getSubKey(root, "solve.models");
-			conf.setKeyValue(key, "0");
+
+			this->conf->setKeyValue(this->modelsKey, "0");
 			int dim = prepareSolution(vars, calls);
 			auto satisfied = this->solve();
 			if (!satisfied)
@@ -469,18 +464,17 @@ namespace alica
 
 		int ASPSolver::prepareSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
 		{
-			vector<shared_ptr<alica::reasoner::Term> > constraint;
-			int dim = vars.size();
-			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable> > >(dim);
 			if (!this->masterPlanLoaded)
 			{
 				this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
 				this->masterPlanLoaded = true;
 			}
+			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable> > >(vars.size());
 			for (int i = 0; i < vars.size(); ++i)
 			{
 				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
 			}
+			vector<shared_ptr<alica::reasoner::Term> > constraint;
 			for (auto& c : calls)
 			{
 				if (!(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()) != 0))
@@ -492,84 +486,41 @@ namespace alica
 			}
 			for (auto term : constraint)
 			{
-				if (term->getNumberOfModels().compare("") != 0)
+				if (term->getNumberOfModels().empty())
 				{
-					auto& conf = this->clingo->getConf();
-					auto root = conf.getRootKey();
-					auto key = conf.getSubKey(root, "solve.models");
-					conf.setKeyValue(key, term->getNumberOfModels().c_str());
+					conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
-
-				// TODO probier alles im Konstruktor zu machen
-				shared_ptr<AspQuery> query = make_shared<AspQuery>(this, term->getBackGroundFileName(),
-																	term->getLifeTime());
-
-				auto loaded = this->loadFromConfigIfNotYetLoaded(term->getBackGroundFileName());
-				query->createHeadQueryValues(term->getRuleHead());
-#ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains rule: " << term->getRule() << endl;
-#endif
-				query->addRule(term->getBackGroundFileName(), term->getRule(), false);
-				for (auto fact : term->getFacts())
-				{
-#ifdef ASPSolver_DEBUG
-					cout << "ASPSolver: Query contains fact: " << fact << endl;
-#endif
-					query->addRule(term->getBackGroundFileName(), fact, false);
-				}
-				this->registerQuery(query);
-				if (loaded)
-				{
-					this->clingo->ground( { {term->getBackGroundFileName(), {}}}, nullptr);
-				}
+				this->registerQuery(make_shared<AspQuery>(this, term));
 				if (term->getExternals() != nullptr)
 				{
 					for (auto p : *term->getExternals())
 					{
 						auto it = find_if(assignedExternals.begin(), assignedExternals.end(),
-						    [p](shared_ptr<AnnotatedExternal> element){ return element->getAspPredicate() == p.first;});
-//						auto iter = assignedExternals.find(p.first);
+											[p](shared_ptr<AnnotatedExternal> element)
+											{	return element->getAspPredicate() == p.first;});
 						if (it == assignedExternals.end())
 						{
-							shared_ptr<Gringo::Value> val = make_shared<Gringo::Value>(this->gringoModule->parseValue(p.first));
+
+							shared_ptr<Gringo::Value> val = make_shared<Gringo::Value>(
+									this->gringoModule->parseValue(p.first));
+							this->clingo->assignExternal(
+									*val, p.second ? Gringo::TruthValue::True : Gringo::TruthValue::False);
 							assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
-									//p.first, pair<shared_ptr<Gringo::Value>, bool>(val, p.second));
-							if (p.second)
-							{
-								this->clingo->assignExternal(*val,
-																Gringo::TruthValue::True);
-							}
-							else
-							{
-								this->clingo->assignExternal(*val,
-																Gringo::TruthValue::False);
-							}
 						}
 						else
 						{
-							if (p.second && !(*it)->getValue())
+							if (p.second != (*it)->getValue())
 							{
-								this->clingo->assignExternal(*((*it)->getGringoValue()),
-																Gringo::TruthValue::True);
-								(*it)->setValue(true);
-								cout << "ASPSolver::changing door to true!" << endl;
-							}
-							else if (!p.second && (*it)->getValue())
-							{
-								this->clingo->assignExternal(*((*it)->getGringoValue()),
-																Gringo::TruthValue::False);
-								(*it)->setValue(false);
-								cout << "ASPSolver::changing door to false!" << endl;
-							}
-							else
-							{
-								continue;
+								this->clingo->assignExternal(
+										*((*it)->getGringoValue()),
+										p.second ? Gringo::TruthValue::True : Gringo::TruthValue::False);
+								(*it)->setValue(p.second);
 							}
 						}
 					}
 				}
 			}
-			return dim;
+			return vars.size();
 		}
 
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)

@@ -10,6 +10,7 @@
 
 #include <string>
 #include <clingo/clingocontrol.hh>
+#include "alica_asp_solver/Term.h"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ namespace alica
 		class AspQuery
 		{
 		public:
+			AspQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term);
 			AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime = 1);
 			AspQuery(ASPSolver* solver, string queryString, string pragrammSection);
 			AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime = 1);
@@ -34,8 +36,8 @@ namespace alica
 			void reduceLifeTime();
 
 			ASPSolver* getSolver();
-			string getPragrammSection();
-			void setPragrammSection(string pragrammSection);
+			string getProgrammSection();
+			void setProgrammSection(string programmSection);
 			string getQueryString();
 			bool setQueryString(string queryString);
 			vector<Gringo::Value> getQueryValues();
@@ -61,8 +63,8 @@ namespace alica
 		private:
 			/**
 			 * queryString is used to ask the solver if specific predicates are true.
-			 * predicates are seperated by "," meaning all of them will be in the same rule and ";"
-			 * meaning that there is arule for every predicate
+			 * predicates are separated by "," meaning all of them will be in the same rule and ";"
+			 * meaning that there is a rule for every predicate
 			 */
 			string queryString;
 			ASPSolver* solver;
@@ -80,9 +82,10 @@ namespace alica
 			// LifeTime == -1 => query is used util unregistered
 			int lifeTime;
 			bool disjunction;
-			string pragrammSection;
+			string programmSection;
 			vector<Gringo::Value> createQueryValues(string queryString);
 			void generateRules(string queryString);
+			shared_ptr<alica::reasoner::Term> term;
 
 		};
 

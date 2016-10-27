@@ -15,13 +15,13 @@ namespace alica
 
 		Term::Term(int lifeTime)
 		{
-			this->backgroundFile = "";
+			this->programmSection = "";
 			this->rule = "";
 			this->head = "";
 			this->body = "";
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
-			this->numberOfModels = "";
+			this->numberOfModels = string::npos;
 		}
 
 		Term::~Term()
@@ -69,15 +69,14 @@ namespace alica
 			return this->body;
 		}
 
-		// TODO umbenennen in program section?
-		string Term::getBackGroundFileName()
+		string Term::getProgrammSection()
 		{
-			return this->backgroundFile;
+			return this->programmSection;
 		}
 
-		void Term::setBackgroundFileName(string backgroundFile)
+		void Term::setProgrammSection(string programmSection)
 		{
-			this->backgroundFile = backgroundFile;
+			this->programmSection = programmSection;
 		}
 
 		int Term::getLifeTime()

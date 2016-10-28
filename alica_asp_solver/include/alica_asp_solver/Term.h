@@ -40,7 +40,7 @@ namespace alica
 			string getNumberOfModels();
 			void setNumberOfModels(string numberOfModels);
 
-		private :
+		private:
 			string numberOfModels;
 			string rule;
 			string head;

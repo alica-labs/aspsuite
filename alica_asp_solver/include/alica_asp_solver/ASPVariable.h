@@ -5,8 +5,8 @@
  *      Author: Stefan Jakob
  */
 
-#ifndef INCLUDE_ALICA_ASP_SOLVER_VARIABLE_H_
-#define INCLUDE_ALICA_ASP_SOLVER_VARIABLE_H_
+#ifndef INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
+#define INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
 
 #include <engine/constraintmodul/SolverVariable.h>
 #include <string>
@@ -18,11 +18,11 @@ namespace alica
 	namespace reasoner
 	{
 
-		class Variable : public alica::reasoner::ASPTerm, public alica::SolverVariable
+		class ASPVariable : public alica::reasoner::ASPTerm, public alica::SolverVariable
 		{
 		public:
-			Variable();
-			virtual ~Variable();
+			ASPVariable();
+			virtual ~ASPVariable();
 
 		private:
 			int ownId;
@@ -32,4 +32,4 @@ namespace alica
 	} /* namespace reasoner */
 } /* namespace alica */
 
-#endif /* INCLUDE_ALICA_ASP_SOLVER_VARIABLE_H_ */
+#endif /* INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_ */

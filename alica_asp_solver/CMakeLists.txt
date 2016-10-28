@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME}
     src/ASPAlicaPlanIntegrator.cpp
     src/ASPGenerator.cpp
     src/ASPQuery.cpp
-    src/Variable.cpp
+    src/ASPVariable.cpp
     src/ASPTerm.cpp
     src/AnnotatedExternal.cpp
 )

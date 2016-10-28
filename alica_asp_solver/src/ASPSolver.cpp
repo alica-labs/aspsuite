@@ -5,10 +5,10 @@
  *      Author: Stephan Opfer
  */
 
+#include <alica_asp_solver/ASPVariable.h>
 #include "alica_asp_solver/ASPSolver.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
-#include "alica_asp_solver/Variable.h"
 #include "alica_asp_solver/ASPTerm.h"
 #include "engine/constraintmodul/ConstraintDescriptor.h"
 #include "engine/AlicaEngine.h"
@@ -469,10 +469,10 @@ namespace alica
 				this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
 				this->masterPlanLoaded = true;
 			}
-			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable> > >(vars.size());
+			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::ASPVariable> > >(vars.size());
 			for (int i = 0; i < vars.size(); ++i)
 			{
-				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
+				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::ASPVariable>(vars.at(i)->getSolverVar());
 			}
 			vector<shared_ptr<alica::reasoner::ASPTerm> > constraint;
 			for (auto& c : calls)
@@ -525,7 +525,7 @@ namespace alica
 
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
-			return make_shared<alica::reasoner::Variable>();
+			return make_shared<alica::reasoner::ASPVariable>();
 		}
 
 		void ASPSolver::integrateRules()

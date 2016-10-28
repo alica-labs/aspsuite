@@ -5,20 +5,20 @@
  *      Author: Stefan Jakob
  */
 
-#include <alica_asp_solver/Variable.h>
+#include <alica_asp_solver/ASPVariable.h>
 
 namespace alica
 {
 	namespace reasoner
 	{
-		int Variable::var_id = 0;
-		Variable::Variable()
+		int ASPVariable::var_id = 0;
+		ASPVariable::ASPVariable()
 		{
 			ownId = var_id++;
 
 		}
 
-		Variable::~Variable()
+		ASPVariable::~ASPVariable()
 		{
 			// TODO Auto-generated destructor stub
 		}

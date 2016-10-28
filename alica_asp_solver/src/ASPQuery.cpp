@@ -25,7 +25,7 @@ namespace alica
 			this->lifeTime = term->getLifeTime();
 			this->disjunction = false;
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			auto loaded = this->solver->loadFromConfigIfNotYetLoaded(this->term->getProgrammSection());
+			auto loaded = this->solver->loadFileFromConfig(this->term->getProgrammSection());
 			this->createHeadQueryValues(this->term->getRuleHead());
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;

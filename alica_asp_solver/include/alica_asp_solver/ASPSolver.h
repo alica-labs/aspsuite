@@ -50,7 +50,8 @@ namespace alica
 
 			bool validatePlan(Plan* plan);
 			void disableWarnings(bool noWarns);
-			bool loadFromConfigIfNotYetLoaded(string filename);
+			bool loadFileFromConfig(string configKey);
+			void loadFile(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			bool onModel(Gringo::Model const &m);
 			bool solve();
@@ -93,8 +94,7 @@ namespace alica
 			unsigned int root;
 			unsigned int modelsKey;
 
-			void load(string filename);
-			void loadFromConfig(string filename);
+
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();

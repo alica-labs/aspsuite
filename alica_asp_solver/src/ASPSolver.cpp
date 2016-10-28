@@ -62,43 +62,40 @@ namespace alica
 			delete this->gringoModule;
 		}
 
-		void ASPSolver::load(string filename)
+		void ASPSolver::loadFile(string absolutFilename)
 		{
-			this->clingo->load(forward<string>(filename));
+			this->clingo->load(forward<string>(absolutFilename));
 		}
 
-		void ASPSolver::loadFromConfig(string filename)
-		{
-
-			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
-																				backGroundKnowledgeFile);
-			this->clingo->load(forward<string>(backGroundKnowledgeFile));
-		}
-
-		bool ASPSolver::loadFromConfigIfNotYetLoaded(string filename)
+		bool ASPSolver::loadFileFromConfig(string configKey)
 		{
 			for (auto file : this->alreadyLoaded)
 			{
-				if (filename.compare(file) == 0)
+				if (configKey.compare(file) == 0)
 				{
 					return false;
 				}
 			}
 
-			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-			this->alreadyLoaded.push_back(filename.c_str());
+			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(configKey.c_str(), NULL);
+			this->alreadyLoaded.push_back(configKey.c_str());
 			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																				backGroundKnowledgeFile);
 			this->clingo->load(forward<string>(backGroundKnowledgeFile));
 			return true;
 		}
 
+		/**
+		 * Let the internal solver ground a given program part (context).
+		 */
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
 			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec), forward<Gringo::Any&&>(context));
 		}
 
+		/**
+		 * Let the internal solver solve one time.
+		 */
 		bool ASPSolver::solve()
 		{
 			this->reduceLifeTime();
@@ -114,6 +111,9 @@ namespace alica
 			return false;
 		}
 
+		/**
+		 * Callback for created models during solving.
+		 */
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
 #ifdef ASPSolver_DEBUG
@@ -135,6 +135,40 @@ namespace alica
 				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				// determine the domain of the query predicate
+				for (auto value : query->getHeadValues())
+				{
+					cout << "ASPSolver::onModel: " << value.first << endl;
+					auto it = clingoModel.out.domains.find(value.first.sig());
+					if (it == clingoModel.out.domains.end())
+					{
+						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+						continue;
+					}
+
+					for (auto& domainPair : it->second.domain)
+					{
+						//cout << "ASPSolver: Inside domain-loop!" << endl;
+
+						if (&(domainPair.second)
+								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+						{
+							//cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+							if (this->checkMatchValues(&value.first, &domainPair.first))
+							{
+								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								foundSomething = true;
+								query->saveHeadValuePair(value.first, domainPair.first);
+							}
+							else
+							{
+								//cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+
+							}
+						}
+					}
+				}
+
 #ifdef ASP_TEST_RELATED
 				for (auto queryValue : query->getQueryValues())
 				{
@@ -203,40 +237,8 @@ namespace alica
 					}
 				}
 #endif
-				for (auto value : query->getHeadValues())
-				{
-					cout << "ASPSolver::onModel: " << value.first << endl;
-					auto it = clingoModel.out.domains.find(value.first.sig());
-					if (it == clingoModel.out.domains.end())
-					{
-						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
-
-					for (auto& domainPair : it->second.domain)
-					{
-						//cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second)
-								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-						{
-							//cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&value.first, &domainPair.first))
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								foundSomething = true;
-								query->saveHeadValuePair(value.first, domainPair.first);
-							}
-							else
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-
-							}
-						}
-					}
-				}
 			}
+
 			return foundSomething;
 		}
 
@@ -479,7 +481,7 @@ namespace alica
 			{
 				if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
 				{
-					cerr << "ASPSolver: Constrainttype not compatible with selected solver" << endl;
+					cerr << "ASPSolver: Type of constraint not compatible with selected solver." << endl;
 					continue;
 				}
 				constraint.push_back(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()));

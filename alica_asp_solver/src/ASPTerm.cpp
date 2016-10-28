@@ -5,7 +5,7 @@
  *      Author: Stefan Jakob
  */
 
-#include <alica_asp_solver/Term.h>
+#include <alica_asp_solver/ASPTerm.h>
 #include <SystemConfig.h>
 
 namespace alica
@@ -13,7 +13,7 @@ namespace alica
 	namespace reasoner
 	{
 
-		Term::Term(int lifeTime)
+		ASPTerm::ASPTerm(int lifeTime)
 		{
 			this->programmSection = "";
 			this->rule = "";
@@ -24,11 +24,11 @@ namespace alica
 			this->numberOfModels = string::npos;
 		}
 
-		Term::~Term()
+		ASPTerm::~ASPTerm()
 		{
 		}
 
-		bool Term::setRule(string rule)
+		bool ASPTerm::setRule(string rule)
 		{
 			if (this->rule.compare("") != 0)
 			{
@@ -47,7 +47,7 @@ namespace alica
 			return true;
 		}
 
-		void Term::addFact(string fact)
+		void ASPTerm::addFact(string fact)
 		{
 			if (fact.find(".") == string::npos)
 			{
@@ -59,57 +59,57 @@ namespace alica
 			}
 		}
 
-		string Term::getRuleHead()
+		string ASPTerm::getRuleHead()
 		{
 			return this->head;
 		}
 
-		string Term::getRuleBody()
+		string ASPTerm::getRuleBody()
 		{
 			return this->body;
 		}
 
-		string Term::getProgrammSection()
+		string ASPTerm::getProgrammSection()
 		{
 			return this->programmSection;
 		}
 
-		void Term::setProgrammSection(string programmSection)
+		void ASPTerm::setProgrammSection(string programmSection)
 		{
 			this->programmSection = programmSection;
 		}
 
-		int Term::getLifeTime()
+		int ASPTerm::getLifeTime()
 		{
 			return this->lifeTime;
 		}
 
-		string Term::getRule()
+		string ASPTerm::getRule()
 		{
 			return this->rule;
 		}
 
-		vector<string> Term::getFacts()
+		vector<string> ASPTerm::getFacts()
 		{
 			return this->facts;
 		}
 
-		void Term::setExternals(shared_ptr<map<string, bool>> externals)
+		void ASPTerm::setExternals(shared_ptr<map<string, bool>> externals)
 		{
 			this->externals = externals;
 		}
 
-		shared_ptr<map<string, bool> > Term::getExternals()
+		shared_ptr<map<string, bool> > ASPTerm::getExternals()
 		{
 			return this->externals;
 		}
 
-		string Term::getNumberOfModels()
+		string ASPTerm::getNumberOfModels()
 		{
 			return this->numberOfModels;
 		}
 
-		void Term::setNumberOfModels(string numberOfModels)
+		void ASPTerm::setNumberOfModels(string numberOfModels)
 		{
 			this->numberOfModels = numberOfModels;
 		}

@@ -16,7 +16,7 @@ namespace alica
 	namespace reasoner
 	{
 
-		ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term)
+		ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term)
 		{
 			this->queryString = "";
 			this->solver = solver;

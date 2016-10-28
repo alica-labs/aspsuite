@@ -9,7 +9,7 @@
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
 #include "alica_asp_solver/Variable.h"
-#include "alica_asp_solver/Term.h"
+#include "alica_asp_solver/ASPTerm.h"
 #include "engine/constraintmodul/ConstraintDescriptor.h"
 #include "engine/AlicaEngine.h"
 #include "engine/PlanBase.h"
@@ -474,15 +474,15 @@ namespace alica
 			{
 				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
 			}
-			vector<shared_ptr<alica::reasoner::Term> > constraint;
+			vector<shared_ptr<alica::reasoner::ASPTerm> > constraint;
 			for (auto& c : calls)
 			{
-				if (!(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()) != 0))
+				if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
 				{
 					cerr << "ASPSolver: Constrainttype not compatible with selected solver" << endl;
 					continue;
 				}
-				constraint.push_back(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()));
+				constraint.push_back(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()));
 			}
 			for (auto term : constraint)
 			{

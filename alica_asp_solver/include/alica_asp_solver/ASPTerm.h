@@ -21,11 +21,11 @@ namespace alica
 	namespace reasoner
 	{
 
-		class Term : public enable_shared_from_this<Term>, public alica::SolverTerm
+		class ASPTerm : public enable_shared_from_this<ASPTerm>, public alica::SolverTerm
 		{
 		public:
-			Term(int lifeTime = 1);
-			virtual ~Term();
+			ASPTerm(int lifeTime = 1);
+			virtual ~ASPTerm();
 			bool setRule(string rule);
 			string getRuleHead();
 			string getRuleBody();

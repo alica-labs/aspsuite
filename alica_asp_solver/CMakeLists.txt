@@ -39,7 +39,7 @@ add_library(${PROJECT_NAME}
     src/ASPGenerator.cpp
     src/ASPQuery.cpp
     src/Variable.cpp
-    src/Term.cpp
+    src/ASPTerm.cpp
     src/AnnotatedExternal.cpp
 )
 

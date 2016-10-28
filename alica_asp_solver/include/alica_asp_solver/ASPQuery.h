@@ -10,7 +10,7 @@
 
 #include <string>
 #include <clingo/clingocontrol.hh>
-#include "alica_asp_solver/Term.h"
+#include "alica_asp_solver/ASPTerm.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ namespace alica
 		class ASPQuery
 		{
 		public:
-			ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term);
+			ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term);
 			ASPQuery(ASPSolver* solver, string programmSection, int lifeTime = 1);
 			ASPQuery(ASPSolver* solver, string queryString, string programmSection);
 			ASPQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime = 1);
@@ -85,7 +85,7 @@ namespace alica
 			string programmSection;
 			vector<Gringo::Value> createQueryValues(string queryString);
 			void generateRules(string queryString);
-			shared_ptr<alica::reasoner::Term> term;
+			shared_ptr<alica::reasoner::ASPTerm> term;
 
 		};
 

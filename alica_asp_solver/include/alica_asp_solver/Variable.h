@@ -11,14 +11,14 @@
 #include <engine/constraintmodul/SolverVariable.h>
 #include <string>
 #include <memory>
-#include "Term.h"
+#include "ASPTerm.h"
 
 namespace alica
 {
 	namespace reasoner
 	{
 
-		class Variable : public alica::reasoner::Term, public alica::SolverVariable
+		class Variable : public alica::reasoner::ASPTerm, public alica::SolverVariable
 		{
 		public:
 			Variable();

@@ -488,24 +488,24 @@ namespace alica
 			{
 				if (term->getNumberOfModels().empty())
 				{
-					conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
+					this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
 				this->registerQuery(make_shared<AspQuery>(this, term));
 				if (term->getExternals() != nullptr)
 				{
 					for (auto p : *term->getExternals())
 					{
-						auto it = find_if(assignedExternals.begin(), assignedExternals.end(),
+						auto it = find_if(this->assignedExternals.begin(), this->assignedExternals.end(),
 											[p](shared_ptr<AnnotatedExternal> element)
-											{	return element->getAspPredicate() == p.first;});
-						if (it == assignedExternals.end())
+											{return element->getAspPredicate() == p.first;});
+						if (it == this->assignedExternals.end())
 						{
 
 							shared_ptr<Gringo::Value> val = make_shared<Gringo::Value>(
 									this->gringoModule->parseValue(p.first));
 							this->clingo->assignExternal(
 									*val, p.second ? Gringo::TruthValue::True : Gringo::TruthValue::False);
-							assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
+							this->assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
 						}
 						else
 						{

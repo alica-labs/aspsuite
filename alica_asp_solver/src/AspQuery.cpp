@@ -8,6 +8,7 @@
 #include <alica_asp_solver/AspQuery.h>
 #include <alica_asp_solver/ASPSolver.h>
 #include <clingo/clingocontrol.hh>
+#include <Logging.h>
 #include <regex>
 
 namespace alica
@@ -43,10 +44,10 @@ namespace alica
 			}
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime)
+		AspQuery::AspQuery(ASPSolver* solver, string programmSection, int lifeTime)
 		{
 			this->queryString = "";
-			this->programmSection = pragrammSection;
+			this->programmSection = programmSection;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -58,10 +59,10 @@ namespace alica
 			this->term = nullptr;
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string programmSection)
 		{
 			this->queryString = queryString;
-			this->programmSection = pragrammSection;
+			this->programmSection = programmSection;
 			this->lifeTime = 1;
 			this->solver = solver;
 			this->disjunction = false;
@@ -74,10 +75,10 @@ namespace alica
 			this->term = nullptr;
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime)
+		AspQuery::AspQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime)
 		{
 			this->queryString = queryString;
-			this->programmSection = pragrammSection;
+			this->programmSection = programmSection;
 			this->lifeTime = lifeTime;
 			this->solver = solver;
 			this->disjunction = false;
@@ -170,22 +171,22 @@ namespace alica
 		void AspQuery::generateRules(string queryString)
 		{
 			stringstream ss;
-			string tmp = "";
-			string rule = "";
 			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
-			tmp = ss.str();
-			rule = tmp + " :- " + queryString + ".";
+			string head = ss.str();
+			ss << " :- " << queryString << ".";
+			string rule = ss.str();
+			// FIXME: This is a problem if somebody already used X in the queryString.
 			if (queryString.find(ASPSolver::WILDCARD_STRING) != string::npos)
 			{
 				int pos = rule.find(ASPSolver::WILDCARD_STRING);
 				rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
 			}
+
 			this->solver->getClingo()->add(this->programmSection, {}, rule);
-			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(tmp), vector<Gringo::Value>());
+			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(head), vector<Gringo::Value>());
 			this->rules.push_back(rule);
 
-			cout << rule << endl;
-
+			LOG(rule);
 		}
 
 		void AspQuery::createHeadQueryValues(string queryString)

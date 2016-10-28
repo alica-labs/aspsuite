@@ -24,9 +24,9 @@ namespace alica
 		{
 		public:
 			AspQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term);
-			AspQuery(ASPSolver* solver, string pragrammSection, int lifeTime = 1);
-			AspQuery(ASPSolver* solver, string queryString, string pragrammSection);
-			AspQuery(ASPSolver* solver, string queryString, string pragrammSection, int lifeTime = 1);
+			AspQuery(ASPSolver* solver, string programmSection, int lifeTime = 1);
+			AspQuery(ASPSolver* solver, string queryString, string programmSection);
+			AspQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime = 1);
 			virtual ~AspQuery();
 
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();

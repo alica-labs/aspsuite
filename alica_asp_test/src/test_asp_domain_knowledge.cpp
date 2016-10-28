@@ -101,7 +101,7 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 
 	string queryString = "inconsistent(harryPotter1)";
 
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject);
 
@@ -137,7 +137,7 @@ TEST_F(ASPDomainKnowledge, overloaded)
 
 	string queryString = "overloaded(leonardo)";
 
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
 																										1);
 	aspSolver->registerQuery(queryObject);
 
@@ -170,7 +170,7 @@ TEST_F(ASPDomainKnowledge, largeObject)
 
 	string queryString = "overloaded(michelangelo)";
 
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
 																										1);
 	aspSolver->registerQuery(queryObject);
 

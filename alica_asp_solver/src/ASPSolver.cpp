@@ -276,7 +276,7 @@ namespace alica
 			return gringoValues;
 		}
 
-		bool ASPSolver::registerQuery(shared_ptr<AspQuery> query)
+		bool ASPSolver::registerQuery(shared_ptr<ASPQuery> query)
 		{
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry == this->registeredQueries.end())
@@ -287,7 +287,7 @@ namespace alica
 			return false;
 		}
 
-		bool ASPSolver::unregisterQuery(shared_ptr<AspQuery> query)
+		bool ASPSolver::unregisterQuery(shared_ptr<ASPQuery> query)
 		{
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry != this->registeredQueries.end())
@@ -328,7 +328,7 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<AspQuery> query)
+		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPQuery> query)
 		{
 			if (query->isDisjunction())
 			{
@@ -361,7 +361,7 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAllModels(shared_ptr<AspQuery> query)
+		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPQuery> query)
 		{
 			if (query->isDisjunction())
 			{
@@ -490,7 +490,7 @@ namespace alica
 				{
 					conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
-				this->registerQuery(make_shared<AspQuery>(this, term));
+				this->registerQuery(make_shared<ASPQuery>(this, term));
 				if (term->getExternals() != nullptr)
 				{
 					for (auto p : *term->getExternals())
@@ -569,7 +569,7 @@ namespace alica
 
 		void ASPSolver::removeDeadQueries()
 		{
-			vector<shared_ptr<AspQuery>> toRemove;
+			vector<shared_ptr<ASPQuery>> toRemove;
 			for (auto query : this->registeredQueries)
 			{
 				if (query->getLifeTime() == 0)

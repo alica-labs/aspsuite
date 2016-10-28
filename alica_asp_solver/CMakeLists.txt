@@ -11,7 +11,6 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 find_package(catkin REQUIRED COMPONENTS
   alica_engine 
-  autodiff
   clingo_cpp
   system_config
   system_util
@@ -21,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES alica_asp_solver
-  CATKIN_DEPENDS alica_engine clingo_cpp system_config fsystem autodiff
+  CATKIN_DEPENDS alica_engine clingo_cpp system_config fsystem
   #DEPENDS lua python
 )
 
@@ -38,7 +37,7 @@ add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
     src/ASPAlicaPlanIntegrator.cpp
     src/ASPGenerator.cpp
-    src/AspQuery.cpp
+    src/ASPQuery.cpp
     src/Variable.cpp
     src/Term.cpp
     src/AnnotatedExternal.cpp

@@ -5,7 +5,7 @@
  *      Author: Stefan Jakob
  */
 
-#include <alica_asp_solver/AspQuery.h>
+#include <alica_asp_solver/ASPQuery.h>
 #include <alica_asp_solver/ASPSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <Logging.h>
@@ -16,7 +16,7 @@ namespace alica
 	namespace reasoner
 	{
 
-		AspQuery::AspQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term)
+		ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term)
 		{
 			this->queryString = "";
 			this->solver = solver;
@@ -44,7 +44,7 @@ namespace alica
 			}
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string programmSection, int lifeTime)
+		ASPQuery::ASPQuery(ASPSolver* solver, string programmSection, int lifeTime)
 		{
 			this->queryString = "";
 			this->programmSection = programmSection;
@@ -59,7 +59,7 @@ namespace alica
 			this->term = nullptr;
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string programmSection)
+		ASPQuery::ASPQuery(ASPSolver* solver, string queryString, string programmSection)
 		{
 			this->queryString = queryString;
 			this->programmSection = programmSection;
@@ -75,7 +75,7 @@ namespace alica
 			this->term = nullptr;
 		}
 
-		AspQuery::AspQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime)
+		ASPQuery::ASPQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime)
 		{
 			this->queryString = queryString;
 			this->programmSection = programmSection;
@@ -91,11 +91,11 @@ namespace alica
 			this->term = nullptr;
 		}
 
-		AspQuery::~AspQuery()
+		ASPQuery::~ASPQuery()
 		{
 		}
 
-		void AspQuery::reduceLifeTime()
+		void ASPQuery::reduceLifeTime()
 		{
 			if (this->lifeTime > 0)
 			{
@@ -103,7 +103,7 @@ namespace alica
 			}
 		}
 
-		void AspQuery::saveStaisfiedPredicate(Gringo::Value key, Gringo::Value value)
+		void ASPQuery::saveStaisfiedPredicate(Gringo::Value key, Gringo::Value value)
 		{
 			auto entry = this->predicateModelMap.find(key);
 			if (entry != this->predicateModelMap.end())
@@ -112,7 +112,7 @@ namespace alica
 			}
 		}
 
-		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > AspQuery::getSattisfiedPredicates()
+		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ASPQuery::getSattisfiedPredicates()
 		{
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ret = make_shared<
 					map<Gringo::Value, vector<Gringo::Value> > >();
@@ -126,7 +126,7 @@ namespace alica
 			return ret;
 		}
 
-		void AspQuery::addRule(string domainName, string rule, bool ground)
+		void ASPQuery::addRule(string domainName, string rule, bool ground)
 		{
 			this->solver->getClingo()->add(domainName, {}, rule);
 			this->rules.push_back(rule);
@@ -136,7 +136,7 @@ namespace alica
 			}
 		}
 
-		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > AspQuery::getSattisfiedRules()
+		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ASPQuery::getSattisfiedRules()
 		{
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ret = make_shared<
 					map<Gringo::Value, vector<Gringo::Value> > >();
@@ -150,7 +150,7 @@ namespace alica
 			return ret;
 		}
 
-		void AspQuery::saveRuleModelPair(Gringo::Value key, Gringo::Value value)
+		void ASPQuery::saveRuleModelPair(Gringo::Value key, Gringo::Value value)
 		{
 			auto entry = this->ruleModelMap.find(key);
 			if (entry != this->ruleModelMap.end())
@@ -159,7 +159,7 @@ namespace alica
 			}
 		}
 
-		void AspQuery::saveHeadValuePair(Gringo::Value key, Gringo::Value value)
+		void ASPQuery::saveHeadValuePair(Gringo::Value key, Gringo::Value value)
 		{
 			auto entry = this->headValues.find(key);
 			if (entry != this->headValues.end())
@@ -168,7 +168,7 @@ namespace alica
 			}
 		}
 
-		void AspQuery::generateRules(string queryString)
+		void ASPQuery::generateRules(string queryString)
 		{
 			stringstream ss;
 			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
@@ -189,7 +189,7 @@ namespace alica
 			LOG(rule);
 		}
 
-		void AspQuery::createHeadQueryValues(string queryString)
+		void ASPQuery::createHeadQueryValues(string queryString)
 		{
 			vector<string> valuesToParse;
 			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
@@ -262,7 +262,7 @@ namespace alica
 			}
 		}
 
-		vector<Gringo::Value> AspQuery::createQueryValues(string queryString)
+		vector<Gringo::Value> ASPQuery::createQueryValues(string queryString)
 		{
 			vector<Gringo::Value> ret;
 			if (queryString.compare("") == 0)
@@ -324,7 +324,7 @@ namespace alica
 			return ret;
 		}
 
-		bool AspQuery::setQueryString(string queryString)
+		bool ASPQuery::setQueryString(string queryString)
 		{
 			if (this->queryString.compare("empty") == 0)
 			{
@@ -339,7 +339,7 @@ namespace alica
 			return false;
 		}
 
-		string AspQuery::toString()
+		string ASPQuery::toString()
 		{
 			stringstream ss;
 			ss << "Query:" << "\n";
@@ -401,67 +401,67 @@ namespace alica
 			return ss.str();
 		}
 
-		string AspQuery::getProgrammSection()
+		string ASPQuery::getProgrammSection()
 		{
 			return this->programmSection;
 		}
 
-		void AspQuery::setProgrammSection(string programmSection)
+		void ASPQuery::setProgrammSection(string programmSection)
 		{
 			this->programmSection = programmSection;
 		}
 
-		ASPSolver* AspQuery::getSolver()
+		ASPSolver* ASPQuery::getSolver()
 		{
 			return this->solver;
 		}
 
-		shared_ptr<vector<Gringo::ValVec>> AspQuery::getCurrentModels()
+		shared_ptr<vector<Gringo::ValVec>> ASPQuery::getCurrentModels()
 		{
 			return this->currentModels;
 		}
 
-		int AspQuery::getLifeTime()
+		int ASPQuery::getLifeTime()
 		{
 			return this->lifeTime;
 		}
 
-		void AspQuery::setLifeTime(int lifeTime)
+		void ASPQuery::setLifeTime(int lifeTime)
 		{
 			this->lifeTime = lifeTime;
 		}
 
-		string AspQuery::getQueryString()
+		string ASPQuery::getQueryString()
 		{
 			return this->queryString;
 		}
 
-		map<Gringo::Value, vector<Gringo::Value>> AspQuery::getPredicateModelMap()
+		map<Gringo::Value, vector<Gringo::Value>> ASPQuery::getPredicateModelMap()
 		{
 			return this->predicateModelMap;
 		}
 
-		bool AspQuery::isDisjunction()
+		bool ASPQuery::isDisjunction()
 		{
 			return this->disjunction;
 		}
 
-		vector<Gringo::Value> AspQuery::getQueryValues()
+		vector<Gringo::Value> ASPQuery::getQueryValues()
 		{
 			return this->queryValues;
 		}
 
-		map<Gringo::Value, vector<Gringo::Value> > AspQuery::getRuleModelMap()
+		map<Gringo::Value, vector<Gringo::Value> > ASPQuery::getRuleModelMap()
 		{
 			return this->ruleModelMap;
 		}
 
-		vector<string> AspQuery::getRules()
+		vector<string> ASPQuery::getRules()
 		{
 			return this->rules;
 		}
 
-		map<Gringo::Value, vector<Gringo::Value>> AspQuery::getHeadValues()
+		map<Gringo::Value, vector<Gringo::Value>> ASPQuery::getHeadValues()
 		{
 			return this->headValues;
 		}

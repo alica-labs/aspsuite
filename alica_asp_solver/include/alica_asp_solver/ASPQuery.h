@@ -20,14 +20,14 @@ namespace alica
 	{
 
 		class ASPSolver;
-		class AspQuery
+		class ASPQuery
 		{
 		public:
-			AspQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term);
-			AspQuery(ASPSolver* solver, string programmSection, int lifeTime = 1);
-			AspQuery(ASPSolver* solver, string queryString, string programmSection);
-			AspQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime = 1);
-			virtual ~AspQuery();
+			ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::Term> term);
+			ASPQuery(ASPSolver* solver, string programmSection, int lifeTime = 1);
+			ASPQuery(ASPSolver* solver, string queryString, string programmSection);
+			ASPQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime = 1);
+			virtual ~ASPQuery();
 
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
 

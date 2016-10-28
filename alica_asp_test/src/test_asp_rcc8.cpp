@@ -1,3 +1,4 @@
+#include <alica_asp_solver/ASPQuery.h>
 #include <gtest/gtest.h>
 
 #include <SystemConfig.h>
@@ -21,7 +22,6 @@
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
-#include <alica_asp_solver/AspQuery.h>
 #include <alica_asp_solver/Term.h>
 
 class ASPRCC8 : public ::testing::Test
@@ -103,7 +103,7 @@ TEST_F(ASPRCC8, Department)
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
 
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,"department_sections",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString,"department_sections",
 																								1);
 	aspSolver->registerQuery(queryObject);
 	aspSolver->ground( { {"department_sections", {}}}, nullptr);
@@ -139,7 +139,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
 
 	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "department_sections",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "department_sections",
 																								1);
 	queryObject->createHeadQueryValues("c(CountOfExCon)");
 	queryObject->addRule("department_sections", "c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.", true);

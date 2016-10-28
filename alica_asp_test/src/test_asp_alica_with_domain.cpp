@@ -104,13 +104,13 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	string queryString3 = "brokenPlanBase(raphael)";
 	string queryString4 = "brokenPlanBase(michelangelo)";
 
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
 																									1);
-	shared_ptr<alica::reasoner::AspQuery> queryObject2 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString2, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject2 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString2, "planBase",
 																									1);
-	shared_ptr<alica::reasoner::AspQuery> queryObject3 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString3, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject3 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString3, "planBase",
 																									1);
-	shared_ptr<alica::reasoner::AspQuery> queryObject4 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString4, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject4 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString4, "planBase",
 																									1);
 	aspSolver->registerQuery(queryObject1);
 	aspSolver->registerQuery(queryObject2);
@@ -154,7 +154,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 
 	string queryString1 = "brokenPlanBase(donatello)";
 
-	shared_ptr<alica::reasoner::AspQuery> queryObject1 = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString1, "planBase",
+	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
 																										1);
 	aspSolver->registerQuery(queryObject1);
 

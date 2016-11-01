@@ -32,26 +32,18 @@ namespace alica
 			void setLifeTime(int lifeTime);
 			void reduceLifeTime();
 
+			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
+			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
+
 			ASPSolver* getSolver();
+			vector<string> getRules();
+
 			string getProgrammSection();
 			void setProgrammSection(string programmSection);
 
-			map<Gringo::Value, vector<Gringo::Value>> getRuleModelMap();
-			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
-			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedRules();
-
-			void saveRuleModelPair(Gringo::Value key, Gringo::Value value);
-
-			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
-
-			vector<string> getRules();
-			void addRule(string pragrammSection, string rule, bool ground);
-
-			void createHeadQueryValues(string queryString);
-
 			string toString();
 
-		private:
+		protected:
 			/**
 			 * queryString is used to ask the solver if specific predicates are true.
 			 * predicates are separated by "," meaning all of them will be in the same rule and ";"
@@ -60,8 +52,6 @@ namespace alica
 			ASPSolver* solver;
 			shared_ptr<vector<Gringo::ValVec>> currentModels;
 			vector<string> rules;
-			// key := rule , value := model which satisfies query
-			map<Gringo::Value, vector<Gringo::Value>> ruleModelMap;
 			// key := headValue , value := values which satisfies it
 			map<Gringo::Value, vector<Gringo::Value>> headValues;
 			// lifeTime == 1 => query is used once
@@ -69,7 +59,7 @@ namespace alica
 			// LifeTime == -1 => query is used until unregistered
 			int lifeTime;
 			string programmSection;
-			void generateRules(string queryString);
+//			void generateRules(string queryString);
 			shared_ptr<alica::reasoner::ASPTerm> term;
 
 		};

@@ -340,13 +340,6 @@ namespace alica
 					return false;
 				}
 			}
-			for (auto queryValue : query->getRuleModelMap())
-			{
-				if (queryValue.second.size() == 0)
-				{
-					return false;
-				}
-			}
 			return true;
 		}
 
@@ -356,13 +349,6 @@ namespace alica
 			for (auto queryValue : query->getFactModelMap())
 			{
 				if (queryValue.second.size() != query->getCurrentModels()->size())
-				{
-					return false;
-				}
-			}
-			for (auto queryValue : query->getRuleModelMap())
-			{
-				if (queryValue.second.size() == 0)
 				{
 					return false;
 				}
@@ -467,7 +453,18 @@ namespace alica
 				{
 					conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
-				this->registerQuery(make_shared<ASPQuery>(this, term));
+				if (term->getType() == ASPQueryType::Variable)
+				{
+					this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+				}
+				else if(term->getType() == ASPQueryType::Facts)
+				{
+					this->registerQuery(make_shared<ASPFactsQuery>(this, term));
+				}
+				else
+				{
+					//TODO
+				}
 				if (term->getExternals() != nullptr)
 				{
 					for (auto p : *term->getExternals())

@@ -10,6 +10,7 @@
 
 #include <alica_asp_solver/ASPQuery.h>
 #include <alica_asp_solver/ASPFactsQuery.h>
+#include <alica_asp_solver/ASPVariableQuery.h>
 #include "ASPAlicaPlanIntegrator.h"
 #include "ASPGenerator.h"
 #include <engine/constraintmodul/IConstraintSolver.h>

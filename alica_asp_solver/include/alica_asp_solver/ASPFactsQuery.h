@@ -31,11 +31,9 @@ namespace alica
 		private:
 			const ASPQueryType type = ASPQueryType::Facts;
 			vector<Gringo::Value> queryValues;
-			ASPSolver* solver;
 			vector<Gringo::Value> createQueryValues(string queryString);
 			// key := query value, value := predicates that satisfy the query value
 			map<Gringo::Value, vector<Gringo::Value>> factModelMap;
-			shared_ptr<vector<Gringo::ValVec>> currentModels;
 		};
 
 	} /* namespace reasoner */

@@ -42,6 +42,7 @@ add_library(${PROJECT_NAME}
     src/ASPTerm.cpp
     src/AnnotatedExternal.cpp
     src/ASPFactsQuery.cpp
+    src/ASPVariableQuery.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

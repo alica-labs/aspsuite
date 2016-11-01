@@ -21,6 +21,9 @@
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
+#include <alica_asp_solver/ASPTerm.h>
+#include <alica_asp_solver/ASPFactsQuery.h>
+#include <alica_asp_solver/ASPFactsQuery.h>
 
 class AspAlicaEngine : public ::testing::Test
 {
@@ -105,7 +108,7 @@ protected:
 //
 //	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1413992564409];
 //	string queryString = aspSolver->gen.brokenState(brokenState, false);
-//	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,
+//	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, queryString,
 //																									1);
 //	aspSolver->registerQuery(queryObject);
 //
@@ -141,8 +144,10 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 
 	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783421980];
 	string queryString = aspSolver->gen.brokenState(brokenState, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+    auto constraint = make_shared<alica::reasoner::ASPTerm>();
+    constraint->addFact(queryString);
+    constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -171,8 +176,10 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 
 	alica::EntryPoint* brokenEntryPoint = (alica::EntryPoint*)(*ae->getPlanParser()->getParsedElements())[1453033347286];
 	string queryString = aspSolver->gen.brokenEntryPoint(brokenEntryPoint, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+    auto constraint = make_shared<alica::reasoner::ASPTerm>();
+    constraint->addFact(queryString);
+    constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
@@ -204,8 +211,10 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 															false);
 
 	//gen"brokenPlanTaskPair(p1453033761283, wildcard)";
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+    auto constraint = make_shared<alica::reasoner::ASPTerm>();
+    constraint->addFact(queryString);
+    constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
@@ -234,26 +243,34 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 
 	alica::State* brokenState1 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783558495];
 	string queryString1 = aspSolver->gen.brokenState(brokenState1, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
-																									1);
+	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
+	constraint1->addFact(queryString1);
+	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::State* brokenState2 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783576711];
 	string queryString2 = aspSolver->gen.brokenState(brokenState2, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject2 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString2, "planBase",
-																									1);
+	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
+	constraint2->addFact(queryString2);
+	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject2 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint2);
 	aspSolver->registerQuery(queryObject2);
 
 	alica::State* brokenState3 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783579086];
 	string queryString3 = aspSolver->gen.brokenState(brokenState3, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject3 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString3, "planBase",
-																									1);
+	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
+	constraint3->addFact(queryString3);
+	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject3 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint3);
 	aspSolver->registerQuery(queryObject3);
 
 	alica::State* brokenState4 = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783583119];
 	string queryString4 = aspSolver->gen.brokenState(brokenState4, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject4 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString4, "planBase",
-																									1);
+	auto constraint4 = make_shared<alica::reasoner::ASPTerm>();
+	constraint4->addFact(queryString4);
+	constraint4->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject4 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint4);
 	aspSolver->registerQuery(queryObject4);
 
 	// start time measurement for grounding
@@ -284,8 +301,10 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.brokenRunningPlan(14695984337881541968ul, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -315,20 +334,26 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 
 	alica::Plan* brokenPlan1 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033636578];
 	string queryString1 = aspSolver->gen.cyclic(brokenPlan1, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
-																									1);
+	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
+	constraint1->addFact(queryString1);
+	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::Plan* brokenPlan2 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033643893];
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan2, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject2 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString2, "planBase",
-																									1);
+	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
+	constraint2->addFact(queryString2);
+	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject2 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint2);
 	aspSolver->registerQuery(queryObject2);
 
 	alica::Plan* brokenPlan3 = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1453033651069];
 	string queryString3 = aspSolver->gen.cyclic(brokenPlan3, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject3 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString3, "planBase",
-																									1);
+	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
+	constraint3->addFact(queryString3);
+	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject3 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint3);
 	aspSolver->registerQuery(queryObject3);
 
 	// start time measurement for grounding
@@ -360,15 +385,19 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 	alica::SyncTransition* brokenSynchronisation1 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString1 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation1, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
-																									1);
+	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
+	constraint1->addFact(queryString1);
+	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint1);
 	aspSolver->registerQuery(queryObject1);
 
 	alica::SyncTransition* brokenSynchronisation2 =
 			(alica::SyncTransition*)(*ae->getPlanParser()->getParsedElements())[1455035803877];
 	string queryString2 = aspSolver->gen.brokenSynchronisation(brokenSynchronisation2, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject2 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString2, "planBase",
-																									1);
+	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
+	constraint2->addFact(queryString2);
+	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject2 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint2);
 	aspSolver->registerQuery(queryObject2);
 
 	// start time measurement for grounding
@@ -400,13 +429,17 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 
 	alica::Plan* brokenPlan = (alica::Plan*)(*ae->getPlanParser()->getParsedElements())[1455093185652];
 	string queryString1 = aspSolver->gen.brokenPlan(brokenPlan, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject1 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString1, "planBase",
-																									1);
+	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
+	constraint1->addFact(queryString1);
+	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint1);
 	aspSolver->registerQuery(queryObject1);
 
 	string queryString2 = aspSolver->gen.cyclic(brokenPlan, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject2 = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString2, "planBase",
-																									1);
+	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
+	constraint2->addFact(queryString2);
+	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject2 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint2);
 	aspSolver->registerQuery(queryObject2);
 
 	// start time measurement for grounding
@@ -438,9 +471,11 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 	alica::PreCondition* nonLocalCondition =
 			(alica::PreCondition*)(*ae->getPlanParser()->getParsedElements())[1456731822708];
 	string queryString = aspSolver->gen.neglocal(nonLocalCondition, false);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
 	cout << queryString << endl;
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -469,8 +504,10 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.cyclic(plan, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -498,8 +535,10 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = aspSolver->gen.cycleFree(plan, false);
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -527,14 +566,20 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string brokenRunningMasterPlan = aspSolver->gen.brokenRunningPlan(1922052048482545739ul, false);
+	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
+	constraint1->addFact(brokenRunningMasterPlan);
+	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
 	string brokenRunningPlan1 = aspSolver->gen.brokenRunningPlan(14695982138858284394ul, false);
+	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
+	constraint2->addFact(brokenRunningPlan1);
+	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
 	string brokenRunningPlan2 = aspSolver->gen.brokenRunningPlan(1893175574616393372ul, false);
-	shared_ptr<alica::reasoner::ASPQuery> brokenRunningMasterPlanObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, brokenRunningMasterPlan, "planBase",
-																									1);
-	shared_ptr<alica::reasoner::ASPQuery> brokenRunningPlan1Object = make_shared<alica::reasoner::ASPQuery>(aspSolver, brokenRunningPlan1, "planBase",
-																									1);
-	shared_ptr<alica::reasoner::ASPQuery> brokenRunningPlan2Object = make_shared<alica::reasoner::ASPQuery>(aspSolver, brokenRunningPlan2, "planBase",
-																									1);
+	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
+	constraint3->addFact(brokenRunningPlan2);
+	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> brokenRunningMasterPlanObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint1);
+	shared_ptr<alica::reasoner::ASPFactsQuery> brokenRunningPlan1Object = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint2);
+	shared_ptr<alica::reasoner::ASPFactsQuery> brokenRunningPlan2Object = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint3);
 	aspSolver->registerQuery(brokenRunningMasterPlanObject);
 	aspSolver->registerQuery(brokenRunningPlan1Object);
 	aspSolver->registerQuery(brokenRunningPlan2Object);

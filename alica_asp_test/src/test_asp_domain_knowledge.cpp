@@ -64,8 +64,7 @@ protected:
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-		aspSolver->loadFromConfigIfNotYetLoaded("assistanceBackgroundKnowledgeFile");
+		aspSolver->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
 	}
 
 	virtual void TearDown()
@@ -94,15 +93,16 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFromConfigIfNotYetLoaded("assistanceTestFactsFile");
+	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = "inconsistent(harryPotter1)";
-
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																									1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -127,18 +127,17 @@ TEST_F(ASPDomainKnowledge, overloaded)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	aspSolver->loadFromConfigIfNotYetLoaded("assistanceTestFactsFile");
+	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	string queryString = "overloaded(leonardo)";
-
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																										1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding
@@ -163,15 +162,16 @@ TEST_F(ASPDomainKnowledge, largeObject)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	aspSolver->loadFromConfigIfNotYetLoaded("assistanceTestFactsFile");
+	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
 	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = "overloaded(michelangelo)";
-
-	shared_ptr<alica::reasoner::ASPQuery> queryObject = make_shared<alica::reasoner::ASPQuery>(aspSolver, queryString, "planBase",
-																										1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	constraint->addFact(queryString);
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding

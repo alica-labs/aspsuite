@@ -12,7 +12,7 @@ namespace alica
 {
 	namespace reasoner
 	{
-		enum ASPQueryType {Facts, Variable};
+		enum ASPQueryType {Facts, Variable, Undefined};
 	} /* namespace reasoner */
 } /* namespace alica */
 

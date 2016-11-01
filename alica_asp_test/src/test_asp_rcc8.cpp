@@ -66,7 +66,7 @@ protected:
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
 		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		aspSolver->loadFileFromConfig("rcc8CompositionTableFile");
+		aspSolver->loadFileFromConfig("department_sections");
 	}
 
 	virtual void TearDown()
@@ -93,18 +93,10 @@ TEST_F(ASPRCC8, Department)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFileFromConfig("rrc8DepartmentSectionFile");
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
-	aspSolver->ground( { {"department_sections", {}}}, nullptr);
-	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
-
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 	constraint->addFact(queryString);
+	constraint->setProgrammSection("department_sections");
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
@@ -131,22 +123,13 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFileFromConfig("rrc8DepartmentSectionFile");
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
-	aspSolver->ground( { {"department_sections", {}}}, nullptr);
-	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
-
-	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
+	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->setRule("c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
-	constraint->addFact(queryString);
+//	constraint->setRule("c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
+	constraint->setRule(queryString);
 	constraint->setProgrammSection("department_sections");
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	shared_ptr<alica::reasoner::ASPVariableQuery> queryObject = make_shared<alica::reasoner::ASPVariableQuery>(aspSolver, constraint);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 	auto satified = aspSolver->solve();
 	if (!satified)
@@ -161,7 +144,7 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 	EXPECT_TRUE(satified)
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
-	EXPECT_TRUE(queryObject->getRules().size() == 3) << "The query should create 3 ruless but contains "
+	EXPECT_TRUE(queryObject->getRules().size() == 3) << "The query should create 3 rules but contains "
 			<< queryObject->getRules().size() << ".";
 
 	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"

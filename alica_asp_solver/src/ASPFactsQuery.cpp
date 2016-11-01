@@ -16,13 +16,26 @@ namespace alica
 		ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term) :
 				ASPQuery(solver, term)
 		{
-			this->solver = solver;
-			this->queryValues = this->createQueryValues(term->getRule());
+			this->queryValues = this->createQueryValues(term->getRuleHead());
 			for (auto value : this->queryValues)
 			{
-				this->factModelMap.emplace(value, vector<Gringo::Value>());
+				this->headValues.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
+			auto loaded = this->solver->loadFileFromConfig(term->getProgrammSection());
+#ifdef ASPSolver_DEBUG
+			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
+#endif
+			for (auto fact : this->term->getFacts())
+			{
+#ifdef ASPSolver_DEBUG
+				cout << "ASPSolver: Query contains fact: " << fact << endl;
+#endif
+			}
+			if (loaded)
+			{
+				this->solver->getClingo()->ground( { {term->getProgrammSection(), {}}}, nullptr);
+			}
 		}
 
 		ASPFactsQuery::~ASPFactsQuery()
@@ -44,7 +57,7 @@ namespace alica
 				while (start != string::npos)
 				{
 					end = queryString.find(")", start);
-					if (end == string::npos)
+					if (end == string::npos || end == queryString.size())
 					{
 						break;
 					}

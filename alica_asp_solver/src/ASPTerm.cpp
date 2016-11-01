@@ -22,6 +22,7 @@ namespace alica
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
 			this->numberOfModels = string::npos;
+			this->type = ASPQueryType::Undefined;
 		}
 
 		ASPTerm::~ASPTerm()
@@ -43,6 +44,10 @@ namespace alica
 				this->body = rule.substr(startOfBody, rule.size() - startOfBody - 1);
 				this->head = supplementary::Configuration::trim(this->head);
 				this->body = supplementary::Configuration::trim(this->body);
+			}
+			else
+			{
+				this->head = supplementary::Configuration::trim(rule);
 			}
 			return true;
 		}

@@ -114,6 +114,17 @@ namespace alica
 			this->numberOfModels = numberOfModels;
 		}
 
+		ASPQueryType ASPTerm::getType()
+		{
+			return this->type;
+		}
+
+		void ASPTerm::setType(ASPQueryType type)
+		{
+			this->type = type;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
+
 

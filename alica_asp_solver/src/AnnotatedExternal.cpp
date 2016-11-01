@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "AnnotatedExternal.h"
+#include "alica_asp_solver/AnnotatedExternal.h"
 
 namespace alica
 {

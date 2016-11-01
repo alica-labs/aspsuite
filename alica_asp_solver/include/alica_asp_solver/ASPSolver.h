@@ -9,6 +9,7 @@
 #define SRC_ASPSOLVER_H_
 
 #include <alica_asp_solver/ASPQuery.h>
+#include <alica_asp_solver/ASPFactsQuery.h>
 #include "ASPAlicaPlanIntegrator.h"
 #include "ASPGenerator.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
@@ -57,8 +58,8 @@ namespace alica
 			bool solve();
 
 
-			bool isTrueForAtLeastOneModel(shared_ptr<ASPQuery> query);
-			bool isTrueForAllModels(shared_ptr<ASPQuery> query);
+			bool isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query);
+			bool isTrueForAllModels(shared_ptr<ASPFactsQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool registerQuery(shared_ptr<ASPQuery> query);
 			bool unregisterQuery(shared_ptr<ASPQuery> query);

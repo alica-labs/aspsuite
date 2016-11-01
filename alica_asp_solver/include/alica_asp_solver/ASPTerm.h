@@ -9,6 +9,7 @@
 #define INCLUDE_ALICA_ASP_SOLVER_TERM_H_
 
 #include <engine/constraintmodul/SolverTerm.h>
+#include "ASPQueryType.h"
 #include <string>
 #include <memory>
 #include <vector>
@@ -39,6 +40,8 @@ namespace alica
 			shared_ptr<map<string, bool> > getExternals();
 			string getNumberOfModels();
 			void setNumberOfModels(string numberOfModels);
+			ASPQueryType getType();
+			void setType(ASPQueryType type);
 
 		private:
 			string numberOfModels;
@@ -49,6 +52,7 @@ namespace alica
 			int lifeTime;
 			vector<string> facts;
 			shared_ptr<map<string, bool>> externals;
+			ASPQueryType type;
 		};
 
 	} /* namespace reasoner */

@@ -330,27 +330,14 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPQuery> query)
+		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query)
 		{
-			if (query->isDisjunction())
+
+			for (auto queryValue : query->getFactModelMap())
 			{
-				for (auto queryValue : query->getPredicateModelMap())
+				if (queryValue.second.size() == 0)
 				{
-					if (queryValue.second.size() > 0)
-					{
-						return true;
-					}
-				}
-				return false;
-			}
-			else
-			{
-				for (auto queryValue : query->getPredicateModelMap())
-				{
-					if (queryValue.second.size() == 0)
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 			for (auto queryValue : query->getRuleModelMap())
@@ -363,26 +350,14 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPQuery> query)
+		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPFactsQuery> query)
 		{
-			if (query->isDisjunction())
+
+			for (auto queryValue : query->getFactModelMap())
 			{
-				for (auto queryValue : query->getPredicateModelMap())
+				if (queryValue.second.size() != query->getCurrentModels()->size())
 				{
-					if (queryValue.second.size() == 0)
-					{
-						return false;
-					}
-				}
-			}
-			else
-			{
-				for (auto queryValue : query->getPredicateModelMap())
-				{
-					if (queryValue.second.size() != query->getCurrentModels()->size())
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 			for (auto queryValue : query->getRuleModelMap())

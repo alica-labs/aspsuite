@@ -24,9 +24,6 @@ namespace alica
 		{
 		public:
 			ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term);
-			ASPQuery(ASPSolver* solver, string programmSection, int lifeTime = 1);
-			ASPQuery(ASPSolver* solver, string queryString, string programmSection);
-			ASPQuery(ASPSolver* solver, string queryString, string programmSection, int lifeTime = 1);
 			virtual ~ASPQuery();
 
 			shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
@@ -38,19 +35,13 @@ namespace alica
 			ASPSolver* getSolver();
 			string getProgrammSection();
 			void setProgrammSection(string programmSection);
-			string getQueryString();
-			bool setQueryString(string queryString);
-			vector<Gringo::Value> getQueryValues();
-			bool isDisjunction();
 
-			map<Gringo::Value, vector<Gringo::Value>> getPredicateModelMap();
 			map<Gringo::Value, vector<Gringo::Value>> getRuleModelMap();
 			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
-			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSattisfiedRules();
-			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSattisfiedPredicates();
+			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedRules();
 
 			void saveRuleModelPair(Gringo::Value key, Gringo::Value value);
-			void saveStaisfiedPredicate(Gringo::Value key, Gringo::Value value);
+
 			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
 
 			vector<string> getRules();
@@ -66,24 +57,18 @@ namespace alica
 			 * predicates are separated by "," meaning all of them will be in the same rule and ";"
 			 * meaning that there is a rule for every predicate
 			 */
-			string queryString;
 			ASPSolver* solver;
 			shared_ptr<vector<Gringo::ValVec>> currentModels;
-			vector<Gringo::Value> queryValues;
 			vector<string> rules;
-			// key := query value, value := predicates that satisfy the query value
-			map<Gringo::Value, vector<Gringo::Value>> predicateModelMap;
 			// key := rule , value := model which satisfies query
 			map<Gringo::Value, vector<Gringo::Value>> ruleModelMap;
 			// key := headValue , value := values which satisfies it
 			map<Gringo::Value, vector<Gringo::Value>> headValues;
 			// lifeTime == 1 => query is used once
 			// lifeTime == x => query is used x times
-			// LifeTime == -1 => query is used util unregistered
+			// LifeTime == -1 => query is used until unregistered
 			int lifeTime;
-			bool disjunction;
 			string programmSection;
-			vector<Gringo::Value> createQueryValues(string queryString);
 			void generateRules(string queryString);
 			shared_ptr<alica::reasoner::ASPTerm> term;
 

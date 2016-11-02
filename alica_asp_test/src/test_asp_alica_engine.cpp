@@ -147,7 +147,6 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
     auto constraint = make_shared<alica::reasoner::ASPTerm>();
     constraint->setRule(queryString);
     constraint->setType(alica::reasoner::ASPQueryType::Facts);
-    constraint->setProgrammSection("planBase");
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 

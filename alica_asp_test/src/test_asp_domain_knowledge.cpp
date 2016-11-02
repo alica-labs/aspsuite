@@ -93,18 +93,17 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
+
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = "inconsistent(harryPotter1)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->addFact(queryString);
+	constraint->setRule(queryString);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	constraint->setProgrammSection("assistanceTestFacts");
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
-
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
@@ -119,6 +118,7 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The book harryPotter1 should be carried by more than one agent.";
+	cout << queryObject->toString() << endl;
 }
 
 TEST_F(ASPDomainKnowledge, overloaded)
@@ -127,19 +127,17 @@ TEST_F(ASPDomainKnowledge, overloaded)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
-	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
+	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = "overloaded(leonardo)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->addFact(queryString);
+	constraint->setRule(queryString);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	constraint->setProgrammSection("assistanceTestFacts");
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
-
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
@@ -154,6 +152,7 @@ TEST_F(ASPDomainKnowledge, overloaded)
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The agent can't carry by more than one thing.";
+	cout << queryObject->toString() << endl;
 }
 
 TEST_F(ASPDomainKnowledge, largeObject)
@@ -162,18 +161,16 @@ TEST_F(ASPDomainKnowledge, largeObject)
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString = "overloaded(michelangelo)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->addFact(queryString);
+	constraint->setRule(queryString);
+	constraint->setProgrammSection("assistanceTestFacts");
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
-
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
@@ -188,4 +185,5 @@ TEST_F(ASPDomainKnowledge, largeObject)
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
 	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The agent can't carry a large thing.";
+	cout << queryObject->toString() << endl;
 }

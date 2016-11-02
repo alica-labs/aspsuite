@@ -21,6 +21,7 @@
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
+#include <alica_asp_solver/ASPQuery.h>
 
 class AspAlicaEngineWithDomain : public ::testing::Test
 {
@@ -94,10 +95,6 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
-
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString1 = "brokenPlanBase(donatello)";
@@ -105,16 +102,20 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	string queryString3 = "brokenPlanBase(raphael)";
 	string queryString4 = "brokenPlanBase(michelangelo)";
 	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
-	constraint1->addFact(queryString1);
+	constraint1->setRule(queryString1);
+	constraint1->setProgrammSection("assistanceTestFacts");
 	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
-	constraint2->addFact(queryString2);
+	constraint2->setRule(queryString2);
+	constraint2->setProgrammSection("assistanceTestFacts");
 	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
-	constraint3->addFact(queryString3);
+	constraint3->setRule(queryString3);
+	constraint3->setProgrammSection("assistanceTestFacts");
 	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint4 = make_shared<alica::reasoner::ASPTerm>();
-	constraint4->addFact(queryString4);
+	constraint4->setRule(queryString4);
+	constraint4->setProgrammSection("assistanceTestFacts");
 	constraint4->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(
 			aspSolver, constraint1);
@@ -129,6 +130,8 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	aspSolver->registerQuery(queryObject3);
 	aspSolver->registerQuery(queryObject4);
 
+	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
 	if (!aspSolver->validatePlan(plan))
@@ -148,6 +151,10 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject3)) << "The planbase of agent raphael should not be broken.";
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject4))
 			<< "The planbase of agent michelangelo should not be broken.";
+	cout << queryObject1->toString() << endl;
+	cout << queryObject2->toString() << endl;
+	cout << queryObject3->toString() << endl;
+	cout << queryObject4->toString() << endl;
 }
 
 TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
@@ -157,16 +164,16 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFileFromConfig("assistanceTestFactsFile");
-
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString1 = "brokenPlanBase(donatello)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->addFact(queryString1);
+	constraint->setRule(queryString1);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	constraint->setProgrammSection("assistanceTestFacts");
+
+	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
+
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver,
 																											constraint);
 	aspSolver->registerQuery(queryObject1);
@@ -187,4 +194,5 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 
 	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1))
 			<< "The plan base of agent donatello should not be broken.";
+	cout << queryObject1->toString() << endl;
 }

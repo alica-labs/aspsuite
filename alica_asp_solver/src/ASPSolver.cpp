@@ -333,22 +333,22 @@ namespace alica
 		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query)
 		{
 
-			for (auto queryValue : query->getFactModelMap())
+			for (auto queryValue : query->getHeadValues())
 			{
-				if (queryValue.second.size() == 0)
+				if (queryValue.second.size() > 0)
 				{
-					return false;
+					return true;
 				}
 			}
-			return true;
+			return false;
 		}
 
 		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPFactsQuery> query)
 		{
 
-			for (auto queryValue : query->getFactModelMap())
+			for (auto queryValue : query->getHeadValues())
 			{
-				if (queryValue.second.size() != query->getCurrentModels()->size())
+				if (queryValue.second.size() == 0)
 				{
 					return false;
 				}

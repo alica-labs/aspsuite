@@ -410,7 +410,7 @@ namespace alica
 			}
 			if (gresults->size() > 0)
 			{
-				for (int i = 0; i < dim; ++i)
+				for (int i = 0; i < gresults->size(); ++i)
 				{
 					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
 					results.push_back(rVal);

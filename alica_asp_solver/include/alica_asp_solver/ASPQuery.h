@@ -37,6 +37,7 @@ namespace alica
 
 			ASPSolver* getSolver();
 			vector<string> getRules();
+			shared_ptr<alica::reasoner::ASPTerm> getTerm();
 
 			string getProgrammSection();
 			void setProgrammSection(string programmSection);

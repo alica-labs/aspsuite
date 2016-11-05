@@ -7,6 +7,7 @@
 
 #include <alica_asp_solver/ASPVariable.h>
 #include "alica_asp_solver/ASPSolver.h"
+#include "alica_asp_solver/AnnotatedValVec.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
 #include "alica_asp_solver/ASPTerm.h"
@@ -405,19 +406,24 @@ namespace alica
 			{
 				for (auto pair : query->getHeadValues())
 				{
-					gresults->push_back(pair.second);
+					results.push_back(new AnnotatedValVec(query->getTerm()->getId(), pair.second, query));
 				}
 			}
 			if (gresults->size() > 0)
 			{
-				for (int i = 0; i < gresults->size(); ++i)
-				{
-					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
-					results.push_back(rVal);
-				}
 				this->removeDeadQueries();
 				return true;
 			}
+//			if (gresults->size() > 0)
+//			{
+//				for (int i = 0; i < gresults->size(); ++i)
+//				{
+//					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
+//					results.push_back(rVal);
+//				}
+//				this->removeDeadQueries();
+//				return true;
+//			}
 			else
 			{
 				this->removeDeadQueries();
@@ -457,7 +463,7 @@ namespace alica
 				{
 					this->registerQuery(make_shared<ASPVariableQuery>(this, term));
 				}
-				else if(term->getType() == ASPQueryType::Facts)
+				else if (term->getType() == ASPQueryType::Facts)
 				{
 					this->registerQuery(make_shared<ASPFactsQuery>(this, term));
 				}

@@ -129,7 +129,16 @@ namespace alica
 			this->type = type;
 		}
 
+		long ASPTerm::getId()
+		{
+			return id;
+		}
+
+		void ASPTerm::setId(long id)
+		{
+			this->id = id;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
-
 

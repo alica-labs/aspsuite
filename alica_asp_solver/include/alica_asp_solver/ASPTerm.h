@@ -42,6 +42,8 @@ namespace alica
 			void setNumberOfModels(string numberOfModels);
 			ASPQueryType getType();
 			void setType(ASPQueryType type);
+			long getId();
+			void setId(long id);
 
 		private:
 			string numberOfModels;
@@ -49,6 +51,7 @@ namespace alica
 			string head;
 			string body;
 			string programmSection;
+			long id;
 			int lifeTime;
 			vector<string> facts;
 			shared_ptr<map<string, bool>> externals;

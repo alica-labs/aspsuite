@@ -154,6 +154,12 @@ namespace alica
 		{
 			return this->headValues;
 		}
+
+		shared_ptr<alica::reasoner::ASPTerm> ASPQuery::getTerm()
+		{
+			return term;
+		}
 	} /* namespace reasoner */
 } /* namespace alica */
+
 

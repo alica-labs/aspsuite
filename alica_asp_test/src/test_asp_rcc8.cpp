@@ -1,3 +1,4 @@
+#include <alica_asp_solver/ASPQuery.h>
 #include <gtest/gtest.h>
 
 #include <SystemConfig.h>
@@ -21,8 +22,7 @@
 
 // ALICA ASP Solver
 #include <alica_asp_solver/ASPSolver.h>
-#include <alica_asp_solver/AspQuery.h>
-#include <alica_asp_solver/Term.h>
+#include <alica_asp_solver/ASPTerm.h>
 
 class ASPRCC8 : public ::testing::Test
 {
@@ -64,9 +64,7 @@ protected:
 		start = std::chrono::high_resolution_clock::now(); // start time measurement
 		// "1" stands for the ASPSolver in this test suite only!
 		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
-		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		aspSolver->loadFromConfigIfNotYetLoaded("rcc8CompositionTableFile");
 	}
 
 	virtual void TearDown()
@@ -86,6 +84,35 @@ protected:
 	}
 };
 
+//TEST_F(ASPRCC8, Department)
+//{
+//	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
+//			<< "Unable to initialise the ALICA Engine!";
+//
+//	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+//
+//	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
+//	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+//	constraint->addFact(queryString);
+//	constraint->setProgrammSection("department_sections");
+//	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+//	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
+//	aspSolver->registerQuery(queryObject);
+//	if (!aspSolver->solve())
+//	{
+//		cout << "ASPAlicaTest: No Model found!" << endl;
+//	}
+//	else
+//	{
+//		aspSolver->printStats();
+//	}
+//
+//	cout << queryObject->toString() << endl;
+//	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+//			<< "The studentArea should be externallyConnected to mainHallA and disconnected to mainHallB.";
+//
+//}
+
 TEST_F(ASPRCC8, Department)
 {
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
@@ -93,58 +120,16 @@ TEST_F(ASPRCC8, Department)
 
 	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
 
-	aspSolver->loadFromConfigIfNotYetLoaded("rrc8DepartmentSectionFile");
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
-	aspSolver->ground( { {"department_sections", {}}}, nullptr);
-	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
-
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString,"department_sections",
-																								1);
+	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+//	constraint->setRule("c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
+	constraint->setRule(queryString);
+	constraint->setProgrammSection("department_sections");
+	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
-	aspSolver->ground( { {"department_sections", {}}}, nullptr);
-	if (!aspSolver->solve())
-	{
-		cout << "ASPAlicaTest: No Model found!" << endl;
-	}
-	else
-	{
-		aspSolver->printStats();
-	}
-
-	cout << queryObject->toString() << endl;
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
-			<< "The studentArea should be externallyConnected to mainHallA and disconnected to mainHallB.";
-
-}
-
-TEST_F(ASPRCC8, DisjunctionInQuery)
-{
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
-			<< "Unable to initialise the ALICA Engine!";
-
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
-
-	aspSolver->loadFromConfigIfNotYetLoaded("rrc8DepartmentSectionFile");
-	// start time measurement
-	std::chrono::_V2::system_clock::time_point startGrounding = std::chrono::high_resolution_clock::now();
-	aspSolver->ground( { {"department_sections", {}}}, nullptr);
-	aspSolver->ground( { {"rcc8_composition_table", {}}}, nullptr);
-	// stop time measurement and report
-	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - startGrounding).count() << " ms" << endl;
-
-	string queryString = "externallyConnected(studentArea, mainHallA); disconnected(studentArea, mainHallB)";
-	shared_ptr<alica::reasoner::AspQuery> queryObject = make_shared<alica::reasoner::AspQuery>(aspSolver, queryString, "department_sections",
-																								1);
-	queryObject->createHeadQueryValues("c(CountOfExCon)");
-	queryObject->addRule("department_sections", "c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.", true);
-	aspSolver->registerQuery(queryObject);
-	if (!aspSolver->solve())
+	auto satified = aspSolver->solve();
+	if (!satified)
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
@@ -153,13 +138,11 @@ TEST_F(ASPRCC8, DisjunctionInQuery)
 		aspSolver->printStats();
 	}
 	aspSolver->removeDeadQueries();
-	EXPECT_TRUE(queryObject->isDisjunction()) << "The query should be a disjunction.";
-
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject))
+	EXPECT_TRUE(satified)
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
-	EXPECT_TRUE(queryObject->getRules().size() == 3) << "The query should create 3 ruless but contains "
-			<< queryObject->getRules().size() << ".";
+	EXPECT_TRUE(queryObject->getHeadValues().size() == 2) << "The query should create 2 headValues but contains "
+			<< queryObject->getHeadValues().size() << ".";
 
 	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"
 			<< queryObject->getLifeTime() << ".";

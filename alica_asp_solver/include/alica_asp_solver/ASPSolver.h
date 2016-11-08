@@ -8,9 +8,11 @@
 #ifndef SRC_ASPSOLVER_H_
 #define SRC_ASPSOLVER_H_
 
+#include <alica_asp_solver/ASPQuery.h>
+#include <alica_asp_solver/ASPFactsQuery.h>
+#include <alica_asp_solver/ASPVariableQuery.h>
 #include "ASPAlicaPlanIntegrator.h"
 #include "ASPGenerator.h"
-#include "AspQuery.h"
 #include <engine/constraintmodul/IConstraintSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <SystemConfig.h>
@@ -50,17 +52,18 @@ namespace alica
 
 			bool validatePlan(Plan* plan);
 			void disableWarnings(bool noWarns);
-			bool loadFromConfigIfNotYetLoaded(string filename);
+			bool loadFileFromConfig(string configKey);
+			void loadFile(string filename);
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			bool onModel(Gringo::Model const &m);
 			bool solve();
 
 
-			bool isTrueForAtLeastOneModel(shared_ptr<AspQuery> query);
-			bool isTrueForAllModels(shared_ptr<AspQuery> query);
+			bool isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query);
+			bool isTrueForAllModels(shared_ptr<ASPFactsQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
-			bool registerQuery(shared_ptr<AspQuery> query);
-			bool unregisterQuery(shared_ptr<AspQuery> query);
+			bool registerQuery(shared_ptr<ASPQuery> query);
+			bool unregisterQuery(shared_ptr<ASPQuery> query);
 			int getRegisteredQueriesCount();
 			int getQueryCounter();
 			void removeDeadQueries();
@@ -88,13 +91,12 @@ namespace alica
 			vector<Gringo::ValVec> currentModels;
 			vector<string> alreadyLoaded;
 			vector<shared_ptr<AnnotatedExternal>> assignedExternals;
-			vector<shared_ptr<AspQuery>> registeredQueries;
+			vector<shared_ptr<ASPQuery>> registeredQueries;
 			Gringo::ConfigProxy* conf;
 			unsigned int root;
 			unsigned int modelsKey;
 
-			void load(string filename);
-			void loadFromConfig(string filename);
+
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();

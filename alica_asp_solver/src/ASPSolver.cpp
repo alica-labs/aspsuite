@@ -5,11 +5,12 @@
  *      Author: Stephan Opfer
  */
 
+#include <alica_asp_solver/ASPVariable.h>
 #include "alica_asp_solver/ASPSolver.h"
+#include "alica_asp_solver/AnnotatedValVec.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
-#include "alica_asp_solver/Variable.h"
-#include "alica_asp_solver/Term.h"
+#include "alica_asp_solver/ASPTerm.h"
 #include "engine/constraintmodul/ConstraintDescriptor.h"
 #include "engine/AlicaEngine.h"
 #include "engine/PlanBase.h"
@@ -62,43 +63,40 @@ namespace alica
 			delete this->gringoModule;
 		}
 
-		void ASPSolver::load(string filename)
+		void ASPSolver::loadFile(string absolutFilename)
 		{
-			this->clingo->load(forward<string>(filename));
+			this->clingo->load(forward<string>(absolutFilename));
 		}
 
-		void ASPSolver::loadFromConfig(string filename)
-		{
-
-			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
-																				backGroundKnowledgeFile);
-			this->clingo->load(forward<string>(backGroundKnowledgeFile));
-		}
-
-		bool ASPSolver::loadFromConfigIfNotYetLoaded(string filename)
+		bool ASPSolver::loadFileFromConfig(string configKey)
 		{
 			for (auto file : this->alreadyLoaded)
 			{
-				if (filename.compare(file) == 0)
+				if (configKey.compare(file) == 0)
 				{
 					return false;
 				}
 			}
 
-			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(filename.c_str(), NULL);
-			this->alreadyLoaded.push_back(filename.c_str());
+			string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(configKey.c_str(), NULL);
+			this->alreadyLoaded.push_back(configKey.c_str());
 			backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																				backGroundKnowledgeFile);
 			this->clingo->load(forward<string>(backGroundKnowledgeFile));
 			return true;
 		}
 
+		/**
+		 * Let the internal solver ground a given program part (context).
+		 */
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
 			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec), forward<Gringo::Any&&>(context));
 		}
 
+		/**
+		 * Let the internal solver solve one time.
+		 */
 		bool ASPSolver::solve()
 		{
 			this->reduceLifeTime();
@@ -114,6 +112,9 @@ namespace alica
 			return false;
 		}
 
+		/**
+		 * Callback for created models during solving.
+		 */
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
 #ifdef ASPSolver_DEBUG
@@ -135,6 +136,40 @@ namespace alica
 				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
 
 				// determine the domain of the query predicate
+				for (auto value : query->getHeadValues())
+				{
+					cout << "ASPSolver::onModel: " << value.first << endl;
+					auto it = clingoModel.out.domains.find(value.first.sig());
+					if (it == clingoModel.out.domains.end())
+					{
+						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
+						continue;
+					}
+
+					for (auto& domainPair : it->second.domain)
+					{
+						//cout << "ASPSolver: Inside domain-loop!" << endl;
+
+						if (&(domainPair.second)
+								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+						{
+							//cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
+
+							if (this->checkMatchValues(&value.first, &domainPair.first))
+							{
+								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
+								foundSomething = true;
+								query->saveHeadValuePair(value.first, domainPair.first);
+							}
+							else
+							{
+								//cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
+
+							}
+						}
+					}
+				}
+
 #ifdef ASP_TEST_RELATED
 				for (auto queryValue : query->getQueryValues())
 				{
@@ -203,40 +238,8 @@ namespace alica
 					}
 				}
 #endif
-				for (auto value : query->getHeadValues())
-				{
-					cout << "ASPSolver::onModel: " << value.first << endl;
-					auto it = clingoModel.out.domains.find(value.first.sig());
-					if (it == clingoModel.out.domains.end())
-					{
-						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
-
-					for (auto& domainPair : it->second.domain)
-					{
-						//cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second)
-								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-						{
-							//cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&value.first, &domainPair.first))
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								foundSomething = true;
-								query->saveHeadValuePair(value.first, domainPair.first);
-							}
-							else
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-
-							}
-						}
-					}
-				}
 			}
+
 			return foundSomething;
 		}
 
@@ -276,7 +279,7 @@ namespace alica
 			return gringoValues;
 		}
 
-		bool ASPSolver::registerQuery(shared_ptr<AspQuery> query)
+		bool ASPSolver::registerQuery(shared_ptr<ASPQuery> query)
 		{
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry == this->registeredQueries.end())
@@ -287,7 +290,7 @@ namespace alica
 			return false;
 		}
 
-		bool ASPSolver::unregisterQuery(shared_ptr<AspQuery> query)
+		bool ASPSolver::unregisterQuery(shared_ptr<ASPQuery> query)
 		{
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry != this->registeredQueries.end())
@@ -328,62 +331,23 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<AspQuery> query)
+		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query)
 		{
-			if (query->isDisjunction())
+
+			for (auto queryValue : query->getHeadValues())
 			{
-				for (auto queryValue : query->getPredicateModelMap())
+				if (queryValue.second.size() > 0)
 				{
-					if (queryValue.second.size() > 0)
-					{
-						return true;
-					}
-				}
-				return false;
-			}
-			else
-			{
-				for (auto queryValue : query->getPredicateModelMap())
-				{
-					if (queryValue.second.size() == 0)
-					{
-						return false;
-					}
+					return true;
 				}
 			}
-			for (auto queryValue : query->getRuleModelMap())
-			{
-				if (queryValue.second.size() == 0)
-				{
-					return false;
-				}
-			}
-			return true;
+			return false;
 		}
 
-		bool ASPSolver::isTrueForAllModels(shared_ptr<AspQuery> query)
+		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPFactsQuery> query)
 		{
-			if (query->isDisjunction())
-			{
-				for (auto queryValue : query->getPredicateModelMap())
-				{
-					if (queryValue.second.size() == 0)
-					{
-						return false;
-					}
-				}
-			}
-			else
-			{
-				for (auto queryValue : query->getPredicateModelMap())
-				{
-					if (queryValue.second.size() != query->getCurrentModels()->size())
-					{
-						return false;
-					}
-				}
-			}
-			for (auto queryValue : query->getRuleModelMap())
+
+			for (auto queryValue : query->getHeadValues())
 			{
 				if (queryValue.second.size() == 0)
 				{
@@ -442,19 +406,24 @@ namespace alica
 			{
 				for (auto pair : query->getHeadValues())
 				{
-					gresults->push_back(pair.second);
+					results.push_back(new AnnotatedValVec(query->getTerm()->getId(), pair.second, query));
 				}
 			}
 			if (gresults->size() > 0)
 			{
-				for (int i = 0; i < dim; ++i)
-				{
-					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
-					results.push_back(rVal);
-				}
 				this->removeDeadQueries();
 				return true;
 			}
+//			if (gresults->size() > 0)
+//			{
+//				for (int i = 0; i < gresults->size(); ++i)
+//				{
+//					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
+//					results.push_back(rVal);
+//				}
+//				this->removeDeadQueries();
+//				return true;
+//			}
 			else
 			{
 				this->removeDeadQueries();
@@ -469,20 +438,20 @@ namespace alica
 				this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
 				this->masterPlanLoaded = true;
 			}
-			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::Variable> > >(vars.size());
+			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::ASPVariable> > >(vars.size());
 			for (int i = 0; i < vars.size(); ++i)
 			{
-				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::Variable>(vars.at(i)->getSolverVar());
+				cVars->at(i) = dynamic_pointer_cast<alica::reasoner::ASPVariable>(vars.at(i)->getSolverVar());
 			}
-			vector<shared_ptr<alica::reasoner::Term> > constraint;
+			vector<shared_ptr<alica::reasoner::ASPTerm> > constraint;
 			for (auto& c : calls)
 			{
-				if (!(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()) != 0))
+				if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
 				{
-					cerr << "ASPSolver: Constrainttype not compatible with selected solver" << endl;
+					cerr << "ASPSolver: Type of constraint not compatible with selected solver." << endl;
 					continue;
 				}
-				constraint.push_back(dynamic_pointer_cast<alica::reasoner::Term>(c->getConstraint()));
+				constraint.push_back(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()));
 			}
 			for (auto term : constraint)
 			{
@@ -490,7 +459,18 @@ namespace alica
 				{
 					this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
-				this->registerQuery(make_shared<AspQuery>(this, term));
+				if (term->getType() == ASPQueryType::Variable)
+				{
+					this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+				}
+				else if (term->getType() == ASPQueryType::Facts)
+				{
+					this->registerQuery(make_shared<ASPFactsQuery>(this, term));
+				}
+				else
+				{
+					//TODO
+				}
 				if (term->getExternals() != nullptr)
 				{
 					for (auto p : *term->getExternals())
@@ -525,7 +505,7 @@ namespace alica
 
 		shared_ptr<SolverVariable> ASPSolver::createVariable(long id)
 		{
-			return make_shared<alica::reasoner::Variable>();
+			return make_shared<alica::reasoner::ASPVariable>();
 		}
 
 		void ASPSolver::integrateRules()
@@ -569,7 +549,7 @@ namespace alica
 
 		void ASPSolver::removeDeadQueries()
 		{
-			vector<shared_ptr<AspQuery>> toRemove;
+			vector<shared_ptr<ASPQuery>> toRemove;
 			for (auto query : this->registeredQueries)
 			{
 				if (query->getLifeTime() == 0)

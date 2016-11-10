@@ -58,7 +58,6 @@ namespace alica
 			bool onModel(Gringo::Model const &m);
 			bool solve();
 
-			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool registerQuery(shared_ptr<ASPQuery> query);
 			bool unregisterQuery(shared_ptr<ASPQuery> query);
 			int getRegisteredQueriesCount();
@@ -85,7 +84,6 @@ namespace alica
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule* gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
-			vector<Gringo::ValVec> currentModels;
 			vector<string> alreadyLoaded;
 			vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 			vector<shared_ptr<ASPQuery>> registeredQueries;
@@ -93,8 +91,6 @@ namespace alica
 			unsigned int root;
 			unsigned int modelsKey;
 
-
-			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();
 			int prepareSolution(std::vector<alica::Variable*>& vars,

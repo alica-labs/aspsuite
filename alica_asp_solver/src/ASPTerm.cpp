@@ -31,23 +31,25 @@ namespace alica
 
 		bool ASPTerm::setRule(string rule)
 		{
+			// not allowed to override an existing rule
 			if (!this->rule.empty())
 			{
 				return false;
 			}
-			this->rule = rule;
-			if (rule.find(":-") != string::npos)
+
+			this->rule = supplementary::Configuration::trim(rule);
+			size_t endOfHead = rule.find(":-");
+			if (endOfHead != string::npos)
 			{
-				size_t endOfHead = rule.find(":-");
+				// for rules (including variables)
 				size_t startOfBody = endOfHead + 2;
-				this->head = rule.substr(0, endOfHead);
-				this->body = rule.substr(startOfBody, rule.size() - startOfBody - 1);
-				this->head = supplementary::Configuration::trim(this->head);
-				this->body = supplementary::Configuration::trim(this->body);
+				this->head = supplementary::Configuration::trim(rule.substr(0, endOfHead));
+				this->body = supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1));
 			}
 			else
 			{
-				this->head = supplementary::Configuration::trim(rule);
+				// for ground literals
+				this->head = this->rule;
 			}
 			return true;
 		}

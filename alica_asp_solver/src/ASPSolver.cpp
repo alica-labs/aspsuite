@@ -100,7 +100,6 @@ namespace alica
 		bool ASPSolver::solve()
 		{
 			this->reduceLifeTime();
-			this->currentModels.clear();
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -128,155 +127,13 @@ namespace alica
 #endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
-			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
 			bool foundSomething = false;
 			for (auto& query : this->registeredQueries)
 			{
-				query->getCurrentModels()->push_back(m.atoms(Gringo::Model::SHOWN));
-				//	cout << "ASPSolver: processing query '" << queryMapPair.first << "'" << endl;
-
-				// determine the domain of the query predicate
-				for (auto value : query->getHeadValues())
-				{
-					cout << "ASPSolver::onModel: " << value.first << endl;
-					auto it = clingoModel.out.domains.find(value.first.sig());
-					if (it == clingoModel.out.domains.end())
-					{
-						//cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
-
-					for (auto& domainPair : it->second.domain)
-					{
-						//cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second)
-								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-						{
-							//cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&value.first, &domainPair.first))
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								foundSomething = true;
-								query->saveHeadValuePair(value.first, domainPair.first);
-							}
-							else
-							{
-								//cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-
-							}
-						}
-					}
-				}
-
-#ifdef ASP_TEST_RELATED
-				for (auto queryValue : query->getQueryValues())
-				{
-					cout << "ASPSolver::onModel: " << queryValue << endl;
-					auto it = clingoModel.out.domains.find(queryValue.sig());
-					if (it == clingoModel.out.domains.end())
-					{
-						//						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
-
-					for (auto& domainPair : it->second.domain)
-					{
-						//							cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second)
-								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-						{
-							//										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&queryValue, &domainPair.first))
-							{
-								//										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								foundSomething = true;
-								query->saveStaisfiedPredicate(queryValue, domainPair.first);
-							}
-							else
-							{
-								//											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-
-							}
-						}
-					}
-				}
-
-				for (auto rule : query->getRuleModelMap())
-				{
-					cout << "ASPSolver::onModel: " << rule.first << endl;
-					auto it = clingoModel.out.domains.find(rule.first.sig());
-					if (it == clingoModel.out.domains.end())
-					{
-						//						cout << "ASPSolver: Didn't find any suitable domain!" << endl;
-						continue;
-					}
-
-					for (auto& domainPair : it->second.domain)
-					{
-						//							cout << "ASPSolver: Inside domain-loop!" << endl;
-
-						if (&(domainPair.second)
-								&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-						{
-							//										cout << "ASPSolver: Found true literal '" << domainPair.first << "'" << endl;
-
-							if (this->checkMatchValues(&rule.first, &domainPair.first))
-							{
-								//										cout << "ASPSolver: Literal '" << domainPair.first << "' matched!" << endl;
-								foundSomething = true;
-								query->saveRuleModelPair(rule.first, domainPair.first);
-							}
-							else
-							{
-								//											cout << "ASPSolver: Literal '" << domainPair.first << "' didn't match!" << endl;
-							}
-						}
-					}
-				}
-#endif
+				query->onModel(clingoModel);
 			}
 
-			return foundSomething;
-		}
-
-		// Old but keep it for a while
-		vector<Gringo::Value> ASPSolver::getAllMatches(Gringo::Value queryValue)
-		{
-			vector<Gringo::Value> gringoValues;
-
-			this->clingo->solve([queryValue, &gringoValues, this](Gringo::Model const &m)
-			{
-				//cout << "Inside Lambda!" << endl;
-					ClingoModel& clingoModel = (ClingoModel&) m;
-					auto it = clingoModel.out.domains.find(queryValue.sig());
-
-					vector<Gringo::AtomState const *> atomStates;
-					if (it != clingoModel.out.domains.end())
-					{
-						//cout << "In Loop" << endl;
-						for (auto& domainPair : it->second.domain)
-						{
-							//cout << domainPair.first << " " << endl;
-							if (&(domainPair.second) && clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-							{
-								if (checkMatchValues(&queryValue, &domainPair.first))
-								{
-									gringoValues.push_back(domainPair.first);
-									atomStates.push_back(&(domainPair.second));
-								}
-							}
-						}
-					}
-
-					return true;
-				},
-					{});
-
-			return gringoValues;
+			return true;
 		}
 
 		bool ASPSolver::registerQuery(shared_ptr<ASPQuery> query)
@@ -299,36 +156,6 @@ namespace alica
 				return true;
 			}
 			return false;
-		}
-
-		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
-		{
-			if (value2->type() != Gringo::Value::Type::FUNC)
-				return false;
-
-			if (value1->name() != value2->name())
-				return false;
-
-			if (value1->args().size() != value2->args().size())
-				return false;
-
-			for (uint i = 0; i < value1->args().size(); ++i)
-			{
-				Gringo::Value arg = value1->args()[i];
-
-				if (arg.type() == Gringo::Value::Type::ID && arg.name() == ASPSolver::WILDCARD_STRING)
-					continue;
-
-				if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
-				{
-					if (false == checkMatchValues(&arg, &value2->args()[i]))
-						return false;
-				}
-				else if (arg != value2->args()[i])
-					return false;
-			}
-
-			return true;
 		}
 
 		void ASPSolver::disableWarnings(bool disable)
@@ -508,7 +335,6 @@ namespace alica
 			}
 			this->integrateRules();
 			this->reduceLifeTime();
-			this->currentModels.clear();
 			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)

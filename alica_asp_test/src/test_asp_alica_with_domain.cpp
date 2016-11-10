@@ -146,10 +146,10 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	cout << "Measured Grounding Time: "
 			<< std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The planbase of agent donatello should be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject2)) << "The planbase of agent leonardo should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject3)) << "The planbase of agent raphael should not be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject4))
+	EXPECT_TRUE(queryObject1->isTrueForAllModels()) << "The planbase of agent donatello should be broken.";
+	EXPECT_FALSE(queryObject2->isTrueForAllModels()) << "The planbase of agent leonardo should not be broken.";
+	EXPECT_FALSE(queryObject3->isTrueForAllModels()) << "The planbase of agent raphael should not be broken.";
+	EXPECT_FALSE(queryObject4->isTrueForAllModels())
 			<< "The planbase of agent michelangelo should not be broken.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
@@ -192,7 +192,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 	cout << "Measured Grounding Time: "
 			<< std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1))
+	EXPECT_FALSE(queryObject1->isTrueForAllModels())
 			<< "The plan base of agent donatello should not be broken.";
 	cout << queryObject1->toString() << endl;
 }

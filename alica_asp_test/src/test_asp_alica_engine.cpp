@@ -163,7 +163,7 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The state '" << brokenState->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The state '" << brokenState->getName() << "' should be broken.";
 	cout << queryObject->toString() << endl;
 }
 
@@ -195,7 +195,7 @@ TEST_F(AspAlicaEngine, localInconsistentCardinalities)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 	cout << queryObject->toString() << endl;
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The EntryPoint '" << brokenEntryPoint->getId()
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The EntryPoint '" << brokenEntryPoint->getId()
 			<< "' should be broken";
 	cout << queryObject->toString() << endl;
 }
@@ -231,7 +231,7 @@ TEST_F(AspAlicaEngine, taskTwiceInPlan)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 	cout << queryObject->toString() << endl;
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "Didn't find a broken Plan-Task pair in '" << plan->getName()
 			<< "'.";
 	cout << queryObject->toString() << endl;
 }
@@ -289,10 +289,10 @@ TEST_F(AspAlicaEngine, unconnectedStateMachine)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The state '" << brokenState1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The state '" << brokenState2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject3)) << "The state '" << brokenState3->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject4)) << "The state '" << brokenState4->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject1->isTrueForAllModels()) << "The state '" << brokenState1->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject2->isTrueForAllModels()) << "The state '" << brokenState2->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject3->isTrueForAllModels()) << "The state '" << brokenState3->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject4->isTrueForAllModels()) << "The state '" << brokenState4->getName() << "' should be broken.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
 	cout << queryObject3->toString() << endl;
@@ -327,7 +327,7 @@ TEST_F(AspAlicaEngine, hierarchicalInconsistentCardinalities)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The running plan 'rp" << to_string(14695984337881541968ul)
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The running plan 'rp" << to_string(14695984337881541968ul)
 			<< "' should be broken.";
 	cout << queryObject->toString() << endl;
 }
@@ -377,9 +377,9 @@ TEST_F(AspAlicaEngine, cycleInPlan)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject3)) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject1->isTrueForAllModels()) << "The plan '" << brokenPlan1->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject2->isTrueForAllModels()) << "The plan '" << brokenPlan2->getName() << "' should be broken.";
+	EXPECT_TRUE(queryObject3->isTrueForAllModels()) << "The plan '" << brokenPlan3->getName() << "' should be broken.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
 	cout << queryObject3->toString() << endl;
@@ -424,9 +424,9 @@ TEST_F(AspAlicaEngine, unconnectedSynchronisations)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject1)) << "The synchronisation '" << brokenSynchronisation1->getName()
+	EXPECT_TRUE(queryObject1->isTrueForAllModels()) << "The synchronisation '" << brokenSynchronisation1->getName()
 			<< "' should be broken.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject2)) << "The synchronisation '" << brokenSynchronisation2->getName()
+	EXPECT_TRUE(queryObject2->isTrueForAllModels()) << "The synchronisation '" << brokenSynchronisation2->getName()
 			<< "' should be broken.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
@@ -468,8 +468,8 @@ TEST_F(AspAlicaEngine, reusePlanWithoutCycle)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject1)) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(queryObject2)) << "The plan '" << brokenPlan->getName()
+	EXPECT_FALSE(queryObject1->isTrueForAllModels()) << "The plan '" << brokenPlan->getName() << "' should NOT be broken.";
+	EXPECT_FALSE(queryObject2->isTrueForAllModels()) << "The plan '" << brokenPlan->getName()
 			<< "' should NOT contain a cycle.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
@@ -506,7 +506,7 @@ TEST_F(AspAlicaEngine, nonLocalInRelation)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The condition '" << nonLocalCondition->getName()
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The condition '" << nonLocalCondition->getName()
 			<< "' should be -local(cond).";
 	cout << queryObject->toString() << endl;
 }
@@ -539,7 +539,7 @@ TEST_F(AspAlicaEngine, indirectReusePlanInPlantype)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The plan '" << plan->getName() << "' should contain a cycle.";
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The plan '" << plan->getName() << "' should contain a cycle.";
 	cout << queryObject->toString() << endl;
 }
 
@@ -571,7 +571,7 @@ TEST_F(AspAlicaEngine, reusePlanFromPlantypeWithoutCycle)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(queryObject)) << "The plan '" << plan->getName() << "' should be free of cycles.";
+	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The plan '" << plan->getName() << "' should be free of cycles.";
 	cout << queryObject->toString() << endl;
 }
 
@@ -615,11 +615,11 @@ TEST_F(AspAlicaEngine, inconsistentCardinalities)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningMasterPlanObject)) << "The query '" << brokenRunningMasterPlan
+	EXPECT_FALSE(brokenRunningMasterPlanObject->isTrueForAllModels()) << "The query '" << brokenRunningMasterPlan
 			<< "' (instance of master plan) should be false.";
-	EXPECT_TRUE(aspSolver->isTrueForAllModels(brokenRunningPlan1Object)) << "The query '" << brokenRunningPlan1
+	EXPECT_TRUE(brokenRunningPlan1Object->isTrueForAllModels()) << "The query '" << brokenRunningPlan1
 			<< "' should be true.";
-	EXPECT_FALSE(aspSolver->isTrueForAllModels(brokenRunningPlan2Object)) << "The query '" << brokenRunningPlan2
+	EXPECT_FALSE(brokenRunningPlan2Object->isTrueForAllModels()) << "The query '" << brokenRunningPlan2
 			<< "' should be false.";
 	cout << brokenRunningMasterPlanObject->toString() << endl;
 	cout << brokenRunningPlan1Object->toString() << endl;

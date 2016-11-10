@@ -114,5 +114,29 @@ namespace alica
 			return ret;
 		}
 
+		bool ASPFactsQuery::isTrueForAtLeastOneModel()
+		{
+			for (auto queryValue : this->headValues)
+			{
+				if (queryValue.second.size() > 0)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		bool ASPFactsQuery::isTrueForAllModels()
+		{
+			for (auto queryValue : this->headValues)
+			{
+				if (queryValue.second.size() == 0)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */

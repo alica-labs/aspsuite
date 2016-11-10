@@ -31,7 +31,7 @@ namespace alica
 
 		bool ASPTerm::setRule(string rule)
 		{
-			if (this->rule.compare("") != 0)
+			if (!this->rule.empty())
 			{
 				return false;
 			}

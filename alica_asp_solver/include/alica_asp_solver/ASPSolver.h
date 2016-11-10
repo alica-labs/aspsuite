@@ -58,9 +58,6 @@ namespace alica
 			bool onModel(Gringo::Model const &m);
 			bool solve();
 
-
-			bool isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query);
-			bool isTrueForAllModels(shared_ptr<ASPFactsQuery> query);
 			std::vector<Gringo::Value> getAllMatches(Gringo::Value queryValue);
 			bool registerQuery(shared_ptr<ASPQuery> query);
 			bool unregisterQuery(shared_ptr<ASPQuery> query);

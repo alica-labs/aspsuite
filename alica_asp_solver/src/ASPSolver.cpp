@@ -331,32 +331,6 @@ namespace alica
 			return true;
 		}
 
-		bool ASPSolver::isTrueForAtLeastOneModel(shared_ptr<ASPFactsQuery> query)
-		{
-
-			for (auto queryValue : query->getHeadValues())
-			{
-				if (queryValue.second.size() > 0)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		bool ASPSolver::isTrueForAllModels(shared_ptr<ASPFactsQuery> query)
-		{
-
-			for (auto queryValue : query->getHeadValues())
-			{
-				if (queryValue.second.size() == 0)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
 		void ASPSolver::disableWarnings(bool disable)
 		{
 			if (disable)

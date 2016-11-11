@@ -10,6 +10,7 @@
 
 #include <alica_asp_solver/ASPQuery.h>
 #include <alica_asp_solver/ASPQueryType.h>
+#include <alica_asp_solver/ASPTruthValue.h>
 #include <clingo/clingocontrol.hh>
 #include "alica_asp_solver/ASPTerm.h"
 
@@ -29,6 +30,8 @@ namespace alica
 			void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
 			bool isTrueForAllModels();
 			bool isTrueForAtLeastOneModel();
+			void removeExternal();
+			vector<pair<Gringo::Value, ASPTruthValue>> getASPTruthValues();
 
 		private:
 			const ASPQueryType type = ASPQueryType::Facts;

@@ -41,6 +41,7 @@ namespace alica
 
 			string getProgrammSection();
 			void setProgrammSection(string programmSection);
+			virtual void removeExternal() = 0;
 
 			string toString();
 

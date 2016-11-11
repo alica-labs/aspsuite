@@ -117,15 +117,14 @@ namespace alica
 		 */
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
-#ifdef ASPSolver_DEBUG
-			this->modelCount++;
-			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
+//#ifdef ASPSolver_DEBUG
+//			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
 				cout << atom << " ";
 			}
 			cout << endl;
-#endif
+//#endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
 			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
@@ -292,6 +291,7 @@ namespace alica
 
 		bool ASPSolver::unregisterQuery(shared_ptr<ASPQuery> query)
 		{
+			query->removeExternal();
 			auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
 			if (entry != this->registeredQueries.end())
 			{
@@ -304,14 +304,17 @@ namespace alica
 		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
 		{
 			if (value2->type() != Gringo::Value::Type::FUNC)
-				return false;
-
+			{
+ 				return false;
+			}
 			if (value1->name() != value2->name())
+			{
 				return false;
-
+			}
 			if (value1->args().size() != value2->args().size())
+			{
 				return false;
-
+			}
 			for (uint i = 0; i < value1->args().size(); ++i)
 			{
 				Gringo::Value arg = value1->args()[i];
@@ -322,10 +325,14 @@ namespace alica
 				if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
 				{
 					if (false == checkMatchValues(&arg, &value2->args()[i]))
+					{
 						return false;
+					}
 				}
 				else if (arg != value2->args()[i])
+				{
 					return false;
+				}
 			}
 
 			return true;
@@ -388,16 +395,6 @@ namespace alica
 				this->removeDeadQueries();
 				return true;
 			}
-//			if (gresults->size() > 0)
-//			{
-//				for (int i = 0; i < gresults->size(); ++i)
-//				{
-//					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
-//					results.push_back(rVal);
-//				}
-//				this->removeDeadQueries();
-//				return true;
-//			}
 			else
 			{
 				this->removeDeadQueries();
@@ -621,6 +618,7 @@ namespace alica
 			this->queryCounter++;
 			return this->queryCounter;
 		}
+
 		const long ASPSolver::getAtomCount()
 		{
 			auto claspFacade = this->clingo->clasp;
@@ -667,6 +665,11 @@ namespace alica
 			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms" << endl;
 
 			cout << ss.str() << flush;
+		}
+
+		vector<Gringo::ValVec> ASPSolver::getCurrentModels()
+		{
+			return currentModels;
 		}
 
 	} /* namespace reasoner */

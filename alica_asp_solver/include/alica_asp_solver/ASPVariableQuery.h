@@ -25,12 +25,22 @@ namespace alica
 			virtual ~ASPVariableQuery();
 
 			vector<string> getRules();
-			void addRule(string pragrammSection, string rule, bool ground);
 
 			void createHeadQueryValues(string queryString);
+			void addRule(string programSection, string rule, bool ground);
+			void addFact(string programSection, string fact, bool ground);
+			ASPQueryType getType();
+			void removeExternal();
 
 		private:
 			const ASPQueryType type = ASPQueryType::Variable;
+			string expandRule(string rule);
+			string expandFact(string fact);
+			shared_ptr<Gringo::Value> external;
+			string queryProgramSection;
+			string externalName;
+			int queryId;
+			void createExternal();
 		};
 
 	} /* namespace reasoner */

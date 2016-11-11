@@ -80,8 +80,10 @@ namespace alica
 			static const string& getWildcardString();
 
 			shared_ptr<ClingoLib> getClingo();
+			vector<Gringo::ValVec> getCurrentModels();
 
 		private:
+			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule* gringoModule;
 			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
@@ -94,7 +96,6 @@ namespace alica
 			unsigned int modelsKey;
 
 
-			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
 			void reduceLifeTime();
 			void integrateRules();
 			int prepareSolution(std::vector<alica::Variable*>& vars,

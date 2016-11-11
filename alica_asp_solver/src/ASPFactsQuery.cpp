@@ -138,5 +138,35 @@ namespace alica
 			return true;
 		}
 
+		void ASPFactsQuery::removeExternal()
+		{
+		}
+
+		vector<pair<Gringo::Value, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
+		{
+			vector<pair<Gringo::Value, ASPTruthValue>> ret;
+			for(auto iter : this->getHeadValues())
+			{
+				if(iter.second.size() == 0)
+				{
+					ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
+				}
+				else
+				{
+					if(iter.second.at(0).sign())
+					{
+						ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::True));
+					}
+					else
+					{
+						ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::False));
+					}
+				}
+
+			}
+			return ret;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
+

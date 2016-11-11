@@ -144,10 +144,10 @@ TEST_F(AspAlicaEngine, singleUnconnectedState)
 
 	alica::State* brokenState = (alica::State*)(*ae->getPlanParser()->getParsedElements())[1452783421980];
 	string queryString = aspSolver->gen.brokenState(brokenState, false);
-    auto constraint = make_shared<alica::reasoner::ASPTerm>();
-    constraint->setRule(queryString);
-    constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
+    auto aspTerm = make_shared<alica::reasoner::ASPTerm>();
+    aspTerm->setRule(queryString);
+    aspTerm->setType(alica::reasoner::ASPQueryType::Facts);
+	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, aspTerm);
 	aspSolver->registerQuery(queryObject);
 
 	// start time measurement for grounding

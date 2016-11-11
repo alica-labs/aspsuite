@@ -32,7 +32,10 @@ namespace alica
 			void setLifeTime(int lifeTime);
 			void reduceLifeTime();
 
-			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
+			void onModel(ClingoModel& clingoModel);
+
+
+
 			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
 
 			ASPSolver* getSolver();
@@ -63,6 +66,11 @@ namespace alica
 			string programmSection;
 //			void generateRules(string queryString);
 			shared_ptr<alica::reasoner::ASPTerm> term;
+
+
+		private:
+			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
+			void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
 
 		};
 

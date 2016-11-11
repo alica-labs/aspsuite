@@ -45,6 +45,71 @@ namespace alica
 			}
 		}
 
+		void ASPQuery::onModel(ClingoModel& clingoModel)
+		{
+			this->getCurrentModels()->push_back(clingoModel.atoms(Gringo::Model::SHOWN));
+			//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
+
+			// determine the domain of the query predicate
+			for (auto value : this->getHeadValues())
+			{
+				cout << "ASPSolver::onModel: " << value.first << endl;
+				auto it = clingoModel.out.domains.find(value.first.sig());
+				if (it == clingoModel.out.domains.end())
+				{
+					//cout << "ASPQuery: Didn't find any suitable domain!" << endl;
+					continue;
+				}
+
+				for (auto& domainPair : it->second.domain)
+				{
+					//cout << "ASPQuery: Inside domain-loop!" << endl;
+
+					if (&(domainPair.second)
+							&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+					{
+						//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
+
+						if (this->checkMatchValues(&value.first, &domainPair.first))
+						{
+							//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
+							this->saveHeadValuePair(value.first, domainPair.first);
+						}
+					}
+				}
+			}
+		}
+
+		bool ASPQuery::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
+		{
+			if (value2->type() != Gringo::Value::Type::FUNC)
+				return false;
+
+			if (value1->name() != value2->name())
+				return false;
+
+			if (value1->args().size() != value2->args().size())
+				return false;
+
+			for (uint i = 0; i < value1->args().size(); ++i)
+			{
+				Gringo::Value arg = value1->args()[i];
+
+				if (arg.type() == Gringo::Value::Type::ID && arg.name() == ASPSolver::WILDCARD_STRING)
+					continue;
+
+				if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
+				{
+					if (false == checkMatchValues(&arg, &value2->args()[i]))
+						return false;
+				}
+				else if (arg != value2->args()[i])
+					return false;
+			}
+
+			return true;
+		}
+
 //		void ASPQuery::generateRules(string queryString)
 //		{
 //			stringstream ss;

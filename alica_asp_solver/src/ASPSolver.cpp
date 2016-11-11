@@ -100,7 +100,6 @@ namespace alica
 		bool ASPSolver::solve()
 		{
 			this->reduceLifeTime();
-			this->currentModels.clear();
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -117,18 +116,16 @@ namespace alica
 		 */
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
-//#ifdef ASPSolver_DEBUG
+#ifdef ASPSolver_DEBUG
 //			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
 				cout << atom << " ";
 			}
 			cout << endl;
-//#endif
+#endif
 
 			ClingoModel& clingoModel = (ClingoModel&)m;
-			this->currentModels.push_back(m.atoms(Gringo::Model::SHOWN));
-			bool foundSomething = false;
 			for (auto& query : this->registeredQueries)
 			{
 				query->onModel(clingoModel);
@@ -158,36 +155,6 @@ namespace alica
 				return true;
 			}
 			return false;
-		}
-
-		bool ASPSolver::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
-		{
-			if (value2->type() != Gringo::Value::Type::FUNC)
-				return false;
-
-			if (value1->name() != value2->name())
-				return false;
-
-			if (value1->args().size() != value2->args().size())
-				return false;
-
-			for (uint i = 0; i < value1->args().size(); ++i)
-			{
-				Gringo::Value arg = value1->args()[i];
-
-				if (arg.type() == Gringo::Value::Type::ID && arg.name() == ASPSolver::WILDCARD_STRING)
-					continue;
-
-				if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
-				{
-					if (false == checkMatchValues(&arg, &value2->args()[i]))
-						return false;
-				}
-				else if (arg != value2->args()[i])
-					return false;
-			}
-
-			return true;
 		}
 
 		void ASPSolver::disableWarnings(bool disable)
@@ -247,16 +214,6 @@ namespace alica
 				this->removeDeadQueries();
 				return true;
 			}
-//			if (gresults->size() > 0)
-//			{
-//				for (int i = 0; i < gresults->size(); ++i)
-//				{
-//					Gringo::ValVec *rVal = new Gringo::ValVec {gresults->at(i)};
-//					results.push_back(rVal);
-//				}
-//				this->removeDeadQueries();
-//				return true;
-//			}
 			else
 			{
 				this->removeDeadQueries();
@@ -367,7 +324,6 @@ namespace alica
 			}
 			this->integrateRules();
 			this->reduceLifeTime();
-			this->currentModels.clear();
 			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
@@ -527,11 +483,6 @@ namespace alica
 			ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms" << endl;
 
 			cout << ss.str() << flush;
-		}
-
-		vector<Gringo::ValVec> ASPSolver::getCurrentModels()
-		{
-			return currentModels;
 		}
 
 	} /* namespace reasoner */

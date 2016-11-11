@@ -16,7 +16,6 @@
 #include <engine/model/Plan.h>
 #include <engine/model/State.h>
 #include <engine/model/PlanType.h>
-#include <engine/constraintmodul/ConstraintQuery.h>
 #include <engine/IPlanParser.h>
 
 // ALICA ASP Solver
@@ -24,6 +23,7 @@
 #include <alica_asp_solver/ASPTerm.h>
 #include <alica_asp_solver/ASPFactsQuery.h>
 #include <alica_asp_solver/ASPFactsQuery.h>
+#include <engine/constraintmodul/Query.h>
 
 class AspAlicaEngine : public ::testing::Test
 {

@@ -13,8 +13,8 @@
 #include <alica_asp_solver/ASPVariableQuery.h>
 #include "ASPAlicaPlanIntegrator.h"
 #include "ASPGenerator.h"
-#include <engine/constraintmodul/IConstraintSolver.h>
 #include <clingo/clingocontrol.hh>
+#include <engine/constraintmodul/ISolver.h>
 #include <SystemConfig.h>
 #include "engine/model/Variable.h"
 #include "AnnotatedExternal.h"
@@ -36,7 +36,7 @@ namespace alica
 	namespace reasoner
 	{
 
-		class ASPSolver : public alica::IConstraintSolver
+		class ASPSolver : public alica::ISolver
 		{
 		public:
 			static const void* const WILDCARD_POINTER;
@@ -45,8 +45,8 @@ namespace alica
 			ASPSolver(AlicaEngine* ae, std::vector<char const*> args);
 			virtual ~ASPSolver();
 
-			bool existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls);
-			bool getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor>>& calls,
+			bool existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls);
+			bool getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls,
 								vector<void*>& results);
 			shared_ptr<SolverVariable> createVariable(long id);
 
@@ -94,8 +94,7 @@ namespace alica
 			void reduceLifeTime();
 			void integrateRules();
 			int prepareSolution(std::vector<alica::Variable*>& vars,
-								std::vector<shared_ptr<ConstraintDescriptor> >& calls);
-			bool masterPlanLoaded;
+								std::vector<shared_ptr<ProblemDescriptor> >& calls);
 			int queryCounter;
 			supplementary::SystemConfig* sc;
 #ifdef ASPSolver_DEBUG

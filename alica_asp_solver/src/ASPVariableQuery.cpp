@@ -2,7 +2,7 @@
  * ASPVariableQuery.cpp
  *
  *  Created on: Nov 1, 2016
- *      Author: stefan
+ *      Author: Stefan Jakob
  */
 
 #include <alica_asp_solver/ASPVariableQuery.h>

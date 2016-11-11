@@ -22,7 +22,7 @@ namespace alica
 				this->headValues.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			if (term->getProgrammSection().compare("") != 0)
+			if (!term->getProgrammSection().empty())
 			{
 				auto loaded = this->solver->loadFileFromConfig(term->getProgrammSection());
 #ifdef ASPSolver_DEBUG

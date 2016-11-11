@@ -6,12 +6,12 @@
  */
 
 #include <alica_asp_solver/ASPVariable.h>
+#include <engine/constraintmodul/ProblemDescriptor.h>
 #include "alica_asp_solver/ASPSolver.h"
 #include "alica_asp_solver/AnnotatedValVec.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
 #include "alica_asp_solver/ASPTerm.h"
-#include "engine/constraintmodul/ConstraintDescriptor.h"
 #include "engine/AlicaEngine.h"
 #include "engine/PlanBase.h"
 
@@ -24,7 +24,7 @@ namespace alica
 		const string ASPSolver::WILDCARD_STRING = "wildcard";
 
 		ASPSolver::ASPSolver(AlicaEngine* ae, vector<char const*> args) :
-				IConstraintSolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
+				ISolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
 		{
 			this->gringoModule = new DefaultGringoModule();
 			this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
@@ -48,7 +48,6 @@ namespace alica
 #endif
 			this->clingo->load(alicaBackGroundKnowledgeFile);
 			this->queryCounter = 0;
-			this->masterPlanLoaded = false;
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -180,7 +179,7 @@ namespace alica
 			}
 		}
 
-		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
+		bool ASPSolver::existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor> >& calls)
 		{
 
 			this->conf->setKeyValue(this->modelsKey, "1");
@@ -190,7 +189,7 @@ namespace alica
 			return satisfied;
 		}
 
-		bool ASPSolver::getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls,
+		bool ASPSolver::getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor> >& calls,
 									vector<void*>& results)
 		{
 
@@ -232,13 +231,10 @@ namespace alica
 			}
 		}
 
-		int ASPSolver::prepareSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ConstraintDescriptor> >& calls)
+		int ASPSolver::prepareSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor> >& calls)
 		{
-			if (!this->masterPlanLoaded)
-			{
-				this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
-				this->masterPlanLoaded = true;
-			}
+			this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
+
 			auto cVars = make_shared<vector<shared_ptr<alica::reasoner::ASPVariable> > >(vars.size());
 			for (int i = 0; i < vars.size(); ++i)
 			{
@@ -328,11 +324,9 @@ namespace alica
 		 */
 		bool ASPSolver::validatePlan(Plan* plan)
 		{
-			if (!this->masterPlanLoaded)
-			{
-				this->planIntegrator->loadPlanTree(plan);
-				this->masterPlanLoaded = true;
-			}
+			// adds all facts about the given plan tree in to clingo
+			this->planIntegrator->loadPlanTree(plan);
+
 			this->integrateRules();
 			this->reduceLifeTime();
 			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
@@ -349,6 +343,7 @@ namespace alica
 
 		void ASPSolver::removeDeadQueries()
 		{
+			// TODO: Optimize
 			vector<shared_ptr<ASPQuery>> toRemove;
 			for (auto query : this->registeredQueries)
 			{
@@ -392,10 +387,7 @@ namespace alica
 		{
 			for (auto query : this->registeredQueries)
 			{
-				if (query->getLifeTime() > 0)
-				{
-					query->reduceLifeTime();
-				}
+				query->reduceLifeTime();
 			}
 		}
 

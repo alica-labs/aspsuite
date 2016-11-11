@@ -2,7 +2,7 @@
  * ASPVariableQuery.h
  *
  *  Created on: Nov 1, 2016
- *      Author: stefan
+ *      Author: Stefan Jakob
  */
 
 #ifndef INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLEQUERY_H_

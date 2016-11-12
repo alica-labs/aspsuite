@@ -100,7 +100,7 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 	constraint->setRule(queryString);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	constraint->setProgrammSection("assistanceTestFacts");
+	constraint->setProgramSection("assistanceTestFacts");
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
@@ -134,7 +134,7 @@ TEST_F(ASPDomainKnowledge, overloaded)
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 	constraint->setRule(queryString);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	constraint->setProgrammSection("assistanceTestFacts");
+	constraint->setProgramSection("assistanceTestFacts");
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
@@ -166,7 +166,7 @@ TEST_F(ASPDomainKnowledge, largeObject)
 	string queryString = "overloaded(michelangelo)";
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 	constraint->setRule(queryString);
-	constraint->setProgrammSection("assistanceTestFacts");
+	constraint->setProgramSection("assistanceTestFacts");
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);

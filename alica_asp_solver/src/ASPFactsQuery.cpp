@@ -23,9 +23,9 @@ namespace alica
 				this->headValues.emplace(value, vector<Gringo::Value>());
 			}
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
-			if (term->getProgrammSection().compare("") != 0)
+			if (term->getProgramSection().compare("") != 0)
 			{
-				auto loaded = this->solver->loadFileFromConfig(term->getProgrammSection());
+				auto loaded = this->solver->loadFileFromConfig(term->getProgramSection());
 #ifdef ASPSolver_DEBUG
 				cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
 #endif
@@ -37,7 +37,7 @@ namespace alica
 				}
 				if (loaded)
 				{
-					this->solver->getClingo()->ground( { {term->getProgrammSection(), {}}}, nullptr);
+					this->solver->getClingo()->ground( { {term->getProgramSection(), {}}}, nullptr);
 				}
 			}
 		}

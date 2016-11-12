@@ -15,7 +15,7 @@ namespace alica
 
 		ASPTerm::ASPTerm(int lifeTime)
 		{
-			this->programmSection = "";
+			this->programSection = "";
 			this->rule = "";
 			this->head = "";
 			this->body = "";
@@ -76,14 +76,14 @@ namespace alica
 			return this->body;
 		}
 
-		string ASPTerm::getProgrammSection()
+		string ASPTerm::getProgramSection()
 		{
-			return this->programmSection;
+			return this->programSection;
 		}
 
-		void ASPTerm::setProgrammSection(string programmSection)
+		void ASPTerm::setProgramSection(string programSection)
 		{
-			this->programmSection = programmSection;
+			this->programSection = programSection;
 		}
 
 		int ASPTerm::getLifeTime()

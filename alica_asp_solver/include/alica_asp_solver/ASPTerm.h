@@ -30,8 +30,8 @@ namespace alica
 			bool setRule(string rule);
 			string getRuleHead();
 			string getRuleBody();
-			string getProgrammSection();
-			void setProgrammSection(string programmSection);
+			string getProgramSection();
+			void setProgramSection(string programSection);
 			int getLifeTime();
 			string getRule();
 			void addFact(string fact);
@@ -50,7 +50,7 @@ namespace alica
 			string rule;
 			string head;
 			string body;
-			string programmSection;
+			string programSection;
 			long id;
 			int lifeTime;
 			vector<string> facts;

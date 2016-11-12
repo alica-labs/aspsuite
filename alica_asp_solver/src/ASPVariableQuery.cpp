@@ -25,7 +25,7 @@ namespace alica
 			this->queryProgramSection = ss.str();
 			cout << "ASPVariableQuery: creating query with number" << this->queryId << " and program section " << this->queryProgramSection << endl;
 			this->createExternal();
-			auto loaded = this->solver->loadFileFromConfig(this->term->getProgrammSection());
+			auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 			this->createHeadQueryValues(this->term->getRuleHead());
 #ifdef ASPSolver_DEBUG
 			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
@@ -40,7 +40,7 @@ namespace alica
 			}
 			if (loaded)
 			{
-				this->solver->getClingo()->ground( { {this->term->getProgrammSection(), {}}}, nullptr);
+				this->solver->getClingo()->ground( { {this->term->getProgramSection(), {}}}, nullptr);
 			}
 			this->solver->getClingo()->ground( { {this->queryProgramSection, {}}}, nullptr);
 			this->solver->getClingo()->assignExternal(*(this->external), Gringo::TruthValue::True);

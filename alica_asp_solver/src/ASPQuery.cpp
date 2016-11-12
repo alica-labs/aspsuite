@@ -20,7 +20,7 @@ namespace alica
 			this->type = ASPQueryType::Undefined;
 			this->solver = solver;
 			this->term = term;
-			this->programmSection = term->getProgrammSection();
+			this->programSection = term->getProgramSection();
 			this->lifeTime = term->getLifeTime();
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 		}
@@ -174,12 +174,12 @@ namespace alica
 
 		string ASPQuery::getProgrammSection()
 		{
-			return this->programmSection;
+			return this->programSection;
 		}
 
-		void ASPQuery::setProgrammSection(string programmSection)
+		void ASPQuery::setProgrammSection(string programSection)
 		{
-			this->programmSection = programmSection;
+			this->programSection = programSection;
 		}
 
 		ASPSolver* ASPQuery::getSolver()

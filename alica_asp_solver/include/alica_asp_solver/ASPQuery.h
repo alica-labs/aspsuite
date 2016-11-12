@@ -63,7 +63,7 @@ namespace alica
 			// lifeTime == x => query is used x times
 			// LifeTime == -1 => query is used until unregistered
 			int lifeTime;
-			string programmSection;
+			string programSection;
 			shared_ptr<alica::reasoner::ASPTerm> term;
 			ASPQueryType type;
 

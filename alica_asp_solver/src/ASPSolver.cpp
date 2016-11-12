@@ -22,6 +22,7 @@ namespace alica
 
 		const void* const ASPSolver::WILDCARD_POINTER = new int(0);
 		const string ASPSolver::WILDCARD_STRING = "wildcard";
+		mutex ASPSolver::queryCounterMutex;
 
 		ASPSolver::ASPSolver(AlicaEngine* ae, vector<char const*> args) :
 				IConstraintSolver(ae), gen(ASPSolver::WILDCARD_POINTER, ASPSolver::WILDCARD_STRING)
@@ -433,6 +434,8 @@ namespace alica
 
 		int ASPSolver::getQueryCounter()
 		{
+			lock_guard<mutex> lock(queryCounterMutex);
+
 			this->queryCounter++;
 			return this->queryCounter;
 		}

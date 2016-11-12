@@ -23,7 +23,9 @@ namespace alica
 			stringstream ss;
 			ss << "queryExternal" << this->queryId;
 			this->queryProgramSection = ss.str();
+//#ifdef ASPSolver_DEBUG
 			cout << "ASPVariableQuery: creating query with number" << this->queryId << " and program section " << this->queryProgramSection << endl;
+//#endif
 			this->createExternal();
 			auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 			this->createHeadQueryValues(this->term->getRuleHead());

@@ -17,11 +17,7 @@ namespace alica
 				ASPQuery(solver, term)
 		{
 			this->type = ASPQueryType::Facts;
-			this->queryValues = this->createQueryValues(term->getRuleHead());
-			for (auto value : this->queryValues)
-			{
-				this->headValues.emplace(value, vector<Gringo::Value>());
-			}
+			this->createQueryValues(term->getRuleHead());
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 			if (term->getProgramSection().compare("") != 0)
 			{
@@ -46,12 +42,12 @@ namespace alica
 		{
 		}
 
-		vector<Gringo::Value> ASPFactsQuery::createQueryValues(string queryString)
+		void ASPFactsQuery::createQueryValues(string queryString)
 		{
 			vector<Gringo::Value> ret;
 			if (queryString.compare("") == 0)
 			{
-				return ret;
+				return;
 			}
 			if (queryString.find(",") != string::npos)
 			{
@@ -67,7 +63,7 @@ namespace alica
 					}
 					currentQuery = queryString.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					ret.push_back(this->solver->getGringoModule()->parseValue(currentQuery));
+					this->headValues.emplace(this->solver->getGringoModule()->parseValue(currentQuery), vector<Gringo::Value>());
 					start = queryString.find(",", end);
 					if (start != string::npos)
 					{
@@ -77,9 +73,8 @@ namespace alica
 			}
 			else
 			{
-				ret.push_back(this->solver->getGringoModule()->parseValue(queryString));
+				this->headValues.emplace(this->solver->getGringoModule()->parseValue(queryString), vector<Gringo::Value>());
 			}
-			return ret;
 		}
 
 		map<Gringo::Value, vector<Gringo::Value> > ASPFactsQuery::getFactModelMap()

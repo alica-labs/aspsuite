@@ -19,9 +19,10 @@ namespace alica
 			this->rule = "";
 			this->head = "";
 			this->body = "";
+			this->id = -1;
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
-			this->numberOfModels = string::npos;
+			this->numberOfModels = "";
 			this->type = ASPQueryType::Undefined;
 		}
 

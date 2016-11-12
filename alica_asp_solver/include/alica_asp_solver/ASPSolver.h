@@ -18,6 +18,7 @@
 #include <SystemConfig.h>
 #include "engine/model/Variable.h"
 #include "AnnotatedExternal.h"
+#include <mutex>
 
 #include <memory>
 #include <vector>
@@ -79,7 +80,6 @@ namespace alica
 			static const string& getWildcardString();
 
 			shared_ptr<ClingoLib> getClingo();
-			vector<Gringo::ValVec> getCurrentModels();
 
 		private:
 			shared_ptr<ClingoLib> clingo;
@@ -100,6 +100,9 @@ namespace alica
 			bool masterPlanLoaded;
 			int queryCounter;
 			supplementary::SystemConfig* sc;
+
+		protected:
+			static mutex queryCounterMutex;
 #ifdef ASPSolver_DEBUG
 			int modelCount;
 #endif

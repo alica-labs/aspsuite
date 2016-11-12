@@ -117,7 +117,7 @@ TEST_F(ASPDomainKnowledge, multipleObjectCarry)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The book harryPotter1 should be carried by more than one agent.";
+	EXPECT_TRUE(queryObject->factsExistForAllModels()) << "The book harryPotter1 should be carried by more than one agent.";
 	cout << queryObject->toString() << endl;
 }
 
@@ -151,7 +151,7 @@ TEST_F(ASPDomainKnowledge, overloaded)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The agent can't carry by more than one thing.";
+	EXPECT_TRUE(queryObject->factsExistForAllModels()) << "The agent can't carry by more than one thing.";
 	cout << queryObject->toString() << endl;
 }
 
@@ -184,6 +184,6 @@ TEST_F(ASPDomainKnowledge, largeObject)
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(queryObject->isTrueForAllModels()) << "The agent can't carry a large thing.";
+	EXPECT_TRUE(queryObject->factsExistForAllModels()) << "The agent can't carry a large thing.";
 	cout << queryObject->toString() << endl;
 }

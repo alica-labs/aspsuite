@@ -18,6 +18,7 @@ namespace alica
 		ASPVariableQuery::ASPVariableQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term) :
 				ASPQuery(solver, term)
 		{
+			this->type = ASPQueryType::Variable;
 			this->queryId = this->solver->getQueryCounter();
 			stringstream ss;
 			ss << "queryExternal" << this->queryId;

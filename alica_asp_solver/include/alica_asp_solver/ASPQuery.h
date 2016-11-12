@@ -11,6 +11,7 @@
 #include <string>
 #include <clingo/clingocontrol.hh>
 #include "alica_asp_solver/ASPTerm.h"
+#include <alica_asp_solver/ASPQueryType.h>
 
 using namespace std;
 
@@ -34,8 +35,6 @@ namespace alica
 
 			void onModel(ClingoModel& clingoModel);
 
-
-
 			map<Gringo::Value,vector<Gringo::Value>> getHeadValues();
 
 			ASPSolver* getSolver();
@@ -47,6 +46,7 @@ namespace alica
 			virtual void removeExternal() = 0;
 
 			string toString();
+			ASPQueryType getType();
 
 		protected:
 			/**
@@ -64,8 +64,8 @@ namespace alica
 			// LifeTime == -1 => query is used until unregistered
 			int lifeTime;
 			string programmSection;
-//			void generateRules(string queryString);
 			shared_ptr<alica::reasoner::ASPTerm> term;
+			ASPQueryType type;
 
 
 		private:

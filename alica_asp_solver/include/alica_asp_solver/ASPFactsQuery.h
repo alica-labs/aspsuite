@@ -28,13 +28,12 @@ namespace alica
 			void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedFacts();
 			void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
-			bool isTrueForAllModels();
-			bool isTrueForAtLeastOneModel();
+			bool factsExistForAllModels();
+			bool factsExistForAtLeastOneModel();
 			void removeExternal();
 			vector<pair<Gringo::Value, ASPTruthValue>> getASPTruthValues();
 
 		private:
-			const ASPQueryType type = ASPQueryType::Facts;
 			vector<Gringo::Value> queryValues;
 			vector<Gringo::Value> createQueryValues(string queryString);
 			// key := query value, value := predicates that satisfy the query value

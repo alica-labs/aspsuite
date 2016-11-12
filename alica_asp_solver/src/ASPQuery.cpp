@@ -17,6 +17,7 @@ namespace alica
 
 		ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term)
 		{
+			this->type = ASPQueryType::Undefined;
 			this->solver = solver;
 			this->term = term;
 			this->programmSection = term->getProgrammSection();
@@ -110,72 +111,63 @@ namespace alica
 			return true;
 		}
 
-//		void ASPQuery::generateRules(string queryString)
-//		{
-//			stringstream ss;
-//			ss << "queryHolds(query" << this->solver->getQueryCounter() << ")";
-//			string head = ss.str();
-//			ss << " :- " << queryString << ".";
-//			string rule = ss.str();
-//			// FIXME: This is a problem if somebody already used X in the queryString.
-//			if (queryString.find(ASPSolver::WILDCARD_STRING) != string::npos)
-//			{
-//				int pos = rule.find(ASPSolver::WILDCARD_STRING);
-//				rule.replace(pos, ASPSolver::WILDCARD_STRING.length(), "X");
-//			}
-//
-//			this->solver->getClingo()->add(this->programmSection, {}, rule);
-//			this->ruleModelMap.emplace(this->solver->getGringoModule()->parseValue(head), vector<Gringo::Value>());
-//			this->rules.push_back(rule);
-//
-//			LOG(rule);
-//		}
-
 		string ASPQuery::toString()
 		{
 			stringstream ss;
 			ss << "Query:" << "\n";
 			ss << "\tModels: \n\t\t";
+			int counter = 0;
 			for (auto model : *this->currentModels)
 			{
+				counter++;
+				ss << "Number " << counter << ":\n\t\t\t";
 				for (auto pred : model)
 				{
 					ss << pred << " ";
 				}
-			}
-			ss << "\n";
-			ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
-//			ss << "\tRules:" << "\n";
-//			for (auto rule : this->rules)
-//			{
-//				ss << "\t\t" << rule << "\n";
-//			}
-//			ss << "\tRules with models:" << "\n";
-//			for (auto rule : this->ruleModelMap)
-//			{
-//				ss << "\t\tRule: " << rule.first << "\n";
-//				ss << "\t\t\t Model: ";
-//				for (auto predicate : rule.second)
-//				{
-//					ss << predicate << " ";
-//				}
-//				ss << "\n";
-//			}
-			ss << "\tHeadValues:" << "\n";
-			for (auto value : this->headValues)
-			{
-				ss << "\t\t" << value.first << "\n";
-			}
-			ss << "\tHeadValues with models:" << "\n";
-			for (auto value : this->headValues)
-			{
-				ss << "\t\tRule: " << value.first << "\n";
-				ss << "\t\t\t Model: ";
-				for (auto predicate : value.second)
-				{
-					ss << predicate << " ";
-				}
 				ss << "\n";
+			}
+			ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
+
+			if (this->getType() == ASPQueryType::Facts)
+			{
+				ss << "\tQuery is of type Facts.\n";
+				ss << "\tFacts:" << "\n";
+				for (auto value : this->headValues)
+				{
+					ss << "\t\t" << value.first << "\n";
+				}
+				ss << "\tFacts in models:" << "\n";
+				for (auto value : this->headValues)
+				{
+					ss << "\t\tFact: " << value.first << "\n";
+					ss << "\t\t\t In Model: ";
+					for (auto predicate : value.second)
+					{
+						ss << predicate << " ";
+					}
+					ss << "\n";
+				}
+			}
+			else
+			{
+				ss << "\tQuery is of type Variable.\n";
+				ss << "\tRuleHeadValues:" << "\n";
+				for (auto value : this->headValues)
+				{
+					ss << "\t\t" << value.first << "\n";
+				}
+				ss << "\tRuleHeadValues with models:" << "\n";
+				for (auto value : this->headValues)
+				{
+					ss << "\t\tRuleHead: " << value.first << "\n";
+					ss << "\t\t\t Grounded in Model: ";
+					for (auto predicate : value.second)
+					{
+						ss << predicate << " ";
+					}
+					ss << "\n";
+				}
 			}
 			return ss.str();
 		}
@@ -224,7 +216,11 @@ namespace alica
 		{
 			return term;
 		}
+
+		ASPQueryType ASPQuery::getType()
+		{
+			return type;
+		}
 	} /* namespace reasoner */
 } /* namespace alica */
-
 

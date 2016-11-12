@@ -33,7 +33,6 @@ namespace alica
 			void removeExternal();
 
 		private:
-			const ASPQueryType type = ASPQueryType::Variable;
 			string expandRule(string rule);
 			string expandFact(string fact);
 			shared_ptr<Gringo::Value> external;

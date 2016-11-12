@@ -16,6 +16,7 @@ namespace alica
 		ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term) :
 				ASPQuery(solver, term)
 		{
+			this->type = ASPQueryType::Facts;
 			this->queryValues = this->createQueryValues(term->getRuleHead());
 			for (auto value : this->queryValues)
 			{
@@ -114,7 +115,7 @@ namespace alica
 			return ret;
 		}
 
-		bool ASPFactsQuery::isTrueForAtLeastOneModel()
+		bool ASPFactsQuery::factsExistForAtLeastOneModel()
 		{
 			for (auto queryValue : this->headValues)
 			{
@@ -126,7 +127,7 @@ namespace alica
 			return false;
 		}
 
-		bool ASPFactsQuery::isTrueForAllModels()
+		bool ASPFactsQuery::factsExistForAllModels()
 		{
 			for (auto queryValue : this->headValues)
 			{

@@ -54,7 +54,9 @@ namespace alica
 			// determine the domain of the query predicate
 			for (auto value : this->getHeadValues())
 			{
-				cout << "ASPSolver::onModel: " << value.first << endl;
+#ifdef ASPQUERY_DEBUG
+				cout << "ASPQuery::onModel: " << value.first << endl;
+#endif
 				auto it = clingoModel.out.domains.find(value.first.sig());
 				if (it == clingoModel.out.domains.end())
 				{

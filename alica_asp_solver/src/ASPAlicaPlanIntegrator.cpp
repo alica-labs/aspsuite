@@ -75,8 +75,9 @@ namespace alica
 
 			processedPlanIds.push_back(currentPlanId);
 
+#ifdef ASPAlicaPlanIntegratorDebug
 			cout << "ASPAlicaPlanIntegrator: processing plan " << p->getName() << " (ID: " << p->getId() << ")" << endl;
-
+#endif
 			// add the plan
 			this->clingo->add("planBase", {}, gen->plan(p));
 

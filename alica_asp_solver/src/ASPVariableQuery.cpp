@@ -19,33 +19,28 @@ namespace alica
 				ASPQuery(solver, term)
 		{
 			this->type = ASPQueryType::Variable;
-			this->queryId = this->solver->getQueryCounter();
 			stringstream ss;
-			ss << "queryExternal" << this->queryId;
-			this->queryProgramSection = ss.str();
-//#ifdef ASPSolver_DEBUG
-			cout << "ASPVariableQuery: creating query with number" << this->queryId << " and program section " << this->queryProgramSection << endl;
-//#endif
-			this->createExternal();
-			auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
-			this->createHeadQueryValues(this->term->getRuleHead());
-#ifdef ASPSolver_DEBUG
-			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
-#endif
-			this->addRule(this->queryProgramSection, this->term->getRule(), false);
-			for (auto fact : this->term->getFacts())
+			if(term->getQueryId() == -1)
 			{
-#ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << fact << endl;
+#ifdef ASPVARIABLEQUERY_DEBUG
+				cout << "ASPVariableQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
 #endif
-				this->addFact(this->queryProgramSection, fact, false);
+				return;
 			}
+			ss << "query" << term->getQueryId();
+			this->queryProgramSection = ss.str();
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "ASPVariableQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
+#endif
+			this->createProgramSection();
+			this->createHeadQueryValues(this->term->getRuleHead());
+			auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 			if (loaded)
 			{
-				this->solver->getClingo()->ground( { {this->term->getProgramSection(), {}}}, nullptr);
+				this->solver->ground( { {this->term->getProgramSection(), {}}}, nullptr);
 			}
-			this->solver->getClingo()->ground( { {this->queryProgramSection, {}}}, nullptr);
-			this->solver->getClingo()->assignExternal(*(this->external), Gringo::TruthValue::True);
+			this->solver->ground( { {this->queryProgramSection, {}}}, nullptr);
+			this->solver->assignExternal(*(this->external), Gringo::TruthValue::True);
 		}
 
 		ASPVariableQuery::~ASPVariableQuery()
@@ -57,44 +52,52 @@ namespace alica
 			return this->rules;
 		}
 
-		void ASPVariableQuery::addRule(string programSection, string rule, bool ground)
-		{
-			rule = expandRule(rule);
-			this->solver->getClingo()->add(programSection, {}, rule);
-			this->rules.push_back(rule);
-			if (ground)
-			{
-				this->solver->ground( { {programSection, {}}}, nullptr);
-			}
-		}
+//		void ASPVariableQuery::addRule(string programSection, string rule, bool ground)
+//		{
+//			rule = expandRule(rule);
+//			this->solver->getClingo()->add(programSection, {}, rule);
+//			this->rules.push_back(rule);
+//			if (ground)
+//			{
+//				this->solver->ground( { {programSection, {}}}, nullptr);
+//			}
+//		}
+//
+//		void ASPVariableQuery::addFact(string programSection, string fact, bool ground)
+//		{
+//			fact = expandFact(fact);
+//			this->solver->getClingo()->add(programSection, {}, fact);
+//			this->rules.push_back(fact);
+//			if (ground)
+//			{
+//				this->solver->ground( { {programSection, {}}}, nullptr);
+//			}
+//		}
 
-		void ASPVariableQuery::addFact(string programSection, string fact, bool ground)
-		{
-			fact = expandFact(fact);
-			this->solver->getClingo()->add(programSection, {}, fact);
-			this->rules.push_back(fact);
-			if (ground)
-			{
-				this->solver->ground( { {programSection, {}}}, nullptr);
-			}
-		}
-
-		void ASPVariableQuery::createExternal()
+		void ASPVariableQuery::createProgramSection()
 		{
 			stringstream ss;
 			ss << "external" << this->queryProgramSection;
 			this->externalName = ss.str();
 			ss.str("");
-			ss << "#external " << this->externalName << ".";
-			this->solver->getClingo()->add(this->queryProgramSection, {}, ss.str());
-			this->external = make_shared<Gringo::Value>(this->solver->getGringoModule()->parseValue(this->externalName));
-//			this->solver->getClingo()->ground({ {this->queryProgramSection, {}}}, nullptr);
+			ss << "#program " << this->queryProgramSection << "." << endl;
+			ss << "#external " << "external" << this->queryProgramSection << "." << endl;
+			ss << expandRule(this->term->getRule()) << endl;
+			for (auto fact : this->term->getFacts())
+			{
+				ss << expandFact(fact) << endl;
+			}
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "ASPVariableQuery: create program section: \n" << ss.str();
+#endif
+			this->solver->add(this->queryProgramSection, {}, ss.str());
+			this->external = make_shared<Gringo::Value>(this->solver->parseValue(this->externalName));
 		}
 
 		void ASPVariableQuery::removeExternal()
 		{
-			//TODO change clingo version to get release external
-			this->solver->getClingo()->assignExternal(*(this->external),  Gringo::TruthValue::False);
+//			this->solver->assignExternal(*(this->external), Gringo::TruthValue::False);
+			this->solver->assignExternal(*(this->external), Gringo::TruthValue::Free);
 		}
 
 		string ASPVariableQuery::expandRule(string rule)
@@ -105,7 +108,9 @@ namespace alica
 			ss.str("");
 			rule = rule.substr(0, rule.size()-1);
 			ss << rule << toAdd << ".";
+#ifdef ASPVARIABLEQUERY_DEBUG
 			cout << "ASPVariableQuery: rule: " << ss.str() << endl;
+#endif
 			return ss.str();
 
 		}
@@ -116,9 +121,12 @@ namespace alica
 			ss << " :- " << this->externalName;
 			string toAdd = ss.str();
 			ss.str("");
+			supplementary::Configuration::trim(fact);
 			fact = fact.substr(0, fact.size()-1);
 			ss << fact << toAdd << ".";
+#ifdef ASPVARIABLEQUERY_DEBUG
 			cout << "ASPVariableQuery: fact: " << ss.str() << endl;
+#endif
 			return ss.str();
 		}
 
@@ -189,7 +197,7 @@ namespace alica
 					words_begin = sregex_iterator(tmp.begin(), tmp.end(), words_regex);
 				}
 				value = value.replace(begin, end - begin, tmp);
-				auto val = this->solver->getGringoModule()->parseValue(value);
+				auto val = this->solver->parseValue(value);
 				this->headValues.emplace(val, vector<Gringo::Value>());
 			}
 		}

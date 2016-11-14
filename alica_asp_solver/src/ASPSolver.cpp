@@ -92,6 +92,9 @@ namespace alica
 		 */
 		void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context)
 		{
+#ifdef ASPSOLVER_DEBUG
+			cout << "ASPSolver_ground: " << vec.at(0).first << endl;
+#endif
 			this->clingo->ground(forward<Gringo::Control::GroundVec const &>(vec), forward<Gringo::Any&&>(context));
 		}
 
@@ -100,7 +103,7 @@ namespace alica
 		 */
 		bool ASPSolver::solve()
 		{
-			this->reduceLifeTime();
+			this->reduceQueryLifeTime();
 #ifdef ASPSolver_DEBUG
 			this->modelCount = 0;
 #endif
@@ -118,7 +121,7 @@ namespace alica
 		bool ASPSolver::onModel(const Gringo::Model& m)
 		{
 #ifdef ASPSolver_DEBUG
-//			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
+			cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
 			for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 			{
 				cout << atom << " ";
@@ -133,6 +136,21 @@ namespace alica
 			}
 
 			return true;
+		}
+
+		void ASPSolver::assignExternal(Gringo::Value ext, Gringo::TruthValue truthValue)
+		{
+			this->clingo->assignExternal(ext, truthValue);
+		}
+
+		void ASPSolver::add(const string& name, const Gringo::FWStringVec& params, const string& par)
+		{
+			this->clingo->add(name, params, par);
+		}
+
+		Gringo::Value ASPSolver::parseValue(const std::string& str)
+		{
+			return this->gringoModule->parseValue(str);
 		}
 
 		bool ASPSolver::registerQuery(shared_ptr<ASPQuery> query)
@@ -185,6 +203,10 @@ namespace alica
 
 			this->conf->setKeyValue(this->modelsKey, "1");
 			int dim = prepareSolution(vars, calls);
+			if(dim == -1)
+			{
+				return false;
+			}
 			auto satisfied = this->solve();
 			this->removeDeadQueries();
 			return satisfied;
@@ -196,6 +218,10 @@ namespace alica
 
 			this->conf->setKeyValue(this->modelsKey, "0");
 			int dim = prepareSolution(vars, calls);
+			if(dim == -1)
+			{
+				return false;
+			}
 			auto satisfied = this->solve();
 			if (!satisfied)
 			{
@@ -246,7 +272,7 @@ namespace alica
 			}
 			for (auto term : constraint)
 			{
-				if (term->getNumberOfModels().empty())
+				if (!term->getNumberOfModels().empty())
 				{
 					this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 				}
@@ -260,7 +286,8 @@ namespace alica
 				}
 				else
 				{
-					//TODO
+					cout << "ASPSolver: Query of unknown type registered!" << endl;
+					return -1;
 				}
 				if (term->getExternals() != nullptr)
 				{
@@ -324,7 +351,7 @@ namespace alica
 				this->masterPlanLoaded = true;
 			}
 			this->integrateRules();
-			this->reduceLifeTime();
+			this->reduceQueryLifeTime();
 			auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
 			this->removeDeadQueries();
 			if (result == Gringo::SolveResult::SAT)
@@ -353,11 +380,6 @@ namespace alica
 			}
 		}
 
-		DefaultGringoModule* ASPSolver::getGringoModule()
-		{
-			return this->gringoModule;
-		}
-
 		const void* ASPSolver::getWildcardPointer()
 		{
 			return WILDCARD_POINTER;
@@ -373,12 +395,7 @@ namespace alica
 			return this->registeredQueries.size();
 		}
 
-		shared_ptr<ClingoLib> ASPSolver::getClingo()
-		{
-			return this->clingo;
-		}
-
-		void ASPSolver::reduceLifeTime()
+		void ASPSolver::reduceQueryLifeTime()
 		{
 			for (auto query : this->registeredQueries)
 			{
@@ -490,4 +507,3 @@ namespace alica
 
 	} /* namespace reasoner */
 } /* namespace alica */
-

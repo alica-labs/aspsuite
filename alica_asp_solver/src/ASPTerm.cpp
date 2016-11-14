@@ -24,6 +24,7 @@ namespace alica
 			this->externals = nullptr;
 			this->numberOfModels = "";
 			this->type = ASPQueryType::Undefined;
+			this->queryId = -1;
 		}
 
 		ASPTerm::~ASPTerm()
@@ -141,7 +142,27 @@ namespace alica
 		{
 			this->id = id;
 		}
+		/**
+		 * The query id has to be added to any predicate which is added to the program, naming rule
+		 * heads and facts!
+		 * An unique id is given by the ASPSolver!
+		 */
+		int ASPTerm::getQueryId()
+		{
+			return queryId;
+		}
+
+		/**
+		 * The query id has to be added to any predicate which is added to the program, naming rule
+		 * heads and facts!
+		 * An unique id is given by the ASPSolver!
+		 */
+		void ASPTerm::setQueryId(int queryId)
+		{
+			this->queryId = queryId;
+		}
 
 	} /* namespace reasoner */
 } /* namespace alica */
+
 

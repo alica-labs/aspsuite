@@ -13,6 +13,8 @@
 #include <clingo/clingocontrol.hh>
 #include "alica_asp_solver/ASPTerm.h"
 
+//#define ASPVARIABLEQUERY_DEBUG
+
 namespace alica
 {
 	namespace reasoner
@@ -27,8 +29,8 @@ namespace alica
 			vector<string> getRules();
 
 			void createHeadQueryValues(string queryString);
-			void addRule(string programSection, string rule, bool ground);
-			void addFact(string programSection, string fact, bool ground);
+//			void addRule(string programSection, string rule, bool ground);
+//			void addFact(string programSection, string fact, bool ground);
 			ASPQueryType getType();
 			void removeExternal();
 
@@ -38,8 +40,7 @@ namespace alica
 			shared_ptr<Gringo::Value> external;
 			string queryProgramSection;
 			string externalName;
-			int queryId;
-			void createExternal();
+			void createProgramSection();
 		};
 
 	} /* namespace reasoner */

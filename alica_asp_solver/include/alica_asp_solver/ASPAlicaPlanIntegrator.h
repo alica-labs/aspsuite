@@ -13,6 +13,8 @@
 
 using namespace std;
 
+//#define ASPAlicaPlanIntegratorDebug
+
 namespace alica
 {
 	class Plan;

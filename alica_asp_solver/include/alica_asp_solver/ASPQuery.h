@@ -15,6 +15,8 @@
 
 using namespace std;
 
+//#define ASPQUERY_DEBUG
+
 namespace alica
 {
 	namespace reasoner

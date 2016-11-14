@@ -44,6 +44,8 @@ namespace alica
 			void setType(ASPQueryType type);
 			long getId();
 			void setId(long id);
+			int getQueryId();
+			void setQueryId(int queryId);
 
 		private:
 			string numberOfModels;
@@ -52,6 +54,12 @@ namespace alica
 			string body;
 			string programSection;
 			long id;
+			/**
+			 * The query id has to be added to any predicate which is added to the program, naming rule
+			 * heads and facts!
+			 * An unique id is given by the ASPSolver!
+			 */
+			int queryId;
 			int lifeTime;
 			vector<string> facts;
 			shared_ptr<map<string, bool>> externals;

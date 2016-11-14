@@ -33,7 +33,7 @@ namespace alica
 				}
 				if (loaded)
 				{
-					this->solver->getClingo()->ground( { {term->getProgramSection(), {}}}, nullptr);
+					this->solver->ground( { {term->getProgramSection(), {}}}, nullptr);
 				}
 			}
 		}
@@ -63,7 +63,7 @@ namespace alica
 					}
 					currentQuery = queryString.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					this->headValues.emplace(this->solver->getGringoModule()->parseValue(currentQuery), vector<Gringo::Value>());
+					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Value>());
 					start = queryString.find(",", end);
 					if (start != string::npos)
 					{
@@ -73,7 +73,7 @@ namespace alica
 			}
 			else
 			{
-				this->headValues.emplace(this->solver->getGringoModule()->parseValue(queryString), vector<Gringo::Value>());
+				this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Value>());
 			}
 		}
 

@@ -59,6 +59,7 @@ namespace alica
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			bool onModel(Gringo::Model const &m);
 			void assignExternal(Gringo::Value ext, Gringo::TruthValue);
+			void releaseExternal(Gringo::Value ext);
 			bool solve();
 			void add(string const &name, Gringo::FWStringVec const &params, string const &par);
 			Gringo::Value parseValue(std::string const &str);

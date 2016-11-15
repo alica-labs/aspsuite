@@ -143,6 +143,11 @@ namespace alica
 			this->clingo->assignExternal(ext, truthValue);
 		}
 
+		void ASPSolver::releaseExternal(Gringo::Value ext)
+		{
+			this->clingo->assignExternal(ext, Gringo::TruthValue::Free);
+		}
+
 		void ASPSolver::add(const string& name, const Gringo::FWStringVec& params, const string& par)
 		{
 			this->clingo->add(name, params, par);

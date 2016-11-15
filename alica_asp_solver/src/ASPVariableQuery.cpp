@@ -52,28 +52,6 @@ namespace alica
 			return this->rules;
 		}
 
-//		void ASPVariableQuery::addRule(string programSection, string rule, bool ground)
-//		{
-//			rule = expandRule(rule);
-//			this->solver->getClingo()->add(programSection, {}, rule);
-//			this->rules.push_back(rule);
-//			if (ground)
-//			{
-//				this->solver->ground( { {programSection, {}}}, nullptr);
-//			}
-//		}
-//
-//		void ASPVariableQuery::addFact(string programSection, string fact, bool ground)
-//		{
-//			fact = expandFact(fact);
-//			this->solver->getClingo()->add(programSection, {}, fact);
-//			this->rules.push_back(fact);
-//			if (ground)
-//			{
-//				this->solver->ground( { {programSection, {}}}, nullptr);
-//			}
-//		}
-
 		void ASPVariableQuery::createProgramSection()
 		{
 			stringstream ss;
@@ -96,8 +74,7 @@ namespace alica
 
 		void ASPVariableQuery::removeExternal()
 		{
-//			this->solver->assignExternal(*(this->external), Gringo::TruthValue::False);
-			this->solver->assignExternal(*(this->external), Gringo::TruthValue::Free);
+			this->solver->releaseExternal(*(this->external));
 		}
 
 		string ASPVariableQuery::expandRule(string rule)

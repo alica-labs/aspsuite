@@ -25,16 +25,12 @@ namespace alica
 		public:
 			ASPVariableQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term);
 			virtual ~ASPVariableQuery();
-
 			vector<string> getRules();
-
-			void createHeadQueryValues(string queryString);
-//			void addRule(string programSection, string rule, bool ground);
-//			void addFact(string programSection, string fact, bool ground);
 			ASPQueryType getType();
 			void removeExternal();
 
 		private:
+			void createHeadQueryValues(string queryString);
 			string expandRule(string rule);
 			string expandFact(string fact);
 			shared_ptr<Gringo::Value> external;

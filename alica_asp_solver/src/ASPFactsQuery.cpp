@@ -20,7 +20,7 @@ namespace alica
 			this->createQueryValues(term->getRuleHead());
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 
-			if (!term->getProgrammSection().empty())
+			if (!term->getProgramSection().empty())
 			{
 				auto loaded = this->solver->loadFileFromConfig(term->getProgramSection());
 #ifdef ASPSolver_DEBUG

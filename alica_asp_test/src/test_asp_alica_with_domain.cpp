@@ -103,19 +103,19 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	string queryString4 = "brokenPlanBase(michelangelo)";
 	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
 	constraint1->setRule(queryString1);
-	constraint1->setProgrammSection("assistanceTestFacts");
+	constraint1->setProgramSection("assistanceTestFacts");
 	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
 	constraint2->setRule(queryString2);
-	constraint2->setProgrammSection("assistanceTestFacts");
+	constraint2->setProgramSection("assistanceTestFacts");
 	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
 	constraint3->setRule(queryString3);
-	constraint3->setProgrammSection("assistanceTestFacts");
+	constraint3->setProgramSection("assistanceTestFacts");
 	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
 	auto constraint4 = make_shared<alica::reasoner::ASPTerm>();
 	constraint4->setRule(queryString4);
-	constraint4->setProgrammSection("assistanceTestFacts");
+	constraint4->setProgramSection("assistanceTestFacts");
 	constraint4->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(
 			aspSolver, constraint1);
@@ -146,10 +146,10 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	cout << "Measured Grounding Time: "
 			<< std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_TRUE(queryObject1->isTrueForAllModels()) << "The planbase of agent donatello should be broken.";
-	EXPECT_FALSE(queryObject2->isTrueForAllModels()) << "The planbase of agent leonardo should not be broken.";
-	EXPECT_FALSE(queryObject3->isTrueForAllModels()) << "The planbase of agent raphael should not be broken.";
-	EXPECT_FALSE(queryObject4->isTrueForAllModels())
+	EXPECT_TRUE(queryObject1->factsExistForAllModels()) << "The planbase of agent donatello should be broken.";
+	EXPECT_FALSE(queryObject2->factsExistForAllModels()) << "The planbase of agent leonardo should not be broken.";
+	EXPECT_FALSE(queryObject3->factsExistForAllModels()) << "The planbase of agent raphael should not be broken.";
+	EXPECT_FALSE(queryObject4->factsExistForAllModels())
 			<< "The planbase of agent michelangelo should not be broken.";
 	cout << queryObject1->toString() << endl;
 	cout << queryObject2->toString() << endl;
@@ -170,7 +170,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 	constraint->setRule(queryString1);
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	constraint->setProgrammSection("assistanceTestFacts");
+	constraint->setProgramSection("assistanceTestFacts");
 
 	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
 
@@ -192,7 +192,7 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 	cout << "Measured Grounding Time: "
 			<< std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
-	EXPECT_FALSE(queryObject1->isTrueForAllModels())
+	EXPECT_FALSE(queryObject1->factsExistForAllModels())
 			<< "The plan base of agent donatello should not be broken.";
 	cout << queryObject1->toString() << endl;
 }

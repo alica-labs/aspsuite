@@ -30,8 +30,8 @@ namespace alica
 			bool setRule(string rule);
 			string getRuleHead();
 			string getRuleBody();
-			string getProgrammSection();
-			void setProgrammSection(string programmSection);
+			string getProgramSection();
+			void setProgramSection(string programSection);
 			int getLifeTime();
 			string getRule();
 			void addFact(string fact);
@@ -44,14 +44,22 @@ namespace alica
 			void setType(ASPQueryType type);
 			long getId();
 			void setId(long id);
+			int getQueryId();
+			void setQueryId(int queryId);
 
 		private:
 			string numberOfModels;
 			string rule;
 			string head;
 			string body;
-			string programmSection;
+			string programSection;
 			long id;
+			/**
+			 * The query id has to be added to any predicate which is added to the program, naming rule
+			 * heads and facts!
+			 * An unique id is given by the ASPSolver!
+			 */
+			int queryId;
 			int lifeTime;
 			vector<string> facts;
 			shared_ptr<map<string, bool>> externals;

@@ -15,14 +15,16 @@ namespace alica
 
 		ASPTerm::ASPTerm(int lifeTime)
 		{
-			this->programmSection = "";
+			this->programSection = "";
 			this->rule = "";
 			this->head = "";
 			this->body = "";
+			this->id = -1;
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
-			this->numberOfModels = string::npos;
+			this->numberOfModels = "";
 			this->type = ASPQueryType::Undefined;
+			this->queryId = -1;
 		}
 
 		ASPTerm::~ASPTerm()
@@ -76,14 +78,14 @@ namespace alica
 			return this->body;
 		}
 
-		string ASPTerm::getProgrammSection()
+		string ASPTerm::getProgramSection()
 		{
-			return this->programmSection;
+			return this->programSection;
 		}
 
-		void ASPTerm::setProgrammSection(string programmSection)
+		void ASPTerm::setProgramSection(string programSection)
 		{
-			this->programmSection = programmSection;
+			this->programSection = programSection;
 		}
 
 		int ASPTerm::getLifeTime()
@@ -140,7 +142,27 @@ namespace alica
 		{
 			this->id = id;
 		}
+		/**
+		 * The query id has to be added to any predicate which is added to the program, naming rule
+		 * heads and facts!
+		 * An unique id is given by the ASPSolver!
+		 */
+		int ASPTerm::getQueryId()
+		{
+			return queryId;
+		}
+
+		/**
+		 * The query id has to be added to any predicate which is added to the program, naming rule
+		 * heads and facts!
+		 * An unique id is given by the ASPSolver!
+		 */
+		void ASPTerm::setQueryId(int queryId)
+		{
+			this->queryId = queryId;
+		}
 
 	} /* namespace reasoner */
 } /* namespace alica */
+
 

@@ -124,7 +124,7 @@ TEST_F(ASPRCC8, Department)
 	auto constraint = make_shared<alica::reasoner::ASPTerm>();
 //	constraint->setRule("c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
 	constraint->setRule(queryString);
-	constraint->setProgrammSection("department_sections");
+	constraint->setProgramSection("department_sections");
 	constraint->setType(alica::reasoner::ASPQueryType::Facts);
 	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
 	aspSolver->registerQuery(queryObject);

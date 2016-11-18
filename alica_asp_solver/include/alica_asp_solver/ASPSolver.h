@@ -18,6 +18,7 @@
 #include <SystemConfig.h>
 #include "engine/model/Variable.h"
 #include "AnnotatedExternal.h"
+#include <mutex>
 
 #include <memory>
 #include <vector>
@@ -54,13 +55,23 @@ namespace alica
 			void disableWarnings(bool noWarns);
 			bool loadFileFromConfig(string configKey);
 			void loadFile(string filename);
+
 			void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
 			bool onModel(Gringo::Model const &m);
+			void assignExternal(Gringo::Value ext, Gringo::TruthValue);
+			void releaseExternal(Gringo::Value ext);
 			bool solve();
+			void add(string const &name, Gringo::FWStringVec const &params, string const &par);
+			Gringo::Value parseValue(std::string const &str);
 
 			bool registerQuery(shared_ptr<ASPQuery> query);
 			bool unregisterQuery(shared_ptr<ASPQuery> query);
 			int getRegisteredQueriesCount();
+			/**
+			 * The query id has to be added to any predicate in an ASPTerm with type Variable
+			 * which is added to the program, naming rule heads and facts!
+			 * An unique id is given by the ASPSolver!
+			 */
 			int getQueryCounter();
 			void removeDeadQueries();
 
@@ -74,29 +85,31 @@ namespace alica
 			void printStats();
 
 			alica::reasoner::ASPGenerator gen;
-			DefaultGringoModule* getGringoModule();
 			static const void* getWildcardPointer();
 			static const string& getWildcardString();
-
-			shared_ptr<ClingoLib> getClingo();
 
 		private:
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule* gringoModule;
-			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
-			vector<string> alreadyLoaded;
-			vector<shared_ptr<AnnotatedExternal>> assignedExternals;
-			vector<shared_ptr<ASPQuery>> registeredQueries;
 			Gringo::ConfigProxy* conf;
 			unsigned int root;
 			unsigned int modelsKey;
 
-			void reduceLifeTime();
+			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
+			vector<string> alreadyLoaded;
+			vector<shared_ptr<AnnotatedExternal>> assignedExternals;
+			vector<shared_ptr<ASPQuery>> registeredQueries;
+
+			void reduceQueryLifeTime();
 			void integrateRules();
 			int prepareSolution(std::vector<alica::Variable*>& vars,
 								std::vector<shared_ptr<ProblemDescriptor> >& calls);
 			int queryCounter;
 			supplementary::SystemConfig* sc;
+
+		protected:
+			static mutex queryCounterMutex;
+
 #ifdef ASPSolver_DEBUG
 			int modelCount;
 #endif

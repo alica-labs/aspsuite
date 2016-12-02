@@ -8,6 +8,8 @@
 #ifndef INCLUDE_ASP_RCC_GENERATOR_ASPRCCGENERATOR_H_
 #define INCLUDE_ASP_RCC_GENERATOR_ASPRCCGENERATOR_H_
 
+#include <string>
+
 using namespace std;
 
 namespace alica
@@ -18,13 +20,15 @@ namespace alica
 		class ASPRCCGenerator
 		{
 		public:
-			ASPRCCGenerator(int numberOfRooms, int percentageStep);
+			ASPRCCGenerator(int endCount, int step, int percentageStep);
 			virtual ~ASPRCCGenerator();
 			void generateLPFile();
 
 		private:
-			int numberOfRooms;
+			int endCount;
+			int step;
 			int percentageStep;
+			std::string createRandomConnections(int size, int percentage);
 		};
 
 	} /* namespace reasoner */

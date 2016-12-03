@@ -9,6 +9,13 @@
 #define INCLUDE_ASP_RCC_GENERATOR_ASPRCCGENERATOR_H_
 
 #include <string>
+#include "ros/ros.h"
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
 
 using namespace std;
 
@@ -29,6 +36,7 @@ namespace alica
 			int step;
 			int percentageStep;
 			std::string createRandomConnections(int size, int percentage);
+			vector<int> selectRandomNodes(int size, int percentage);
 		};
 
 	} /* namespace reasoner */

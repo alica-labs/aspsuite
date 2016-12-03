@@ -6,12 +6,6 @@
  */
 
 #include "asp_rcc_generator/ASPRCCGenerator.h"
-#include "ros/ros.h"
-#include <iostream>
-#include <fstream>
-#include <time.h>
-#include <stdlib.h>
-#include <math.h>
 
 using namespace std;
 
@@ -34,11 +28,12 @@ namespace alica
 		void ASPRCCGenerator::generateLPFile()
 		{
 			stringstream ss;
-			for (int i = step; i < this->endCount; i += step)
+			for (int i = step; i <= this->endCount; i += step)
 			{
 				for (int j = this->percentageStep; j <= 100; j += this->percentageStep)
 				{
 					ofstream myfile;
+					cout << "ASPRCCGenerator: generating: " << "asprcc_" << i << "_" << this->endCount << "_" << j << ".lp" << endl;
 					ss << "asprcc_" << i << "_" << this->endCount << "_" << j << ".lp";
 					myfile.open(ss.str());
 					ss.str("");
@@ -58,19 +53,28 @@ namespace alica
 		string ASPRCCGenerator::createRandomConnections(int size, int percentage)
 		{
 			stringstream ss;
-			int count = (int)(this->endCount * (percentage / 100.0));
-			srand(time(NULL));
-			for(int i = 0; i < count; i++)
+			auto nodes = selectRandomNodes(size, percentage);
+			for(int i = 0; i < nodes.size() - 1; i++)
 			{
-				int rand1 = rand() % this->endCount;
-				int rand2 = rand() % this->endCount;
-				while(rand2 == rand1)
-				{
-					rand2 = rand() % this->endCount;
-				}
-				ss << "partialOverlapping(" << rand1 << ", " << rand2 << ").\n";
+				ss << "partialOverlapping(" << nodes.at(i) << ", " << nodes.at(i + 1) << ").\n";
 			}
 			return ss.str();
+		}
+
+		vector<int> ASPRCCGenerator::selectRandomNodes(int size, int percentage)
+		{
+			vector<int> ret;
+			int count = (int)(size * (percentage / 100.0));
+			srand(time(NULL));
+			while(ret.size() != count)
+			{
+				int r = rand() % size;
+				if(find(ret.begin(), ret.end(), r) == ret.end())
+				{
+					ret.push_back(r);
+				}
+			}
+			return ret;
 		}
 
 	} /* namespace reasoner */

@@ -17,7 +17,7 @@ namespace alica
 				ASPQuery(solver, term)
 		{
 			this->type = ASPQueryType::Facts;
-			this->createQueryValues(term->getRuleHead());
+			this->createQueryValues(term->getRuleHeads());
 			this->currentModels = make_shared<vector<Gringo::ValVec>>();
 
 			if (!term->getProgramSection().empty())
@@ -43,38 +43,40 @@ namespace alica
 		{
 		}
 
-		void ASPFactsQuery::createQueryValues(string queryString)
+		void ASPFactsQuery::createQueryValues(vector<string> queryVec)
 		{
-			vector<Gringo::Value> ret;
-			if (queryString.compare("") == 0)
+			for (auto queryString : queryVec)
 			{
-				return;
-			}
-			if (queryString.find(",") != string::npos)
-			{
-				size_t start = 0;
-				size_t end = string::npos;
-				string currentQuery = "";
-				while (start != string::npos)
+				if (queryString.compare("") == 0)
 				{
-					end = queryString.find(")", start);
-					if (end == string::npos || end == queryString.size())
+					return;
+				}
+				if (queryString.find(",") != string::npos)
+				{
+					size_t start = 0;
+					size_t end = string::npos;
+					string currentQuery = "";
+					while (start != string::npos)
 					{
-						break;
-					}
-					currentQuery = queryString.substr(start, end - start + 1);
-					currentQuery = supplementary::Configuration::trim(currentQuery);
-					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Value>());
-					start = queryString.find(",", end);
-					if (start != string::npos)
-					{
-						start += 1;
+						end = queryString.find(")", start);
+						if (end == string::npos || end == queryString.size())
+						{
+							break;
+						}
+						currentQuery = queryString.substr(start, end - start + 1);
+						currentQuery = supplementary::Configuration::trim(currentQuery);
+						this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Value>());
+						start = queryString.find(",", end);
+						if (start != string::npos)
+						{
+							start += 1;
+						}
 					}
 				}
-			}
-			else
-			{
-				this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Value>());
+				else
+				{
+					this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Value>());
+				}
 			}
 		}
 
@@ -142,15 +144,15 @@ namespace alica
 		vector<pair<Gringo::Value, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
 		{
 			vector<pair<Gringo::Value, ASPTruthValue>> ret;
-			for(auto iter : this->getHeadValues())
+			for (auto iter : this->getHeadValues())
 			{
-				if(iter.second.size() == 0)
+				if (iter.second.size() == 0)
 				{
 					ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
 				}
 				else
 				{
-					if(iter.second.at(0).sign())
+					if (iter.second.at(0).sign())
 					{
 						ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::True));
 					}

@@ -20,7 +20,7 @@ namespace alica
 		{
 			this->type = ASPQueryType::Variable;
 			stringstream ss;
-			if(term->getQueryId() == -1)
+			if (term->getQueryId() == -1)
 			{
 #ifdef ASPVARIABLEQUERY_DEBUG
 				cout << "ASPVariableQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
@@ -33,7 +33,7 @@ namespace alica
 			cout << "ASPVariableQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
 #endif
 			this->createProgramSection();
-			this->createHeadQueryValues(this->term->getRuleHead());
+			this->createHeadQueryValues(this->term->getRuleHeads());
 			auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 			if (loaded)
 			{
@@ -60,7 +60,10 @@ namespace alica
 			ss.str("");
 			ss << "#program " << this->queryProgramSection << "." << endl;
 			ss << "#external " << "external" << this->queryProgramSection << "." << endl;
-			ss << expandRule(this->term->getRule()) << endl;
+			for (auto rule : this->term->getRules())
+			{
+				ss << expandRule(rule) << endl;
+			}
 			for (auto fact : this->term->getFacts())
 			{
 				ss << expandFact(fact) << endl;
@@ -83,7 +86,7 @@ namespace alica
 			ss << ", " << this->externalName;
 			string toAdd = ss.str();
 			ss.str("");
-			rule = rule.substr(0, rule.size()-1);
+			rule = rule.substr(0, rule.size() - 1);
 			ss << rule << toAdd << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
 			cout << "ASPVariableQuery: rule: " << ss.str() << endl;
@@ -99,7 +102,7 @@ namespace alica
 			string toAdd = ss.str();
 			ss.str("");
 			supplementary::Configuration::trim(fact);
-			fact = fact.substr(0, fact.size()-1);
+			fact = fact.substr(0, fact.size() - 1);
 			ss << fact << toAdd << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
 			cout << "ASPVariableQuery: fact: " << ss.str() << endl;
@@ -107,56 +110,59 @@ namespace alica
 			return ss.str();
 		}
 
-		void ASPVariableQuery::createHeadQueryValues(string queryString)
+		void ASPVariableQuery::createHeadQueryValues(vector<string> queryVec)
 		{
 			vector<string> valuesToParse;
-			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
+			for (auto queryString : queryVec)
 			{
-				size_t start = 0;
-				size_t end = string::npos;
-				string currentQuery = "";
-				while (start != string::npos)
+				if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
 				{
-					end = queryString.find(")", start);
-					if (end == string::npos)
+					size_t start = 0;
+					size_t end = string::npos;
+					string currentQuery = "";
+					while (start != string::npos)
 					{
-						break;
-					}
-					currentQuery = queryString.substr(start, end - start + 1);
-					currentQuery = supplementary::Configuration::trim(currentQuery);
-					valuesToParse.push_back(currentQuery);
-					start = queryString.find(",", end);
-					if (start != string::npos)
-					{
-						start += 1;
+						end = queryString.find(")", start);
+						if (end == string::npos)
+						{
+							break;
+						}
+						currentQuery = queryString.substr(start, end - start + 1);
+						currentQuery = supplementary::Configuration::trim(currentQuery);
+						valuesToParse.push_back(currentQuery);
+						start = queryString.find(",", end);
+						if (start != string::npos)
+						{
+							start += 1;
+						}
 					}
 				}
-			}
-			else if (queryString.find(";") != string::npos)
-			{
-				size_t start = 0;
-				size_t end = string::npos;
-				string currentQuery = "";
-				while (start != string::npos)
+				else if (queryString.find(";") != string::npos)
 				{
-					end = queryString.find(")", start);
-					if (end == string::npos)
+					size_t start = 0;
+					size_t end = string::npos;
+					string currentQuery = "";
+					while (start != string::npos)
 					{
-						break;
-					}
-					currentQuery = queryString.substr(start, end - start + 1);
-					currentQuery = supplementary::Configuration::trim(currentQuery);
-					valuesToParse.push_back(currentQuery);
-					start = queryString.find(";", end);
-					if (start != string::npos)
-					{
-						start += 1;
+						end = queryString.find(")", start);
+						if (end == string::npos)
+						{
+							break;
+						}
+						currentQuery = queryString.substr(start, end - start + 1);
+						currentQuery = supplementary::Configuration::trim(currentQuery);
+						valuesToParse.push_back(currentQuery);
+						start = queryString.find(";", end);
+						if (start != string::npos)
+						{
+							start += 1;
+						}
 					}
 				}
-			}
-			else
-			{
-				valuesToParse.push_back(queryString);
+				else
+				{
+					valuesToParse.push_back(queryString);
+				}
 			}
 			regex words_regex("[A-Z]+(\\w*)");
 			for (auto value : valuesToParse)

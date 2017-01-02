@@ -37,6 +37,7 @@ namespace alica
 	namespace reasoner
 	{
 
+		class AnnotatedValVec;
 		class ASPSolver : public alica::ISolver
 		{
 		public:

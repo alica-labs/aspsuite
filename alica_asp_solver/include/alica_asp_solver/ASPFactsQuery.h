@@ -35,7 +35,7 @@ namespace alica
 
 		private:
 			vector<Gringo::Value> queryValues;
-			void createQueryValues(string queryString);
+			void createQueryValues(vector<string> queryString);
 			// key := query value, value := predicates that satisfy the query value
 			map<Gringo::Value, vector<Gringo::Value>> factModelMap;
 		};

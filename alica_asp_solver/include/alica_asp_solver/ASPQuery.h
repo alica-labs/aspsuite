@@ -22,6 +22,7 @@ namespace alica
 	namespace reasoner
 	{
 
+		class AnnotatedValVec;
 		class ASPSolver;
 		class ASPQuery
 		{

@@ -9,6 +9,7 @@
 #include <alica_asp_solver/ASPSolver.h>
 #include <clingo/clingocontrol.hh>
 #include <Logging.h>
+#include "alica_asp_solver/AnnotatedValVec.h"
 
 namespace alica
 {
@@ -223,6 +224,6 @@ namespace alica
 		{
 			return type;
 		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
-

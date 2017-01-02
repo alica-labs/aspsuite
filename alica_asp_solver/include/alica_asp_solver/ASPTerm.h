@@ -27,13 +27,13 @@ namespace alica
 		public:
 			ASPTerm(int lifeTime = 1);
 			virtual ~ASPTerm();
-			bool setRule(string rule);
-			string getRuleHead();
-			string getRuleBody();
+			void addRule(string rule);
+			vector<string> getRuleHeads();
+			vector<string> getRuleBodies();
 			string getProgramSection();
 			void setProgramSection(string programSection);
 			int getLifeTime();
-			string getRule();
+			vector<string> getRules();
 			void addFact(string fact);
 			vector<string> getFacts();
 			void setExternals(shared_ptr<map<string, bool>> externals);
@@ -49,9 +49,9 @@ namespace alica
 
 		private:
 			string numberOfModels;
-			string rule;
-			string head;
-			string body;
+			vector<string> rules;
+			vector<string> heads;
+			vector<string> bodies;
 			string programSection;
 			long id;
 			/**

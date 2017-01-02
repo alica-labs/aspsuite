@@ -16,9 +16,6 @@ namespace alica
 		ASPTerm::ASPTerm(int lifeTime)
 		{
 			this->programSection = "";
-			this->rule = "";
-			this->head = "";
-			this->body = "";
 			this->id = -1;
 			this->lifeTime = lifeTime;
 			this->externals = nullptr;
@@ -31,29 +28,29 @@ namespace alica
 		{
 		}
 
-		bool ASPTerm::setRule(string rule)
+		void ASPTerm::addRule(string rule)
 		{
-			// not allowed to override an existing rule
-			if (!this->rule.empty())
+			if (rule.empty())
 			{
-				return false;
+				return;
 			}
 
-			this->rule = supplementary::Configuration::trim(rule);
+			rule = supplementary::Configuration::trim(rule);
 			size_t endOfHead = rule.find(":-");
 			if (endOfHead != string::npos)
 			{
 				// for rules (including variables)
 				size_t startOfBody = endOfHead + 2;
-				this->head = supplementary::Configuration::trim(rule.substr(0, endOfHead));
-				this->body = supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1));
+				this->heads.push_back(supplementary::Configuration::trim(rule.substr(0, endOfHead)));
+				this->bodies.push_back(supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
 			}
 			else
 			{
 				// for ground literals
-				this->head = this->rule;
+				this->heads.push_back(rule);
 			}
-			return true;
+			this->rules.push_back(rule);
+//			return true;
 		}
 
 		void ASPTerm::addFact(string fact)
@@ -68,14 +65,14 @@ namespace alica
 			}
 		}
 
-		string ASPTerm::getRuleHead()
+		vector<string> ASPTerm::getRuleHeads()
 		{
-			return this->head;
+			return this->heads;
 		}
 
-		string ASPTerm::getRuleBody()
+		vector<string> ASPTerm::getRuleBodies()
 		{
-			return this->body;
+			return this->bodies;
 		}
 
 		string ASPTerm::getProgramSection()
@@ -93,9 +90,9 @@ namespace alica
 			return this->lifeTime;
 		}
 
-		string ASPTerm::getRule()
+		vector<string> ASPTerm::getRules()
 		{
-			return this->rule;
+			return this->rules;
 		}
 
 		vector<string> ASPTerm::getFacts()

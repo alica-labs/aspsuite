@@ -12,7 +12,13 @@ namespace alica
 	namespace reasoner
 	{
 
-		AnnotatedValVec::AnnotatedValVec(long id, Gringo::ValVec values, shared_ptr<ASPQuery> query)
+//		AnnotatedValVec::AnnotatedValVec()
+//		{
+//			this->id = -1;
+//			this->query = nullptr;
+//		}
+
+		AnnotatedValVec::AnnotatedValVec(long id, vector<Gringo::ValVec> values, shared_ptr<ASPQuery> query)
 		{
 			this->id = id;
 			this->values = values;

@@ -7,8 +7,8 @@
 
 #include <alica_asp_solver/ASPVariable.h>
 #include <engine/constraintmodul/ProblemDescriptor.h>
-#include "alica_asp_solver/ASPSolver.h"
 #include "alica_asp_solver/AnnotatedValVec.h"
+#include "alica_asp_solver/ASPSolver.h"
 #include "engine/model/Plan.h"
 #include "engine/model/Variable.h"
 #include "alica_asp_solver/ASPTerm.h"
@@ -61,6 +61,7 @@ namespace alica
 		ASPSolver::~ASPSolver()
 		{
 			delete this->gringoModule;
+
 		}
 
 		void ASPSolver::loadFile(string absolutFilename)
@@ -232,15 +233,17 @@ namespace alica
 				this->removeDeadQueries();
 				return false;
 			}
-			shared_ptr<vector<Gringo::ValVec>> gresults = make_shared<vector<Gringo::ValVec>>();
 			for (auto query : this->registeredQueries)
 			{
+				vector<Gringo::ValVec> vals;
 				for (auto pair : query->getHeadValues())
 				{
-					results.push_back(new AnnotatedValVec(query->getTerm()->getId(), pair.second, query));
+					vals.push_back(pair.second);
 				}
+
+				results.push_back(new AnnotatedValVec(query->getTerm()->getId(), vals, query));
 			}
-			if (gresults->size() > 0)
+			if (results.size() > 0)
 			{
 				this->removeDeadQueries();
 				return true;

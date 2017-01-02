@@ -22,10 +22,11 @@ namespace alica
 		class AnnotatedValVec
 		{
 		public:
-			AnnotatedValVec(long id, Gringo::ValVec values, shared_ptr<ASPQuery> query);
+//			AnnotatedValVec();
+			AnnotatedValVec(long id, vector<Gringo::ValVec> values, shared_ptr<ASPQuery> query);
 			virtual ~AnnotatedValVec();
 			long id;
-			Gringo::ValVec values;
+			vector<Gringo::ValVec> values;
 			shared_ptr<ASPQuery> query;
 		};
 

@@ -30,7 +30,7 @@ namespace alica
 			void removeExternal();
 
 		private:
-			void createHeadQueryValues(string queryString);
+			void createHeadQueryValues(vector<string> queryVec);
 			string expandRule(string rule);
 			string expandFact(string fact);
 			shared_ptr<Gringo::Value> external;

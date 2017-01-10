@@ -13,8 +13,9 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 find_package(catkin QUIET)
-find_library(LIBZMQ libzmq)
-message("#### ZMQ: ${LIBZMQ_INCLUDE_DIRS} ### ${LIBZMQ_LIBRARIES}")
+
+message("#### ZMQ-Includes: ${zmq_INCLUDE_DIRS}") 
+message("#### ZMQ-Libraries: ${zmq_LIBRARIES}")
 
 if (catkin_FOUND)
   find_package(catkin REQUIRED COMPONENTS)

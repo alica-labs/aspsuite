@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>discovery</name>
+  <version>0.0.0</version>
+  <description>The discovery package</description>
+
+  <maintainer email="opfer@vs.uni-kassel.de">Stephan Opfer</maintainer>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+</package>

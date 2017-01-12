@@ -10,10 +10,11 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 # Define where to find modules for ZeroMQ
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules CACHE INTERNAL "" FORCE)
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
 message("#### ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
+
 message("#### ZMQ-Libraries: ${ZeroMQ_LIBRARIES}") 
 
 # Catkin Stuff

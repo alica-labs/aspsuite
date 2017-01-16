@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>concept_net_gui</name>
+  <version>0.0.0</version>
+  <description>The conceptNetGui package</description>
+  <maintainer email="s.jakob872@gmail.com">Stefan Jakob</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>qt_gui</build_depend>
+  <build_depend>system_config</build_depend>
+
+  <run_depend>qt_gui</run_depend>
+  <run_depend>system_config</run_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

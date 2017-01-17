@@ -27,10 +27,12 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 set(conceptNetGui_SRCS
   src/ConceptNetGui.cpp
   src/main.cpp
+  src/SettingsDialog.cpp
 )
 
 set(conceptNetGui_HDRS
   include/ConceptNetGui.h
+  include/SettingsDialog.h
 )
 
 set(conceptNetGui_UIS
@@ -63,13 +65,6 @@ QT5_WRAP_UI(conceptNetGui_UIS_H ${conceptNetGui_UIS})
 #add_library(${PROJECT_NAME} ${conceptNetGui_SRCS} ${conceptNetGui_MOCS} ${conceptNetGui_UIS_H} ${QT_RESOURCES_CPP})
 add_executable (ConceptNetGui ${conceptNetGui_SRCS} ${conceptNetGui_MOCS} ${conceptNetGui_UIS_H} ${QT_RESOURCES_CPP})
 target_link_libraries(ConceptNetGui ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5WebKitWidgets_location})
-
-find_package(class_loader)
-class_loader_hide_library_symbols(ConceptNetGui)
-
-install(FILES plugin.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
 
 install(TARGETS ConceptNetGui
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

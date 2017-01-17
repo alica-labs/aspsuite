@@ -105,8 +105,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -138,8 +138,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -171,8 +171,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -233,8 +233,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>96</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -270,6 +270,8 @@
     <addaction name="actionSave_Models"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_Models"/>
+    <addaction name="actionLoad_Program"/>
+    <addaction name="actionLoad_Background_Knowledge"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -306,6 +308,16 @@
    </property>
    <property name="text">
     <string>Solver Settings</string>
+   </property>
+  </action>
+  <action name="actionLoad_Program">
+   <property name="text">
+    <string>Load Program</string>
+   </property>
+  </action>
+  <action name="actionLoad_Background_Knowledge">
+   <property name="text">
+    <string>Load Background Knowledge</string>
    </property>
   </action>
  </widget>

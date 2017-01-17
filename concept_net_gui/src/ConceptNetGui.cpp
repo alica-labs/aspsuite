@@ -8,39 +8,39 @@
 #include <SystemConfig.h>
 
 ConceptNetGui::ConceptNetGui(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::ConceptNetGui)
+		QMainWindow(parent), ui(new Ui::ConceptNetGui)
 {
 	this->settingsDialog = new SettingsDialog(parent);
-    this->ui->setupUi(this);
+	this->ui->setupUi(this);
 
-    // Settings connects
-    this->connect(this->ui->actionSolver_Settings, SIGNAL(triggered()), this->settingsDialog, SLOT(show()));
+	// Settings connects
+	this->connect(this->ui->actionSolver_Settings, SIGNAL(triggered()), this->settingsDialog, SLOT(show()));
 
-    // Menu connects
-    this->connect(this->ui->actionSave_Program, SIGNAL(triggered()), this, SLOT(saveProgram()));
-    this->connect(this->ui->actionSave_Models, SIGNAL(triggered()), this, SLOT(saveModels()));
-    this->connect(this->ui->actionLoad_Program, SIGNAL(triggered()), this, SLOT(loadProgram()));
-    this->connect(this->ui->actionLoad_Models, SIGNAL(triggered()), this, SLOT(loadModels()));
-    this->connect(this->ui->actionLoad_Background_Knowledge, SIGNAL(triggered()), this, SLOT(loadBackgroundKnowledge()));
-    this->connect(this->ui->actionNew_Program, SIGNAL(triggered()), this, SLOT(newSolver()));
+	// Menu connects
+	this->connect(this->ui->actionSave_Program, SIGNAL(triggered()), this, SLOT(saveProgram()));
+	this->connect(this->ui->actionSave_Models, SIGNAL(triggered()), this, SLOT(saveModels()));
+	this->connect(this->ui->actionLoad_Program, SIGNAL(triggered()), this, SLOT(loadProgram()));
+	this->connect(this->ui->actionLoad_Models, SIGNAL(triggered()), this, SLOT(loadModels()));
+	this->connect(this->ui->actionLoad_Background_Knowledge, SIGNAL(triggered()), this,
+					SLOT(loadBackgroundKnowledge()));
+	this->connect(this->ui->actionNew_Program, SIGNAL(triggered()), this, SLOT(newSolver()));
 
-    // Button connects
-    this->connect(this->ui->groundBtn, SIGNAL(released()), this, SLOT(groundCallBack()));
-    this->connect(this->ui->solveBtn, SIGNAL(released()), this, SLOT(solveCallBack()));
-    this->connect(this->ui->queryBtn, SIGNAL(released()), this, SLOT(queryCallBack()));
-    this->connect(this->ui->conceptNetBtn, SIGNAL(released()), this, SLOT(conceptNetCallBack()));
+	// Button connects
+	this->connect(this->ui->groundBtn, SIGNAL(released()), this, SLOT(groundCallBack()));
+	this->connect(this->ui->solveBtn, SIGNAL(released()), this, SLOT(solveCallBack()));
+	this->connect(this->ui->queryBtn, SIGNAL(released()), this, SLOT(queryCallBack()));
+	this->connect(this->ui->conceptNetBtn, SIGNAL(released()), this, SLOT(conceptNetCallBack()));
 
-    // Settings ok button connect
-    this->connect(this->settingsDialog->getUi()->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
+	// Settings ok button connect
+	this->connect(this->settingsDialog->getUi()->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
 
-    this->sc = supplementary::SystemConfig::getInstance();
+	this->sc = supplementary::SystemConfig::getInstance();
 }
 
 ConceptNetGui::~ConceptNetGui()
 {
 	delete this->settingsDialog;
-    delete this->ui;
+	delete this->ui;
 }
 
 void ConceptNetGui::newSolver()
@@ -82,8 +82,8 @@ void ConceptNetGui::saveProgram()
 void ConceptNetGui::saveModels()
 {
 	//Open save file dialog to save models
-	QString filename = QFileDialog::getSaveFileName(this->parentWidget(), tr("Save Current Models"), QDir::currentPath(),
-													tr("ConceptNetGui Models File (*.cnmod)"), 0,
+	QString filename = QFileDialog::getSaveFileName(this->parentWidget(), tr("Save Current Models"),
+													QDir::currentPath(), tr("ConceptNetGui Models File (*.cnmod)"), 0,
 													QFileDialog::DontUseNativeDialog);
 
 	if (!filename.endsWith(".cnmod"))
@@ -156,8 +156,8 @@ void ConceptNetGui::loadProgram()
 void ConceptNetGui::loadBackgroundKnowledge()
 {
 	//Open load file dialog to select a pregenerated wumpus world
-	QString filename = QFileDialog::getOpenFileName(this->parentWidget(), tr("Load Background Knowledge"), QDir::currentPath(),
-													tr("Logic Program (*.lp)"), 0,
+	QString filename = QFileDialog::getOpenFileName(this->parentWidget(), tr("Load Background Knowledge"),
+													QDir::currentPath(), tr("Logic Program (*.lp)"), 0,
 													QFileDialog::DontUseNativeDialog);
 
 	//Check if the user selected a correct file
@@ -177,7 +177,38 @@ void ConceptNetGui::loadBackgroundKnowledge()
 
 void ConceptNetGui::applySettings()
 {
-	cout << this->settingsDialog->getCurrentSettings() << endl;
+	cout << "ConceptNetGui: Solver Params: " << this->settingsDialog->getCurrentSettings() << endl;
+	string params = this->settingsDialog->getCurrentSettings();
+	this->arguments.clear();
+	if (params.find(",") != string::npos)
+	{
+		size_t start = 0;
+		size_t end = string::npos;
+		string parsedParam = "";
+		while (start != string::npos)
+		{
+			end = params.find(",", start);
+			if (end == string::npos)
+			{
+				parsedParam = supplementary::Configuration::trim(params.substr(start, params.length() - start));
+				this->arguments.push_back(parsedParam.c_str());
+				break;
+			}
+			parsedParam = supplementary::Configuration::trim(params.substr(start, end - start));
+			start = params.find(",", end);
+			if (start != string::npos)
+			{
+				start += 1;
+			}
+			this->arguments.push_back(parsedParam.c_str());
+		}
+		this->arguments.push_back(nullptr);
+	}
+	else
+	{
+		this->arguments.push_back(params.c_str());
+		this->arguments.push_back(nullptr);
+	}
 	//TODO pass params to solver
 	this->settingsDialog->close();
 }

@@ -15,8 +15,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
 	this->ui->setupUi(this);
 	this->connect(this->ui->cancelBtn, SIGNAL(released()), this, SLOT(close()));
-	this->connect(this->ui->commandLineEdit, SIGNAL(textEdited(const QString &)), this, SLOT(setCurrentSettings(const QString &)));
-	this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this, SLOT(fillSettingsLabel(QListWidgetItem * )));
+	this->connect(this->ui->commandLineEdit, SIGNAL(textEdited(const QString &)), this,
+					SLOT(setCurrentSettings(const QString &)));
+	this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this,
+					SLOT(fillSettingsLabel(QListWidgetItem * )));
 	this->sc = supplementary::SystemConfig::getInstance();
 	loadSettingsFromConfig();
 	fillSettingsList();
@@ -51,13 +53,14 @@ void SettingsDialog::loadSettingsFromConfig()
 	// Iterate over all model sections in config file
 	for (auto section : *(this->parameterSectionNames))
 	{
-		this->parameterMap.emplace(section, (*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters", NULL));
+		this->parameterMap.emplace(
+				section, (*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters", NULL));
 	}
 }
 
 void SettingsDialog::fillSettingsList()
 {
-	for(auto pair : this->parameterMap)
+	for (auto pair : this->parameterMap)
 	{
 		this->ui->settingsListWidget->addItem(QString(pair.first.c_str()));
 	}
@@ -66,6 +69,32 @@ void SettingsDialog::fillSettingsList()
 void SettingsDialog::fillSettingsLabel(QListWidgetItem* item)
 {
 	auto params = this->parameterMap.at(item->text().toStdString());
-	this->ui->settingsLabel->setText(QString(params.c_str()));
 	this->currentSettings = params;
+	if (params.find(",") != string::npos)
+	{
+		size_t start = 0;
+		size_t end = string::npos;
+		string parsedParams = "";
+		while (start != string::npos)
+		{
+			end = params.find(",", start);
+			if (end == string::npos)
+			{
+				parsedParams += params.substr(start, params.length() - start);
+				break;
+			}
+			parsedParams += params.substr(start, end - start);
+			parsedParams += "\n";
+			start = params.find(",", end);
+			if (start != string::npos)
+			{
+				start += 1;
+			}
+		}
+		this->ui->settingsLabel->setText(QString(parsedParams.c_str()));
+	}
+	else
+	{
+		this->ui->settingsLabel->setText(QString(params.c_str()));
+	}
 }

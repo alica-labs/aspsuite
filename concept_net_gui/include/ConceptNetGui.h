@@ -45,6 +45,7 @@ private slots:
 	void conceptNetCallBack();
 
 private:
+	vector<char const*> arguments;
 	Ui::ConceptNetGui* ui;
 	SettingsDialog* settingsDialog;
 	supplementary::SystemConfig* sc;

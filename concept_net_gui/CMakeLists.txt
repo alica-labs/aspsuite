@@ -28,11 +28,13 @@ set(conceptNetGui_SRCS
   src/ConceptNetGui.cpp
   src/main.cpp
   src/SettingsDialog.cpp
+  src/Command.cpp
 )
 
 set(conceptNetGui_HDRS
   include/ConceptNetGui.h
   include/SettingsDialog.h
+  include/Command.h
 )
 
 set(conceptNetGui_UIS

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <iostream>
+#include "../include/Command.h"
 
 using namespace std;
 
@@ -49,6 +50,7 @@ private:
 	Ui::ConceptNetGui* ui;
 	SettingsDialog* settingsDialog;
 	supplementary::SystemConfig* sc;
+	vector<Command> commandHistory;
 };
 
 #endif // CONCEPTNETGUI_H

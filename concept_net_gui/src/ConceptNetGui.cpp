@@ -172,6 +172,7 @@ void ConceptNetGui::loadBackgroundKnowledge()
 		}
 
 		QByteArray saveData = file.readAll();
+		this->ui->aspRuleTextArea->setText(saveData);
 	}
 }
 

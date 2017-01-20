@@ -10,22 +10,23 @@
 
 #include "../include/commands/Command.h"
 #include <vector>
+#include <memory>
 
 namespace cng
 {
 
+	class SolverSettings;
 	class ConceptNetGui;
 	class NewSolverCommand : public Command
 	{
 	public:
-		NewSolverCommand(vector<char const*> arguments, ConceptNetGui* gui, string argumentString);
+		NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings);
 		virtual ~NewSolverCommand();
 
 		void execute();
 		void undo();
 
-		vector<char const*> arguments;
-		string argumentString;
+		shared_ptr<SolverSettings> settings;
 		ConceptNetGui* gui;
 
 	private:

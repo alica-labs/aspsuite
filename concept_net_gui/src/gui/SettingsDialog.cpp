@@ -112,38 +112,8 @@ namespace cng
 
 	void SettingsDialog::applySettings()
 	{
-		vector<char const*> arguments;
 		cout << "SettingsDialog: applying parameters: " << currentSettings << endl;
-		if (currentSettings.find(",") != string::npos)
-		{
-			size_t start = 0;
-			size_t end = string::npos;
-			string parsedParam = "";
-			while (start != string::npos)
-			{
-				end = currentSettings.find(",", start);
-				if (end == string::npos)
-				{
-					parsedParam = supplementary::Configuration::trim(currentSettings.substr(start, currentSettings.length() - start));
-					arguments.push_back(parsedParam.c_str());
-					break;
-				}
-				parsedParam = supplementary::Configuration::trim(currentSettings.substr(start, end - start));
-				start = currentSettings.find(",", end);
-				if (start != string::npos)
-				{
-					start += 1;
-				}
-				arguments.push_back(parsedParam.c_str());
-			}
-			arguments.push_back(nullptr);
-		}
-		else
-		{
-			arguments.push_back(currentSettings.c_str());
-			arguments.push_back(nullptr);
-		}
-		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(arguments, this->mainGui, this, currentSettings);
+		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(this->mainGui, this, currentSettings);
 		this->mainGui->addToCommandHistory(cmd);
 		cmd->execute();
 		this->close();

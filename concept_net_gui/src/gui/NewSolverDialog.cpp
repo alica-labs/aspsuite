@@ -31,7 +31,7 @@ namespace cng
 
 	void NewSolverDialog::okBtnClicked()
 	{
-		shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this->mainGui->getArguments(), this->mainGui, this->mainGui->getArgumentString());
+		shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this->mainGui, this->mainGui->getSettings());
 		this->mainGui->addToCommandHistory(cmd);
 		cmd->execute();
 		this->close();

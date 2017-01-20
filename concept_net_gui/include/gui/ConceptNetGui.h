@@ -23,6 +23,7 @@ namespace Ui
 
 namespace cng
 {
+	class SolverSettings;
 	class SettingsDialog;
 	class NewSolverDialog;
 	class ConceptNetGui : public QMainWindow
@@ -34,10 +35,8 @@ namespace cng
 		~ConceptNetGui();
 		void addToCommandHistory(shared_ptr<Command> cmd);
 
-		vector<const char*> getArguments();
-		void setArguments(vector<const char*> arguments);
-		string getArgumentString();
-		void setArgumentString(string argumentString);
+		shared_ptr<SolverSettings> getSettings();
+		void setSettings(shared_ptr<SolverSettings> settings);
 
 	private slots:
 		// menu solts
@@ -58,8 +57,7 @@ namespace cng
 		void drawHistoryTable();
 
 	private:
-		vector<char const*> arguments;
-		string argumentString;
+		shared_ptr<SolverSettings> settings;
 		Ui::ConceptNetGui* ui;
 		SettingsDialog* settingsDialog;
 		NewSolverDialog* newSolverDialog;
@@ -68,6 +66,7 @@ namespace cng
 
 	signals:
 		void updateCommandList();
+
 	};
 }
 #endif // CONCEPTNETGUI_H

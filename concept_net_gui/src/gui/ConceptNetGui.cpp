@@ -1,6 +1,9 @@
 #include "../include/gui/ConceptNetGui.h"
 #include "../include/gui/SettingsDialog.h"
 #include "../include/gui/NewSolverDialog.h"
+
+#include "../include/containers/SolverSettings.h"
+
 #include "../include/commands/NewSolverCommand.h"
 #include "../include/commands/ChangeSolverSettingsCommand.h"
 
@@ -44,6 +47,7 @@ namespace cng
 		this->connect(this, SIGNAL(updateCommandList()), this, SLOT(fillCommandList()));
 
 		this->sc = supplementary::SystemConfig::getInstance();
+		this->settings = nullptr;
 	}
 
 	ConceptNetGui::~ConceptNetGui()
@@ -55,13 +59,13 @@ namespace cng
 
 	void ConceptNetGui::newSolver()
 	{
-		if (this->arguments.size() == 0)
+		if (this->settings == nullptr)
 		{
 			this->newSolverDialog->show();
 		}
 		else
 		{
-			shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this->arguments, this, this->argumentString);
+			shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this, this->settings);
 			this->addToCommandHistory(cmd);
 			cmd->execute();
 		}
@@ -190,11 +194,6 @@ namespace cng
 		//TODO create query
 	}
 
-	vector<const char*> ConceptNetGui::getArguments()
-	{
-		return this->arguments;
-	}
-
 	void ConceptNetGui::addToCommandHistory(shared_ptr<Command> cmd)
 	{
 		this->commandHistory.push_back(cmd);
@@ -207,9 +206,14 @@ namespace cng
 		//TODO ask conceptNet
 	}
 
-	void ConceptNetGui::setArguments(vector<const char*> arguments)
+	shared_ptr<SolverSettings> ConceptNetGui::getSettings()
 	{
-		this->arguments = arguments;
+		return settings;
+	}
+
+	void ConceptNetGui::setSettings(shared_ptr<SolverSettings> settings)
+	{
+		this->settings = settings;
 	}
 
 	void ConceptNetGui::drawHistoryTable()
@@ -237,29 +241,19 @@ namespace cng
 
 			if (dynamic_pointer_cast<NewSolverCommand>(cmd))
 			{
-				auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<NewSolverCommand>(cmd)->argumentString.c_str()));
+				auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<NewSolverCommand>(cmd)->settings->argString.c_str()));
 				tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
 				this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
 			}
 
 			if (dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd))
 			{
-				auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings.c_str()));
+				auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
 				tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
 				this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
 			}
 
 		}
-	}
-
-	string ConceptNetGui::getArgumentString()
-	{
-		return argumentString;
-	}
-
-	void ConceptNetGui::setArgumentString(string argumentString)
-	{
-		this->argumentString = argumentString;
 	}
 
 }

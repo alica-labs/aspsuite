@@ -10,25 +10,25 @@
 
 #include <commands/Command.h>
 #include <vector>
+#include <memory>
 
 namespace cng
 {
 
+	class SolverSettings;
 	class ConceptNetGui;
 	class SettingsDialog;
 	class ChangeSolverSettingsCommand : public Command
 	{
 	public:
-		ChangeSolverSettingsCommand(vector<char const*> arguments, ConceptNetGui* gui, SettingsDialog* dialog, string currentSettings);
+		ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, string currentSettings);
 		virtual ~ChangeSolverSettingsCommand();
 
 		void execute();
 		void undo();
 
-		vector<char const*> arguments;
-		vector<char const*> previousArguments;
-		string currentSettings;
-		string previousSettings;
+		shared_ptr<SolverSettings> previousSettings;
+		shared_ptr<SolverSettings> currentSettings;
 		ConceptNetGui* gui;
 		SettingsDialog* dialog;
 	};

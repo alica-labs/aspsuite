@@ -9,6 +9,8 @@
 
 #include "../include/gui/ConceptNetGui.h"
 
+#include "../include/containers/SolverSettings.h"
+
 #include <SystemConfig.h>
 #include <iostream>
 
@@ -17,13 +19,12 @@ using namespace std;
 namespace cng
 {
 
-	NewSolverCommand::NewSolverCommand(vector<char const*> arguments, ConceptNetGui* gui, string argumentString)
+	NewSolverCommand::NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings)
 	{
 		this->type = "New Solver";
-		this->arguments = arguments;
+		this->settings = settings;
 		this->gui = gui;
-		this->argumentString = argumentString;
-		if (arguments.size() == 0)
+		if (settings == nullptr)
 		{
 			getDefaultArguments();
 		}
@@ -36,6 +37,7 @@ namespace cng
 	void NewSolverCommand::execute()
 	{
 		cout << "NewSolverCommand: create new solver" << endl;
+		this->gui->setSettings(this->settings);
 		//TODO create solver and pass it to the conceptnet gui
 	}
 
@@ -47,33 +49,8 @@ namespace cng
 	void NewSolverCommand::getDefaultArguments()
 	{
 		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-		this->argumentString = (*sc)["ConceptNetGui"]->get<string>("ConceptNetGui", "Default", "Parameters", NULL);
-		if (this->argumentString.find(",") != string::npos)
-		{
-			size_t start = 0;
-			size_t end = string::npos;
-			string parsedParam = "";
-			while (start != string::npos)
-			{
-				end = this->argumentString.find(",", start);
-				if (end == string::npos)
-				{
-					parsedParam = this->argumentString.substr(start, this->argumentString.length() - start);
-					break;
-				}
-				parsedParam += this->argumentString.substr(start, end - start);
-				start = this->argumentString.find(",", end);
-				if (start != string::npos)
-				{
-					start += 1;
-				}
-			}
-			this->arguments.push_back(parsedParam.c_str());
-		}
-		else
-		{
-			this->arguments.push_back(this->argumentString.c_str());
-		}
+		string argumentString = (*sc)["ConceptNetGui"]->get<string>("ConceptNetGui", "Default", "Parameters", NULL);
+		this->settings = make_shared<SolverSettings>(argumentString);
 	}
 
 } /* namespace cng */

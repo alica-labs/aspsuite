@@ -9,15 +9,21 @@
 #define SRC_COMMANDS_LOADSAVEDPROGRAMCOMMAND_H_
 
 #include <commands/Command.h>
+#include <memory>
 
 namespace cng
 {
-
-	class LoadSavedProgramCommand : public Command
+	class ConceptNetGui;
+	class LoadSavedProgramCommand : public Command, public enable_shared_from_this<LoadSavedProgramCommand>
 	{
 	public:
-		LoadSavedProgramCommand();
+		LoadSavedProgramCommand(ConceptNetGui* gui);
 		virtual ~LoadSavedProgramCommand();
+
+		void execute();
+		void undo();
+
+		ConceptNetGui* gui;
 	};
 
 } /* namespace cng */

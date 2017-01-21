@@ -9,15 +9,22 @@
 #define INCLUDE_COMMANDS_VARIABLEQUERYCOMMAND_H_
 
 #include <commands/Command.h>
+#include <memory>
 
 namespace cng
 {
 
-	class VariableQueryCommand : public Command
+	class ConceptNetGui;
+	class VariableQueryCommand : public Command, public enable_shared_from_this<VariableQueryCommand>
 	{
 	public:
-		VariableQueryCommand();
+		VariableQueryCommand(ConceptNetGui* gui);
 		virtual ~VariableQueryCommand();
+
+		void execute();
+		void undo();
+
+		ConceptNetGui* gui;
 	};
 
 } /* namespace cng */

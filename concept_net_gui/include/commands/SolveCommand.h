@@ -9,15 +9,22 @@
 #define SRC_COMMANDS_SOLVECOMMAND_H_
 
 #include <commands/Command.h>
+#include <memory>
 
 namespace cng
 {
 
-	class SolveCommand : public Command
+	class ConceptNetGui;
+	class SolveCommand : public Command, public enable_shared_from_this<SolveCommand>
 	{
 	public:
-		SolveCommand();
+		SolveCommand(ConceptNetGui* gui);
 		virtual ~SolveCommand();
+
+		void execute();
+		void undo();
+
+		ConceptNetGui* gui;
 	};
 
 } /* namespace cng */

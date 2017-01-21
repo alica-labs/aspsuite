@@ -6,19 +6,29 @@
  */
 
 #include <commands/VariableQueryCommand.h>
+#include "../include/gui/ConceptNetGui.h"
 
 namespace cng
 {
 
-	VariableQueryCommand::VariableQueryCommand()
+	VariableQueryCommand::VariableQueryCommand(ConceptNetGui* gui)
 	{
-		// TODO Auto-generated constructor stub
-
+		this->type = "Variable Query";
+		this->gui = gui;
 	}
 
 	VariableQueryCommand::~VariableQueryCommand()
 	{
-		// TODO Auto-generated destructor stub
+	}
+
+	void VariableQueryCommand::execute()
+	{
+		this->gui->addToCommandHistory(shared_from_this());
+	}
+
+	void VariableQueryCommand::undo()
+	{
+		this->gui->removeFromCommandHistory(shared_from_this());
 	}
 
 } /* namespace cng */

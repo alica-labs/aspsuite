@@ -10,9 +10,10 @@
 
 #include <QDialog>
 #include <QtGui>
+#include <QListWidget>
+
 #include <string>
 #include <memory>
-#include <qlistwidget.h>
 
 using namespace std;
 
@@ -27,6 +28,7 @@ namespace Ui
 }
 namespace cng
 {
+	class SolverSettings;
 	class ConceptNetGui;
 	class SettingsDialog : public QDialog
 	{
@@ -36,7 +38,6 @@ namespace cng
 		SettingsDialog(QWidget *parent = 0, ConceptNetGui* gui = 0);
 		virtual ~SettingsDialog();
 		Ui::SettingsDialog* getUi();
-		string getCurrentSettings();
 
 	private slots:
 		void setCurrentSettings(const QString &text);
@@ -51,7 +52,7 @@ namespace cng
 		void loadSettingsFromConfig();
 		void fillSettingsList();
 		shared_ptr<vector<string>> parameterSectionNames;
-		map<string, string> parameterMap;
+		map<string, shared_ptr<SolverSettings>> parameterMap;
 	};
 }
 #endif /* INCLUDE_SETTINGSDIALOG_H_ */

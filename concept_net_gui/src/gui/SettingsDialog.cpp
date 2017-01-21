@@ -8,6 +8,7 @@
 #include "../include/gui/SettingsDialog.h"
 #include "../include/gui/ConceptNetGui.h"
 #include "../include/commands/ChangeSolverSettingsCommand.h"
+#include "../include/containers/SolverSettings.h"
 
 #include <ui_settingsdialog.h>
 
@@ -28,7 +29,7 @@ namespace cng
 						SLOT(setCurrentSettings(const QString &)));
 		this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this,
 						SLOT(fillSettingsLabel(QListWidgetItem * )));
-		this->connect(this->ui->okBtn, SIGNAL(released()), this,SLOT(applySettings()));
+		this->connect(this->ui->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
 		this->sc = supplementary::SystemConfig::getInstance();
 		loadSettingsFromConfig();
 		fillSettingsList();
@@ -42,11 +43,6 @@ namespace cng
 	SettingsDialog::~SettingsDialog()
 	{
 		delete ui;
-	}
-
-	string SettingsDialog::getCurrentSettings()
-	{
-		return currentSettings;
 	}
 
 	void SettingsDialog::setCurrentSettings(const QString& text)
@@ -65,7 +61,7 @@ namespace cng
 		{
 			this->parameterMap.emplace(
 					section,
-					(*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters", NULL));
+					make_shared<SolverSettings>((*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters", NULL)));
 		}
 	}
 
@@ -80,41 +76,31 @@ namespace cng
 	void SettingsDialog::fillSettingsLabel(QListWidgetItem* item)
 	{
 		auto params = this->parameterMap.at(item->text().toStdString());
-		this->currentSettings = params;
-		if (params.find(",") != string::npos)
+		this->currentSettings = params->argString;
+		if (this->currentSettings.find(",") != string::npos)
 		{
-			size_t start = 0;
-			size_t end = string::npos;
-			string parsedParams = "";
-			while (start != string::npos)
+			string parameters = "";
+			for(auto param : params->argumentStrings)
 			{
-				end = params.find(",", start);
-				if (end == string::npos)
-				{
-					parsedParams += params.substr(start, params.length() - start);
-					break;
-				}
-				parsedParams += params.substr(start, end - start);
-				parsedParams += "\n";
-				start = params.find(",", end);
-				if (start != string::npos)
-				{
-					start += 1;
-				}
+				parameters += param;
+				parameters += "\n";
 			}
-			this->ui->settingsLabel->setText(QString(parsedParams.c_str()));
+			this->ui->settingsLabel->setText(QString(parameters.c_str()));
 		}
 		else
 		{
-			this->ui->settingsLabel->setText(QString(params.c_str()));
+			this->ui->settingsLabel->setText(QString(this->currentSettings.c_str()));
 		}
 	}
 
 	void SettingsDialog::applySettings()
 	{
+		if(this->currentSettings.empty())
+		{
+			return;
+		}
 		cout << "SettingsDialog: applying parameters: " << currentSettings << endl;
 		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(this->mainGui, this, currentSettings);
-		this->mainGui->addToCommandHistory(cmd);
 		cmd->execute();
 		this->close();
 	}

@@ -24,6 +24,7 @@ namespace cng
 		virtual ~SolverSettings();
 
 		vector<const char*> args;
+		vector<string> argumentStrings;
 		string argString;
 	private:
 		void extractSettingsVector();

@@ -36,13 +36,18 @@ namespace cng
 
 	void NewSolverCommand::execute()
 	{
+		this->gui->addToCommandHistory(shared_from_this());
 		cout << "NewSolverCommand: create new solver" << endl;
 		this->gui->setSettings(this->settings);
 		//TODO create solver and pass it to the conceptnet gui
+		this->gui->enableGui(true);
 	}
 
 	void NewSolverCommand::undo()
 	{
+		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->enableGui(false);
+		this->gui->clear();
 		//delete solver ?
 	}
 

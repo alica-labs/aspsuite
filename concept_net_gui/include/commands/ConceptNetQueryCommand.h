@@ -9,15 +9,22 @@
 #define SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_
 
 #include <commands/Command.h>
+#include <memory>
 
 namespace cng
 {
 
-	class ConceptNetQueryCommand : public Command
+	class ConceptNetGui;
+	class ConceptNetQueryCommand : public Command, public enable_shared_from_this<ConceptNetQueryCommand>
 	{
 	public:
-		ConceptNetQueryCommand();
+		ConceptNetQueryCommand(ConceptNetGui* gui);
 		virtual ~ConceptNetQueryCommand();
+
+		void execute();
+		void undo();
+
+		ConceptNetGui* gui;
 	};
 
 } /* namespace cng */

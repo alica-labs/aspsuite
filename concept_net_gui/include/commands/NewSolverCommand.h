@@ -17,7 +17,7 @@ namespace cng
 
 	class SolverSettings;
 	class ConceptNetGui;
-	class NewSolverCommand : public Command
+	class NewSolverCommand : public Command, public enable_shared_from_this<NewSolverCommand>
 	{
 	public:
 		NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings);

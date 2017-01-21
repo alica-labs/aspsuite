@@ -8,16 +8,29 @@
 #ifndef SRC_COMMANDS_GROUNDCOMMAND_H_
 #define SRC_COMMANDS_GROUNDCOMMAND_H_
 
+#include <QString>
+
 #include <commands/Command.h>
+#include <memory>
 
 namespace cng
 {
-
-	class GroundCommand : public Command
+	class ConceptNetGui;
+	class GroundCommand : public Command, public enable_shared_from_this<GroundCommand>
 	{
 	public:
-		GroundCommand();
+		GroundCommand(ConceptNetGui* gui, QString program);
 		virtual ~GroundCommand();
+
+		void execute();
+		void undo();
+
+		ConceptNetGui* gui;
+		QString program;
+		string programSection;
+
+	private:
+		string extractProgramSection();
 	};
 
 } /* namespace cng */

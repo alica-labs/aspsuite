@@ -36,6 +36,7 @@ namespace cng
 				{
 					parsedParam = supplementary::Configuration::trim(this->argString.substr(start, this->argString.length() - start));
 					this->args.push_back(parsedParam.c_str());
+					this->argumentStrings.push_back(parsedParam);
 					break;
 				}
 				parsedParam = supplementary::Configuration::trim(this->argString.substr(start, end - start));
@@ -45,11 +46,13 @@ namespace cng
 					start += 1;
 				}
 				this->args.push_back(parsedParam.c_str());
+				this->argumentStrings.push_back(parsedParam);
 			}
 		}
 		else
 		{
 			this->args.push_back(this->argString.c_str());
+			this->argumentStrings.push_back(this->argString);
 		}
 	}
 

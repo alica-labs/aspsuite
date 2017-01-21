@@ -6,18 +6,38 @@
  */
 
 #include "../include/commands/GroundCommand.h"
+#include "../include/gui/ConceptNetGui.h"
 
 namespace cng
 {
 
-	GroundCommand::GroundCommand()
+	GroundCommand::GroundCommand(ConceptNetGui* gui, QString program)
 	{
 		this->type = "Ground";
+		this->gui = gui;
+		this->program = program;
+		this->programSection = extractProgramSection();
 	}
 
 	GroundCommand::~GroundCommand()
 	{
-		// TODO Auto-generated destructor stub
+	}
+
+	void GroundCommand::execute()
+	{
+		this->gui->addToCommandHistory(shared_from_this());
+	}
+
+	void GroundCommand::undo()
+	{
+		this->gui->removeFromCommandHistory(shared_from_this());
+	}
+
+	string GroundCommand::extractProgramSection()
+	{
+		string ret;
+		//TODO
+		return ret;
 	}
 
 } /* namespace cng */

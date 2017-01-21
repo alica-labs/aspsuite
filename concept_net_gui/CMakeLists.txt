@@ -28,7 +28,6 @@ set(conceptNetGui_SRCS
   src/main.cpp
   src/gui/ConceptNetGui.cpp
   src/gui/SettingsDialog.cpp
-  src/gui/NewSolverDialog.cpp
   src/containers/SolverSettings.cpp
   src/commands/NewSolverCommand.cpp
   src/commands/ChangeSolverSettingsCommand.cpp
@@ -38,13 +37,13 @@ set(conceptNetGui_SRCS
   src/commands/LoadSavedProgramCommand.cpp
   src/commands/SolveCommand.cpp
   src/commands/VariableQueryCommand.cpp
+  src/commands/LoadBackgroundKnowledgeCommand.cpp
   
 )
 
 set(conceptNetGui_HDRS
   include/gui/ConceptNetGui.h
   include/gui/SettingsDialog.h
-  include/gui/NewSolverDialog.h
   include/containers/SolverSettings.h
   include/commands/Command.h
   include/commands/NewSolverCommand.h
@@ -55,12 +54,12 @@ set(conceptNetGui_HDRS
   include/commands/LoadSavedProgramCommand.h
   include/commands/SolveCommand.h
   include/commands/VariableQueryCommand.h
+  include/commands/LoadBackgroundKnowledgeCommand.h
 )
 
 set(conceptNetGui_UIS
   ui/conceptnetgui.ui
   ui/settingsdialog.ui
-  ui/newsolver.ui
 )
 
 set(conceptNetGui_INCLUDE_DIRECTORIES

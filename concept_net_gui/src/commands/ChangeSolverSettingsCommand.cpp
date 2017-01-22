@@ -40,4 +40,13 @@ namespace cng
 		this->gui->setSettings(this->previousSettings);
 	}
 
+	QJsonObject cng::ChangeSolverSettingsCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "Change Settings";
+		ret["settingsString"] = QString(this->currentSettings->argString.c_str());
+		return ret;
+	}
+
 } /* namespace cng */
+

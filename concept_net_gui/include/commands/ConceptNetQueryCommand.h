@@ -10,6 +10,7 @@
 
 #include <commands/Command.h>
 #include <memory>
+#include <QJsonObject>
 
 namespace cng
 {
@@ -23,6 +24,8 @@ namespace cng
 
 		void execute();
 		void undo();
+
+		QJsonObject toJSON();
 
 		ConceptNetGui* gui;
 	};

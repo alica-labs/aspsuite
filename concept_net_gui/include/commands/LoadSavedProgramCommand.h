@@ -11,17 +11,24 @@
 #include <commands/Command.h>
 #include <memory>
 
+#include <QJsonObject>
+#include <QByteArray>
+#include <QJsonDocument>
+
 namespace cng
 {
 	class ConceptNetGui;
 	class LoadSavedProgramCommand : public Command, public enable_shared_from_this<LoadSavedProgramCommand>
 	{
 	public:
-		LoadSavedProgramCommand(ConceptNetGui* gui);
+		LoadSavedProgramCommand(ConceptNetGui* gui, QByteArray loadedData);
 		virtual ~LoadSavedProgramCommand();
 
 		void execute();
 		void undo();
+
+		QJsonObject toJSON();
+		QByteArray loadedData;
 
 		ConceptNetGui* gui;
 	};

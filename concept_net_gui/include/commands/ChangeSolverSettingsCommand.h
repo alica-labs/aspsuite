@@ -11,6 +11,7 @@
 #include <commands/Command.h>
 #include <vector>
 #include <memory>
+#include <QJsonObject>
 
 namespace cng
 {
@@ -26,6 +27,8 @@ namespace cng
 
 		void execute();
 		void undo();
+
+		QJsonObject toJSON();
 
 		shared_ptr<SolverSettings> previousSettings;
 		shared_ptr<SolverSettings> currentSettings;

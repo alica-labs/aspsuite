@@ -38,6 +38,7 @@ namespace cng
 		SettingsDialog(QWidget *parent = 0, ConceptNetGui* gui = 0);
 		virtual ~SettingsDialog();
 		Ui::SettingsDialog* getUi();
+		bool isSaveSortedChecked();
 
 	private slots:
 		void setCurrentSettings(const QString &text);

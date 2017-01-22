@@ -30,7 +30,15 @@ namespace cng
 		this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this,
 						SLOT(fillSettingsLabel(QListWidgetItem * )));
 		this->connect(this->ui->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
+		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						SLOT(fillSettingsLabel(QListWidgetItem *)));
+		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						SLOT(applySettings()));
 		this->sc = supplementary::SystemConfig::getInstance();
+		string tmp = (*this->sc)["ConceptNetGui"]->get<string>("ConceptNetGui", "saveSortedModels", NULL);
+		bool checked;
+		istringstream(tmp) >> std::boolalpha >> checked;
+		this->ui->safeSortedModelscheckBox->setChecked(checked);
 		loadSettingsFromConfig();
 		fillSettingsList();
 	}
@@ -61,7 +69,9 @@ namespace cng
 		{
 			this->parameterMap.emplace(
 					section,
-					make_shared<SolverSettings>((*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters", NULL)));
+					make_shared<SolverSettings>(
+							(*this->sc)[conceptNetGui]->get<string>(conceptNetGui, section.c_str(), "Parameters",
+																	NULL)));
 		}
 	}
 
@@ -80,7 +90,7 @@ namespace cng
 		if (this->currentSettings.find(",") != string::npos)
 		{
 			string parameters = "";
-			for(auto param : params->argumentStrings)
+			for (auto param : params->argumentStrings)
 			{
 				parameters += param;
 				parameters += "\n";
@@ -95,13 +105,22 @@ namespace cng
 
 	void SettingsDialog::applySettings()
 	{
-		if(this->currentSettings.empty())
+
+		if (this->currentSettings.empty())
 		{
+			this->close();
 			return;
 		}
 		cout << "SettingsDialog: applying parameters: " << currentSettings << endl;
-		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(this->mainGui, this, currentSettings);
+		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(this->mainGui, this,
+																								currentSettings);
 		cmd->execute();
 		this->close();
 	}
+
+	bool SettingsDialog::isSaveSortedChecked()
+	{
+		return this->ui->safeSortedModelscheckBox->isChecked();
+	}
+
 }

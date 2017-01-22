@@ -8,8 +8,9 @@
 #ifndef INCLUDE_COMMANDS_LOADBACKGROUNDKNOWLEDGECOMMAND_H_
 #define INCLUDE_COMMANDS_LOADBACKGROUNDKNOWLEDGECOMMAND_H_
 
-#include <QByteArray>
 #include <QString>
+#include <QJsonObject>
+#include <QByteArray>
 
 #include <commands/Command.h>
 #include <memory>
@@ -20,14 +21,16 @@ namespace cng
 	class LoadBackgroundKnowledgeCommand : public Command, public enable_shared_from_this<LoadBackgroundKnowledgeCommand>
 	{
 	public:
-		LoadBackgroundKnowledgeCommand(ConceptNetGui* gui, QByteArray file, QString fileName);
+		LoadBackgroundKnowledgeCommand(ConceptNetGui* gui, QString fileName);
 		virtual ~LoadBackgroundKnowledgeCommand();
 
 		void execute();
 		void undo();
 
+		QJsonObject toJSON();
+
 		ConceptNetGui* gui;
-		QByteArray file;
+		QByteArray fileContent;
 		QString fileName;
 	};
 

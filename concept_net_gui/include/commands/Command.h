@@ -9,6 +9,7 @@
 #define INCLUDE_COMMAND_H_
 
 #include <string>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -21,6 +22,8 @@ namespace cng
 
 		virtual void execute() = 0;
 		virtual void undo() = 0;
+
+		virtual QJsonObject toJSON() = 0;
 
 		string getType() {return type;};
 

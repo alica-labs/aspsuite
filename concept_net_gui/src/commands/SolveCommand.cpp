@@ -31,4 +31,11 @@ namespace cng
 		this->gui->removeFromCommandHistory(shared_from_this());
 	}
 
+	QJsonObject SolveCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "Solve";
+		return ret;
+	}
+
 } /* namespace cng */

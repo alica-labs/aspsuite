@@ -20,6 +20,8 @@
 #include <QUrl>
 #include <QFileDialog>
 #include <QDebug>
+#include <QScrollBar>
+#include <QTextStream>
 
 #include <SystemConfig.h>
 
@@ -99,21 +101,36 @@ namespace cng
 				return;
 			}
 
-		}
+			QJsonObject history;
 
-		//TODO JSON serialization of command history
+			//JSON Array to hold the commandHistory
+			QJsonArray jsonCommandHistory;
+			for (auto cmd : this->commandHistory)
+			{
+				//Skip load saved commandHistory to avoid recursive loading
+				if(cmd->getType().compare("Load Saved Program") == 0)
+				{
+					continue;
+				}
+				jsonCommandHistory.append(cmd->toJSON());
+			}
+			history["commandHistory"] = jsonCommandHistory;
+			//Write to file
+			QJsonDocument saveDoc(history);
+			file.write(saveDoc.toJson());
+		}
 	}
 
 	void ConceptNetGui::saveModels()
 	{
 		//Open save file dialog to save models
 		QString filename = QFileDialog::getSaveFileName(this->parentWidget(), tr("Save Current Models"),
-														QDir::currentPath(), tr("ConceptNetGui Models File (*.cnmod)"),
-														0, QFileDialog::DontUseNativeDialog);
+														QDir::currentPath(), tr("ConceptNetGui Models File (*.txt)"), 0,
+														QFileDialog::DontUseNativeDialog);
 
-		if (!filename.endsWith(".cnmod"))
+		if (!filename.endsWith(".txt"))
 		{
-			filename += ".cnmod";
+			filename += ".txt";
 		}
 
 		//Check if the user selected a correct file
@@ -129,9 +146,24 @@ namespace cng
 				return;
 			}
 
-		}
+			QString models;
+			if (this->settingsDialog->isSaveSortedChecked())
+			{
+				models = this->ui->sortedModelsLabel->text();
+			}
+			else
+			{
+				models = this->ui->currentModelsLabel->text();
+			}
+			// Point a QTextStream object at the file
+			QTextStream outStream(&file);
 
-		//TODO save models
+			// Write the line to the file
+			outStream << models;
+
+			// Close the file
+			file.close();
+		}
 	}
 
 	void ConceptNetGui::loadProgram()
@@ -152,8 +184,8 @@ namespace cng
 				return;
 			}
 
-			QByteArray saveData = file.readAll();
-			shared_ptr<LoadSavedProgramCommand> cmd = make_shared<LoadSavedProgramCommand>(this);
+			QByteArray loadedData = file.readAll();
+			shared_ptr<LoadSavedProgramCommand> cmd = make_shared<LoadSavedProgramCommand>(this, loadedData);
 			cmd->execute();
 		}
 	}
@@ -166,20 +198,10 @@ namespace cng
 		QString filename = QFileDialog::getOpenFileName(this->parentWidget(), tr("Load Background Knowledge"),
 														QDir::currentPath(), tr("Logic Program (*.lp)"), 0,
 														QFileDialog::DontUseNativeDialog);
-
 		//Check if the user selected a correct file
 		if (!filename.isNull())
 		{
-			//Open file
-			QFile file(filename);
-			if (!file.open(QIODevice::ReadOnly))
-			{
-				qWarning("Couldn't open file.");
-				return;
-			}
-
-			QByteArray saveData = file.readAll();
-			shared_ptr<LoadBackgroundKnowledgeCommand> cmd = make_shared<LoadBackgroundKnowledgeCommand>(this, saveData, filename);
+			shared_ptr<LoadBackgroundKnowledgeCommand> cmd = make_shared<LoadBackgroundKnowledgeCommand>(this, filename);
 			cmd->execute();
 		}
 	}
@@ -343,13 +365,13 @@ namespace cng
 				this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
 			}
 		}
-		this->ui->commandHistoryScrollArea;
+		this->ui->commandHistoryTable->scrollToBottom();
 	}
 
 	void ConceptNetGui::enableGui(bool enable)
 	{
 		this->ui->actionLoad_Background_Knowledge->setEnabled(enable);
-		this->ui->actionLoad_Program->setEnabled(enable);
+//		this->ui->actionLoad_Program->setEnabled(enable);
 		this->ui->actionSave_Models->setEnabled(enable);
 		this->ui->actionSave_Program->setEnabled(enable);
 		this->ui->aspRuleTextArea->setEnabled(enable);
@@ -359,71 +381,6 @@ namespace cng
 		this->ui->queryBtn->setEnabled(enable);
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
-	}
-
-	void ConceptNetGui::addNewSolverCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(
-				QString(dynamic_pointer_cast<NewSolverCommand>(cmd)->settings->argString.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addChangeSolverSettingsCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(
-				QString(dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addConceptNetQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addGroundCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<GroundCommand>(cmd)->programSection.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addLoadSavedProgramCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addSolveCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addVariableQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addLoadBackgroundKnowledgeCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<LoadBackgroundKnowledgeCommand>(cmd)->fileName));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
-	}
-
-	void ConceptNetGui::addFactsQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
-	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
 	}
 
 	void ConceptNetGui::connectGuiElements()
@@ -474,5 +431,72 @@ namespace cng
 	{
 		return settings;
 	}
+
+	void ConceptNetGui::addNewSolverCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(
+				QString(dynamic_pointer_cast<NewSolverCommand>(cmd)->settings->argString.c_str()));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addChangeSolverSettingsCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(
+				QString(dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addConceptNetQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addGroundCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(
+				QString(dynamic_pointer_cast<GroundCommand>(cmd)->historyProgramSection.c_str()));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addLoadSavedProgramCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addSolveCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addVariableQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addLoadBackgroundKnowledgeCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<LoadBackgroundKnowledgeCommand>(cmd)->fileName));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
+	void ConceptNetGui::addFactsQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
+	{
+		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
+		this->ui->commandHistoryTable->setItem(pos, 1, tmp2);
+	}
+
 }
 

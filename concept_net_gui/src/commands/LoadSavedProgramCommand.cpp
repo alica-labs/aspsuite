@@ -11,25 +11,33 @@
 namespace cng
 {
 
-	LoadSavedProgramCommand::LoadSavedProgramCommand(ConceptNetGui* gui)
+	LoadSavedProgramCommand::LoadSavedProgramCommand(ConceptNetGui* gui, QByteArray loadedData)
 	{
 		this->type = "Load Saved Program";
 		this->gui = gui;
+		this->loadedData = loadedData;
 	}
 
 	LoadSavedProgramCommand::~LoadSavedProgramCommand()
 	{
-		// TODO Auto-generated destructor stub
 	}
 
 	void LoadSavedProgramCommand::execute()
 	{
 		this->gui->addToCommandHistory(shared_from_this());
+		QJsonDocument loadDoc(QJsonDocument::fromJson(this->loadedData));
 	}
 
 	void LoadSavedProgramCommand::undo()
 	{
 		this->gui->removeFromCommandHistory(shared_from_this());
+	}
+
+	QJsonObject LoadSavedProgramCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "Load Saved Program";
+		return ret;
 	}
 
 } /* namespace cng */

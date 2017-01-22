@@ -12,6 +12,8 @@
 #include <vector>
 #include <memory>
 
+#include <QJsonObject>
+
 namespace cng
 {
 
@@ -25,6 +27,8 @@ namespace cng
 
 		void execute();
 		void undo();
+
+		QJsonObject toJSON();
 
 		shared_ptr<SolverSettings> settings;
 		ConceptNetGui* gui;

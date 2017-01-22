@@ -31,4 +31,11 @@ namespace cng
 		this->gui->removeFromCommandHistory(shared_from_this());
 	}
 
+	QJsonObject VariableQueryCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "Variable Query";
+		return ret;
+	}
+
 } /* namespace cng */

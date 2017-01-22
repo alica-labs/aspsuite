@@ -32,4 +32,11 @@ namespace cng
 		this->gui->removeFromCommandHistory(shared_from_this());
 	}
 
+	QJsonObject FactsQueryCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "Facts Query";
+		return ret;
+	}
+
 } /* namespace cng */

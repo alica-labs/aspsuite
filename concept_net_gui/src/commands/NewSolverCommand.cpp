@@ -51,6 +51,14 @@ namespace cng
 		//delete solver ?
 	}
 
+	QJsonObject NewSolverCommand::toJSON()
+	{
+		QJsonObject ret;
+		ret["type"] = "New Solver";
+		ret["SettingsString"] = QString(this->settings->argString.c_str());
+		return ret;
+	}
+
 	void NewSolverCommand::getDefaultArguments()
 	{
 		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();

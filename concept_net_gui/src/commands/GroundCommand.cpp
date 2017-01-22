@@ -8,6 +8,8 @@
 #include "../include/commands/GroundCommand.h"
 #include "../include/gui/ConceptNetGui.h"
 
+#include <SystemConfig.h>
+
 namespace cng
 {
 
@@ -16,7 +18,7 @@ namespace cng
 		this->type = "Ground";
 		this->gui = gui;
 		this->program = program;
-		this->programSection = extractProgramSection();
+		extractProgramSection();
 	}
 
 	GroundCommand::~GroundCommand()
@@ -33,11 +35,26 @@ namespace cng
 		this->gui->removeFromCommandHistory(shared_from_this());
 	}
 
-	string GroundCommand::extractProgramSection()
+	QJsonObject GroundCommand::toJSON()
 	{
-		string ret;
-		//TODO
+		QJsonObject ret;
+		ret["type"] = "Ground";
+		ret["program"] = this->program;
 		return ret;
+	}
+
+	void GroundCommand::extractProgramSection()
+	{
+		size_t prefixLength = string("#program").length();
+		string tmp = this->program.toStdString();
+		size_t start = tmp.find("#program");
+		if (start != string::npos)
+		{
+			tmp = tmp.substr(start, tmp.length() - start - 1);
+			this->historyProgramSection = tmp;
+			size_t end = tmp.find_first_of(".");
+			this->programSection = supplementary::Configuration::trim(tmp.substr(prefixLength, end - prefixLength));
+		}
 	}
 
 } /* namespace cng */

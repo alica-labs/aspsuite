@@ -9,6 +9,7 @@
 #define SRC_COMMANDS_GROUNDCOMMAND_H_
 
 #include <QString>
+#include <QJsonObject>
 
 #include <commands/Command.h>
 #include <memory>
@@ -25,12 +26,15 @@ namespace cng
 		void execute();
 		void undo();
 
+		QJsonObject toJSON();
+
 		ConceptNetGui* gui;
 		QString program;
 		string programSection;
+		string historyProgramSection;
 
 	private:
-		string extractProgramSection();
+		void extractProgramSection();
 	};
 
 } /* namespace cng */

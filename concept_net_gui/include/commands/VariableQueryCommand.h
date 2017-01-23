@@ -17,6 +17,9 @@ namespace cng
 {
 
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to create a VariableQuery
+	 */
 	class VariableQueryCommand : public Command, public enable_shared_from_this<VariableQueryCommand>
 	{
 	public:

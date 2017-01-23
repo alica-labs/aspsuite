@@ -8,6 +8,8 @@
 #include "../include/commands/GroundCommand.h"
 #include "../include/gui/ConceptNetGui.h"
 
+#include "../include/handler/CommandHistoryHandler.h"
+
 #include <SystemConfig.h>
 
 namespace cng
@@ -27,12 +29,12 @@ namespace cng
 
 	void GroundCommand::execute()
 	{
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 
 	void GroundCommand::undo()
 	{
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 	}
 
 	QJsonObject GroundCommand::toJSON()

@@ -17,6 +17,9 @@
 namespace cng
 {
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to call the solvers Ground method
+	 */
 	class GroundCommand : public Command, public enable_shared_from_this<GroundCommand>
 	{
 	public:

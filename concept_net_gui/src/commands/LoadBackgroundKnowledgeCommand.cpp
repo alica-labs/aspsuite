@@ -5,8 +5,12 @@
  *      Author: stefan
  */
 
-#include <commands/LoadBackgroundKnowledgeCommand.h>
+#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
+
 #include "../include/gui/ConceptNetGui.h"
+
+#include "../include/handler/CommandHistoryHandler.h"
+
 #include <ui_conceptnetgui.h>
 
 namespace cng
@@ -35,19 +39,20 @@ namespace cng
 		this->fileContent = file.readAll();
 		file.close();
 		this->gui->getUi()->aspRuleTextArea->setText(fileContent);
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 
 	void LoadBackgroundKnowledgeCommand::undo()
 	{
 		this->gui->getUi()->aspRuleTextArea->clear();
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 	}
 
 	QJsonObject LoadBackgroundKnowledgeCommand::toJSON()
 	{
 		QJsonObject ret;
 		ret["type"] = "Load Logic Program";
+		ret["fileName"] = this->fileName;
 		return ret;
 	}
 

@@ -17,6 +17,9 @@ namespace cng
 {
 
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to call the solvers solve method
+	 */
 	class SolveCommand : public Command, public enable_shared_from_this<SolveCommand>
 	{
 	public:

@@ -18,6 +18,9 @@
 namespace cng
 {
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to load a BackgroundKnowledge file
+	 */
 	class LoadBackgroundKnowledgeCommand : public Command, public enable_shared_from_this<LoadBackgroundKnowledgeCommand>
 	{
 	public:

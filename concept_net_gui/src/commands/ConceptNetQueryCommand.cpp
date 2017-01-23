@@ -8,6 +8,8 @@
 #include "../include/commands/ConceptNetQueryCommand.h"
 #include "../include/gui/ConceptNetGui.h"
 
+#include "../include/handler/CommandHistoryHandler.h"
+
 #include <ui_conceptnetgui.h>
 
 namespace cng
@@ -28,12 +30,12 @@ namespace cng
 		//TODO just for testing remove later
 		this->gui->getUi()->currentModelsLabel->setText(QString("Testing save models using currentModelsLabel."));
 		this->gui->getUi()->sortedModelsLabel->setText(QString("Testing save models using sortedModelsLabel."));
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 
 	void ConceptNetQueryCommand::undo()
 	{
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 	}
 
 	QJsonObject ConceptNetQueryCommand::toJSON()

@@ -15,6 +15,9 @@
 namespace cng
 {
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to create a FactsQuery
+	 */
 	class FactsQueryCommand : public Command, public enable_shared_from_this<FactsQueryCommand>
 	{
 	public:

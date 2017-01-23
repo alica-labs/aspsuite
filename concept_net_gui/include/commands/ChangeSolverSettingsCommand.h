@@ -19,6 +19,9 @@ namespace cng
 	class SolverSettings;
 	class ConceptNetGui;
 	class SettingsDialog;
+	/**
+	 * Class inheriting from Command interface used to Change Solver Settings
+	 */
 	class ChangeSolverSettingsCommand : public Command, public enable_shared_from_this<ChangeSolverSettingsCommand>
 	{
 	public:

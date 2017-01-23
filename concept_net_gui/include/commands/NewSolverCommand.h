@@ -19,6 +19,9 @@ namespace cng
 
 	class SolverSettings;
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to create a new solver
+	 */
 	class NewSolverCommand : public Command, public enable_shared_from_this<NewSolverCommand>
 	{
 	public:

@@ -15,16 +15,32 @@ using namespace std;
 
 namespace cng
 {
+	/**
+	 * Command interface
+	 */
 	class Command
 	{
 	public:
 		virtual ~Command() {};
-
+		/**
+		 * Execute the command
+		 */
 		virtual void execute() = 0;
+		/**
+		 * Undo the Command
+		 */
 		virtual void undo() = 0;
 
+		/**
+		 * Creates JSON String to be saved
+		 * @return QJsonObject
+		 */
 		virtual QJsonObject toJSON() = 0;
 
+		/**
+		 * Gets type of Command
+		 * @return type string
+		 */
 		string getType() {return type;};
 
 	protected:

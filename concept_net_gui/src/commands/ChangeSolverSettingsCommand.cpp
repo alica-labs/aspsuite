@@ -9,6 +9,8 @@
 
 #include "../include/containers/SolverSettings.h"
 
+#include "../include/handler/CommandHistoryHandler.h"
+
 #include "../include/gui/ConceptNetGui.h"
 #include "../include/gui/SettingsDialog.h"
 
@@ -30,13 +32,13 @@ namespace cng
 
 	void ChangeSolverSettingsCommand::execute()
 	{
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->setSettings(this->currentSettings);
 	}
 
 	void ChangeSolverSettingsCommand::undo()
 	{
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 		this->gui->setSettings(this->previousSettings);
 	}
 

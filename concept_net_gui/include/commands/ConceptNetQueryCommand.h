@@ -16,6 +16,9 @@ namespace cng
 {
 
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to create a ConceptNet Query
+	 */
 	class ConceptNetQueryCommand : public Command, public enable_shared_from_this<ConceptNetQueryCommand>
 	{
 	public:

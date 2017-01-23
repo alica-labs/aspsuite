@@ -36,66 +36,127 @@ namespace cng
 	class SolveCommand;
 	class VariableQueryCommand;
 	class LoadBackgroundKnowledgeCommand;
+	class SaveLoadHandler;
+	class CommandHistoryHandler;
+	/**
+	 * Class containing the main window and managing th connects, handler and provides the command history
+	 */
 	class ConceptNetGui : public QMainWindow
 	{
 	Q_OBJECT
 
 	public:
+		/**
+		 * Constructor
+		 * @param parent pointer to main widget
+		 */
 		explicit ConceptNetGui(QWidget *parent = 0);
 		~ConceptNetGui();
-		void addToCommandHistory(shared_ptr<Command> cmd);
-		void removeFromCommandHistory(shared_ptr<Command> cmd);
 
+		/**
+		 * Get current solver settings
+		 * @return shared_ptr<SolverSettings>
+		 */
 		shared_ptr<SolverSettings> getSettings();
+		/**
+		 * Set current solver settings
+		 * @param settings shared_ptr<SolverSettings> settings to be given to the solver
+		 */
 		void setSettings(shared_ptr<SolverSettings> settings);
+		/**
+		 * Gets the pointer to the QT main window
+		 * @return Ui::ConceptNetGui*
+		 */
 		Ui::ConceptNetGui* getUi();
-
+		/**
+		 * History of abstract Command class
+		 * Used to save the order of commands
+		 * Undo via ctrl+z
+		 */
+		vector<shared_ptr<Command>> commandHistory;
+		/**
+		 * Pointer to CommandHistoryHandler
+		 * Handles interaction with the command history
+		 */
+		CommandHistoryHandler* chHandler;
+		/**
+		 * Pointer to the SaveLoadHandler
+		 * Handles Save and Load operations
+		 */
+		SaveLoadHandler* slHandler;
+		/**
+		 * Pointer to SettingsDialog class
+		 * Used to change Solver parameters
+		 */
+		SettingsDialog* settingsDialog;
+		/**
+		 * Enables/Disables Gui elements
+		 * @param enable bool true to enable
+		 */
 		void enableGui(bool enable);
+		/**
+		 * Clears Gui labels
+		 */
 		void clear();
 
 	private slots:
-		// menu solts
+		/**
+		 * Slot to create new Solver
+		 */
 		void newSolver();
-		void saveProgram();
-		void saveModels();
-		void loadProgram();
-		void loadBackgroundKnowledge();
 
-		// button slots
+		/**
+		 * Slot for Ground call
+		 */
 		void groundCallBack();
+		/**
+		 * Slot for Solve call
+		 */
 		void solveCallBack();
+		/**
+		 * Slot for Query call
+		 */
 		void queryCallBack();
+		/**
+		 * Slot for ConceptNet call
+		 */
 		void conceptNetCallBack();
 
-		// command history
-		void fillCommandHistory();
-		void drawHistoryTable();
-		void undoHistory();
-		void removeFocus();
-
 	private:
+		/**
+		 * Current Settings
+		 */
 		shared_ptr<SolverSettings> settings;
-		Ui::ConceptNetGui* ui;
-		SettingsDialog* settingsDialog;
-		QMessageBox* msgBox;
+		/**
+		 * SystemConfig pointer
+		 */
 		supplementary::SystemConfig* sc;
-		vector<shared_ptr<Command>> commandHistory;
+		/**
+		 * Pointer to main window
+		 */
+		Ui::ConceptNetGui* ui;
+		/**
+		 * Pointer to new Solver Dialog
+		 */
+		QMessageBox* msgBox;
+		/**
+		 * Shortcut to ctrl+z
+		 */
 		QShortcut* strgZShortcut;
+		/**
+		 * Shortcut to esc button
+		 */
 		QShortcut* escShortcut;
 
+		/**
+		 * Connect Gui elements to corresponding slots
+		 */
 		void connectGuiElements();
 
-		void addNewSolverCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addChangeSolverSettingsCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addConceptNetQueryCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addGroundCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addLoadSavedProgramCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addSolveCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addVariableQueryCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addLoadBackgroundKnowledgeCommandToHistory(shared_ptr<Command> cmd, int pos);
-		void addFactsQueryCommandToHistory(shared_ptr<Command> cmd, int pos);
-
 	signals:
+		/**
+		 * Signal used to redraw the command history
+		 */
 		void updateCommandList();
 	};
 }

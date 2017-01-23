@@ -8,6 +8,8 @@
 #include "../include/commands/FactsQueryCommand.h"
 #include "../include/gui/ConceptNetGui.h"
 
+#include "../include/handler/CommandHistoryHandler.h"
+
 namespace cng
 {
 
@@ -24,12 +26,12 @@ namespace cng
 
 	void FactsQueryCommand::execute()
 	{
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 
 	void FactsQueryCommand::undo()
 	{
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 	}
 
 	QJsonObject FactsQueryCommand::toJSON()

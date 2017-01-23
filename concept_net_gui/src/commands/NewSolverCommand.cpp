@@ -11,6 +11,8 @@
 
 #include "../include/containers/SolverSettings.h"
 
+#include "../include/handler/CommandHistoryHandler.h"
+
 #include <SystemConfig.h>
 #include <iostream>
 
@@ -36,7 +38,7 @@ namespace cng
 
 	void NewSolverCommand::execute()
 	{
-		this->gui->addToCommandHistory(shared_from_this());
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		cout << "NewSolverCommand: create new solver" << endl;
 		this->gui->setSettings(this->settings);
 		//TODO create solver and pass it to the conceptnet gui
@@ -45,7 +47,7 @@ namespace cng
 
 	void NewSolverCommand::undo()
 	{
-		this->gui->removeFromCommandHistory(shared_from_this());
+		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 		this->gui->enableGui(false);
 		this->gui->clear();
 		//delete solver ?
@@ -55,7 +57,7 @@ namespace cng
 	{
 		QJsonObject ret;
 		ret["type"] = "New Solver";
-		ret["SettingsString"] = QString(this->settings->argString.c_str());
+		ret["settingsString"] = QString(this->settings->argString.c_str());
 		return ret;
 	}
 

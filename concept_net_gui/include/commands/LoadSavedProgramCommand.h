@@ -17,7 +17,11 @@
 
 namespace cng
 {
+	class SettingsDialog;
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used to load a saved Json program
+	 */
 	class LoadSavedProgramCommand : public Command, public enable_shared_from_this<LoadSavedProgramCommand>
 	{
 	public:

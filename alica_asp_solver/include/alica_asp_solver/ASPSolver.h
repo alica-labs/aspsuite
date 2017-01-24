@@ -65,8 +65,6 @@ namespace alica
 			void add(string const &name, Gringo::FWStringVec const &params, string const &par);
 			Gringo::Value parseValue(std::string const &str);
 
-			bool registerQuery(shared_ptr<ASPQuery> query);
-			bool unregisterQuery(shared_ptr<ASPQuery> query);
 			int getRegisteredQueriesCount();
 			/**
 			 * The query id has to be added to any predicate in an ASPTerm with type Variable
@@ -90,6 +88,8 @@ namespace alica
 			static const string& getWildcardString();
 
 		private:
+			bool registerQuery(shared_ptr<ASPQuery> query);
+			bool unregisterQuery(shared_ptr<ASPQuery> query);
 			shared_ptr<ClingoLib> clingo;
 			DefaultGringoModule* gringoModule;
 			Gringo::ConfigProxy* conf;

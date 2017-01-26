@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(asp_commons)
+project(asp_solver)
 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -12,12 +12,15 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 find_package(catkin REQUIRED COMPONENTS
   clingo_cpp
   system_config
+  system_util
+  fsystem
+  asp_commons
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES asp_commons
-  CATKIN_DEPENDS clingo_cpp system_config
+  LIBRARIES asp_solver
+  CATKIN_DEPENDS clingo_cpp system_config fsystem asp_commons
   #DEPENDS lua python
 )
 
@@ -27,14 +30,15 @@ add_definitions(-DWITH_PYTHON) # for libclasp...
 
 include_directories(
   include
-  include/asp_commons
   ${catkin_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
-    src/ASPQuery.cpp
-    src/ASPVariable.cpp
-    src/ASPTerm.cpp
+    src/ASPSolver.cpp
+    src/AnnotatedExternal.cpp
+    src/ASPFactsQuery.cpp
+    src/ASPVariableQuery.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+

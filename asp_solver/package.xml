@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>asp_commons</name>
+  <name>asp_solver</name>
   <version>0.0.0</version>
-  <description>The asp_commons package</description>
-
+  <description>The asp_solver package</description>
 
   <maintainer email="s.jakob872@gmail.com">Stefan Jakob</maintainer>
 
@@ -14,11 +13,15 @@
 
   <build_depend>clingo_cpp</build_depend>
   <build_depend>system_config</build_depend>
+  <build_depend>fsystem</build_depend>
+  <build_depend>asp_commons</build_depend>
 
   <run_depend>clingo_cpp</run_depend>
   <run_depend>system_config</run_depend>
-  
+  <run_depend>fsystem</run_depend>
+  <run_depend>asp_commons</run_depend>
+ 
   <export>
   </export>
-  
+
 </package>

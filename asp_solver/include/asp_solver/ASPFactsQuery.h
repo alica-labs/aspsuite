@@ -12,7 +12,7 @@
 
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
-#include <asp_commons/ASPTerm.h>
+#include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPTruthValue.h>
 
 namespace reasoner
@@ -21,7 +21,7 @@ namespace reasoner
 	class ASPFactsQuery : public ASPQuery
 	{
 	public:
-		ASPFactsQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term);
+		ASPFactsQuery(ASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPFactsQuery();
 		map<Gringo::Value, vector<Gringo::Value> > getFactModelMap();
 		void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);

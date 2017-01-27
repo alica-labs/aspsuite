@@ -5,19 +5,19 @@
  *      Author: Stefan Jakob
  */
 
+#include <ASPCommonsTerm.h>
 #include "../include/asp_commons/ASPQuery.h"
 
 
 #include <clingo/clingocontrol.hh>
 
 #include "../include/asp_commons/AnnotatedValVec.h"
-#include "../include/asp_commons/ASPTerm.h"
 #include "../include/asp_commons/IASPSolver.h"
 
 namespace reasoner
 {
 
-	ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term)
+	ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term)
 	{
 		this->type = ASPQueryType::Undefined;
 		this->solver = solver;
@@ -216,7 +216,7 @@ namespace reasoner
 		return this->headValues;
 	}
 
-	shared_ptr<reasoner::ASPTerm> ASPQuery::getTerm()
+	shared_ptr<reasoner::ASPCommonsTerm> ASPQuery::getTerm()
 	{
 		return term;
 	}

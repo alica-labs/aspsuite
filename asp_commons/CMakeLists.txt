@@ -33,8 +33,8 @@ include_directories(
 
 add_library(${PROJECT_NAME}
     src/ASPQuery.cpp
-    src/ASPVariable.cpp
-    src/ASPTerm.cpp
+    src/ASPCommonsVariable.cpp
+    src/ASPCommonsTerm.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

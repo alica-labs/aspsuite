@@ -12,7 +12,7 @@
 
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
-#include <asp_commons/ASPTerm.h>
+#include <asp_commons/ASPCommonsTerm.h>
 
 //#define ASPVARIABLEQUERY_DEBUG
 
@@ -22,7 +22,7 @@ namespace reasoner
 	class ASPVariableQuery : public ASPQuery
 	{
 	public:
-		ASPVariableQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term);
+		ASPVariableQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term);
 		virtual ~ASPVariableQuery();
 		vector<string> getRules();
 		ASPQueryType getType();

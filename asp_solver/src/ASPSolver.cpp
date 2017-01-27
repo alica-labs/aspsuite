@@ -8,8 +8,8 @@
 #include "../include/asp_solver/ASPSolver.h"
 
 #include <asp_commons/AnnotatedValVec.h>
-#include <asp_commons/ASPTerm.h>
-#include <asp_commons/ASPVariable.h>
+#include <asp_commons/ASPCommonsTerm.h>
+#include <asp_commons/ASPCommonsVariable.h>
 
 namespace reasoner
 {
@@ -182,7 +182,7 @@ namespace reasoner
 		}
 	}
 
-	bool ASPSolver::existsSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls)
+	bool ASPSolver::existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		this->conf->setKeyValue(this->modelsKey, "1");
@@ -196,7 +196,7 @@ namespace reasoner
 		return satisfied;
 	}
 
-	bool ASPSolver::getSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls,
+	bool ASPSolver::getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 								vector<void*>& results)
 	{
 
@@ -234,15 +234,15 @@ namespace reasoner
 		}
 	}
 
-	int ASPSolver::prepareSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls)
+	int ASPSolver::prepareSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
-		auto cVars = make_shared<vector<shared_ptr<reasoner::ASPVariable> > >(vars.size());
+		auto cVars = make_shared<vector<shared_ptr<reasoner::ASPCommonsVariable> > >(vars.size());
 		for (int i = 0; i < vars.size(); ++i)
 		{
-			cVars->at(i) = make_shared<reasoner::ASPVariable>();
+			cVars->at(i) = make_shared<reasoner::ASPCommonsVariable>();
 		}
-		vector<shared_ptr<reasoner::ASPTerm> > constraint;
+		vector<shared_ptr<reasoner::ASPCommonsTerm> > constraint;
 		for (auto& c : calls)
 		{
 			constraint.push_back(c);
@@ -298,9 +298,9 @@ namespace reasoner
 		return vars.size();
 	}
 
-	shared_ptr<ASPVariable> ASPSolver::createVariable(long id)
+	shared_ptr<ASPCommonsVariable> ASPSolver::createVariable(long id)
 	{
-		return make_shared<reasoner::ASPVariable>();
+		return make_shared<reasoner::ASPCommonsVariable>();
 	}
 
 	void ASPSolver::removeDeadQueries()

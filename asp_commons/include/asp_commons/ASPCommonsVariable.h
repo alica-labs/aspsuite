@@ -11,16 +11,16 @@
 #include <string>
 #include <memory>
 
-#include "../include/asp_commons/ASPTerm.h"
+#include "asp_commons/ASPCommonsTerm.h"
 
 namespace reasoner
 {
 
-	class ASPVariable : public reasoner::ASPTerm
+	class ASPCommonsVariable : public reasoner::ASPCommonsTerm
 	{
 	public:
-		ASPVariable();
-		virtual ~ASPVariable();
+		ASPCommonsVariable();
+		virtual ~ASPCommonsVariable();
 
 	private:
 		int ownId;

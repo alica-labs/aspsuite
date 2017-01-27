@@ -12,7 +12,7 @@
 namespace reasoner
 {
 
-	ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term) :
+	ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, shared_ptr<ASPCommonsTerm> term) :
 			ASPQuery(solver, term)
 	{
 		this->type = ASPQueryType::Facts;

@@ -18,7 +18,7 @@
 #include "../asp_solver/ASPFactsQuery.h"
 #include <asp_commons/ASPQuery.h>
 #include "../asp_solver/ASPVariableQuery.h"
-#include <asp_commons/ASPVariable.h>
+#include <asp_commons/ASPCommonsVariable.h>
 #include <asp_commons/IASPSolver.h>
 
 //#define ASPSolver_DEBUG
@@ -37,10 +37,10 @@ namespace reasoner
 		ASPSolver(std::vector<char const*> args);
 		virtual ~ASPSolver();
 
-		bool existsSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls);
-		bool getSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls,
+		bool existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
+		bool getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 							vector<void*>& results);
-		shared_ptr<ASPVariable> createVariable(long id);
+		shared_ptr<ASPCommonsVariable> createVariable(long id);
 
 		void disableWarnings(bool noWarns);
 		bool loadFileFromConfig(string configKey);
@@ -89,7 +89,7 @@ namespace reasoner
 		vector<shared_ptr<ASPQuery>> registeredQueries;
 
 		void reduceQueryLifeTime();
-		int prepareSolution(std::vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls);
+		int prepareSolution(std::vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
 		int queryCounter;
 		supplementary::SystemConfig* sc;
 

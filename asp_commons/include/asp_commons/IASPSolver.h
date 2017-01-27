@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 #include <clingo/clingocontrol.hh>
-#include <asp_commons/ASPVariable.h>
-#include <asp_commons/ASPTerm.h>
+#include <asp_commons/ASPCommonsTerm.h>
+#include <asp_commons/ASPCommonsVariable.h>
 
 using namespace std;
 
@@ -27,10 +27,10 @@ namespace reasoner
 		IASPSolver();
 		virtual ~IASPSolver() {};
 
-		virtual bool existsSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls) = 0;
-		virtual bool getSolution(vector<ASPVariable*>& vars, vector<shared_ptr<ASPTerm>>& calls,
+		virtual bool existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls) = 0;
+		virtual bool getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 							vector<void*>& results) = 0;
-		virtual shared_ptr<ASPVariable> createVariable(long id) = 0;
+		virtual shared_ptr<ASPCommonsVariable> createVariable(long id) = 0;
 
 		virtual void disableWarnings(bool noWarns) = 0;
 		virtual bool loadFileFromConfig(string configKey) = 0;

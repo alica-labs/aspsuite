@@ -14,7 +14,7 @@
 namespace reasoner
 {
 
-	ASPVariableQuery::ASPVariableQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term) :
+	ASPVariableQuery::ASPVariableQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term) :
 			ASPQuery(solver, term)
 	{
 		this->type = ASPQueryType::Variable;

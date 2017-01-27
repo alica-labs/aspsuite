@@ -19,11 +19,11 @@ using namespace std;
 namespace reasoner
 {
 
-	class ASPTerm : public enable_shared_from_this<ASPTerm>
+	class ASPCommonsTerm : public enable_shared_from_this<ASPCommonsTerm>
 	{
 	public:
-		ASPTerm(int lifeTime = 1);
-		virtual ~ASPTerm();
+		ASPCommonsTerm(int lifeTime = 1);
+		virtual ~ASPCommonsTerm();
 		void addRule(string rule);
 		vector<string> getRuleHeads();
 		vector<string> getRuleBodies();

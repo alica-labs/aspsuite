@@ -5,14 +5,13 @@
  *      Author: Stefan Jakob
  */
 
-#include "../include/asp_commons/ASPTerm.h"
-
+#include <ASPCommonsTerm.h>
 #include <SystemConfig.h>
 
 namespace reasoner
 {
 
-	ASPTerm::ASPTerm(int lifeTime)
+	ASPCommonsTerm::ASPCommonsTerm(int lifeTime)
 	{
 		this->programSection = "";
 		this->id = -1;
@@ -23,11 +22,11 @@ namespace reasoner
 		this->queryId = -1;
 	}
 
-	ASPTerm::~ASPTerm()
+	ASPCommonsTerm::~ASPCommonsTerm()
 	{
 	}
 
-	void ASPTerm::addRule(string rule)
+	void ASPCommonsTerm::addRule(string rule)
 	{
 		if (rule.empty())
 		{
@@ -53,7 +52,7 @@ namespace reasoner
 //			return true;
 	}
 
-	void ASPTerm::addFact(string fact)
+	void ASPCommonsTerm::addFact(string fact)
 	{
 		if (fact.find(".") == string::npos)
 		{
@@ -65,77 +64,77 @@ namespace reasoner
 		}
 	}
 
-	vector<string> ASPTerm::getRuleHeads()
+	vector<string> ASPCommonsTerm::getRuleHeads()
 	{
 		return this->heads;
 	}
 
-	vector<string> ASPTerm::getRuleBodies()
+	vector<string> ASPCommonsTerm::getRuleBodies()
 	{
 		return this->bodies;
 	}
 
-	string ASPTerm::getProgramSection()
+	string ASPCommonsTerm::getProgramSection()
 	{
 		return this->programSection;
 	}
 
-	void ASPTerm::setProgramSection(string programSection)
+	void ASPCommonsTerm::setProgramSection(string programSection)
 	{
 		this->programSection = programSection;
 	}
 
-	int ASPTerm::getLifeTime()
+	int ASPCommonsTerm::getLifeTime()
 	{
 		return this->lifeTime;
 	}
 
-	vector<string> ASPTerm::getRules()
+	vector<string> ASPCommonsTerm::getRules()
 	{
 		return this->rules;
 	}
 
-	vector<string> ASPTerm::getFacts()
+	vector<string> ASPCommonsTerm::getFacts()
 	{
 		return this->facts;
 	}
 
-	void ASPTerm::setExternals(shared_ptr<map<string, bool>> externals)
+	void ASPCommonsTerm::setExternals(shared_ptr<map<string, bool>> externals)
 	{
 		this->externals = externals;
 	}
 
-	shared_ptr<map<string, bool> > ASPTerm::getExternals()
+	shared_ptr<map<string, bool> > ASPCommonsTerm::getExternals()
 	{
 		return this->externals;
 	}
 
-	string ASPTerm::getNumberOfModels()
+	string ASPCommonsTerm::getNumberOfModels()
 	{
 		return this->numberOfModels;
 	}
 
-	void ASPTerm::setNumberOfModels(string numberOfModels)
+	void ASPCommonsTerm::setNumberOfModels(string numberOfModels)
 	{
 		this->numberOfModels = numberOfModels;
 	}
 
-	ASPQueryType ASPTerm::getType()
+	ASPQueryType ASPCommonsTerm::getType()
 	{
 		return this->type;
 	}
 
-	void ASPTerm::setType(ASPQueryType type)
+	void ASPCommonsTerm::setType(ASPQueryType type)
 	{
 		this->type = type;
 	}
 
-	long ASPTerm::getId()
+	long ASPCommonsTerm::getId()
 	{
 		return id;
 	}
 
-	void ASPTerm::setId(long id)
+	void ASPCommonsTerm::setId(long id)
 	{
 		this->id = id;
 	}
@@ -144,7 +143,7 @@ namespace reasoner
 	 * heads and facts!
 	 * An unique id is given by the ASPSolver!
 	 */
-	int ASPTerm::getQueryId()
+	int ASPCommonsTerm::getQueryId()
 	{
 		return queryId;
 	}
@@ -154,7 +153,7 @@ namespace reasoner
 	 * heads and facts!
 	 * An unique id is given by the ASPSolver!
 	 */
-	void ASPTerm::setQueryId(int queryId)
+	void ASPCommonsTerm::setQueryId(int queryId)
 	{
 		this->queryId = queryId;
 	}

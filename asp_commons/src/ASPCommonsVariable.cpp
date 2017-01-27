@@ -5,18 +5,18 @@
  *      Author: Stefan Jakob
  */
 
-#include "../include/asp_commons/ASPVariable.h"
+#include <ASPCommonsVariable.h>
 
 namespace reasoner
 {
-	int ASPVariable::var_id = 0;
-	ASPVariable::ASPVariable()
+	int ASPCommonsVariable::var_id = 0;
+	ASPCommonsVariable::ASPCommonsVariable()
 	{
 		ownId = var_id++;
 
 	}
 
-	ASPVariable::~ASPVariable()
+	ASPCommonsVariable::~ASPCommonsVariable()
 	{
 		// TODO Auto-generated destructor stub
 	}

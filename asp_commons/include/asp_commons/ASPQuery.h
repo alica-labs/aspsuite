@@ -20,13 +20,13 @@ using namespace std;
 namespace reasoner
 {
 
-	class ASPTerm;
+	class ASPCommonsTerm;
 	class AnnotatedValVec;
 	class ASPSolver;
 	class ASPQuery
 	{
 	public:
-		ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPTerm> term);
+		ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term);
 		virtual ~ASPQuery();
 
 		shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
@@ -41,7 +41,7 @@ namespace reasoner
 
 		ASPSolver* getSolver();
 		vector<string> getRules();
-		shared_ptr<reasoner::ASPTerm> getTerm();
+		shared_ptr<reasoner::ASPCommonsTerm> getTerm();
 
 		string getProgrammSection();
 		void setProgrammSection(string programmSection);
@@ -66,7 +66,7 @@ namespace reasoner
 		// LifeTime == -1 => query is used until unregistered
 		int lifeTime;
 		string programSection;
-		shared_ptr<reasoner::ASPTerm> term;
+		shared_ptr<reasoner::ASPCommonsTerm> term;
 		ASPQueryType type;
 
 	private:

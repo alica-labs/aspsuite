@@ -5,7 +5,7 @@
  *      Author: Stephan Opfer
  */
 
-#include "../include/asp_solver/ASPSolver.h"
+#include <asp_solver/ASPSolver.h>
 
 #include <asp_commons/AnnotatedValVec.h>
 #include <asp_commons/ASPCommonsTerm.h>
@@ -87,6 +87,7 @@ namespace reasoner
 	 */
 	bool ASPSolver::solve()
 	{
+		this->currentModels.clear();
 		this->reduceQueryLifeTime();
 #ifdef ASPSolver_DEBUG
 		this->modelCount = 0;
@@ -118,7 +119,7 @@ namespace reasoner
 		{
 			query->onModel(clingoModel);
 		}
-
+		this->currentModels.push_back(clingoModel.atoms(Gringo::Model::SHOWN));
 		return true;
 	}
 
@@ -427,6 +428,11 @@ namespace reasoner
 			return -1;
 
 		return claspFacade->summary().lpStats()->auxAtoms;
+	}
+
+	vector<Gringo::ValVec> ASPSolver::getCurrentModels()
+	{
+		return currentModels;
 	}
 
 	void ASPSolver::printStats()

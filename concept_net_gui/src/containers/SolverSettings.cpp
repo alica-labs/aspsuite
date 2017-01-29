@@ -5,7 +5,7 @@
  *      Author: stefan
  */
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 #include <SystemConfig.h>
 
 namespace cng
@@ -46,12 +46,14 @@ namespace cng
 					start += 1;
 				}
 				this->args.push_back(parsedParam.c_str());
+				this->args.push_back(nullptr);
 				this->argumentStrings.push_back(parsedParam);
 			}
 		}
 		else
 		{
 			this->args.push_back(this->argString.c_str());
+			this->args.push_back(nullptr);
 			this->argumentStrings.push_back(this->argString);
 		}
 	}

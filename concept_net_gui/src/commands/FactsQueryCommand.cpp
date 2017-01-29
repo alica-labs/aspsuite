@@ -5,10 +5,10 @@
  *      Author: stefan
  */
 
-#include "../include/commands/FactsQueryCommand.h"
-#include "../include/gui/ConceptNetGui.h"
+#include "commands/FactsQueryCommand.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
 namespace cng
 {

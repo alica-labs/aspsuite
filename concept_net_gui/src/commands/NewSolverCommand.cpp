@@ -7,14 +7,17 @@
 
 #include <commands/NewSolverCommand.h>
 
-#include "../include/gui/ConceptNetGui.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
 #include <SystemConfig.h>
 #include <iostream>
+
+#include <asp_commons/IASPSolver.h>
+#include <asp_solver/ASPSolver.h>
 
 using namespace std;
 
@@ -39,9 +42,9 @@ namespace cng
 	void NewSolverCommand::execute()
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
-		cout << "NewSolverCommand: create new solver" << endl;
 		this->gui->setSettings(this->settings);
-		//TODO create solver and pass it to the conceptnet gui
+		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};
+		this->gui->setSolver(new reasoner::ASPSolver(this->settings->args));
 		this->gui->enableGui(true);
 	}
 
@@ -50,7 +53,8 @@ namespace cng
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 		this->gui->enableGui(false);
 		this->gui->clear();
-		//delete solver ?
+		delete this->gui->getSolver();
+		this->gui->setSolver(nullptr);
 	}
 
 	QJsonObject NewSolverCommand::toJSON()

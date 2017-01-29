@@ -8,7 +8,7 @@
 #ifndef INCLUDE_COMMANDS_NEWSOLVERCOMMAND_H_
 #define INCLUDE_COMMANDS_NEWSOLVERCOMMAND_H_
 
-#include "../include/commands/Command.h"
+#include "commands/Command.h"
 #include <vector>
 #include <memory>
 

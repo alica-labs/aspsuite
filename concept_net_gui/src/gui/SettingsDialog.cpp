@@ -5,10 +5,10 @@
  *      Author: stefan
  */
 
-#include "../include/gui/SettingsDialog.h"
-#include "../include/gui/ConceptNetGui.h"
-#include "../include/commands/ChangeSolverSettingsCommand.h"
-#include "../include/containers/SolverSettings.h"
+#include "gui/SettingsDialog.h"
+#include "gui/ConceptNetGui.h"
+#include "commands/ChangeSolverSettingsCommand.h"
+#include "containers/SolverSettings.h"
 
 #include <ui_settingsdialog.h>
 

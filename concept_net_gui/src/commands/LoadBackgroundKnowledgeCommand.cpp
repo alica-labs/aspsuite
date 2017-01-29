@@ -5,11 +5,11 @@
  *      Author: stefan
  */
 
-#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
+#include "commands/LoadBackgroundKnowledgeCommand.h"
 
-#include "../include/gui/ConceptNetGui.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
 #include <ui_conceptnetgui.h>
 

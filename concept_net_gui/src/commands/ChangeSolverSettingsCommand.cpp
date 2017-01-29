@@ -5,14 +5,14 @@
  *      Author: stefan
  */
 
-#include "../include/commands/ChangeSolverSettingsCommand.h"
+#include "commands/ChangeSolverSettingsCommand.h"
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
-#include "../include/gui/ConceptNetGui.h"
-#include "../include/gui/SettingsDialog.h"
+#include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 
 namespace cng
 {

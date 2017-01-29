@@ -6,32 +6,33 @@
  */
 
 
-#include "../include/gui/ConceptNetGui.h"
-#include "../include/gui/SettingsDialog.h"
+#include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 
-#include "../include/commands/NewSolverCommand.h"
-#include "../include/commands/ChangeSolverSettingsCommand.h"
-#include "../include/commands/ConceptNetQueryCommand.h"
-#include "../include/commands/Command.h"
-#include "../include/commands/FactsQueryCommand.h"
-#include "../include/commands/GroundCommand.h"
-#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
-#include "../include/commands/LoadSavedProgramCommand.h"
-#include "../include/commands/SolveCommand.h"
-#include "../include/commands/VariableQueryCommand.h"
+#include "commands/NewSolverCommand.h"
+#include "commands/ChangeSolverSettingsCommand.h"
+#include "commands/ConceptNetQueryCommand.h"
+#include "commands/Command.h"
+#include "commands/FactsQueryCommand.h"
+#include "commands/GroundCommand.h"
+#include "commands/LoadBackgroundKnowledgeCommand.h"
+#include "commands/LoadSavedProgramCommand.h"
+#include "commands/SolveCommand.h"
+#include "commands/VariableQueryCommand.h"
 
 namespace cng
 {
 
-	LoadSavedProgramCommand::LoadSavedProgramCommand(ConceptNetGui* gui, QByteArray loadedData)
+	LoadSavedProgramCommand::LoadSavedProgramCommand(ConceptNetGui* gui, QString fileName, QByteArray loadedData)
 	{
 		this->type = "Load Saved Program";
 		this->gui = gui;
 		this->loadedData = loadedData;
+		this->fileName = fileName;
 	}
 
 	LoadSavedProgramCommand::~LoadSavedProgramCommand()
@@ -105,7 +106,7 @@ namespace cng
 				 * since it will result in a recursive load call!
 				 */
 //				shared_ptr<LoadSavedProgramCommand> c = make_shared<LoadSavedProgramCommand>(
-//						this->gui, this->loadedData));
+//						this->gui, this->fileName ,this->loadedData));
 //				c->execute();
 //				emit this->gui->updateCommandList();
 				continue;
@@ -142,6 +143,7 @@ namespace cng
 	{
 		QJsonObject ret;
 		ret["type"] = "Load Saved Program";
+		ret["fileName"] = this->fileName;
 		return ret;
 	}
 

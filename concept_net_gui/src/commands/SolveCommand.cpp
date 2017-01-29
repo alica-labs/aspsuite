@@ -5,10 +5,13 @@
  *      Author: stefan
  */
 
-#include "../include/commands/SolveCommand.h"
-#include "../include/gui/ConceptNetGui.h"
+#include "commands/SolveCommand.h"
+#include "gui/ConceptNetGui.h"
+#include <ui_conceptnetgui.h>
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
+
+#include <asp_solver/ASPSolver.h>
 
 namespace cng
 {
@@ -17,15 +20,35 @@ namespace cng
 	{
 		this->type = "Solve";
 		this->gui = gui;
+		this->satisfiable = false;
 	}
 
 	SolveCommand::~SolveCommand()
 	{
 	}
 
+	void SolveCommand::printModels()
+	{
+		stringstream ss;
+		for (int i = 0; i < this->currentModels.size(); i++)
+		{
+			ss << "Model number " << i + 1 << ":" << endl;
+			for (auto atom : this->currentModels.at(i))
+			{
+				ss << atom << " ";
+			}
+			ss << endl;
+		}
+		this->gui->getUi()->currentModelsLabel->setText(QString(ss.str().c_str()));
+	}
+
 	void SolveCommand::execute()
 	{
+		this->satisfiable = this->gui->getSolver()->solve();
+		this->currentModels = this->gui->getSolver()->getCurrentModels();
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		printModels();
+		printSortedModels();
 	}
 
 	void SolveCommand::undo()
@@ -38,6 +61,43 @@ namespace cng
 		QJsonObject ret;
 		ret["type"] = "Solve";
 		return ret;
+	}
+
+	vector<Gringo::ValVec> SolveCommand::getCurrentModels()
+	{
+		return currentModels;
+	}
+
+	bool SolveCommand::isSatisfiable()
+	{
+		return satisfiable;
+	}
+
+	void SolveCommand::printSortedModels()
+	{
+		stringstream ss;
+		vector<vector<string>> sorted = vector<vector<string>>(this->currentModels.size());
+		for (int i = 0; i < this->currentModels.size(); i++)
+		{
+			for (auto atom : this->currentModels.at(i))
+			{
+				ss << atom;
+				sorted.at(i).push_back(ss.str());
+				ss.str("");
+			}
+			std::sort(sorted.at(i).begin(), sorted.at(i).end());
+		}
+		ss.str("");
+		for (int i = 0; i < sorted.size(); i++)
+		{
+			ss << "Model number " << i + 1 << ":" << endl;
+			for (auto atom : sorted.at(i))
+			{
+				ss << atom << " ";
+			}
+			ss << endl;
+		}
+		this->gui->getUi()->sortedModelsLabel->setText(QString(ss.str().c_str()));
 	}
 
 } /* namespace cng */

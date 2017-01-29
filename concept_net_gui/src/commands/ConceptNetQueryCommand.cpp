@@ -5,10 +5,10 @@
  *      Author: stefan
  */
 
-#include "../include/commands/ConceptNetQueryCommand.h"
-#include "../include/gui/ConceptNetGui.h"
+#include "commands/ConceptNetQueryCommand.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
 #include <ui_conceptnetgui.h>
 

@@ -1,21 +1,21 @@
-#include "../include/gui/ConceptNetGui.h"
-#include "../include/gui/SettingsDialog.h"
+#include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 
-#include "../include/commands/NewSolverCommand.h"
-#include "../include/commands/ChangeSolverSettingsCommand.h"
-#include "../include/commands/ConceptNetQueryCommand.h"
-#include "../include/commands/Command.h"
-#include "../include/commands/FactsQueryCommand.h"
-#include "../include/commands/GroundCommand.h"
-#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
-#include "../include/commands/LoadSavedProgramCommand.h"
-#include "../include/commands/SolveCommand.h"
-#include "../include/commands/VariableQueryCommand.h"
+#include "commands/NewSolverCommand.h"
+#include "commands/ChangeSolverSettingsCommand.h"
+#include "commands/ConceptNetQueryCommand.h"
+#include "commands/Command.h"
+#include "commands/FactsQueryCommand.h"
+#include "commands/GroundCommand.h"
+#include "commands/LoadBackgroundKnowledgeCommand.h"
+#include "commands/LoadSavedProgramCommand.h"
+#include "commands/SolveCommand.h"
+#include "commands/VariableQueryCommand.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
-#include "../include/handler/SaveLoadHandler.h"
+#include "handler/CommandHistoryHandler.h"
+#include "handler/SaveLoadHandler.h"
 
 #include <ui_conceptnetgui.h>
 #include <ui_settingsdialog.h>
@@ -27,6 +27,9 @@
 #include <QTextStream>
 
 #include <SystemConfig.h>
+
+#include <asp_commons/IASPSolver.h>
+#include <asp_solver/ASPSolver.h>
 
 namespace cng
 {
@@ -45,12 +48,20 @@ namespace cng
 
 		this->sc = supplementary::SystemConfig::getInstance();
 		this->settings = nullptr;
+		this->solver = nullptr;
 		this->enableGui(false);
+		this->ui->currentModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->queryResultsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->sortedModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		this->connectGuiElements();
 	}
 
 	ConceptNetGui::~ConceptNetGui()
 	{
+		if(this->solver != nullptr)
+		{
+			delete this->solver;
+		}
 		delete this->chHandler;
 		delete this->slHandler;
 		delete this->strgZShortcut;
@@ -89,7 +100,6 @@ namespace cng
 		{
 			return;
 		}
-		cout << "ConceptNetGui: gound" << endl;
 		shared_ptr<GroundCommand> cmd = make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
@@ -100,7 +110,6 @@ namespace cng
 		{
 			return;
 		}
-		cout << "ConceptNetGui: solve" << endl;
 		shared_ptr<SolveCommand> cmd = make_shared<SolveCommand>(this);
 		cmd->execute();
 	}
@@ -198,5 +207,18 @@ namespace cng
 	{
 		return settings;
 	}
+
+	reasoner::ASPSolver* ConceptNetGui::getSolver()
+	{
+		return solver;
+	}
+
+
+	void ConceptNetGui::setSolver(reasoner::ASPSolver* solver)
+	{
+		this->solver = solver;
+	}
+
 }
+
 

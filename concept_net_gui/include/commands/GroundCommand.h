@@ -14,6 +14,8 @@
 #include <commands/Command.h>
 #include <memory>
 
+using namespace std;
+
 namespace cng
 {
 	class ConceptNetGui;

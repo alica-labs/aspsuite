@@ -10,6 +10,7 @@
 
 #include <commands/Command.h>
 #include <memory>
+#include <clingo/clingocontrol.hh>
 
 #include <QJsonObject>
 
@@ -30,8 +31,17 @@ namespace cng
 		void undo();
 
 		QJsonObject toJSON();
+		vector<Gringo::ValVec> getCurrentModels();
+		bool isSatisfiable();
 
 		ConceptNetGui* gui;
+
+	private:
+		bool satisfiable;
+		vector<Gringo::ValVec> currentModels;
+
+		void printModels();
+		void printSortedModels();
 	};
 
 } /* namespace cng */

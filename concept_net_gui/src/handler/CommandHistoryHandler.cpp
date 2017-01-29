@@ -5,22 +5,22 @@
  *      Author: stefan
  */
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
-#include "../include/gui/ConceptNetGui.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/containers/SolverSettings.h"
+#include "containers/SolverSettings.h"
 
-#include "../include/commands/NewSolverCommand.h"
-#include "../include/commands/ChangeSolverSettingsCommand.h"
-#include "../include/commands/ConceptNetQueryCommand.h"
-#include "../include/commands/Command.h"
-#include "../include/commands/FactsQueryCommand.h"
-#include "../include/commands/GroundCommand.h"
-#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
-#include "../include/commands/LoadSavedProgramCommand.h"
-#include "../include/commands/SolveCommand.h"
-#include "../include/commands/VariableQueryCommand.h"
+#include "commands/NewSolverCommand.h"
+#include "commands/ChangeSolverSettingsCommand.h"
+#include "commands/ConceptNetQueryCommand.h"
+#include "commands/Command.h"
+#include "commands/FactsQueryCommand.h"
+#include "commands/GroundCommand.h"
+#include "commands/LoadBackgroundKnowledgeCommand.h"
+#include "commands/LoadSavedProgramCommand.h"
+#include "commands/SolveCommand.h"
+#include "commands/VariableQueryCommand.h"
 
 #include <ui_conceptnetgui.h>
 
@@ -160,14 +160,23 @@ namespace cng
 
 	void CommandHistoryHandler::addLoadSavedProgramCommandToHistory(shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<LoadSavedProgramCommand>(cmd)->fileName));
 		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
 	}
 
 	void CommandHistoryHandler::addSolveCommandToHistory(shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		QString satisfiable;
+		if(dynamic_pointer_cast<SolveCommand>(cmd)->isSatisfiable())
+		{
+			satisfiable = QString("satisfied");
+		}
+		else
+		{
+			satisfiable = QString("not satisfied");
+		}
+		auto tmp2 = new QTableWidgetItem(satisfiable);
 		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
 	}

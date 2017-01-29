@@ -5,23 +5,23 @@
  *      Author: stefan
  */
 
-#include "../include/handler/SaveLoadHandler.h"
+#include "handler/SaveLoadHandler.h"
 
-#include "../include/gui/ConceptNetGui.h"
-#include "../include/gui/SettingsDialog.h"
+#include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 #include <ui_conceptnetgui.h>
 #include <ui_settingsdialog.h>
 
-#include "../include/commands/NewSolverCommand.h"
-#include "../include/commands/ChangeSolverSettingsCommand.h"
-#include "../include/commands/ConceptNetQueryCommand.h"
-#include "../include/commands/Command.h"
-#include "../include/commands/FactsQueryCommand.h"
-#include "../include/commands/GroundCommand.h"
-#include "../include/commands/LoadBackgroundKnowledgeCommand.h"
-#include "../include/commands/LoadSavedProgramCommand.h"
-#include "../include/commands/SolveCommand.h"
-#include "../include/commands/VariableQueryCommand.h"
+#include "commands/NewSolverCommand.h"
+#include "commands/ChangeSolverSettingsCommand.h"
+#include "commands/ConceptNetQueryCommand.h"
+#include "commands/Command.h"
+#include "commands/FactsQueryCommand.h"
+#include "commands/GroundCommand.h"
+#include "commands/LoadBackgroundKnowledgeCommand.h"
+#include "commands/LoadSavedProgramCommand.h"
+#include "commands/SolveCommand.h"
+#include "commands/VariableQueryCommand.h"
 
 #include <QString>
 #include <QFileDialog>
@@ -148,7 +148,7 @@ namespace cng
 			}
 
 			QByteArray loadedData = file.readAll();
-			shared_ptr<LoadSavedProgramCommand> cmd = make_shared<LoadSavedProgramCommand>(this->gui, loadedData);
+			shared_ptr<LoadSavedProgramCommand> cmd = make_shared<LoadSavedProgramCommand>(this->gui, filename, loadedData);
 			cmd->execute();
 		}
 	}

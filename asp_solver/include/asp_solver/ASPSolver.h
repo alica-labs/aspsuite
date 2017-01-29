@@ -78,6 +78,7 @@ namespace reasoner
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
+		vector<Gringo::ValVec> getCurrentModels();
 
 	private:
 		bool onModel(Gringo::Model const &m);
@@ -90,6 +91,7 @@ namespace reasoner
 		vector<string> alreadyLoaded;
 		vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 		vector<shared_ptr<ASPQuery>> registeredQueries;
+		vector<Gringo::ValVec> currentModels;
 
 		void reduceQueryLifeTime();
 		int prepareSolution(std::vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);

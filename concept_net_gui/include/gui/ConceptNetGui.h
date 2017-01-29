@@ -9,11 +9,18 @@
 #include <iostream>
 #include <memory>
 
+#include <clingo/clingocontrol.hh>
+
 using namespace std;
 
 namespace supplementary
 {
 	class SystemConfig;
+}
+
+namespace reasoner
+{
+	class ASPSolver;
 }
 
 namespace Ui
@@ -99,6 +106,11 @@ namespace cng
 		 */
 		void clear();
 
+		reasoner::ASPSolver* getSolver();
+		void setSolver(reasoner::ASPSolver* solver);
+
+		bool onModel(Gringo::Model const &m);
+
 	private slots:
 		/**
 		 * Slot to create new Solver
@@ -123,6 +135,9 @@ namespace cng
 		void conceptNetCallBack();
 
 	private:
+
+		reasoner::ASPSolver* solver;
+
 		/**
 		 * Current Settings
 		 */

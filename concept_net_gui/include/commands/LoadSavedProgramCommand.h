@@ -25,7 +25,7 @@ namespace cng
 	class LoadSavedProgramCommand : public Command, public enable_shared_from_this<LoadSavedProgramCommand>
 	{
 	public:
-		LoadSavedProgramCommand(ConceptNetGui* gui, QByteArray loadedData);
+		LoadSavedProgramCommand(ConceptNetGui* gui, QString fileName, QByteArray loadedData);
 		virtual ~LoadSavedProgramCommand();
 
 		void execute();
@@ -33,6 +33,7 @@ namespace cng
 
 		QJsonObject toJSON();
 		QByteArray loadedData;
+		QString fileName;
 
 		ConceptNetGui* gui;
 	};

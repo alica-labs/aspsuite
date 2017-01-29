@@ -5,12 +5,14 @@
  *      Author: stefan
  */
 
-#include "../include/commands/GroundCommand.h"
-#include "../include/gui/ConceptNetGui.h"
+#include "commands/GroundCommand.h"
+#include "gui/ConceptNetGui.h"
 
-#include "../include/handler/CommandHistoryHandler.h"
+#include "handler/CommandHistoryHandler.h"
 
 #include <SystemConfig.h>
+
+#include <asp_solver/ASPSolver.h>
 
 namespace cng
 {
@@ -30,11 +32,15 @@ namespace cng
 	void GroundCommand::execute()
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		string aspString = program.toStdString();
+		this->gui->getSolver()->add(this->programSection, {}, aspString);
+		this->gui->getSolver()->ground( { {this->programSection, {}}}, nullptr);
 	}
 
 	void GroundCommand::undo()
 	{
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
+		//TODO extend every rule with an external to remove them ?
 	}
 
 	QJsonObject GroundCommand::toJSON()
@@ -52,9 +58,9 @@ namespace cng
 		size_t start = tmp.find("#program");
 		if (start != string::npos)
 		{
-			tmp = tmp.substr(start, tmp.length() - start - 1);
-			this->historyProgramSection = tmp;
 			size_t end = tmp.find_first_of(".");
+			tmp = tmp.substr(start, end - start);
+			this->historyProgramSection = tmp;
 			this->programSection = supplementary::Configuration::trim(tmp.substr(prefixLength, end - prefixLength));
 		}
 	}

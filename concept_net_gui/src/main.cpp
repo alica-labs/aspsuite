@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "../include/gui/ConceptNetGui.h"
+#include "gui/ConceptNetGui.h"
 #include <QtGui>
 #include <qdesktopwidget.h>
 

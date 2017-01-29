@@ -18,6 +18,7 @@
 namespace reasoner
 {
 
+	class ASPSolver;
 	class ASPFactsQuery : public ASPQuery
 	{
 	public:

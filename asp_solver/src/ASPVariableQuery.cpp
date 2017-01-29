@@ -5,11 +5,12 @@
  *      Author: Stefan Jakob
  */
 
-#include "../include/asp_solver/ASPVariableQuery.h"
+#include "asp_solver/ASPVariableQuery.h"
 
 #include <regex>
 #include <algorithm>
-#include "../include/asp_solver/ASPSolver.h"
+#include "asp_solver/ASPSolver.h"
+#include <asp_commons/IASPSolver.h>
 
 namespace reasoner
 {

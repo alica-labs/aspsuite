@@ -5,8 +5,8 @@
  *      Author: stefan
  */
 
-#ifndef SRC_ANNOTATEDVALVEC_H_
-#define SRC_ANNOTATEDVALVEC_H_
+#ifndef SRC_COMMONS_ANNOTATEDVALVEC_H_
+#define SRC_COMMONS_ANNOTATEDVALVEC_H_
 
 #include <clingo/clingocontrol.hh>
 #include <memory>
@@ -29,4 +29,4 @@ namespace reasoner
 
 } /* namespace reasoner */
 
-#endif /* SRC_ANNOTATEDVALVEC_H_ */
+#endif /* SRC_COMMONS_ANNOTATEDVALVEC_H_ */

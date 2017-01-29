@@ -17,7 +17,13 @@
   <build_depend>alica_engine</build_depend>
   <build_depend>alica_dummy_proxy</build_depend>
   <build_depend>alica_asp_solver</build_depend>
+  <build_depend>asp_commons</build_depend>
+  <build_depend>asp_solver_wrapper</build_depend>
+  <build_depend>asp_solver</build_depend>
    
+  <run_depend>asp_solver</run_depend>
+  <run_depend>asp_commons</run_depend>
+  <run_depend>asp_solver_wrapper</run_depend>
   <run_depend>clingo_cpp</run_depend>
   <run_depend>cmake_modules</run_depend>
   <run_depend>alica_engine</run_depend>

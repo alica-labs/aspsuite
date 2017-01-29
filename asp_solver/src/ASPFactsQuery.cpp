@@ -5,9 +5,11 @@
  *      Author: stefan
  */
 
-#include "../include/asp_solver/ASPFactsQuery.h"
+#include "asp_solver/ASPFactsQuery.h"
 
-#include "../include/asp_solver/ASPSolver.h"
+#include "asp_solver/ASPSolver.h"
+
+#include <asp_commons/IASPSolver.h>
 
 namespace reasoner
 {

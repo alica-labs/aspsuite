@@ -5,13 +5,14 @@
  *      Author: Stefan Jakob
  */
 
-#ifndef SYMROCK_ALICA_ASP_SOLVER_INCLUDE_ALICA_ASP_SOLVER_ASPQUERY_H_
-#define SYMROCK_ALICA_ASP_SOLVER_INCLUDE_ALICA_ASP_SOLVER_ASPQUERY_H_
+#ifndef SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_
+#define SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_
 
 #include <string>
 #include <clingo/clingocontrol.hh>
+#include <memory>
 
-#include "../include/asp_commons/ASPQueryType.h"
+#include <asp_commons/ASPQueryType.h>
 
 using namespace std;
 
@@ -22,11 +23,11 @@ namespace reasoner
 
 	class ASPCommonsTerm;
 	class AnnotatedValVec;
-	class ASPSolver;
+	class IASPSolver;
 	class ASPQuery
 	{
 	public:
-		ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term);
+		ASPQuery(IASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPQuery();
 
 		shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
@@ -39,9 +40,9 @@ namespace reasoner
 
 		map<Gringo::Value, vector<Gringo::Value>> getHeadValues();
 
-		ASPSolver* getSolver();
+		IASPSolver* getSolver();
 		vector<string> getRules();
-		shared_ptr<reasoner::ASPCommonsTerm> getTerm();
+		shared_ptr<ASPCommonsTerm> getTerm();
 
 		string getProgrammSection();
 		void setProgrammSection(string programmSection);
@@ -56,7 +57,7 @@ namespace reasoner
 		 * predicates are separated by "," meaning all of them will be in the same rule and ";"
 		 * meaning that there is a rule for every predicate
 		 */
-		ASPSolver* solver;
+		IASPSolver* solver;
 		shared_ptr<vector<Gringo::ValVec>> currentModels;
 		vector<string> rules;
 		// key := headValue , value := values which satisfies it
@@ -66,7 +67,7 @@ namespace reasoner
 		// LifeTime == -1 => query is used until unregistered
 		int lifeTime;
 		string programSection;
-		shared_ptr<reasoner::ASPCommonsTerm> term;
+		shared_ptr<ASPCommonsTerm> term;
 		ASPQueryType type;
 
 	private:
@@ -77,4 +78,4 @@ namespace reasoner
 
 } /* namespace reasoner */
 
-#endif /* SYMROCK_ALICA_ASP_SOLVER_INCLUDE_ALICA_ASP_SOLVER_ASPQUERY_H_ */
+#endif /* SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_ */

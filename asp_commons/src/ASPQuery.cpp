@@ -6,18 +6,18 @@
  */
 
 #include <ASPCommonsTerm.h>
-#include "../include/asp_commons/ASPQuery.h"
+#include "asp_commons/ASPQuery.h"
 
 
 #include <clingo/clingocontrol.hh>
 
-#include "../include/asp_commons/AnnotatedValVec.h"
-#include "../include/asp_commons/IASPSolver.h"
+#include "asp_commons/AnnotatedValVec.h"
+#include "asp_commons/IASPSolver.h"
 
 namespace reasoner
 {
 
-	ASPQuery::ASPQuery(ASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term)
+	ASPQuery::ASPQuery(IASPSolver* solver, shared_ptr<reasoner::ASPCommonsTerm> term)
 	{
 		this->type = ASPQueryType::Undefined;
 		this->solver = solver;
@@ -186,7 +186,7 @@ namespace reasoner
 		this->programSection = programSection;
 	}
 
-	ASPSolver* ASPQuery::getSolver()
+	IASPSolver* ASPQuery::getSolver()
 	{
 		return this->solver;
 	}

@@ -35,6 +35,8 @@ add_library(${PROJECT_NAME}
     src/ASPQuery.cpp
     src/ASPCommonsVariable.cpp
     src/ASPCommonsTerm.cpp
+    src/IASPSolver.cpp
+    src/AnnotatedValVec.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

@@ -13,12 +13,13 @@
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
 #include <asp_commons/ASPCommonsTerm.h>
+#include <memory>
 
 //#define ASPVARIABLEQUERY_DEBUG
 
 namespace reasoner
 {
-
+	class ASPSolver;
 	class ASPVariableQuery : public ASPQuery
 	{
 	public:

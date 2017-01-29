@@ -6,6 +6,8 @@
  */
 
 #include <asp_commons/IASPSolver.h>
+#include <asp_commons/ASPCommonsTerm.h>
+#include <asp_commons/ASPCommonsVariable.h>
 
 namespace reasoner
 {
@@ -14,13 +16,11 @@ namespace reasoner
 
 	IASPSolver::IASPSolver()
 	{
-		// TODO Auto-generated constructor stub
 
 	}
 
 	IASPSolver::~IASPSolver()
 	{
-		// TODO Auto-generated destructor stub
 	}
 
 } /* namespace cng */

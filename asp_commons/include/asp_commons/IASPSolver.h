@@ -11,13 +11,14 @@
 #include <string>
 #include <vector>
 #include <clingo/clingocontrol.hh>
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPCommonsVariable.h>
 
 using namespace std;
 
 namespace reasoner
 {
+	class ASPCommonsTerm;
+	class ASPCommonsVariable;
+	class ASPQuery;
 	class IASPSolver : public enable_shared_from_this<IASPSolver>
 	{
 	public:
@@ -25,10 +26,10 @@ namespace reasoner
 		static const string WILDCARD_STRING;
 
 		IASPSolver();
-		virtual ~IASPSolver() {};
+		virtual ~IASPSolver();
 
-		virtual bool existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls) = 0;
-		virtual bool getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
+		virtual bool existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls) = 0;
+		virtual bool getSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 							vector<void*>& results) = 0;
 		virtual shared_ptr<ASPCommonsVariable> createVariable(long id) = 0;
 
@@ -42,6 +43,14 @@ namespace reasoner
 		virtual bool solve() = 0;
 		virtual void add(string const &name, Gringo::FWStringVec const &params, string const &par) = 0;
 		virtual Gringo::Value parseValue(std::string const &str) = 0;
+		virtual int getQueryCounter() = 0;
+
+		virtual void removeDeadQueries() = 0;
+		virtual bool registerQuery(shared_ptr<ASPQuery> query) = 0;
+		virtual bool unregisterQuery(shared_ptr<ASPQuery> query) = 0;
+		virtual void printStats() = 0;
+		virtual vector<shared_ptr<ASPQuery>> getRegisteredQueries() = 0;
+
 	};
 
 } /* namespace reasoner */

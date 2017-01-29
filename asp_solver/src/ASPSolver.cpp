@@ -10,13 +10,18 @@
 #include <asp_commons/AnnotatedValVec.h>
 #include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPCommonsVariable.h>
+#include <asp_solver/AnnotatedExternal.h>
+#include <asp_solver/ASPFactsQuery.h>
+#include <asp_commons/ASPQuery.h>
+#include <asp_solver/ASPVariableQuery.h>
+#include <asp_commons/ASPCommonsVariable.h>
 
 namespace reasoner
 {
 
 	mutex ASPSolver::queryCounterMutex;
 
-	ASPSolver::ASPSolver(vector<char const*> args)
+	ASPSolver::ASPSolver(vector<char const*> args) : IASPSolver()
 	{
 		this->gringoModule = new DefaultGringoModule();
 		this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
@@ -182,7 +187,7 @@ namespace reasoner
 		}
 	}
 
-	bool ASPSolver::existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
+	bool ASPSolver::existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		this->conf->setKeyValue(this->modelsKey, "1");
@@ -196,7 +201,7 @@ namespace reasoner
 		return satisfied;
 	}
 
-	bool ASPSolver::getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
+	bool ASPSolver::getSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 								vector<void*>& results)
 	{
 
@@ -234,13 +239,13 @@ namespace reasoner
 		}
 	}
 
-	int ASPSolver::prepareSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
+	int ASPSolver::prepareSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		auto cVars = make_shared<vector<shared_ptr<reasoner::ASPCommonsVariable> > >(vars.size());
 		for (int i = 0; i < vars.size(); ++i)
 		{
-			cVars->at(i) = make_shared<reasoner::ASPCommonsVariable>();
+			cVars->at(i) = vars.at(i);
 		}
 		vector<shared_ptr<reasoner::ASPCommonsTerm> > constraint;
 		for (auto& c : calls)
@@ -442,4 +447,10 @@ namespace reasoner
 		cout << ss.str() << flush;
 	}
 
+	vector<shared_ptr<ASPQuery>> ASPSolver::getRegisteredQueries()
+	{
+		return registeredQueries;
+	}
+
 } /* namespace reasoner */
+

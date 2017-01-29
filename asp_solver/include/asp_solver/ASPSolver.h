@@ -14,11 +14,7 @@
 
 #include <memory>
 #include <vector>
-#include "../asp_solver/AnnotatedExternal.h"
-#include "../asp_solver/ASPFactsQuery.h"
-#include <asp_commons/ASPQuery.h>
-#include "../asp_solver/ASPVariableQuery.h"
-#include <asp_commons/ASPCommonsVariable.h>
+
 #include <asp_commons/IASPSolver.h>
 
 //#define ASPSolver_DEBUG
@@ -30,6 +26,11 @@ using namespace std;
 namespace reasoner
 {
 
+	class AnnotatedExternal;
+	class ASPFactsQuery;
+	class ASPQuery;
+	class ASPVariableQuery;
+	class ASPCommonsVariable;
 	class AnnotatedValVec;
 	class ASPSolver : public IASPSolver
 	{
@@ -37,8 +38,8 @@ namespace reasoner
 		ASPSolver(std::vector<char const*> args);
 		virtual ~ASPSolver();
 
-		bool existsSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
-		bool getSolution(vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
+		bool existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
+		bool getSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
 							vector<void*>& results);
 		shared_ptr<ASPCommonsVariable> createVariable(long id);
 
@@ -61,6 +62,11 @@ namespace reasoner
 		 */
 		int getQueryCounter();
 
+		void removeDeadQueries();
+		bool registerQuery(shared_ptr<ASPQuery> query);
+		bool unregisterQuery(shared_ptr<ASPQuery> query);
+		void printStats();
+
 		const long long getSolvingTime();
 		const long long getSatTime();
 		const long long getUnsatTime();
@@ -68,16 +74,13 @@ namespace reasoner
 		const long getAtomCount();
 		const long getBodiesCount();
 		const long getAuxAtomsCount();
-		void printStats();
 
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
+		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
 
 	private:
 		bool onModel(Gringo::Model const &m);
-		void removeDeadQueries();
-		bool registerQuery(shared_ptr<ASPQuery> query);
-		bool unregisterQuery(shared_ptr<ASPQuery> query);
 		shared_ptr<ClingoLib> clingo;
 		DefaultGringoModule* gringoModule;
 		Gringo::ConfigProxy* conf;
@@ -89,7 +92,7 @@ namespace reasoner
 		vector<shared_ptr<ASPQuery>> registeredQueries;
 
 		void reduceQueryLifeTime();
-		int prepareSolution(std::vector<ASPCommonsVariable*>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
+		int prepareSolution(std::vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
 		int queryCounter;
 		supplementary::SystemConfig* sc;
 

@@ -5,8 +5,8 @@
  *      Author: stefan
  */
 
-#include "../include/asp_commons/AnnotatedValVec.h"
-#include "../include/asp_commons/ASPQuery.h"
+#include "asp_commons/AnnotatedValVec.h"
+#include "asp_commons/ASPQuery.h"
 
 namespace reasoner
 {

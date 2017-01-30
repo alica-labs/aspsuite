@@ -30,6 +30,7 @@ namespace reasoner
 		string getProgramSection();
 		void setProgramSection(string programSection);
 		int getLifeTime();
+		void setLifeTime(int lifeTime);
 		vector<string> getRules();
 		void addFact(string fact);
 		vector<string> getFacts();

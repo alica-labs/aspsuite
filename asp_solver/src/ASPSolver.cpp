@@ -55,6 +55,12 @@ namespace reasoner
 
 	bool ASPSolver::loadFileFromConfig(string configKey)
 	{
+
+		//TODO test nothing to load so everything is loaded
+		if(configKey.empty())
+		{
+			return true;
+		}
 		for (auto file : this->alreadyLoaded)
 		{
 			if (configKey.compare(file) == 0)

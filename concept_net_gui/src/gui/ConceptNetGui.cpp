@@ -43,7 +43,7 @@ namespace cng
 		this->msgBox = new QMessageBox();
 		this->strgZShortcut = new QShortcut(QKeySequence(QKeySequence::Undo), this->ui->mainWindow);
 		this->escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this->ui->mainWindow);
-		this->chHandler =  new CommandHistoryHandler(this);
+		this->chHandler = new CommandHistoryHandler(this);
 		this->slHandler = new SaveLoadHandler(this);
 
 		this->sc = supplementary::SystemConfig::getInstance();
@@ -58,7 +58,7 @@ namespace cng
 
 	ConceptNetGui::~ConceptNetGui()
 	{
-		if(this->solver != nullptr)
+		if (this->solver != nullptr)
 		{
 			delete this->solver;
 		}
@@ -96,8 +96,19 @@ namespace cng
 
 	void ConceptNetGui::groundCallBack()
 	{
-		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
+		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
 		{
+			return;
+		}
+		if(isQuery())
+		{
+			QMessageBox mBox;
+			mBox.setWindowTitle("Query");
+			mBox.setText("A query is not supposed to be grounded!");
+			mBox.setInformativeText("This step is done by the query itself.");
+			mBox.setStandardButtons(QMessageBox::Ok);
+			mBox.setDefaultButton(QMessageBox::Ok);
+			mBox.exec();
 			return;
 		}
 		shared_ptr<GroundCommand> cmd = make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
@@ -106,21 +117,30 @@ namespace cng
 
 	void ConceptNetGui::solveCallBack()
 	{
-		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
-		{
-			return;
-		}
+//		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
+//		{
+//			return;
+//		}
 		shared_ptr<SolveCommand> cmd = make_shared<SolveCommand>(this);
 		cmd->execute();
 	}
 
 	void ConceptNetGui::queryCallBack()
 	{
-		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
+		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
 		{
 			return;
 		}
-		cout << "ConceptNetGui: query" << endl;
+		if(!isQuery())
+		{
+			QMessageBox mBox;
+			mBox.setWindowTitle("Query");
+			mBox.setText("A query is started with #query!");
+			mBox.setStandardButtons(QMessageBox::Ok);
+			mBox.setDefaultButton(QMessageBox::Ok);
+			mBox.exec();
+			return;
+		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
 			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this);
@@ -157,6 +177,16 @@ namespace cng
 		this->ui->queryBtn->setEnabled(enable);
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
+	}
+
+	bool ConceptNetGui::isQuery()
+	{
+		auto program = this->ui->aspRuleTextArea->toPlainText().toStdString();
+		if(program.find("#query") != string::npos)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	void ConceptNetGui::connectGuiElements()
@@ -213,12 +243,44 @@ namespace cng
 		return solver;
 	}
 
-
 	void ConceptNetGui::setSolver(reasoner::ASPSolver* solver)
 	{
 		this->solver = solver;
 	}
 
+	bool ConceptNetGui::rulesAreDotTerminated()
+	{
+		auto program = this->ui->aspRuleTextArea->toPlainText().toStdString();
+		std::string delimiter = "\n";
+
+		size_t pos = 0;
+		string token;
+		vector<string> lines;
+		while ((pos = program.find(delimiter)) != string::npos)
+		{
+			token = program.substr(0, pos);
+			lines.push_back(token);
+			program.erase(0, pos + delimiter.length());
+		}
+		lines.push_back(program);
+		for (auto line : lines)
+		{
+			if (!(line.empty() || line.find("%") != string::npos))
+			{
+				if (line.find(".") == string::npos)
+				{
+					QMessageBox mBox;
+					mBox.setWindowTitle("Rule not terminated!");
+					mBox.setText("The following rule is not terminated by a dot:");
+					mBox.setInformativeText(QString(line.c_str()));
+					mBox.setStandardButtons(QMessageBox::Ok);
+					mBox.setDefaultButton(QMessageBox::Ok);
+					mBox.exec();
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 }
-
-

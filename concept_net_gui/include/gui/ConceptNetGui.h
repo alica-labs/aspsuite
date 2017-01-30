@@ -107,9 +107,8 @@ namespace cng
 		void clear();
 
 		reasoner::ASPSolver* getSolver();
-		void setSolver(reasoner::ASPSolver* solver);
 
-		bool onModel(Gringo::Model const &m);
+		void setSolver(reasoner::ASPSolver* solver);
 
 	private slots:
 		/**
@@ -135,6 +134,9 @@ namespace cng
 		void conceptNetCallBack();
 
 	private:
+
+		bool rulesAreDotTerminated();
+		bool isQuery();
 
 		reasoner::ASPSolver* solver;
 

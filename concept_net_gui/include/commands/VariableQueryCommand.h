@@ -10,8 +10,11 @@
 
 #include <commands/Command.h>
 #include <memory>
+#include <string>
 
 #include <QJsonObject>
+
+using namespace std;
 
 namespace cng
 {
@@ -32,6 +35,7 @@ namespace cng
 		QJsonObject toJSON();
 
 		ConceptNetGui* gui;
+		QString program;
 	};
 
 } /* namespace cng */

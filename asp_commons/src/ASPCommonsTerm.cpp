@@ -89,6 +89,12 @@ namespace reasoner
 		return this->lifeTime;
 	}
 
+	void ASPCommonsTerm::setLifeTime(int lifeTime)
+	{
+		this->lifeTime = lifeTime;
+	}
+
+
 	vector<string> ASPCommonsTerm::getRules()
 	{
 		return this->rules;

@@ -26,7 +26,7 @@ namespace cng
 		 * Constructor
 		 * @param argString string containing the params
 		 */
-		SolverSettings(string argString);
+		SolverSettings(string name, string argString);
 		virtual ~SolverSettings();
 
 		/**
@@ -41,6 +41,8 @@ namespace cng
 		 * Not parsed param string
 		 */
 		string argString;
+
+		string name;
 	private:
 		/**
 		 * Extracts both settings vectors from argString

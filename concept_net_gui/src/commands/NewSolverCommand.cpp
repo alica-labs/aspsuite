@@ -8,12 +8,12 @@
 #include <commands/NewSolverCommand.h>
 
 #include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 
 #include "containers/SolverSettings.h"
 
 #include "handler/CommandHistoryHandler.h"
 
-#include <SystemConfig.h>
 #include <iostream>
 
 #include <asp_commons/IASPSolver.h>
@@ -43,7 +43,7 @@ namespace cng
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->setSettings(this->settings);
-		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};
+//		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};
 		this->gui->setSolver(new reasoner::ASPSolver(this->settings->args));
 		this->gui->enableGui(true);
 	}
@@ -62,14 +62,13 @@ namespace cng
 		QJsonObject ret;
 		ret["type"] = "New Solver";
 		ret["settingsString"] = QString(this->settings->argString.c_str());
+		ret["name"] = QString(this->settings->name.c_str());
 		return ret;
 	}
 
 	void NewSolverCommand::getDefaultArguments()
 	{
-		supplementary::SystemConfig* sc = supplementary::SystemConfig::getInstance();
-		string argumentString = (*sc)["ConceptNetGui"]->get<string>("ConceptNetGui", "Default", "Parameters", NULL);
-		this->settings = make_shared<SolverSettings>(argumentString);
+		this->settings = this->gui->settingsDialog->getDefaultSettings();
 	}
 
 } /* namespace cng */

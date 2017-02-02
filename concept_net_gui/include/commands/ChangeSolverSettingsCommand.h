@@ -25,7 +25,7 @@ namespace cng
 	class ChangeSolverSettingsCommand : public Command, public enable_shared_from_this<ChangeSolverSettingsCommand>
 	{
 	public:
-		ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, string currentSettings);
+		ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, shared_ptr<SolverSettings> settings);
 		virtual ~ChangeSolverSettingsCommand();
 
 		void execute();

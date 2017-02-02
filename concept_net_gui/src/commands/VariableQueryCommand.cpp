@@ -8,6 +8,7 @@
 #include "commands/VariableQueryCommand.h"
 #include "handler/CommandHistoryHandler.h"
 #include "gui/ConceptNetGui.h"
+#include "gui/SettingsDialog.h"
 #include <ui_conceptnetgui.h>
 
 #include <asp_commons/ASPCommonsTerm.h>
@@ -51,26 +52,18 @@ namespace cng
 		int queryId = this->gui->getSolver()->getQueryCounter();
 		term->setId(queryId);
 		term->setQueryId(queryId);
+		if(this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
+		{
+			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
+		}
 		for (auto line : lines)
 		{
-			if(line.find("#query") != string::npos)
-			{
-				continue;
-			}
-			else if(line.find("#lifeTime") != string::npos)
-			{
-				line.erase(0, string("#lifeTime").length());
-				line.erase(line.find("."));
-				line = supplementary::Configuration::trim(line);
-				term->setLifeTime(stoi(line));
-				continue;
-			}
-			else if(line.find(":-") != string::npos)
+			if (line.find(":-") != string::npos)
 			{
 				term->addRule(line);
 				continue;
 			}
-			else if(line.find(":-") == string::npos)
+			else if (line.find(":-") == string::npos)
 			{
 				term->addFact(line);
 				continue;

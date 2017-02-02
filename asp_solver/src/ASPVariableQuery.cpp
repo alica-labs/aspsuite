@@ -82,12 +82,10 @@ namespace reasoner
 
 	string ASPVariableQuery::expandRule(string rule)
 	{
-		stringstream ss;
-		ss << ", " << this->externalName;
-		string toAdd = ss.str();
-		ss.str("");
+		supplementary::Configuration::trim(rule);
 		rule = rule.substr(0, rule.size() - 1);
-		ss << rule << toAdd << ".";
+		stringstream ss;
+		ss << rule << ", " << this->externalName << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
 		cout << "ASPVariableQuery: rule: " << ss.str() << endl;
 #endif
@@ -97,13 +95,10 @@ namespace reasoner
 
 	string ASPVariableQuery::expandFact(string fact)
 	{
-		stringstream ss;
-		ss << " :- " << this->externalName;
-		string toAdd = ss.str();
-		ss.str("");
 		supplementary::Configuration::trim(fact);
 		fact = fact.substr(0, fact.size() - 1);
-		ss << fact << toAdd << ".";
+		stringstream ss;
+		ss << fact << " :- " << this->externalName << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
 		cout << "ASPVariableQuery: fact: " << ss.str() << endl;
 #endif

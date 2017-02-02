@@ -17,11 +17,6 @@
 
 using namespace std;
 
-namespace supplementary
-{
-	class SystemConfig;
-}
-
 namespace Ui
 {
 	class SettingsDialog;
@@ -30,6 +25,7 @@ namespace cng
 {
 	class SolverSettings;
 	class ConceptNetGui;
+	class AddSettingsDialog;
 	class SettingsDialog : public QDialog
 	{
 	Q_OBJECT
@@ -39,21 +35,25 @@ namespace cng
 		virtual ~SettingsDialog();
 		Ui::SettingsDialog* getUi();
 		bool isSaveSortedChecked();
+		shared_ptr<SolverSettings> getDefaultSettings();
 
 	private slots:
-		void setCurrentSettings(const QString &text);
 		void fillSettingsLabel(QListWidgetItem * item);
 		void applySettings();
+		void onAddBtn();
+		void onRemoveBth();
 
 	private:
+		QFile* settingsFile;
+		shared_ptr<SolverSettings> defaultSettings;
 		Ui::SettingsDialog* ui;
 		ConceptNetGui* mainGui;
-		string currentSettings;
-		supplementary::SystemConfig* sc;
+		shared_ptr<SolverSettings> currentSettings;
 		void loadSettingsFromConfig();
 		void fillSettingsList();
 		shared_ptr<vector<string>> parameterSectionNames;
 		map<string, shared_ptr<SolverSettings>> parameterMap;
+		void writeSettings();
 	};
 }
 #endif /* INCLUDE_SETTINGSDIALOG_H_ */

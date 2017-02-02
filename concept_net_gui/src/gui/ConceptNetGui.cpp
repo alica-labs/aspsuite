@@ -26,8 +26,6 @@
 #include <QScrollBar>
 #include <QTextStream>
 
-#include <SystemConfig.h>
-
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
 
@@ -46,7 +44,6 @@ namespace cng
 		this->chHandler = new CommandHistoryHandler(this);
 		this->slHandler = new SaveLoadHandler(this);
 
-		this->sc = supplementary::SystemConfig::getInstance();
 		this->settings = nullptr;
 		this->solver = nullptr;
 		this->enableGui(false);
@@ -100,17 +97,6 @@ namespace cng
 		{
 			return;
 		}
-		if(isQuery())
-		{
-			QMessageBox mBox;
-			mBox.setWindowTitle("Query");
-			mBox.setText("A query is not supposed to be grounded!");
-			mBox.setInformativeText("This step is done by the query itself.");
-			mBox.setStandardButtons(QMessageBox::Ok);
-			mBox.setDefaultButton(QMessageBox::Ok);
-			mBox.exec();
-			return;
-		}
 		shared_ptr<GroundCommand> cmd = make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
@@ -129,16 +115,6 @@ namespace cng
 	{
 		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
 		{
-			return;
-		}
-		if(!isQuery())
-		{
-			QMessageBox mBox;
-			mBox.setWindowTitle("Query");
-			mBox.setText("A query is started with #query!");
-			mBox.setStandardButtons(QMessageBox::Ok);
-			mBox.setDefaultButton(QMessageBox::Ok);
-			mBox.exec();
 			return;
 		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
@@ -167,7 +143,6 @@ namespace cng
 	void ConceptNetGui::enableGui(bool enable)
 	{
 		this->ui->actionLoad_Background_Knowledge->setEnabled(enable);
-//		this->ui->actionLoad_Program->setEnabled(enable);
 		this->ui->actionSave_Models->setEnabled(enable);
 		this->ui->actionSave_Program->setEnabled(enable);
 		this->ui->aspRuleTextArea->setEnabled(enable);
@@ -177,16 +152,8 @@ namespace cng
 		this->ui->queryBtn->setEnabled(enable);
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
-	}
-
-	bool ConceptNetGui::isQuery()
-	{
-		auto program = this->ui->aspRuleTextArea->toPlainText().toStdString();
-		if(program.find("#query") != string::npos)
-		{
-			return true;
-		}
-		return false;
+		this->ui->numberOfModelsSpinBox->setEnabled(enable);
+		this->ui->numberOfmodelsLabel->setVisible(enable);
 	}
 
 	void ConceptNetGui::connectGuiElements()

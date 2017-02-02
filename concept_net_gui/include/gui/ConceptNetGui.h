@@ -13,11 +13,6 @@
 
 using namespace std;
 
-namespace supplementary
-{
-	class SystemConfig;
-}
-
 namespace reasoner
 {
 	class ASPSolver;
@@ -46,7 +41,7 @@ namespace cng
 	class SaveLoadHandler;
 	class CommandHistoryHandler;
 	/**
-	 * Class containing the main window and managing th connects, handler and provides the command history
+	 * Class containing the main window and managing the connects, handler and provides the command history
 	 */
 	class ConceptNetGui : public QMainWindow
 	{
@@ -136,7 +131,6 @@ namespace cng
 	private:
 
 		bool rulesAreDotTerminated();
-		bool isQuery();
 
 		reasoner::ASPSolver* solver;
 
@@ -144,10 +138,6 @@ namespace cng
 		 * Current Settings
 		 */
 		shared_ptr<SolverSettings> settings;
-		/**
-		 * SystemConfig pointer
-		 */
-		supplementary::SystemConfig* sc;
 		/**
 		 * Pointer to main window
 		 */

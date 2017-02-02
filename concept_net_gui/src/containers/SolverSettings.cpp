@@ -11,8 +11,9 @@
 namespace cng
 {
 
-	SolverSettings::SolverSettings(string argString)
+	SolverSettings::SolverSettings(string name, string argString)
 	{
+		this->name = name;
 		this->argString = argString;
 		extractSettingsVector();
 

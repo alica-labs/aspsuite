@@ -17,12 +17,12 @@
 namespace cng
 {
 
-	ChangeSolverSettingsCommand::ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, string currentSettings)
+	ChangeSolverSettingsCommand::ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, shared_ptr<SolverSettings> settings)
 	{
 		this->previousSettings = gui->getSettings();
 		this->gui = gui;
 		this->dialog = dialog;
-		this->currentSettings = make_shared<SolverSettings>(currentSettings);
+		this->currentSettings = settings;
 		this->type = "Change Settings";
 	}
 
@@ -47,6 +47,7 @@ namespace cng
 		QJsonObject ret;
 		ret["type"] = "Change Settings";
 		ret["settingsString"] = QString(this->currentSettings->argString.c_str());
+		ret["name"] = QString(this->currentSettings->name.c_str());
 		return ret;
 	}
 

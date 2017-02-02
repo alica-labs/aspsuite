@@ -71,6 +71,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="numberOfmodelsLabel">
+        <property name="text">
+         <string>Number of shown Models:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="numberOfModelsSpinBox">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="buttonSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -105,8 +122,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -138,8 +155,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -171,8 +188,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -204,8 +221,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>96</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_10">

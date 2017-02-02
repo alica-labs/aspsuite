@@ -5,7 +5,6 @@
  *      Author: stefan
  */
 
-
 #include "gui/ConceptNetGui.h"
 #include "gui/SettingsDialog.h"
 
@@ -50,11 +49,14 @@ namespace cng
 		{
 
 			QJsonObject cmd = cmds[i].toObject();
-			cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i+1 << "/" << cmds.size() << endl;
+			cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/"
+					<< cmds.size() << endl;
 			if (cmd["type"].toString().toStdString().compare("New Solver") == 0)
 			{
 				shared_ptr<NewSolverCommand> c = make_shared<NewSolverCommand>(
-						this->gui, make_shared<SolverSettings>(cmd["settingsString"].toString().toStdString()));
+						this->gui,
+						make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
+													cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -62,31 +64,31 @@ namespace cng
 			else if (cmd["type"].toString().toStdString().compare("Change Settings") == 0)
 			{
 				shared_ptr<ChangeSolverSettingsCommand> c = make_shared<ChangeSolverSettingsCommand>(
-						this->gui, this->gui->settingsDialog, cmd["settingsString"].toString().toStdString());
+						this->gui,
+						this->gui->settingsDialog,
+						make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
+													cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Concept Net") == 0)
 			{
-				shared_ptr<ConceptNetQueryCommand> c = make_shared<ConceptNetQueryCommand>(
-						this->gui);
+				shared_ptr<ConceptNetQueryCommand> c = make_shared<ConceptNetQueryCommand>(this->gui);
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0)
 			{
-				shared_ptr<FactsQueryCommand> c = make_shared<FactsQueryCommand>(
-						this->gui);
+				shared_ptr<FactsQueryCommand> c = make_shared<FactsQueryCommand>(this->gui);
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Ground") == 0)
 			{
-				shared_ptr<GroundCommand> c = make_shared<GroundCommand>(
-						this->gui, cmd["program"].toString());
+				shared_ptr<GroundCommand> c = make_shared<GroundCommand>(this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -113,16 +115,14 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0)
 			{
-				shared_ptr<VariableQueryCommand> c = make_shared<VariableQueryCommand>(
-						this->gui);
+				shared_ptr<VariableQueryCommand> c = make_shared<VariableQueryCommand>(this->gui);
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Solve") == 0)
 			{
-				shared_ptr<SolveCommand> c = make_shared<SolveCommand>(
-						this->gui);
+				shared_ptr<SolveCommand> c = make_shared<SolveCommand>(this->gui);
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

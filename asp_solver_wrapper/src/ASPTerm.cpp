@@ -30,25 +30,27 @@ namespace alica
 
 		void ASPTerm::addRule(string rule)
 		{
-			if (rule.empty())
-			{
-				return;
-			}
-
-			rule = supplementary::Configuration::trim(rule);
-			size_t endOfHead = rule.find(":-");
-			if (endOfHead != string::npos)
-			{
-				// for rules (including variables)
-				size_t startOfBody = endOfHead + 2;
-				this->heads.push_back(supplementary::Configuration::trim(rule.substr(0, endOfHead)));
-				this->bodies.push_back(supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
-			}
-			else
-			{
-				// for ground literals
-				this->heads.push_back(rule);
-			}
+			//TODO was needed before query rule
+			//test
+//			if (rule.empty())
+//			{
+//				return;
+//			}
+//
+//			rule = supplementary::Configuration::trim(rule);
+//			size_t endOfHead = rule.find(":-");
+//			if (endOfHead != string::npos)
+//			{
+//				// for rules (including variables)
+//				size_t startOfBody = endOfHead + 2;
+//				this->heads.push_back(supplementary::Configuration::trim(rule.substr(0, endOfHead)));
+//				this->bodies.push_back(supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
+//			}
+//			else
+//			{
+//				// for ground literals
+//				this->heads.push_back(rule);
+//			}
 			this->rules.push_back(rule);
 //			return true;
 		}
@@ -159,7 +161,35 @@ namespace alica
 			this->queryId = queryId;
 		}
 
+		string ASPTerm::getQueryRule()
+		{
+			return queryRule;
+		}
+
+		void ASPTerm::setQueryRule(string queryRule)
+		{
+			if (queryRule.empty())
+			{
+				return;
+			}
+
+			queryRule = supplementary::Configuration::trim(queryRule);
+			size_t endOfHead = queryRule.find(":-");
+			if (endOfHead != string::npos)
+			{
+				// for rules (including variables)
+				size_t startOfBody = endOfHead + 2;
+				this->heads.push_back(supplementary::Configuration::trim(queryRule.substr(0, endOfHead)));
+				this->bodies.push_back(
+						supplementary::Configuration::trim(queryRule.substr(startOfBody, queryRule.size() - startOfBody - 1)));
+			}
+			else
+			{
+				// for ground literals
+				this->heads.push_back(queryRule);
+			}
+			this->queryRule = queryRule;
+		}
+
 	} /* namespace reasoner */
 } /* namespace alica */
-
-

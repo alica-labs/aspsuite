@@ -60,6 +60,7 @@ namespace reasoner
 		ss.str("");
 		ss << "#program " << this->queryProgramSection << "." << endl;
 		ss << "#external " << "external" << this->queryProgramSection << "." << endl;
+		ss << expandRule(this->term->getQueryRule()) << endl;
 		for (auto rule : this->term->getRules())
 		{
 			ss << expandRule(rule) << endl;

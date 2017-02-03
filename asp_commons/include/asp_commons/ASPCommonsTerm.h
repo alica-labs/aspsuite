@@ -44,9 +44,12 @@ namespace reasoner
 		void setId(long id);
 		int getQueryId();
 		void setQueryId(int queryId);
+		string getQueryRule();
+		void setQueryRule(string queryRule);
 
 	private:
 		string numberOfModels;
+		string queryRule;
 		vector<string> rules;
 		vector<string> heads;
 		vector<string> bodies;

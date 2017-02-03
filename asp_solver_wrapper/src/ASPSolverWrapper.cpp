@@ -90,7 +90,6 @@ namespace alica
 			vector<shared_ptr<::reasoner::ASPCommonsTerm> > constraint;
 			for (auto& c : calls)
 			{
-				cout << "call" << endl;
 				if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
 				{
 					cerr << "ASPSolverWrapper: Type of constraint not compatible with selected solver." << endl;
@@ -115,6 +114,7 @@ namespace alica
 				return nullptr;
 			}
 			shared_ptr<::reasoner::ASPCommonsTerm> ret = make_shared<::reasoner::ASPCommonsTerm>(tmp->getLifeTime());
+			ret->setQueryRule(tmp->getQueryRule());
 			for (auto it : tmp->getRules())
 			{
 				ret->addRule(it);

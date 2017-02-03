@@ -26,7 +26,7 @@ namespace cng
 	class VariableQueryCommand : public Command, public enable_shared_from_this<VariableQueryCommand>
 	{
 	public:
-		VariableQueryCommand(ConceptNetGui* gui);
+		VariableQueryCommand(ConceptNetGui* gui, QString program);
 		virtual ~VariableQueryCommand();
 
 		void execute();
@@ -36,6 +36,7 @@ namespace cng
 
 		ConceptNetGui* gui;
 		QString program;
+		QString toShow;
 	};
 
 } /* namespace cng */

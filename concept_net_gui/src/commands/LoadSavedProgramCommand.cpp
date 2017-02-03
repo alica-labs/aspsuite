@@ -115,7 +115,7 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0)
 			{
-				shared_ptr<VariableQueryCommand> c = make_shared<VariableQueryCommand>(this->gui);
+				shared_ptr<VariableQueryCommand> c = make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

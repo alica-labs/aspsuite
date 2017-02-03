@@ -183,7 +183,7 @@ namespace cng
 
 	void CommandHistoryHandler::addVariableQueryCommandToHistory(shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString("TODO"));
+		auto tmp2 = new QTableWidgetItem(QString(dynamic_pointer_cast<VariableQueryCommand>(cmd)->toShow));
 		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
 	}

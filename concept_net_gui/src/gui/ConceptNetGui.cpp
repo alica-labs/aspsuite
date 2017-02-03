@@ -124,7 +124,7 @@ namespace cng
 		}
 		else
 		{
-			shared_ptr<VariableQueryCommand> cmd = make_shared<VariableQueryCommand>(this);
+			shared_ptr<VariableQueryCommand> cmd = make_shared<VariableQueryCommand>(this, ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 	}

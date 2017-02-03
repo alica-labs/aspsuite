@@ -22,11 +22,12 @@
 namespace cng
 {
 
-	VariableQueryCommand::VariableQueryCommand(ConceptNetGui* gui)
+	VariableQueryCommand::VariableQueryCommand(ConceptNetGui* gui, QString program)
 	{
 		this->type = "Variable Query";
 		this->gui = gui;
 		this->program = program;
+		this->toShow = QString("");
 	}
 
 	VariableQueryCommand::~VariableQueryCommand()
@@ -35,8 +36,6 @@ namespace cng
 
 	void VariableQueryCommand::execute()
 	{
-		this->gui->chHandler->addToCommandHistory(shared_from_this());
-		this->program = this->gui->getUi()->aspRuleTextArea->toPlainText();
 		auto prgm = this->program.toStdString();
 		std::string delimiter = "\n";
 
@@ -69,6 +68,7 @@ namespace cng
 					return;
 				}
 				term->setQueryRule(lines.at(i));
+				this->toShow = QString(lines.at(i).c_str());
 				continue;
 			}
 			if (lines.at(i).find(":-") != string::npos)
@@ -96,44 +96,48 @@ namespace cng
 		if (result.size() > 0)
 		{
 			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
-			if(castedResults.at(0).values.size() == 0)
+			if (castedResults.at(0).values.size() == 0)
 			{
 				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
-				return;
 			}
-			stringstream ss;
-			ss << "Query: " << term->getQueryRule() << endl;
-			ss << "Result contains the predicates: " << endl;
-			ss << "\t\t";
-			for (int i = 0; i < castedResults.size(); i++)
+			else
 			{
-				for (int j = 0; j < castedResults.at(i).values.size(); j++)
+				stringstream ss;
+				ss << "Variable Query: " << term->getQueryRule() << endl;
+				ss << "Result contains the predicates: " << endl;
+				ss << "\t";
+				for (int i = 0; i < castedResults.size(); i++)
 				{
-					for(int k = 0; k < castedResults.at(i).values.at(j).size(); k++)
+					for (int j = 0; j < castedResults.at(i).values.size(); j++)
 					{
-						ss << castedResults.at(i).values.at(j).at(k) << " ";
+						for (int k = 0; k < castedResults.at(i).values.at(j).size(); k++)
+						{
+							ss << castedResults.at(i).values.at(j).at(k) << " ";
+						}
 					}
 				}
+				ss << endl;
+				ss << "The queried model contains the following predicates: " << endl;
+				ss << "\t";
+				for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
+				{
+					ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
+				}
+				ss << endl;
+				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 			}
-			ss << endl;
-			ss << "\tThe queried model contains the following predicates: " << endl;
-			ss << "\t\t";
-			for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
-			{
-				ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
-			}
-			ss << endl;
-			this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 		}
 		else
 		{
 			this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 		}
+		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 
 	void VariableQueryCommand::undo()
 	{
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
+		this->gui->getUi()->queryResultsLabel->clear();
 	}
 
 	QJsonObject VariableQueryCommand::toJSON()

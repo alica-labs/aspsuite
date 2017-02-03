@@ -12,6 +12,9 @@
 #include <ui_conceptnetgui.h>
 
 #include <asp_commons/ASPCommonsTerm.h>
+#include <asp_commons/ASPCommonsVariable.h>
+#include <asp_commons/AnnotatedValVec.h>
+#include <asp_commons/ASPQuery.h>
 #include <asp_solver/ASPSolver.h>
 
 #include <SystemConfig.h>
@@ -52,28 +55,80 @@ namespace cng
 		int queryId = this->gui->getSolver()->getQueryCounter();
 		term->setId(queryId);
 		term->setQueryId(queryId);
-		if(this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
+		if (this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
 		{
 			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
 		}
-		for (auto line : lines)
+		for (int i = 0; i < lines.size(); i++)
 		{
-			if (line.find(":-") != string::npos)
+			if (i == 0)
 			{
-				term->addRule(line);
+				if (lines.at(i).find(":-") == string::npos)
+				{
+					cout << "VariableQueryCommand: malformed query rule! Aborting!" << endl;
+					return;
+				}
+				term->setQueryRule(lines.at(i));
 				continue;
 			}
-			else if (line.find(":-") == string::npos)
+			if (lines.at(i).find(":-") != string::npos)
 			{
-				term->addFact(line);
+				term->addRule(lines.at(i));
+				continue;
+			}
+			else if (lines.at(i).find(":-") == string::npos)
+			{
+				term->addFact(lines.at(i));
 				continue;
 			}
 			else
 			{
-				cout << "VariableQuery: string not recognized!" << endl;
+				cout << "VariableQueryCommand: string not recognized!" << endl;
 			}
 		}
-		//TODO call getSolution
+		vector<shared_ptr<reasoner::ASPCommonsVariable>> vars;
+		vars.push_back(make_shared<reasoner::ASPCommonsVariable>());
+		vector<shared_ptr<reasoner::ASPCommonsTerm>> terms;
+		terms.push_back(term);
+		vector<void*> result;
+		this->gui->getSolver()->getSolution(vars, terms, result);
+		vector<reasoner::AnnotatedValVec> castedResults;
+		if (result.size() > 0)
+		{
+			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
+			if(castedResults.at(0).values.size() == 0)
+			{
+				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
+				return;
+			}
+			stringstream ss;
+			ss << "Query: " << term->getQueryRule() << endl;
+			ss << "Result contains the predicates: " << endl;
+			ss << "\t\t";
+			for (int i = 0; i < castedResults.size(); i++)
+			{
+				for (int j = 0; j < castedResults.at(i).values.size(); j++)
+				{
+					for(int k = 0; k < castedResults.at(i).values.at(j).size(); k++)
+					{
+						ss << castedResults.at(i).values.at(j).at(k) << " ";
+					}
+				}
+			}
+			ss << endl;
+			ss << "\tThe queried model contains the following predicates: " << endl;
+			ss << "\t\t";
+			for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
+			{
+				ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
+			}
+			ss << endl;
+			this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
+		}
+		else
+		{
+			this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
+		}
 	}
 
 	void VariableQueryCommand::undo()

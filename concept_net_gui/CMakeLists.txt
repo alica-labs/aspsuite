@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(concept_net_gui)
 
-find_package(catkin REQUIRED qt_gui asp_commons asp_solver)
+find_package(catkin REQUIRED qt_gui asp_commons asp_solver system_config)
 
 find_package(Qt5Core REQUIRED)
 get_target_property(Qt5Core_location Qt5::Core LOCATION)
@@ -81,7 +81,7 @@ include_directories(${conceptNetGui_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS})
 catkin_package(
   INCLUDE_DIRS ${conceptNetGui_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS qt_gui asp_commons asp_solver
+  CATKIN_DEPENDS qt_gui asp_commons asp_solver system_config
 )
 
 #QT5_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})

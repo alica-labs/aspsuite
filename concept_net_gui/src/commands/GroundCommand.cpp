@@ -10,7 +10,7 @@
 
 #include "handler/CommandHistoryHandler.h"
 
-#include <SystemConfig.h>
+#include <Configuration.h>
 
 #include <asp_solver/ASPSolver.h>
 

@@ -119,7 +119,7 @@ namespace cng
 		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
-			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this);
+			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this, ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 		else

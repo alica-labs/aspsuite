@@ -6,7 +6,7 @@
  */
 
 #include "containers/SolverSettings.h"
-#include <SystemConfig.h>
+#include <Configuration.h>
 
 namespace cng
 {

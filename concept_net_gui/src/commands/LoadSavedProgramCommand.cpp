@@ -81,7 +81,7 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0)
 			{
-				shared_ptr<FactsQueryCommand> c = make_shared<FactsQueryCommand>(this->gui);
+				shared_ptr<FactsQueryCommand> c = make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

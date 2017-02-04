@@ -21,7 +21,7 @@ namespace cng
 	class FactsQueryCommand : public Command, public enable_shared_from_this<FactsQueryCommand>
 	{
 	public:
-		FactsQueryCommand(ConceptNetGui* gui);
+		FactsQueryCommand(ConceptNetGui* gui, QString factsString);
 		virtual ~FactsQueryCommand();
 
 		void execute();
@@ -30,6 +30,7 @@ namespace cng
 		QJsonObject toJSON();
 
 		ConceptNetGui* gui;
+		QString factsString;
 	};
 
 } /* namespace cng */

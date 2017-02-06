@@ -132,12 +132,14 @@ namespace cng
 			this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		this->gui->getUi()->aspRuleTextArea->setText(this->program);
 	}
 
 	void VariableQueryCommand::undo()
 	{
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 		this->gui->getUi()->queryResultsLabel->clear();
+		this->gui->getUi()->aspRuleTextArea->clear();
 	}
 
 	QJsonObject VariableQueryCommand::toJSON()

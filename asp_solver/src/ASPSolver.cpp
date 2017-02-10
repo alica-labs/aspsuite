@@ -25,11 +25,6 @@ namespace reasoner
 			IASPSolver()
 	{
 		this->gringoModule = new DefaultGringoModule();
-
-		for(auto arg : args)
-		{
-			cout << arg << endl;
-		}
 		this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
 		this->disableWarnings(true);
 

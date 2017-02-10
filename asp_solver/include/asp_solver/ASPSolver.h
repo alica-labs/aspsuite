@@ -110,20 +110,20 @@ namespace reasoner
 	{
 		int subKeys, arrLen;
 		const char* help;
-		conf.getKeyInfo(key, &subKeys, &arrLen, &help);
+		conf->getKeyInfo(key, &subKeys, &arrLen, &help);
 		if (arrLen > 0)
 		{
 			for (int i = 0; i != arrLen; ++i)
 			{
-				traverseOptions(conf, conf.getArrKey(key, i), accu + std::to_string(i) + ".");
+				traverseOptions(conf, conf->getArrKey(key, i), accu + std::to_string(i) + ".");
 			}
 		}
 		else if (subKeys > 0)
 		{
 			for (int i = 0; i != subKeys; ++i)
 			{
-				const char* sk = conf.getSubKeyName(key, i);
-				traverseOptions(conf, conf.getSubKey(key, sk), accu + sk);
+				const char* sk = conf->getSubKeyName(key, i);
+				traverseOptions(conf, conf->getSubKey(key, sk), accu + sk);
 			}
 		}
 		else

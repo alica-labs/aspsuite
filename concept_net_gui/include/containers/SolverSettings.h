@@ -9,8 +9,11 @@
 #define INCLUDE_CONTAINERS_SOLVERSETTINGS_H_
 
 #include <vector>
+#include <string.h>
 #include <string>
 #include <iostream>
+#include <memory>
+#include <stdlib.h>
 
 using namespace std;
 

@@ -31,6 +31,7 @@ namespace cng
 		this->gui = gui;
 		if (settings == nullptr)
 		{
+			cout << "Using default params" << endl;
 			getDefaultArguments();
 		}
 	}

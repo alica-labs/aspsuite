@@ -21,6 +21,10 @@ namespace cng
 
 	SolverSettings::~SolverSettings()
 	{
+//		for(auto arg : this->args)
+//		{
+//			free(arg);
+//		}
 	}
 
 	void SolverSettings::extractSettingsVector()
@@ -36,7 +40,6 @@ namespace cng
 				if (end == string::npos)
 				{
 					parsedParam = supplementary::Configuration::trim(this->argString.substr(start, this->argString.length() - start));
-					this->args.push_back(parsedParam.c_str());
 					this->argumentStrings.push_back(parsedParam);
 					break;
 				}
@@ -46,17 +49,18 @@ namespace cng
 				{
 					start += 1;
 				}
-				this->args.push_back(parsedParam.c_str());
-				this->args.push_back(nullptr);
 				this->argumentStrings.push_back(parsedParam);
 			}
 		}
 		else
 		{
-			this->args.push_back(this->argString.c_str());
-			this->args.push_back(nullptr);
 			this->argumentStrings.push_back(this->argString);
 		}
+		for (int i = 0; i < this->argumentStrings.size(); i++)
+		{ // add params to startParams
+			this->args.push_back(strdup(this->argumentStrings[i].c_str()));
+		}
+		this->args.push_back(nullptr);
 	}
 
 } /* namespace cng */

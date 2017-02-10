@@ -21,14 +21,16 @@ namespace reasoner
 
 	mutex ASPSolver::queryCounterMutex;
 
-	ASPSolver::ASPSolver(vector<char const*> args) : IASPSolver()
+	ASPSolver::ASPSolver(vector<char const*> args) :
+			IASPSolver()
 	{
 		this->gringoModule = new DefaultGringoModule();
-		this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
-#ifdef SOLVER_OPTIONS
-		traverseOptions(conf, root, "");
-#endif
 
+		for(auto arg : args)
+		{
+			cout << arg << endl;
+		}
+		this->clingo = make_shared<ClingoLib>(*gringoModule, args.size() - 2, args.data());
 		this->disableWarnings(true);
 
 		this->sc = supplementary::SystemConfig::getInstance();
@@ -40,6 +42,9 @@ namespace reasoner
 		this->root = this->conf->getRootKey();
 		this->modelsKey = this->conf->getSubKey(this->root, "solve.models");
 		this->conf->setKeyValue(this->modelsKey, "0");
+#ifdef SOLVER_OPTIONS
+		traverseOptions(conf, root, "");
+#endif
 	}
 
 	ASPSolver::~ASPSolver()
@@ -57,7 +62,7 @@ namespace reasoner
 	{
 
 		//TODO test nothing to load so everything is loaded
-		if(configKey.empty())
+		if (configKey.empty())
 		{
 			return true;
 		}
@@ -69,7 +74,7 @@ namespace reasoner
 			}
 		}
 
-		string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get < string > (configKey.c_str(), NULL);
+		string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<string>(configKey.c_str(), NULL);
 		this->alreadyLoaded.push_back(configKey.c_str());
 		backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																			backGroundKnowledgeFile);
@@ -112,7 +117,7 @@ namespace reasoner
 	bool ASPSolver::onModel(const Gringo::Model& m)
 	{
 #ifdef ASPSolver_DEBUG
-		cout << "ASPSolver: Found the following model which is number " << this->modelCount << ":" << endl;
+		cout << "ASPSolver: Found the following model which is number " << endl;
 		for (auto &atom : m.atoms(Gringo::Model::SHOWN))
 		{
 			cout << atom << " ";
@@ -136,6 +141,7 @@ namespace reasoner
 
 	void ASPSolver::releaseExternal(Gringo::Value ext)
 	{
+		this->clingo->assignExternal(ext, Gringo::TruthValue::False);
 		this->clingo->assignExternal(ext, Gringo::TruthValue::Free);
 	}
 
@@ -194,7 +200,8 @@ namespace reasoner
 		}
 	}
 
-	bool ASPSolver::existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
+	bool ASPSolver::existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars,
+									vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		this->conf->setKeyValue(this->modelsKey, "1");
@@ -216,6 +223,7 @@ namespace reasoner
 		int dim = prepareSolution(vars, calls);
 		if (dim == -1)
 		{
+			this->removeDeadQueries();
 			return false;
 		}
 		auto satisfied = this->solve();
@@ -246,7 +254,8 @@ namespace reasoner
 		}
 	}
 
-	int ASPSolver::prepareSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls)
+	int ASPSolver::prepareSolution(vector<shared_ptr<ASPCommonsVariable>>& vars,
+									vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		auto cVars = make_shared<vector<shared_ptr<reasoner::ASPCommonsVariable> > >(vars.size());

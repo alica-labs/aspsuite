@@ -35,7 +35,7 @@ namespace cng
 		/**
 		 * Parsed params for solver const char*
 		 */
-		vector<const char*> args;
+		vector<char const *> args;
 		/**
 		 * Parsed params for solver vector<string>
 		 */

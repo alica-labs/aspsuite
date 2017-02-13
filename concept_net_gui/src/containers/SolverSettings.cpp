@@ -21,10 +21,10 @@ namespace cng
 
 	SolverSettings::~SolverSettings()
 	{
-//		for(auto arg : this->args)
-//		{
-//			free(arg);
-//		}
+		for(auto arg : this->args)
+		{
+			free((char*)arg);
+		}
 	}
 
 	void SolverSettings::extractSettingsVector()

@@ -60,6 +60,17 @@ namespace cng
 		}
 		for (int i = 0; i < lines.size(); i++)
 		{
+			// empty lines would result in a constraint for the query external statement
+			if(lines.at(i).empty())
+			{
+				continue;
+			}
+			// comments aren't needed
+			if(lines.at(i).find("%") != string::npos)
+			{
+				continue;
+			}
+			//query rule
 			if (i == 0)
 			{
 				if (lines.at(i).find(":-") == string::npos)
@@ -71,11 +82,13 @@ namespace cng
 				this->toShow = QString(lines.at(i).c_str());
 				continue;
 			}
+			// general rules
 			if (lines.at(i).find(":-") != string::npos)
 			{
 				term->addRule(lines.at(i));
 				continue;
 			}
+			//facts
 			else if (lines.at(i).find(":-") == string::npos)
 			{
 				term->addFact(lines.at(i));
@@ -92,11 +105,11 @@ namespace cng
 		terms.push_back(term);
 		vector<void*> result;
 		this->gui->getSolver()->getSolution(vars, terms, result);
-		vector<reasoner::AnnotatedValVec> castedResults;
+		vector<reasoner::AnnotatedValVec*> castedResults;
 		if (result.size() > 0)
 		{
-			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
-			if (castedResults.at(0).values.size() == 0)
+			castedResults.push_back((reasoner::AnnotatedValVec*)result.at(0));
+			if (castedResults.at(0)->values.size() == 0)
 			{
 				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 			}
@@ -108,20 +121,20 @@ namespace cng
 				ss << "\t";
 				for (int i = 0; i < castedResults.size(); i++)
 				{
-					for (int j = 0; j < castedResults.at(i).values.size(); j++)
+					for (int j = 0; j < castedResults.at(i)->values.size(); j++)
 					{
-						for (int k = 0; k < castedResults.at(i).values.at(j).size(); k++)
+						for (int k = 0; k < castedResults.at(i)->values.at(j).size(); k++)
 						{
-							ss << castedResults.at(i).values.at(j).at(k) << " ";
+							ss << castedResults.at(i)->values.at(j).at(k) << " ";
 						}
 					}
 				}
 				ss << endl;
 				ss << "The queried model contains the following predicates: " << endl;
 				ss << "\t";
-				for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
+				for (int i = 0; i < castedResults.at(0)->query->getCurrentModels()->at(0).size(); i++)
 				{
-					ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
+					ss << castedResults.at(0)->query->getCurrentModels()->at(0).at(i) << " ";
 				}
 				ss << endl;
 				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));

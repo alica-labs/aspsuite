@@ -24,7 +24,10 @@ namespace reasoner
 		virtual ~AnnotatedValVec();
 		long id;
 		vector<Gringo::ValVec> values;
+		vector<vector<string>> parsedValues;
 		shared_ptr<ASPQuery> query;
+	private:
+		void removeQueryExpansion();
 	};
 
 } /* namespace reasoner */

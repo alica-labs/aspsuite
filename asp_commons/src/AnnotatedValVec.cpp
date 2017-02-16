@@ -16,10 +16,18 @@ namespace reasoner
 		this->id = id;
 		this->values = values;
 		this->query = query;
+		removeQueryExpansion();
 	}
 
 	AnnotatedValVec::~AnnotatedValVec()
 	{
 	}
 
+	void AnnotatedValVec::removeQueryExpansion()
+	{
+		//TODO
+	}
+
 } /* namespace reasoner */
+
+

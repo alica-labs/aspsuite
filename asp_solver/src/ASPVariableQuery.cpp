@@ -52,6 +52,135 @@ namespace reasoner
 		return this->rules;
 	}
 
+	string ASPVariableQuery::expandQueryRuleModuleProperty(string rule)
+	{
+		//TODO discuss how to handle rules
+		return "";
+	}
+
+	string ASPVariableQuery::expandFactModuleProperty(string fact)
+	{
+		fact = supplementary::Configuration::trim(fact);
+		fact = fact.substr(0, fact.size() - 1);
+		stringstream ss;
+		ss << this->queryProgramSection << "(" << fact << ") :- " << this->externalName << ".";
+#ifdef ASPVARIABLEQUERY_DEBUG
+		cout << "ASPVariableQuery: fact: " << ss.str() << endl;
+#endif
+		return ss.str();
+	}
+
+	void ASPVariableQuery::replaceFittingPredicate(string& ruleBody, string predicate)
+	{
+		auto tmp = predicate.substr(0, predicate.find("("));
+		auto pos = ruleBody.find(tmp);
+		if (pos != string::npos)
+		{
+			stringstream ss;
+			ss << this->queryProgramSection << "(" << tmp << "("
+					<< ruleBody.substr(pos + tmp.size() + 1, ruleBody.find(")", pos) - pos - tmp.size() - 1) << "))";
+			ruleBody.replace(pos, ruleBody.find(")", pos) - pos + 1, ss.str());
+		}
+	}
+
+	string ASPVariableQuery::expandRuleModuleProperty(string rule)
+	{
+		rule = supplementary::Configuration::trim(rule);
+		if (rule.find(":-") == 0)
+		{
+			return rule;
+		}
+		else
+		{
+			size_t endOfHead = rule.find(":-");
+			string head;
+			string body;
+
+			// for rules (including variables)
+			size_t startOfBody = endOfHead + 2;
+			head = (supplementary::Configuration::trim(rule.substr(0, endOfHead)));
+			body = (supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "Head: " << head << endl;
+			cout << "Body: " << body << endl;
+#endif
+			for (auto fact : this->term->getFacts())
+			{
+				replaceFittingPredicate(body, fact);
+#ifdef ASPVARIABLEQUERY_DEBUG
+				cout << "ASPVariableQuery: Replaced body: " << body << endl;
+#endif
+			}
+			head = replaceHeadPredicates(head);
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "ASPVariableQuery: Replaced head: " << head << endl;
+#endif
+			rule = rule.substr(0, rule.size() - 1);
+			stringstream ss;
+			ss << head << " :- " << body << ", " << this->externalName << ".";
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "ASPVariableQuery: rule: " << ss.str() << endl;
+#endif
+			return ss.str();
+		}
+	}
+
+	string ASPVariableQuery::replaceHeadPredicates(string head)
+	{
+		stringstream ss;
+		if (head.find(",") != string::npos && head.find(";") == string::npos)
+		{
+			size_t start = 0;
+			size_t end = string::npos;
+			string currentQuery = "";
+			while (start != string::npos)
+			{
+				end = head.find(")", start);
+				if (end == string::npos)
+				{
+					break;
+				}
+				currentQuery = head.substr(start, end - start + 1);
+				currentQuery = supplementary::Configuration::trim(currentQuery);
+				ss << this->queryProgramSection << "(" << currentQuery << ")";
+				start = head.find(",", end);
+				if (start != string::npos)
+				{
+					ss << ",";
+					start += 1;
+				}
+			}
+		}
+		else if (head.find(";") != string::npos)
+		{
+			size_t start = 0;
+			size_t end = string::npos;
+			string currentQuery = "";
+			while (start != string::npos)
+			{
+				end = head.find(")", start);
+				if (end == string::npos)
+				{
+					break;
+				}
+				currentQuery = head.substr(start, end - start + 1);
+				currentQuery = supplementary::Configuration::trim(currentQuery);
+				ss << this->queryProgramSection << "(" << currentQuery << ")";
+				start = head.find(";", end);
+				if (start != string::npos)
+				{
+					ss << ";";
+					start += 1;
+				}
+			}
+		}
+		else
+		{
+			ss << this->queryProgramSection << "(" << head << ")";
+		}
+		return ss.str();
+	}
+
 	void ASPVariableQuery::createProgramSection()
 	{
 		stringstream ss;
@@ -60,14 +189,14 @@ namespace reasoner
 		ss.str("");
 		ss << "#program " << this->queryProgramSection << "." << endl;
 		ss << "#external " << "external" << this->queryProgramSection << "." << endl;
-		ss << expandRule(this->term->getQueryRule()) << endl;
+		ss << expandRuleModuleProperty(this->term->getQueryRule()) << endl;
 		for (auto rule : this->term->getRules())
 		{
-			ss << expandRule(rule) << endl;
+			ss << expandRuleModuleProperty(rule) << endl;
 		}
 		for (auto fact : this->term->getFacts())
 		{
-			ss << expandFact(fact) << endl;
+			ss << expandFactModuleProperty(fact) << endl;
 		}
 #ifdef ASPVARIABLEQUERY_DEBUG
 		cout << "ASPVariableQuery: create program section: \n" << ss.str();
@@ -83,7 +212,7 @@ namespace reasoner
 
 	string ASPVariableQuery::expandRule(string rule)
 	{
-		supplementary::Configuration::trim(rule);
+		rule = supplementary::Configuration::trim(rule);
 		rule = rule.substr(0, rule.size() - 1);
 		stringstream ss;
 		ss << rule << ", " << this->externalName << ".";
@@ -96,7 +225,7 @@ namespace reasoner
 
 	string ASPVariableQuery::expandFact(string fact)
 	{
-		supplementary::Configuration::trim(fact);
+		fact = supplementary::Configuration::trim(fact);
 		fact = fact.substr(0, fact.size() - 1);
 		stringstream ss;
 		ss << fact << " :- " << this->externalName << ".";
@@ -176,7 +305,9 @@ namespace reasoner
 				words_begin = sregex_iterator(tmp.begin(), tmp.end(), words_regex);
 			}
 			value = value.replace(begin, end - begin, tmp);
-			auto val = this->solver->parseValue(value);
+			stringstream ss;
+			ss << this->queryProgramSection << "(" << value << ")";
+			auto val = this->solver->parseValue(ss.str());
 			this->headValues.emplace(val, vector<Gringo::Value>());
 		}
 	}

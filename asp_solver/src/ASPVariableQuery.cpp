@@ -55,7 +55,55 @@ namespace reasoner
 	string ASPVariableQuery::expandQueryRuleModuleProperty(string rule)
 	{
 		//TODO discuss how to handle rules
-		return "";
+		if (rule.find(":-") == 0)
+		{
+			return rule;
+		}
+		stringstream ss;
+		ss << this->expandRuleModuleProperty(rule);
+		if (this->getTerm()->getRules().size() > 0)
+		{
+			ss << endl;
+			rule = supplementary::Configuration::trim(rule);
+			size_t endOfQueryRuleHead = rule.find(":-");
+			string queryRuleHead = (supplementary::Configuration::trim(rule.substr(0, endOfQueryRuleHead)));
+			queryRuleHead = replaceHeadPredicates(queryRuleHead);
+			string queryRuleBody = (supplementary::Configuration::trim(
+					rule.substr(endOfQueryRuleHead + 2, rule.size() - endOfQueryRuleHead + 1)));
+			for (auto r : this->term->getRules())
+			{
+				size_t endOfRuleHead = r.find(":-");
+				string head;
+
+				// for rules (including variables)
+				size_t startOfBody = endOfRuleHead + 2;
+				head = (supplementary::Configuration::trim(r.substr(0, endOfRuleHead)));
+				auto headPredicates = createHeadPredicates(head);
+#ifdef ASPVARIABLEQUERY_DEBUG
+				cout << "ASPVariableQuery: Head: " << head << endl;
+#endif
+				for (auto pred : headPredicates)
+				{
+					replaceFittingPredicate(queryRuleBody, pred);
+#ifdef ASPVARIABLEQUERY_DEBUG
+					cout << "ASPVariableQuery: Replaced body: " << queryRuleBody << endl;
+#endif
+				}
+				for (auto fact : this->term->getFacts())
+				{
+					replaceFittingPredicate(queryRuleBody, fact);
+#ifdef ASPVARIABLEQUERY_DEBUG
+					cout << "ASPVariableQuery: Replaced body: " << body << endl;
+#endif
+				}
+			}
+#ifdef ASPVARIABLEQUERY_DEBUG
+			cout << "ASPVariableQuery: queryRule: " << ss.str() << endl;
+#endif
+			queryRuleBody = queryRuleBody.substr(0, queryRuleBody.size() - 1);
+			ss << queryRuleHead << " :- " << queryRuleBody << ", " << this->externalName << ".";
+		}
+		return ss.str();
 	}
 
 	string ASPVariableQuery::expandFactModuleProperty(string fact)
@@ -101,8 +149,8 @@ namespace reasoner
 			head = (supplementary::Configuration::trim(rule.substr(0, endOfHead)));
 			body = (supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
 #ifdef ASPVARIABLEQUERY_DEBUG
-			cout << "Head: " << head << endl;
-			cout << "Body: " << body << endl;
+			cout << "ASPVariableQuery: Head: " << head << endl;
+			cout << "ASPVariableQuery: Body: " << body << endl;
 #endif
 			for (auto fact : this->term->getFacts())
 			{
@@ -181,6 +229,60 @@ namespace reasoner
 		return ss.str();
 	}
 
+	vector<string> ASPVariableQuery::createHeadPredicates(string head)
+	{
+		vector<string> ret;
+		if (head.find(",") != string::npos && head.find(";") == string::npos)
+		{
+			size_t start = 0;
+			size_t end = string::npos;
+			string currentQuery = "";
+			while (start != string::npos)
+			{
+				end = head.find(")", start);
+				if (end == string::npos)
+				{
+					break;
+				}
+				currentQuery = head.substr(start, end - start + 1);
+				currentQuery = supplementary::Configuration::trim(currentQuery);
+				ret.push_back(currentQuery);
+				start = head.find(",", end);
+				if (start != string::npos)
+				{
+					start += 1;
+				}
+			}
+		}
+		else if (head.find(";") != string::npos)
+		{
+			size_t start = 0;
+			size_t end = string::npos;
+			string currentQuery = "";
+			while (start != string::npos)
+			{
+				end = head.find(")", start);
+				if (end == string::npos)
+				{
+					break;
+				}
+				currentQuery = head.substr(start, end - start + 1);
+				currentQuery = supplementary::Configuration::trim(currentQuery);
+				ret.push_back(currentQuery);
+				start = head.find(";", end);
+				if (start != string::npos)
+				{
+					start += 1;
+				}
+			}
+		}
+		else
+		{
+			ret.push_back(head);
+		}
+		return ret;
+	}
+
 	void ASPVariableQuery::createProgramSection()
 	{
 		stringstream ss;
@@ -189,7 +291,10 @@ namespace reasoner
 		ss.str("");
 		ss << "#program " << this->queryProgramSection << "." << endl;
 		ss << "#external " << "external" << this->queryProgramSection << "." << endl;
-		ss << expandRuleModuleProperty(this->term->getQueryRule()) << endl;
+		ss << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;
+//#ifdef ASPVARIABLEQUERY_DEBUG
+		cout << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;
+//#endif
 		for (auto rule : this->term->getRules())
 		{
 			ss << expandRuleModuleProperty(rule) << endl;
@@ -210,83 +315,40 @@ namespace reasoner
 		this->solver->releaseExternal(*(this->external));
 	}
 
-	string ASPVariableQuery::expandRule(string rule)
-	{
-		rule = supplementary::Configuration::trim(rule);
-		rule = rule.substr(0, rule.size() - 1);
-		stringstream ss;
-		ss << rule << ", " << this->externalName << ".";
-#ifdef ASPVARIABLEQUERY_DEBUG
-		cout << "ASPVariableQuery: rule: " << ss.str() << endl;
-#endif
-		return ss.str();
-
-	}
-
-	string ASPVariableQuery::expandFact(string fact)
-	{
-		fact = supplementary::Configuration::trim(fact);
-		fact = fact.substr(0, fact.size() - 1);
-		stringstream ss;
-		ss << fact << " :- " << this->externalName << ".";
-#ifdef ASPVARIABLEQUERY_DEBUG
-		cout << "ASPVariableQuery: fact: " << ss.str() << endl;
-#endif
-		return ss.str();
-	}
+//	string ASPVariableQuery::expandRule(string rule)
+//	{
+//		rule = supplementary::Configuration::trim(rule);
+//		rule = rule.substr(0, rule.size() - 1);
+//		stringstream ss;
+//		ss << rule << ", " << this->externalName << ".";
+//#ifdef ASPVARIABLEQUERY_DEBUG
+//		cout << "ASPVariableQuery: rule: " << ss.str() << endl;
+//#endif
+//		return ss.str();
+//
+//	}
+//
+//	string ASPVariableQuery::expandFact(string fact)
+//	{
+//		fact = supplementary::Configuration::trim(fact);
+//		fact = fact.substr(0, fact.size() - 1);
+//		stringstream ss;
+//		ss << fact << " :- " << this->externalName << ".";
+//#ifdef ASPVARIABLEQUERY_DEBUG
+//		cout << "ASPVariableQuery: fact: " << ss.str() << endl;
+//#endif
+//		return ss.str();
+//	}
 
 	void ASPVariableQuery::createHeadQueryValues(vector<string> queryVec)
 	{
 		vector<string> valuesToParse;
 		for (auto queryString : queryVec)
 		{
-			if (queryString.find(",") != string::npos && queryString.find(";") == string::npos)
+			auto vec = createHeadPredicates(queryString);
+			for (auto s : vec)
 			{
-				size_t start = 0;
-				size_t end = string::npos;
-				string currentQuery = "";
-				while (start != string::npos)
-				{
-					end = queryString.find(")", start);
-					if (end == string::npos)
-					{
-						break;
-					}
-					currentQuery = queryString.substr(start, end - start + 1);
-					currentQuery = supplementary::Configuration::trim(currentQuery);
-					valuesToParse.push_back(currentQuery);
-					start = queryString.find(",", end);
-					if (start != string::npos)
-					{
-						start += 1;
-					}
-				}
-			}
-			else if (queryString.find(";") != string::npos)
-			{
-				size_t start = 0;
-				size_t end = string::npos;
-				string currentQuery = "";
-				while (start != string::npos)
-				{
-					end = queryString.find(")", start);
-					if (end == string::npos)
-					{
-						break;
-					}
-					currentQuery = queryString.substr(start, end - start + 1);
-					currentQuery = supplementary::Configuration::trim(currentQuery);
-					valuesToParse.push_back(currentQuery);
-					start = queryString.find(";", end);
-					if (start != string::npos)
-					{
-						start += 1;
-					}
-				}
-			}
-			else
-			{
-				valuesToParse.push_back(queryString);
+				valuesToParse.push_back(s);
 			}
 		}
 		regex words_regex("[A-Z]+(\\w*)");

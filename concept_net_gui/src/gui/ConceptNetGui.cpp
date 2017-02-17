@@ -48,8 +48,12 @@ namespace cng
 		this->solver = nullptr;
 		this->enableGui(false);
 		this->ui->currentModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->currentModelsLabel->setWordWrap(true);
 		this->ui->queryResultsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->queryResultsLabel->setWordWrap(true);
 		this->ui->sortedModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->sortedModelsLabel->setWordWrap(true);
+		this->ui->showModelsCheckBox->setChecked(true);
 		this->connectGuiElements();
 	}
 
@@ -153,7 +157,8 @@ namespace cng
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
 		this->ui->numberOfModelsSpinBox->setEnabled(enable);
-		this->ui->numberOfmodelsLabel->setVisible(enable);
+		this->ui->numberOfmodelsLabel->setEnabled(enable);
+		this->ui->showModelsCheckBox->setEnabled(enable);
 	}
 
 	void ConceptNetGui::connectGuiElements()

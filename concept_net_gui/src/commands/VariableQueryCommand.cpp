@@ -61,12 +61,12 @@ namespace cng
 		for (int i = 0; i < lines.size(); i++)
 		{
 			// empty lines would result in a constraint for the query external statement
-			if(lines.at(i).empty())
+			if (lines.at(i).empty())
 			{
 				continue;
 			}
 			// comments aren't needed
-			if(lines.at(i).find("%") != string::npos)
+			if (lines.at(i).find("%") != string::npos)
 			{
 				continue;
 			}
@@ -109,7 +109,7 @@ namespace cng
 		if (result.size() > 0)
 		{
 			castedResults.push_back((reasoner::AnnotatedValVec*)result.at(0));
-			if (castedResults.at(0)->values.size() == 0)
+			if (castedResults.at(0)->variableQueryValues.size() == 0)
 			{
 				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 			}
@@ -121,22 +121,25 @@ namespace cng
 				ss << "\t";
 				for (int i = 0; i < castedResults.size(); i++)
 				{
-					for (int j = 0; j < castedResults.at(i)->values.size(); j++)
+					for (int j = 0; j < castedResults.at(i)->variableQueryValues.size(); j++)
 					{
-						for (int k = 0; k < castedResults.at(i)->values.at(j).size(); k++)
+						for (int k = 0; k < castedResults.at(i)->variableQueryValues.at(j).size(); k++)
 						{
-							ss << castedResults.at(i)->values.at(j).at(k) << " ";
+							ss << castedResults.at(i)->variableQueryValues.at(j).at(k) << " ";
 						}
 					}
 				}
 				ss << endl;
-				ss << "The queried model contains the following predicates: " << endl;
-				ss << "\t";
-				for (int i = 0; i < castedResults.at(0)->query->getCurrentModels()->at(0).size(); i++)
+				if (this->gui->getUi()->showModelsCheckBox->isChecked())
 				{
-					ss << castedResults.at(0)->query->getCurrentModels()->at(0).at(i) << " ";
+					ss << "The queried model contains the following predicates: " << endl;
+					ss << "\t";
+					for (int i = 0; i < castedResults.at(0)->query->getCurrentModels()->at(0).size(); i++)
+					{
+						ss << castedResults.at(0)->query->getCurrentModels()->at(0).at(i) << " ";
+					}
+					ss << endl;
 				}
-				ss << endl;
 				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 			}
 		}

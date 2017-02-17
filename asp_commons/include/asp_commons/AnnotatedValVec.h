@@ -23,11 +23,12 @@ namespace reasoner
 		AnnotatedValVec(long id, vector<Gringo::ValVec> values, shared_ptr<ASPQuery> query);
 		virtual ~AnnotatedValVec();
 		long id;
-		vector<Gringo::ValVec> values;
-		vector<vector<string>> parsedValues;
+		vector<vector<string>> variableQueryValues;
+		vector<vector<string>> factQueryValues;
 		shared_ptr<ASPQuery> query;
 	private:
-		void removeQueryExpansion();
+		vector<Gringo::ValVec> values;
+		void extractResponse();
 	};
 
 } /* namespace reasoner */

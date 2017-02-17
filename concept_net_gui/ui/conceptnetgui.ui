@@ -88,6 +88,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="showModelsCheckBox">
+        <property name="text">
+         <string>Show Models in Query?</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="buttonSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

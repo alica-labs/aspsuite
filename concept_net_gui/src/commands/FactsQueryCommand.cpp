@@ -42,7 +42,7 @@ namespace cng
 
 		size_t pos = 0;
 		string token;
-		if((pos = prgm.find(delimiter)) != string::npos)
+		if ((pos = prgm.find(delimiter)) != string::npos)
 		{
 			cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << endl;
 			return;
@@ -69,7 +69,7 @@ namespace cng
 		if (result.size() > 0)
 		{
 			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
-			if (castedResults.at(0).values.size() == 0)
+			if (castedResults.at(0).factQueryValues.size() == 0)
 			{
 				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 			}
@@ -78,25 +78,26 @@ namespace cng
 				stringstream ss;
 				ss << "Facts Query: " << term->getQueryRule() << endl;
 				ss << "Result contains the predicates: " << endl;
-				ss << "\t";
 				for (int i = 0; i < castedResults.size(); i++)
 				{
-					for (int j = 0; j < castedResults.at(i).values.size(); j++)
+					for (int j = 0; j < castedResults.at(i).factQueryValues.size(); j++)
 					{
-						for (int k = 0; k < castedResults.at(i).values.at(j).size(); k++)
+						for (int k = 0; k < castedResults.at(i).factQueryValues.at(j).size(); k++)
 						{
-							ss << castedResults.at(i).values.at(j).at(k) << " ";
+							ss << castedResults.at(i).factQueryValues.at(j).at(k) << " ";
 						}
 					}
 				}
 				ss << endl;
-				ss << "The queried model contains the following predicates: " << endl;
-				ss << "\t";
-				for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
+				if (this->gui->getUi()->showModelsCheckBox->isChecked())
 				{
-					ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
+					ss << "The queried model contains the following predicates: " << endl;
+					for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
+					{
+						ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
+					}
+					ss << endl;
 				}
-				ss << endl;
 				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 			}
 		}

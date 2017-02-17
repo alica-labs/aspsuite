@@ -31,13 +31,14 @@ namespace reasoner
 
 	private:
 		void createHeadQueryValues(vector<string> queryVec);
-		string expandRule(string rule);
+		vector<string> createHeadPredicates(string head);
+//		string expandRule(string rule);
 		string expandQueryRuleModuleProperty(string rule);
 		string expandRuleModuleProperty(string rule);
 		string expandFactModuleProperty(string fact);
 		void replaceFittingPredicate(string& ruleBody, string predicate);
 		string replaceHeadPredicates(string head);
-		string expandFact(string fact);
+//		string expandFact(string fact);
 		shared_ptr<Gringo::Value> external;
 		string queryProgramSection;
 		string externalName;

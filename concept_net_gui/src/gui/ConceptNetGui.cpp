@@ -55,10 +55,22 @@ namespace cng
 		this->ui->sortedModelsLabel->setWordWrap(true);
 		this->ui->showModelsCheckBox->setChecked(true);
 		this->connectGuiElements();
+		this->isDockerInstalled = checkDockerInstallation();
+		this->isConcneptNetInstalled = checkConcneptNetInstallation();
+		if(isDockerInstalled && isConcneptNetInstalled)
+		{
+			int i = system("docker start conceptnet5_conceptnet-web_1");
+			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i << endl;
+		}
 	}
 
 	ConceptNetGui::~ConceptNetGui()
 	{
+		if(isDockerInstalled && isConcneptNetInstalled)
+		{
+			int i = system("docker stop conceptnet5_conceptnet-web_1");
+			cout << "ConceptNetGui: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i << endl;
+		}
 		if (this->solver != nullptr)
 		{
 			delete this->solver;
@@ -123,12 +135,14 @@ namespace cng
 		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
-			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this, ui->aspRuleTextArea->toPlainText());
+			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this,
+																				ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 		else
 		{
-			shared_ptr<VariableQueryCommand> cmd = make_shared<VariableQueryCommand>(this, ui->aspRuleTextArea->toPlainText());
+			shared_ptr<VariableQueryCommand> cmd = make_shared<VariableQueryCommand>(
+					this, ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 	}
@@ -150,7 +164,18 @@ namespace cng
 		this->ui->actionSave_Models->setEnabled(enable);
 		this->ui->actionSave_Program->setEnabled(enable);
 		this->ui->aspRuleTextArea->setEnabled(enable);
-		this->ui->conceptNetBtn->setEnabled(enable);
+		if (!enable)
+		{
+			this->ui->conceptNetBtn->setEnabled(enable);
+		}
+
+		else
+		{
+			if(isDockerInstalled && isConcneptNetInstalled)
+			{
+				this->ui->conceptNetBtn->setEnabled(enable);
+			}
+		}
 		this->ui->groundBtn->setEnabled(enable);
 		this->ui->solveBtn->setEnabled(enable);
 		this->ui->queryBtn->setEnabled(enable);
@@ -159,6 +184,42 @@ namespace cng
 		this->ui->numberOfModelsSpinBox->setEnabled(enable);
 		this->ui->numberOfmodelsLabel->setEnabled(enable);
 		this->ui->showModelsCheckBox->setEnabled(enable);
+	}
+
+	bool ConceptNetGui::checkDockerInstallation()
+	{
+		std::array<char, 128> buffer;
+		std::string result;
+		std::shared_ptr<FILE> pipe(popen("docker -v", "r"), pclose);
+		if (!pipe)
+			throw std::runtime_error("popen() failed!");
+		while (!feof(pipe.get()))
+		{
+			if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+				result += buffer.data();
+		}
+#ifdef GUIDEUG
+		cout << "ConceptNetGui: " << result << endl;
+#endif
+		return (result.find("Docker version ") != string::npos);
+	}
+
+	bool ConceptNetGui::checkConcneptNetInstallation()
+	{
+		std::array<char, 128> buffer;
+		std::string result;
+		std::shared_ptr<FILE> pipe(popen("docker ps -a", "r"), pclose);
+		if (!pipe)
+			throw std::runtime_error("popen() failed!");
+		while (!feof(pipe.get()))
+		{
+			if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+				result += buffer.data();
+		}
+#ifdef GUIDEUG
+		cout << "ConceptNetGui: " << result << endl;
+#endif
+		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
 	}
 
 	void ConceptNetGui::connectGuiElements()

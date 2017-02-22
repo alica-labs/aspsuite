@@ -11,6 +11,8 @@
 
 #include <clingo/clingocontrol.hh>
 
+//#define GUIDEUG
+
 using namespace std;
 
 namespace reasoner
@@ -130,6 +132,10 @@ namespace cng
 
 	private:
 
+		bool checkDockerInstallation();
+
+		bool checkConcneptNetInstallation();
+
 		bool rulesAreDotTerminated();
 
 		reasoner::ASPSolver* solver;
@@ -159,6 +165,9 @@ namespace cng
 		 * Connect Gui elements to corresponding slots
 		 */
 		void connectGuiElements();
+
+		bool isDockerInstalled;
+		bool isConcneptNetInstalled;
 
 	signals:
 		/**

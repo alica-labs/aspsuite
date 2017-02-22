@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QMessageBox>
+#include <QNetworkReply>
 #include <QShortcut>
 
 #include <iostream>
@@ -108,6 +109,8 @@ namespace cng
 		void setSolver(reasoner::ASPSolver* solver);
 
 	private slots:
+
+		void finished(QNetworkReply* reply);
 		/**
 		 * Slot to create new Solver
 		 */

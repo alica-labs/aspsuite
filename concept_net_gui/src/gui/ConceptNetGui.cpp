@@ -25,6 +25,8 @@
 #include <QDebug>
 #include <QScrollBar>
 #include <QTextStream>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
@@ -57,19 +59,34 @@ namespace cng
 		this->connectGuiElements();
 		this->isDockerInstalled = checkDockerInstallation();
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
-		if(isDockerInstalled && isConcneptNetInstalled)
+		QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+		connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
+		if (isDockerInstalled && isConcneptNetInstalled)
 		{
 			int i = system("docker start conceptnet5_conceptnet-web_1");
-			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i << endl;
+			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+					<< endl;
+			QUrl url("api.localhost/c/en/example");
+//			QUrlQuery query;
+//
+//			query.addQueryItem("username", "test");
+//			query.addQueryItem("password", "test");
+//
+//			url.setQuery(query.query());
+
+			QNetworkRequest request(url);
+
+			nam->get(request);
 		}
 	}
 
 	ConceptNetGui::~ConceptNetGui()
 	{
-		if(isDockerInstalled && isConcneptNetInstalled)
+		if (isDockerInstalled && isConcneptNetInstalled)
 		{
 			int i = system("docker stop conceptnet5_conceptnet-web_1");
-			cout << "ConceptNetGui: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i << endl;
+			cout << "ConceptNetGui: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+					<< endl;
 		}
 		if (this->solver != nullptr)
 		{
@@ -171,7 +188,7 @@ namespace cng
 
 		else
 		{
-			if(isDockerInstalled && isConcneptNetInstalled)
+			if (isDockerInstalled && isConcneptNetInstalled)
 			{
 				this->ui->conceptNetBtn->setEnabled(enable);
 			}
@@ -220,6 +237,13 @@ namespace cng
 		cout << "ConceptNetGui: " << result << endl;
 #endif
 		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
+	}
+
+	void ConceptNetGui::finished(QNetworkReply* reply)
+	{
+		cout << "finished called" << endl;
+		QString data = reply->readAll();
+		cout << data.toStdString() << endl;
 	}
 
 	void ConceptNetGui::connectGuiElements()

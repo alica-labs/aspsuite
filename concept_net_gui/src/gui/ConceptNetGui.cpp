@@ -2,6 +2,8 @@
 #include "gui/SettingsDialog.h"
 
 #include "containers/SolverSettings.h"
+#include "containers/ConceptNetCall.h"
+#include "containers/ConceptNetEdge.h"
 
 #include "commands/NewSolverCommand.h"
 #include "commands/ChangeSolverSettingsCommand.h"
@@ -28,6 +30,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QtScript/QScriptEngine>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
@@ -61,7 +65,7 @@ namespace cng
 		this->isDockerInstalled = checkDockerInstallation();
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
 		nam = new QNetworkAccessManager(this);
-		connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
+		connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		if (isDockerInstalled && isConcneptNetInstalled)
 		{
 			int i = system("docker start conceptnet5_conceptnet-web_1");
@@ -158,15 +162,7 @@ namespace cng
 	{
 		//TODO remove later
 		QUrl url("http://api.localhost/c/en/example");
-//			QUrlQuery query;
-//
-//			query.addQueryItem("username", "test");
-//			query.addQueryItem("password", "test");
-//
-//			url.setQuery(query.query());
-
 		QNetworkRequest request(url);
-
 		nam->get(request);
 		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
 		{
@@ -241,13 +237,50 @@ namespace cng
 		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
 	}
 
-	void ConceptNetGui::finished(QNetworkReply* reply)
+	void ConceptNetGui::conceptNetCallFinished(QNetworkReply* reply)
 	{
-		cout << "finished called" << endl;
 		QString data = reply->readAll();
-		QScriptEngine engine;
-		QScriptValue result = engine.evaluate(data);
-		cout << "Data: " << data.toStdString() << endl;
+		string fullData = data.toStdString();
+		auto start = fullData.find("{\"@context\":");
+		auto end = fullData.find("</script>");
+		fullData = fullData.substr(start, end - start);
+//		cout << "Data: " << fullData << endl;
+		auto jsonString = QString(fullData.c_str()).toUtf8();
+//		cout << "DataJson: " << jsonString.toStdString() << endl;
+		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
+		QString id = jsonDoc.object()["@id"].toString();
+		QString nextPage = jsonDoc.object()["view"].toObject()["nextPage"].toString();
+		cout << id.toStdString() << endl;
+		cout << nextPage.toStdString() << endl;
+		ConceptNetCall call(id.toStdString(), nextPage.toStdString());
+		QJsonArray edges = jsonDoc.object()["edges"].toArray();
+		for (int i = 0; i < edges.size(); i++)
+		{
+			QJsonObject edge = edges[i].toObject();
+			QString edgeId = edge["@id"].toString();
+			QJsonObject end = edge["end"].toObject();
+			QString endConcept = end["label"].toString();
+			QString endLanguage = end["language"].toString();
+			if (endLanguage != "en")
+			{
+				continue;
+			}
+			QJsonObject start = edge["start"].toObject();
+			QString startConcept = start["label"].toString();
+			QString startLanguage = start["language"].toString();
+			if (startLanguage != "en")
+			{
+				continue;
+			}
+			QString relation = edge["rel"].toObject()["label"].toString();
+			double weight = edge["weight"].toDouble();
+			call.edges.push_back(
+					make_shared<ConceptNetEdge>(edgeId.toStdString(), startLanguage.toStdString(),
+												startConcept.toStdString(), endConcept.toStdString(),
+												relation.toStdString(), weight));
+		}
+		cout << call.toString();
+
 	}
 
 	void ConceptNetGui::connectGuiElements()

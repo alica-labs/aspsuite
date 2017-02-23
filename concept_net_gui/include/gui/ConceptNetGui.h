@@ -110,7 +110,7 @@ namespace cng
 
 	private slots:
 
-		void finished(QNetworkReply* reply);
+		void conceptNetCallFinished(QNetworkReply* reply);
 		/**
 		 * Slot to create new Solver
 		 */

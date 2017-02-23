@@ -13,6 +13,8 @@ find_package(Qt5Widgets REQUIRED)
 get_target_property(Qt5Widgets_location Qt5::Widgets LOCATION)
 find_package(Qt5WebKitWidgets REQUIRED)
 get_target_property(Qt5WebKitWidgets_location Qt5::WebKitWidgets LOCATION)
+find_package(Qt5Script REQUIRED)
+get_target_property(Qt5Script_location Qt5::Script LOCATION)
 SET( QT_USE_QTXML TRUE )
 SET( QT_WRAP_CPP TRUE )
 
@@ -90,7 +92,7 @@ QT5_WRAP_UI(conceptNetGui_UIS_H ${conceptNetGui_UIS})
 
 #add_library(${PROJECT_NAME} ${conceptNetGui_SRCS} ${conceptNetGui_MOCS} ${conceptNetGui_UIS_H} ${QT_RESOURCES_CPP})
 add_executable (ConceptNetGui ${conceptNetGui_SRCS} ${conceptNetGui_MOCS} ${conceptNetGui_UIS_H} ${QT_RESOURCES_CPP})
-target_link_libraries(ConceptNetGui ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5WebKitWidgets_location})
+target_link_libraries(ConceptNetGui ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5Script_location} ${Qt5WebKitWidgets_location})
 
 install(TARGETS ConceptNetGui
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

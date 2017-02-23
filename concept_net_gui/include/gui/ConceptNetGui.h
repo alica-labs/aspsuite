@@ -171,6 +171,7 @@ namespace cng
 
 		bool isDockerInstalled;
 		bool isConcneptNetInstalled;
+		QNetworkAccessManager *nam;
 
 	signals:
 		/**

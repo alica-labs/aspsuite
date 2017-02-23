@@ -27,6 +27,7 @@
 #include <QTextStream>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QtScript/QScriptEngine>
 
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
@@ -59,24 +60,13 @@ namespace cng
 		this->connectGuiElements();
 		this->isDockerInstalled = checkDockerInstallation();
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
-		QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+		nam = new QNetworkAccessManager(this);
 		connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(finished(QNetworkReply*)));
 		if (isDockerInstalled && isConcneptNetInstalled)
 		{
 			int i = system("docker start conceptnet5_conceptnet-web_1");
 			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
 					<< endl;
-			QUrl url("api.localhost/c/en/example");
-//			QUrlQuery query;
-//
-//			query.addQueryItem("username", "test");
-//			query.addQueryItem("password", "test");
-//
-//			url.setQuery(query.query());
-
-			QNetworkRequest request(url);
-
-			nam->get(request);
 		}
 	}
 
@@ -166,6 +156,18 @@ namespace cng
 
 	void ConceptNetGui::conceptNetCallBack()
 	{
+		//TODO remove later
+		QUrl url("http://api.localhost/c/en/example");
+//			QUrlQuery query;
+//
+//			query.addQueryItem("username", "test");
+//			query.addQueryItem("password", "test");
+//
+//			url.setQuery(query.query());
+
+		QNetworkRequest request(url);
+
+		nam->get(request);
 		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
 		{
 			return;
@@ -243,7 +245,9 @@ namespace cng
 	{
 		cout << "finished called" << endl;
 		QString data = reply->readAll();
-		cout << data.toStdString() << endl;
+		QScriptEngine engine;
+		QScriptValue result = engine.evaluate(data);
+		cout << "Data: " << data.toStdString() << endl;
 	}
 
 	void ConceptNetGui::connectGuiElements()

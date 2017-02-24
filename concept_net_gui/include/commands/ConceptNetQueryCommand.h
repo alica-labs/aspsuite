@@ -51,6 +51,10 @@ namespace cng
 
 	private:
 		QNetworkAccessManager *nam;
+		std::string conceptToASPPredicate(std::string concept);
+		QString createWeightedASPPredicates();
+		QString createAvgWeightedASPPredicates();
+		QString createASPPredicates();
 
 	signals:
 		void jsonExtracted();

@@ -30,8 +30,7 @@ namespace cng
 		this->query = query;
 		this->currentConceptNetCall = nullptr;
 		this->nam = new QNetworkAccessManager(this);
-		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this,
-				SLOT(conceptNetCallFinished(QNetworkReply*)));
+		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
 	}
 
@@ -94,6 +93,7 @@ namespace cng
 			QString endLanguage = end["language"].toString();
 			if (endLanguage != "en")
 			{
+//				cout << "not egnlish " << endLanguage.toStdString() << endl;
 				continue;
 			}
 			QJsonObject start = edge["start"].toObject();
@@ -101,6 +101,7 @@ namespace cng
 			QString startLanguage = start["language"].toString();
 			if (startLanguage != "en")
 			{
+//				cout << "not egnlish " << startLanguage.toStdString() << endl;
 				continue;
 			}
 			QString relation = edge["rel"].toObject()["label"].toString();
@@ -109,7 +110,7 @@ namespace cng
 			auto tmp = make_shared<ConceptNetEdge>(edgeId.toStdString(), startLanguage.toStdString(),
 													startConcept.toStdString(), endConcept.toStdString(),
 													relation.toStdString(), weight);
-			for(int j = 0; j < sources.size(); j++)
+			for (int j = 0; j < sources.size(); j++)
 			{
 				tmp->sources.push_back(sources[j].toObject()["contributor"].toString().toStdString());
 			}
@@ -133,34 +134,96 @@ namespace cng
 
 	void ConceptNetQueryCommand::extractASPPredicates()
 	{
+		this->gui->getUi()->aspRuleTextArea->setText(createASPPredicates());
 		this->gui->getUi()->conceptNetBtn->setEnabled(true);
+		this->gui->getUi()->conceptNetBtn->setFocus();
+	}
+
+	std::string ConceptNetQueryCommand::conceptToASPPredicate(std::string concept)
+	{
+		vector<string> wordVector;
+		std::size_t prev = 0, pos;
+		while ((pos = concept.find_first_of(" ,.", prev)) != std::string::npos)
+		{
+			if (pos > prev)
+			{
+				wordVector.push_back(concept.substr(prev, pos - prev));
+			}
+			prev = pos + 1;
+		}
+		if (prev < concept.length())
+		{
+			wordVector.push_back(concept.substr(prev, std::string::npos));
+		}
+		if(wordVector.size() == 1)
+		{
+			return wordVector.at(0);
+		}
+		else
+		{
+			stringstream ss;
+			wordVector.at(0)[0] = tolower(wordVector.at(0)[0]);
+			ss << wordVector.at(0);
+			for(int i = 1; i < wordVector.size(); i++)
+			{
+				wordVector.at(i)[0] = toupper(wordVector.at(i)[0]);
+				ss << wordVector.at(i);
+			}
+			return ss.str();
+		}
+	}
+
+	QString ConceptNetQueryCommand::createWeightedASPPredicates()
+	{
+		//TODO think about concept net weighting
+		/**
+		 * weights directly from conceptnet can not be used in asp predicates since they are double values containing a dot which violates
+		 * the asp syntax
+		 * a possible way is to multiply the weight with 100 and cast it to int keeping the first two digets after the komma and leaving the rest
+		 * are weights even necessary? perhaps to use it during optimization
+		 */
 		stringstream ss;
-		for(auto edge : this->currentConceptNetCall->edges)
+		for (auto edge : this->currentConceptNetCall->edges)
 		{
 			string tmp = edge->relation;
 			tmp[0] = tolower(tmp[0]);
-			string first = edge->firstConcept;
-			if(first.find(".") != string::npos)
-			{
-				first.erase(remove(first.begin(), first.end(), '.'), first.end());
-			}
-			if(first.find(",") != string::npos)
-			{
-				first.erase(remove(first.begin(), first.end(), ','), first.end());
-			}
-			string second = edge->secondConcept;
-			if(second.find(".") != string::npos)
-			{
-				second.erase(remove(second.begin(), second.end(), '.'), second.end());
-			}
-			if(second.find(",") != string::npos)
-			{
-				second.erase(remove(second.begin(), second.end(), ','), second.end());
-			}
-			ss << tmp << "(" << first << ", " << second << ")." << endl;
-			//TODO remove spaces, camel case ?
+			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
+					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight << ", " << edge->sources.size() <<")." << endl;
 		}
-		this->gui->getUi()->aspRuleTextArea->setText(QString(ss.str().c_str()));
+		return QString(ss.str().c_str());
+	}
+
+	QString ConceptNetQueryCommand::createAvgWeightedASPPredicates()
+	{
+		//TODO think about avg weighting
+		/**
+		 * a high value is for example given for a cup holds a liquid which has a weight of 6.9 and 13 supporters
+		 * which results in an average weight of 0.5... which is very low
+		 * this can be caused by unreliable sources like word games and can lower the influence of good source, which are distinguished in weight and only the sum is given.
+		 * perhaps do not use averaged weights
+		 */
+		stringstream ss;
+		for (auto edge : this->currentConceptNetCall->edges)
+		{
+			string tmp = edge->relation;
+			tmp[0] = tolower(tmp[0]);
+			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
+					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight / edge->sources.size() <<")." << endl;
+		}
+		return QString(ss.str().c_str());
+	}
+
+	QString ConceptNetQueryCommand::createASPPredicates()
+	{
+		stringstream ss;
+		for (auto edge : this->currentConceptNetCall->edges)
+		{
+			string tmp = edge->relation;
+			tmp[0] = tolower(tmp[0]);
+			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
+					<< conceptToASPPredicate(edge->secondConcept) << ")." << endl;
+		}
+		return QString(ss.str().c_str());
 	}
 
 } /* namespace cng */

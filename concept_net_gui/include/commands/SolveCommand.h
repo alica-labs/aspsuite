@@ -23,6 +23,7 @@ namespace cng
 	 */
 	class SolveCommand : public Command, public enable_shared_from_this<SolveCommand>
 	{
+		Q_OBJECT
 	public:
 		SolveCommand(ConceptNetGui* gui);
 		virtual ~SolveCommand();

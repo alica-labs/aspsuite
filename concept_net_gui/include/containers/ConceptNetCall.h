@@ -19,7 +19,7 @@ namespace cng
 	class ConceptNetCall
 	{
 	public:
-		ConceptNetCall(std::string id, std::string nextEdgesPage);
+		ConceptNetCall(std::string id);
 		virtual ~ConceptNetCall();
 		std::string id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;

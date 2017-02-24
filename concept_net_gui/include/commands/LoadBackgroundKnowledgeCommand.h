@@ -23,6 +23,7 @@ namespace cng
 	 */
 	class LoadBackgroundKnowledgeCommand : public Command, public enable_shared_from_this<LoadBackgroundKnowledgeCommand>
 	{
+		Q_OBJECT
 	public:
 		LoadBackgroundKnowledgeCommand(ConceptNetGui* gui, QString fileName);
 		virtual ~LoadBackgroundKnowledgeCommand();

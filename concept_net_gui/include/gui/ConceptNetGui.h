@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QMessageBox>
-#include <QNetworkReply>
 #include <QShortcut>
 
 #include <iostream>
@@ -43,6 +42,7 @@ namespace cng
 	class LoadBackgroundKnowledgeCommand;
 	class SaveLoadHandler;
 	class CommandHistoryHandler;
+	class ConceptNetCall;
 	/**
 	 * Class containing the main window and managing the connects, handler and provides the command history
 	 */
@@ -110,7 +110,6 @@ namespace cng
 
 	private slots:
 
-		void conceptNetCallFinished(QNetworkReply* reply);
 		/**
 		 * Slot to create new Solver
 		 */
@@ -171,7 +170,6 @@ namespace cng
 
 		bool isDockerInstalled;
 		bool isConcneptNetInstalled;
-		QNetworkAccessManager *nam;
 
 	signals:
 		/**

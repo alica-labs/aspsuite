@@ -24,6 +24,7 @@ namespace cng
 	 */
 	class NewSolverCommand : public Command, public enable_shared_from_this<NewSolverCommand>
 	{
+		Q_OBJECT
 	public:
 		NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings);
 		virtual ~NewSolverCommand();

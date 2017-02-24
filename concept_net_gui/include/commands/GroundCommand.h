@@ -24,6 +24,7 @@ namespace cng
 	 */
 	class GroundCommand : public Command, public enable_shared_from_this<GroundCommand>
 	{
+		Q_OBJECT
 	public:
 		GroundCommand(ConceptNetGui* gui, QString program);
 		virtual ~GroundCommand();

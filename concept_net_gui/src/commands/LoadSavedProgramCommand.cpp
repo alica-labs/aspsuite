@@ -74,7 +74,7 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Concept Net") == 0)
 			{
-				shared_ptr<ConceptNetQueryCommand> c = make_shared<ConceptNetQueryCommand>(this->gui);
+				shared_ptr<ConceptNetQueryCommand> c = make_shared<ConceptNetQueryCommand>(this->gui, cmd["queryString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

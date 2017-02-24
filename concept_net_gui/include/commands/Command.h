@@ -10,6 +10,7 @@
 
 #include <string>
 #include <QJsonObject>
+#include <QObject>
 
 using namespace std;
 
@@ -18,8 +19,9 @@ namespace cng
 	/**
 	 * Command interface
 	 */
-	class Command
+	class Command : public QObject
 	{
+	Q_OBJECT
 	public:
 		virtual ~Command() {};
 		/**

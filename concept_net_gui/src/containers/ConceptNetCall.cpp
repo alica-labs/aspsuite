@@ -14,7 +14,7 @@
 namespace cng
 {
 
-	ConceptNetCall::ConceptNetCall(std::string id, std::string nextEdgesPage)
+	ConceptNetCall::ConceptNetCall(std::string id)
 	{
 		this->id = id;
 		this->nextEdgesPage = nextEdgesPage;

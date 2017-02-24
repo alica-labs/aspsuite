@@ -25,6 +25,7 @@ namespace cng
 	 */
 	class VariableQueryCommand : public Command, public enable_shared_from_this<VariableQueryCommand>
 	{
+		Q_OBJECT
 	public:
 		VariableQueryCommand(ConceptNetGui* gui, QString program);
 		virtual ~VariableQueryCommand();

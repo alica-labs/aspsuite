@@ -20,6 +20,7 @@ namespace cng
 	 */
 	class FactsQueryCommand : public Command, public enable_shared_from_this<FactsQueryCommand>
 	{
+		Q_OBJECT
 	public:
 		FactsQueryCommand(ConceptNetGui* gui, QString factsString);
 		virtual ~FactsQueryCommand();

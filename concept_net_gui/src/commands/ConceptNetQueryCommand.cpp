@@ -39,45 +39,83 @@ namespace cng
 		delete this->nam;
 	}
 
+	void ConceptNetQueryCommand::handleWrongInput()
+	{
+		auto pos = query.indexOf("(");
+		auto parsedQuery = query.left(pos);
+		QMessageBox* msgBox = new QMessageBox(this->gui);
+		msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
+		msgBox->setWindowModality(Qt::NonModal);
+		QString relations;
+		auto tmp = this->gui->getConceptNetBaseRealtions();
+		for (int i = 0; i < tmp.size(); i++)
+		{
+			if (i % 2 == 0)
+			{
+				relations.append("\n");
+			}
+			relations.append(tmp.at(i));
+			relations.append("\t");
+			if (tmp.at(i).size() <= 10)
+			{
+				relations.append("\t");
+			}
+		}
+		msgBox->setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
+		msgBox->setStandardButtons(QMessageBox::Ok);
+		msgBox->setDefaultButton(QMessageBox::Ok);
+		int ret = msgBox->exec();
+		this->undo();
+	}
+
+	void ConceptNetQueryCommand::handleQuery()
+	{
+		auto pos = this->query.indexOf("(");
+		auto relation = this->query.left(pos);
+		if (this->query.contains("wildcard"))
+		{
+			auto wildcardPos = this->query.indexOf("wildcard");
+			auto commaPos = this->query.indexOf(",");
+			if(wildcardPos < commaPos)
+			{
+				auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
+				concept = concept.left(concept.size() - 1).trimmed();
+				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
+				QNetworkRequest request(url);
+				this->nam->get(request);
+			}
+			else
+			{
+				auto concept = this->query.mid(pos + 1, commaPos - pos).trimmed();
+				concept = concept.left(concept.size() - 1);
+				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation);
+				QNetworkRequest request(url);
+				this->nam->get(request);
+			}
+			// AtLocation(cup, wildcard)
+		}
+		else
+		{
+			auto concept = this->query.right(this->query.size() - pos - 1);
+			concept = concept.left(concept.size() - 1);
+			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation);
+			QNetworkRequest request(url);
+			this->nam->get(request);
+		}
+	}
+
 	void ConceptNetQueryCommand::execute()
 	{
-		if (this->query.contains("(") and this->query.contains(")"))
+		if (this->query.contains("(") && this->query.contains(")"))
 		{
-			auto pos = query.indexOf("(");
-			auto parsedQuery = query.remove(pos, query.length() - pos);
 			if (!isConceptNetRealtion(this->query))
 			{
-				QMessageBox *msgBox = new QMessageBox(this->gui);
-				msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
-				msgBox->setWindowModality(Qt::NonModal);
-				QString relations;
-				auto tmp = this->gui->getConceptNetBaseRealtions();
-				for(int i = 0; i < tmp.size(); i++)
-				{
-					if(i % 2 == 0)
-					{
-						relations.append("\n");
-					}
-					relations.append(tmp.at(i));
-					relations.append("\t");
-					if(tmp.at(i).size() <= 10)
-					{
-						relations.append("\t");
-					}
-				}
-				msgBox->setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
-				msgBox->setStandardButtons(QMessageBox::Ok);
-				msgBox->setDefaultButton(QMessageBox::Ok);
-				int ret = msgBox->exec();
-				this->undo();
+				handleWrongInput();
 				return;
 			}
 			else
 			{
-				//TODO http://api.localhost/query?node=/c/en/cup&rel=/r/AtLocation
-				QUrl url("http://api.localhost/c/en/" + this->query);
-				QNetworkRequest request(url);
-				this->nam->get(request);
+				handleQuery();
 			}
 		}
 		else
@@ -131,6 +169,7 @@ namespace cng
 			QJsonObject edge = edges[i].toObject();
 			QString edgeId = edge["@id"].toString();
 			QJsonObject end = edge["end"].toObject();
+			//TODO not use label since it contains unecessary info
 			QString endConcept = end["label"].toString();
 			QString endLanguage = end["language"].toString();
 			if (endLanguage != "en")
@@ -273,10 +312,10 @@ namespace cng
 	bool ConceptNetQueryCommand::isConceptNetRealtion(QString query)
 	{
 		auto pos = query.indexOf("(");
-		query = query.remove(pos, query.length() - pos);
+		auto tmp = query.left(pos);
 		for (auto relation : this->gui->getConceptNetBaseRealtions())
 		{
-			if (relation.compare(query) == 0)
+			if (relation.compare(tmp) == 0)
 			{
 				return true;
 			}

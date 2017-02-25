@@ -68,6 +68,7 @@ namespace cng
 			int i = system("docker start conceptnet5_conceptnet-web_1");
 			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
 					<< endl;
+			readConceptNetBaseRelations();
 		}
 	}
 
@@ -91,6 +92,28 @@ namespace cng
 		delete this->settingsDialog;
 		delete this->msgBox;
 		delete this->ui;
+	}
+
+
+	void ConceptNetGui::readConceptNetBaseRelations()
+	{
+		QFile file(QString(QCoreApplication::applicationDirPath() + "/../../../../../src/symrock/concept_net_gui/etc/conceptNetRelations.txt"));
+
+
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			qWarning("Couldn't open file.");
+			return;
+		}
+
+		QByteArray loadedData = file.readAll();
+		QJsonDocument loadDoc(QJsonDocument::fromJson(loadedData));
+		QJsonObject savedObject = loadDoc.object();
+		QJsonArray relations = savedObject["relations"].toArray();
+		for(auto relation : relations)
+		{
+			this->conceptNetBaseRealtions.push_back(relation.toObject()["rel"].toString());
+		}
 	}
 
 	void ConceptNetGui::newSolver()
@@ -228,6 +251,11 @@ namespace cng
 		cout << "ConceptNetGui: " << result << endl;
 #endif
 		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
+	}
+
+	vector<QString> ConceptNetGui::getConceptNetBaseRealtions()
+	{
+		return conceptNetBaseRealtions;
 	}
 
 	void ConceptNetGui::connectGuiElements()

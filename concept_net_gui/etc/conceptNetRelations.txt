@@ -1,0 +1,124 @@
+{
+    "relations": [
+        {
+            "rel": "RelatedTo"
+        },
+        {
+            "rel": "ExternalURL"
+        },
+        {
+            "rel": "FormOf"
+        },
+        {
+            "rel": "IsA"
+        },
+        {
+            "rel": "PartOf"
+        },
+        {
+            "rel": "HasA"
+        },
+        {
+            "rel": "UsedFor"
+        },
+        {
+            "rel": "CapableOf"
+        },
+        {
+            "rel": "AtLocation"
+        },
+        {
+            "rel": "Causes"
+        },
+        {
+            "rel": "HasSubevent"
+        },
+        {
+            "rel": "HasFirstSubevent"
+        },
+        {
+            "rel": "HasLastSubevent"
+        },
+        {
+            "rel": "HasPrerequisite"
+        },
+        {
+            "rel": "HasProperty"
+        },
+        {
+            "rel": "MotivatedByGoal"
+        },
+        {
+            "rel": "ObstructedBy"
+        },
+        {
+            "rel": "Desires"
+        },
+        {
+            "rel": "CreatedBy"
+        },
+        {
+            "rel": "Synonym"
+        },
+        {
+            "rel": "Antonym"
+        },
+        {
+            "rel": "DerivedFrom"
+        },
+        {
+            "rel": "SymbolOf"
+        },
+        {
+            "rel": "DefinedAs"
+        },
+        {
+            "rel": "Entails"
+        },
+        {
+            "rel": "MannerOf"
+        },
+        {
+            "rel": "LocatedNear"
+        },
+        {
+            "rel": "NotDesires"
+        },
+        {
+            "rel": "NotCapableOf"
+        },
+        {
+            "rel": "NotUsedFor"
+        },
+        {
+            "rel": "NotHasProperty"
+        },
+        {
+            "rel": "dbpedia/genre"
+        },
+        {
+            "rel": "dbpedia/influencedBy"
+        },
+        {
+            "rel": "dbpedia/knownFor"
+        },
+        {
+            "rel": "dbpedia/occupation"
+        },
+        {
+            "rel": "dbpedia/language"
+        },
+        {
+            "rel": "dbpedia/field"
+        },
+        {
+            "rel": "dbpedia/product"
+        },
+        {
+            "rel": "dbpedia/capital"
+        },
+        {
+            "rel": "dbpedia/leader"
+        }
+    ]
+}

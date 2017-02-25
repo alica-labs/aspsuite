@@ -41,9 +41,51 @@ namespace cng
 
 	void ConceptNetQueryCommand::execute()
 	{
-		QUrl url("http://api.localhost/c/en/" + this->query);
-		QNetworkRequest request(url);
-		this->nam->get(request);
+		if (this->query.contains("(") and this->query.contains(")"))
+		{
+			auto pos = query.indexOf("(");
+			auto parsedQuery = query.remove(pos, query.length() - pos);
+			if (!isConceptNetRealtion(this->query))
+			{
+				QMessageBox *msgBox = new QMessageBox(this->gui);
+				msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
+				msgBox->setWindowModality(Qt::NonModal);
+				QString relations;
+				auto tmp = this->gui->getConceptNetBaseRealtions();
+				for(int i = 0; i < tmp.size(); i++)
+				{
+					if(i % 2 == 0)
+					{
+						relations.append("\n");
+					}
+					relations.append(tmp.at(i));
+					relations.append("\t");
+					if(tmp.at(i).size() <= 10)
+					{
+						relations.append("\t");
+					}
+				}
+				msgBox->setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
+				msgBox->setStandardButtons(QMessageBox::Ok);
+				msgBox->setDefaultButton(QMessageBox::Ok);
+				int ret = msgBox->exec();
+				this->undo();
+				return;
+			}
+			else
+			{
+				//TODO http://api.localhost/query?node=/c/en/cup&rel=/r/AtLocation
+				QUrl url("http://api.localhost/c/en/" + this->query);
+				QNetworkRequest request(url);
+				this->nam->get(request);
+			}
+		}
+		else
+		{
+			QUrl url("http://api.localhost/c/en/" + this->query);
+			QNetworkRequest request(url);
+			this->nam->get(request);
+		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->getUi()->conceptNetBtn->setEnabled(false);
 	}
@@ -155,7 +197,7 @@ namespace cng
 		{
 			wordVector.push_back(concept.substr(prev, std::string::npos));
 		}
-		if(wordVector.size() == 1)
+		if (wordVector.size() == 1)
 		{
 			return wordVector.at(0);
 		}
@@ -164,7 +206,7 @@ namespace cng
 			stringstream ss;
 			wordVector.at(0)[0] = tolower(wordVector.at(0)[0]);
 			ss << wordVector.at(0);
-			for(int i = 1; i < wordVector.size(); i++)
+			for (int i = 1; i < wordVector.size(); i++)
 			{
 				wordVector.at(i)[0] = toupper(wordVector.at(i)[0]);
 				ss << wordVector.at(i);
@@ -188,7 +230,8 @@ namespace cng
 			string tmp = edge->relation;
 			tmp[0] = tolower(tmp[0]);
 			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
-					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight << ", " << edge->sources.size() <<")." << endl;
+					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight << ", "
+					<< edge->sources.size() << ")." << endl;
 		}
 		return QString(ss.str().c_str());
 	}
@@ -208,7 +251,8 @@ namespace cng
 			string tmp = edge->relation;
 			tmp[0] = tolower(tmp[0]);
 			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
-					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight / edge->sources.size() <<")." << endl;
+					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight / edge->sources.size() << ")."
+					<< endl;
 		}
 		return QString(ss.str().c_str());
 	}
@@ -224,6 +268,20 @@ namespace cng
 					<< conceptToASPPredicate(edge->secondConcept) << ")." << endl;
 		}
 		return QString(ss.str().c_str());
+	}
+
+	bool ConceptNetQueryCommand::isConceptNetRealtion(QString query)
+	{
+		auto pos = query.indexOf("(");
+		query = query.remove(pos, query.length() - pos);
+		for (auto relation : this->gui->getConceptNetBaseRealtions())
+		{
+			if (relation.compare(query) == 0)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 } /* namespace cng */

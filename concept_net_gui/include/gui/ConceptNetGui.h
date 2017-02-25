@@ -108,6 +108,8 @@ namespace cng
 
 		void setSolver(reasoner::ASPSolver* solver);
 
+		vector<QString> getConceptNetBaseRealtions();
+
 	private slots:
 
 		/**
@@ -170,7 +172,8 @@ namespace cng
 
 		bool isDockerInstalled;
 		bool isConcneptNetInstalled;
-
+		void readConceptNetBaseRelations();
+		vector<QString> conceptNetBaseRealtions;
 	signals:
 		/**
 		 * Signal used to redraw the command history

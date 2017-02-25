@@ -55,6 +55,7 @@ namespace cng
 		QString createWeightedASPPredicates();
 		QString createAvgWeightedASPPredicates();
 		QString createASPPredicates();
+		bool isConceptNetRealtion(QString query);
 
 	signals:
 		void jsonExtracted();

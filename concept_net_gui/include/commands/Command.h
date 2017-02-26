@@ -12,8 +12,6 @@
 #include <QJsonObject>
 #include <QObject>
 
-using namespace std;
-
 namespace cng
 {
 	/**
@@ -43,10 +41,10 @@ namespace cng
 		 * Gets type of Command
 		 * @return type string
 		 */
-		string getType() {return type;};
+		std::string getType() {return type;};
 
 	protected:
-		string type = "interface";
+		std::string type = "interface";
 
 	};
 }

@@ -15,8 +15,6 @@
 #include <memory>
 #include <stdlib.h>
 
-using namespace std;
-
 namespace cng
 {
 	/**
@@ -29,23 +27,23 @@ namespace cng
 		 * Constructor
 		 * @param argString string containing the params
 		 */
-		SolverSettings(string name, string argString);
+		SolverSettings(std::string name, std::string argString);
 		virtual ~SolverSettings();
 
 		/**
 		 * Parsed params for solver const char*
 		 */
-		vector<char const *> args;
+		std::vector<char const *> args;
 		/**
 		 * Parsed params for solver vector<string>
 		 */
-		vector<string> argumentStrings;
+		std::vector<std::string> argumentStrings;
 		/**
 		 * Not parsed param string
 		 */
-		string argString;
+		std::string argString;
 
-		string name;
+		std::string name;
 	private:
 		/**
 		 * Extracts both settings vectors from argString

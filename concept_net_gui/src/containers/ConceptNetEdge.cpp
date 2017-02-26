@@ -13,7 +13,8 @@
 namespace cng
 {
 
-	ConceptNetEdge::ConceptNetEdge(std::string id, std::string language, std::string firstConcept, std::string secondConcept, std::string relation, double weight)
+	ConceptNetEdge::ConceptNetEdge(QString id, QString language, QString firstConcept, QString secondConcept,
+									QString relation, double weight)
 	{
 		this->id = id;
 		this->language = language;
@@ -30,7 +31,8 @@ namespace cng
 	std::string ConceptNetEdge::toString()
 	{
 		std::stringstream ss;
-		ss << "Edge: " << firstConcept << " " << relation << " " << secondConcept << " Weight: " << weight << " Number of sources: " << this->sources.size() << std::endl;
+		ss << "Edge: " << firstConcept.toStdString() << " " << relation.toStdString() << " " << secondConcept.toStdString()
+				<< " Weight: " << weight << " Number of sources: " << this->sources.size() << std::endl;
 		return ss.str();
 	}
 

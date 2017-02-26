@@ -21,7 +21,7 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to load a BackgroundKnowledge file
 	 */
-	class LoadBackgroundKnowledgeCommand : public Command, public enable_shared_from_this<LoadBackgroundKnowledgeCommand>
+	class LoadBackgroundKnowledgeCommand : public Command, public std::enable_shared_from_this<LoadBackgroundKnowledgeCommand>
 	{
 		Q_OBJECT
 	public:

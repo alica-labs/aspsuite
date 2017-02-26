@@ -148,7 +148,7 @@ namespace cng
 			}
 
 			QByteArray loadedData = file.readAll();
-			shared_ptr<LoadSavedProgramCommand> cmd = make_shared<LoadSavedProgramCommand>(this->gui, filename, loadedData);
+			std::shared_ptr<LoadSavedProgramCommand> cmd = std::make_shared<LoadSavedProgramCommand>(this->gui, filename, loadedData);
 			cmd->execute();
 		}
 	}
@@ -164,7 +164,7 @@ namespace cng
 		//Check if the user selected a correct file
 		if (!filename.isNull())
 		{
-			shared_ptr<LoadBackgroundKnowledgeCommand> cmd = make_shared<LoadBackgroundKnowledgeCommand>(this->gui, filename);
+			std::shared_ptr<LoadBackgroundKnowledgeCommand> cmd = std::make_shared<LoadBackgroundKnowledgeCommand>(this->gui, filename);
 			cmd->execute();
 		}
 	}

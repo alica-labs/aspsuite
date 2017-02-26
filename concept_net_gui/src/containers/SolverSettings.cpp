@@ -6,12 +6,12 @@
  */
 
 #include "containers/SolverSettings.h"
-#include <Configuration.h>
+#include <QString>
 
 namespace cng
 {
 
-	SolverSettings::SolverSettings(string name, string argString)
+	SolverSettings::SolverSettings(std::string name, std::string argString)
 	{
 		this->name = name;
 		this->argString = argString;
@@ -29,23 +29,23 @@ namespace cng
 
 	void SolverSettings::extractSettingsVector()
 	{
-		if (this->argString.find(",") != string::npos)
+		if (this->argString.find(",") != std::string::npos)
 		{
 			size_t start = 0;
-			size_t end = string::npos;
-			string parsedParam = "";
-			while (start != string::npos)
+			size_t end = std::string::npos;
+			std::string parsedParam = "";
+			while (start != std::string::npos)
 			{
 				end = this->argString.find(",", start);
-				if (end == string::npos)
+				if (end == std::string::npos)
 				{
-					parsedParam = supplementary::Configuration::trim(this->argString.substr(start, this->argString.length() - start));
+					parsedParam = QString(this->argString.substr(start, this->argString.length() - start).c_str()).trimmed().toStdString();
 					this->argumentStrings.push_back(parsedParam);
 					break;
 				}
-				parsedParam = supplementary::Configuration::trim(this->argString.substr(start, end - start));
+				parsedParam = QString(this->argString.substr(start, end - start).c_str()).trimmed().toStdString();
 				start = this->argString.find(",", end);
-				if (start != string::npos)
+				if (start != std::string::npos)
 				{
 					start += 1;
 				}

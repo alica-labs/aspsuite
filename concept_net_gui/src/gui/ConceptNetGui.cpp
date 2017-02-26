@@ -65,9 +65,9 @@ namespace cng
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
 		if (isDockerInstalled && isConcneptNetInstalled)
 		{
-			int i = system("docker start conceptnet5_conceptnet-web_1");
-			cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
-					<< endl;
+			int i = std::system("docker start conceptnet5_conceptnet-web_1");
+			std::cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+					<< std::endl;
 			readConceptNetBaseRelations();
 		}
 	}
@@ -76,10 +76,10 @@ namespace cng
 	{
 		if (isDockerInstalled && isConcneptNetInstalled)
 		{
-			cout << "Quitting the application. It may take a few seconds to shutdown ConceptNet 5." << endl;
-			int i = system("docker stop conceptnet5_conceptnet-web_1");
-			cout << "ConceptNetGui: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i
-					<< endl;
+			std::cout << "Quitting the application. It may take a few seconds to shutdown ConceptNet 5." << std::endl;
+			int i = std::system("docker stop conceptnet5_conceptnet-web_1");
+			std::cout << "ConceptNetGui: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+					<< std::endl;
 		}
 		if (this->solver != nullptr)
 		{
@@ -94,11 +94,11 @@ namespace cng
 		delete this->ui;
 	}
 
-
 	void ConceptNetGui::readConceptNetBaseRelations()
 	{
-		QFile file(QString(QCoreApplication::applicationDirPath() + "/../../../../../src/symrock/concept_net_gui/etc/conceptNetRelations.txt"));
-
+		QFile file(
+				QString(QCoreApplication::applicationDirPath()
+						+ "/../../../../../src/symrock/concept_net_gui/etc/conceptNetRelations.txt"));
 
 		if (!file.open(QIODevice::ReadOnly))
 		{
@@ -110,7 +110,7 @@ namespace cng
 		QJsonDocument loadDoc(QJsonDocument::fromJson(loadedData));
 		QJsonObject savedObject = loadDoc.object();
 		QJsonArray relations = savedObject["relations"].toArray();
-		for(auto relation : relations)
+		for (auto relation : relations)
 		{
 			this->conceptNetBaseRealtions.push_back(relation.toObject()["rel"].toString());
 		}
@@ -128,52 +128,50 @@ namespace cng
 			int btn = msgBox->exec();
 			if (btn == QMessageBox::Ok)
 			{
-				shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this, this->settings);
+				std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
 				cmd->execute();
 			}
 		}
 		else
 		{
-			shared_ptr<NewSolverCommand> cmd = make_shared<NewSolverCommand>(this, this->settings);
+			std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
 			cmd->execute();
 		}
 	}
 
 	void ConceptNetGui::groundCallBack()
 	{
-		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
+		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated()
+				|| this->ui->aspRuleTextArea->toPlainText().trimmed()[0].isUpper())
 		{
 			return;
 		}
-		shared_ptr<GroundCommand> cmd = make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
+		std::shared_ptr<GroundCommand> cmd = std::make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
 
 	void ConceptNetGui::solveCallBack()
 	{
-//		if (this->ui->aspRuleTextArea->toPlainText().isEmpty())
-//		{
-//			return;
-//		}
-		shared_ptr<SolveCommand> cmd = make_shared<SolveCommand>(this);
+		std::shared_ptr<SolveCommand> cmd = std::make_shared<SolveCommand>(this);
 		cmd->execute();
 	}
 
 	void ConceptNetGui::queryCallBack()
 	{
-		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
+		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated()
+				|| this->ui->aspRuleTextArea->toPlainText().trimmed()[0].isUpper())
 		{
 			return;
 		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
-			shared_ptr<FactsQueryCommand> cmd = make_shared<FactsQueryCommand>(this,
+			std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(this,
 																				ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 		else
 		{
-			shared_ptr<VariableQueryCommand> cmd = make_shared<VariableQueryCommand>(
+			std::shared_ptr<VariableQueryCommand> cmd = std::make_shared<VariableQueryCommand>(
 					this, ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
@@ -185,7 +183,8 @@ namespace cng
 		{
 			return;
 		}
-		shared_ptr<ConceptNetQueryCommand> cmd = make_shared<ConceptNetQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
+		std::shared_ptr<ConceptNetQueryCommand> cmd = std::make_shared<ConceptNetQueryCommand>(
+				this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
 
@@ -253,7 +252,7 @@ namespace cng
 		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
 	}
 
-	vector<QString> ConceptNetGui::getConceptNetBaseRealtions()
+	std::vector<QString> ConceptNetGui::getConceptNetBaseRealtions()
 	{
 		return conceptNetBaseRealtions;
 	}
@@ -302,7 +301,7 @@ namespace cng
 		return ui;
 	}
 
-	shared_ptr<SolverSettings> ConceptNetGui::getSettings()
+	std::shared_ptr<SolverSettings> ConceptNetGui::getSettings()
 	{
 		return settings;
 	}
@@ -323,9 +322,9 @@ namespace cng
 		std::string delimiter = "\n";
 
 		size_t pos = 0;
-		string token;
-		vector<string> lines;
-		while ((pos = program.find(delimiter)) != string::npos)
+		std::string token;
+		std::vector<std::string> lines;
+		while ((pos = program.find(delimiter)) != std::string::npos)
 		{
 			token = program.substr(0, pos);
 			lines.push_back(token);
@@ -334,9 +333,9 @@ namespace cng
 		lines.push_back(program);
 		for (auto line : lines)
 		{
-			if (!(line.empty() || line.find("%") != string::npos))
+			if (!(line.empty() || line.find("%") != std::string::npos))
 			{
-				if (line.find(".") == string::npos)
+				if (line.find(".") == std::string::npos)
 				{
 					QMessageBox mBox;
 					mBox.setWindowTitle("Rule not terminated!");

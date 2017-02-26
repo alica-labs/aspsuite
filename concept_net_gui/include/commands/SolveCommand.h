@@ -21,7 +21,7 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to call the solvers solve method
 	 */
-	class SolveCommand : public Command, public enable_shared_from_this<SolveCommand>
+	class SolveCommand : public Command, public std::enable_shared_from_this<SolveCommand>
 	{
 		Q_OBJECT
 	public:
@@ -32,14 +32,14 @@ namespace cng
 		void undo();
 
 		QJsonObject toJSON();
-		vector<Gringo::ValVec> getCurrentModels();
+		std::vector<Gringo::ValVec> getCurrentModels();
 		bool isSatisfiable();
 
 		ConceptNetGui* gui;
 
 	private:
 		bool satisfiable;
-		vector<Gringo::ValVec> currentModels;
+		std::vector<Gringo::ValVec> currentModels;
 
 		void printModels();
 		void printSortedModels();

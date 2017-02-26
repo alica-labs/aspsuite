@@ -10,9 +10,9 @@
 
 #include "handler/CommandHistoryHandler.h"
 
-#include <Configuration.h>
-
 #include <asp_solver/ASPSolver.h>
+
+#include <QString>
 
 namespace cng
 {
@@ -32,7 +32,7 @@ namespace cng
 	void GroundCommand::execute()
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
-		string aspString = program.toStdString();
+		std::string aspString = program.toStdString();
 		this->gui->getSolver()->add(this->programSection, {}, aspString);
 		this->gui->getSolver()->ground( { {this->programSection, {}}}, nullptr);
 	}
@@ -53,15 +53,15 @@ namespace cng
 
 	void GroundCommand::extractProgramSection()
 	{
-		size_t prefixLength = string("#program").length();
-		string tmp = this->program.toStdString();
+		size_t prefixLength = std::string("#program").length();
+		std::string tmp = this->program.toStdString();
 		size_t start = tmp.find("#program");
-		if (start != string::npos)
+		if (start != std::string::npos)
 		{
 			size_t end = tmp.find_first_of(".");
 			tmp = tmp.substr(start, end - start);
 			this->historyProgramSection = tmp;
-			this->programSection = supplementary::Configuration::trim(tmp.substr(prefixLength, end - prefixLength));
+			this->programSection = QString(tmp.substr(prefixLength, end - prefixLength).c_str()).trimmed().toStdString();
 		}
 	}
 

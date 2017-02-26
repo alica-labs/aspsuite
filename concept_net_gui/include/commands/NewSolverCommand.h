@@ -22,11 +22,11 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to create a new solver
 	 */
-	class NewSolverCommand : public Command, public enable_shared_from_this<NewSolverCommand>
+	class NewSolverCommand : public Command, public std::enable_shared_from_this<NewSolverCommand>
 	{
 		Q_OBJECT
 	public:
-		NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings);
+		NewSolverCommand(ConceptNetGui* gui, std::shared_ptr<SolverSettings> settings);
 		virtual ~NewSolverCommand();
 
 		void execute();
@@ -34,7 +34,7 @@ namespace cng
 
 		QJsonObject toJSON();
 
-		shared_ptr<SolverSettings> settings;
+		std::shared_ptr<SolverSettings> settings;
 		ConceptNetGui* gui;
 
 	private:

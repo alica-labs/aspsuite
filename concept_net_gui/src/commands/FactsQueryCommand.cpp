@@ -18,7 +18,6 @@
 #include <asp_commons/AnnotatedValVec.h>
 #include <asp_solver/ASPFactsQuery.h>
 #include <asp_solver/ASPSolver.h>
-#include <Configuration.h>
 
 namespace cng
 {
@@ -37,14 +36,10 @@ namespace cng
 
 	void FactsQueryCommand::execute()
 	{
-		auto prgm = this->factsString.toStdString();
-		std::string delimiter = "\n";
-
-		size_t pos = 0;
-		string token;
-		if ((pos = prgm.find(delimiter)) != string::npos)
+		auto prgm = this->factsString.trimmed().toStdString();
+		if (prgm.find("\n") != std::string::npos)
 		{
-			cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << endl;
+			std::cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
 			return;
 		}
 		auto term = make_shared<reasoner::ASPCommonsTerm>();
@@ -56,16 +51,15 @@ namespace cng
 		{
 			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
 		}
-		prgm = supplementary::Configuration::trim(prgm);
 		prgm = prgm.substr(0, prgm.size() - 1);
 		term->setQueryRule(prgm);
-		vector<shared_ptr<reasoner::ASPCommonsVariable>> vars;
+		std::vector<std::shared_ptr<reasoner::ASPCommonsVariable>> vars;
 		vars.push_back(make_shared<reasoner::ASPCommonsVariable>());
-		vector<shared_ptr<reasoner::ASPCommonsTerm>> terms;
+		std::vector<std::shared_ptr<reasoner::ASPCommonsTerm>> terms;
 		terms.push_back(term);
-		vector<void*> result;
+		std::vector<void*> result;
 		this->gui->getSolver()->getSolution(vars, terms, result);
-		vector<reasoner::AnnotatedValVec> castedResults;
+		std::vector<reasoner::AnnotatedValVec> castedResults;
 		if (result.size() > 0)
 		{
 			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
@@ -75,9 +69,9 @@ namespace cng
 			}
 			else
 			{
-				stringstream ss;
-				ss << "Facts Query: " << term->getQueryRule() << endl;
-				ss << "Result contains the predicates: " << endl;
+				std::stringstream ss;
+				ss << "Facts Query: " << term->getQueryRule() << std::endl;
+				ss << "Result contains the predicates: " << std::endl;
 				for (int i = 0; i < castedResults.size(); i++)
 				{
 					for (int j = 0; j < castedResults.at(i).factQueryValues.size(); j++)
@@ -88,15 +82,15 @@ namespace cng
 						}
 					}
 				}
-				ss << endl;
+				ss << std::endl;
 				if (this->gui->getUi()->showModelsCheckBox->isChecked())
 				{
-					ss << "The queried model contains the following predicates: " << endl;
+					ss << "The queried model contains the following predicates: " << std::endl;
 					for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)
 					{
 						ss << castedResults.at(0).query->getCurrentModels()->at(0).at(i) << " ";
 					}
-					ss << endl;
+					ss << std::endl;
 				}
 				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 			}

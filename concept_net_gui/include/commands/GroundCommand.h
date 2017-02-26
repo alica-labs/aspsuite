@@ -14,15 +14,13 @@
 #include <commands/Command.h>
 #include <memory>
 
-using namespace std;
-
 namespace cng
 {
 	class ConceptNetGui;
 	/**
 	 * Class inheriting from Command interface used to call the solvers Ground method
 	 */
-	class GroundCommand : public Command, public enable_shared_from_this<GroundCommand>
+	class GroundCommand : public Command, public std::enable_shared_from_this<GroundCommand>
 	{
 		Q_OBJECT
 	public:
@@ -36,8 +34,8 @@ namespace cng
 
 		ConceptNetGui* gui;
 		QString program;
-		string programSection;
-		string historyProgramSection;
+		std::string programSection;
+		std::string historyProgramSection;
 
 	private:
 		void extractProgramSection();

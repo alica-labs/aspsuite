@@ -38,14 +38,11 @@ namespace cng
 	{
 		auto prgm = this->program.toStdString();
 		std::string delimiter = "\n";
-
 		size_t pos = 0;
-		string token;
-		vector<string> lines;
-		while ((pos = prgm.find(delimiter)) != string::npos)
+		std::vector<std::string> lines;
+		while ((pos = prgm.find(delimiter)) != std::string::npos)
 		{
-			token = prgm.substr(0, pos);
-			lines.push_back(token);
+			lines.push_back(prgm.substr(0, pos));
 			prgm.erase(0, pos + delimiter.length());
 		}
 		lines.push_back(prgm);
@@ -66,14 +63,14 @@ namespace cng
 				continue;
 			}
 			// comments aren't needed
-			if (lines.at(i).find("%") != string::npos)
+			if (lines.at(i).find("%") != std::string::npos)
 			{
 				continue;
 			}
 			//query rule
 			if (i == 0)
 			{
-				if (lines.at(i).find(":-") == string::npos)
+				if (lines.at(i).find(":-") == std::string::npos)
 				{
 					cout << "VariableQueryCommand: malformed query rule! Aborting!" << endl;
 					return;
@@ -83,13 +80,13 @@ namespace cng
 				continue;
 			}
 			// general rules
-			if (lines.at(i).find(":-") != string::npos)
+			if (lines.at(i).find(":-") != std::string::npos)
 			{
 				term->addRule(lines.at(i));
 				continue;
 			}
 			//facts
-			else if (lines.at(i).find(":-") == string::npos)
+			else if (lines.at(i).find(":-") == std::string::npos)
 			{
 				term->addFact(lines.at(i));
 				continue;
@@ -99,13 +96,13 @@ namespace cng
 				cout << "VariableQueryCommand: string not recognized!" << endl;
 			}
 		}
-		vector<shared_ptr<reasoner::ASPCommonsVariable>> vars;
+		std::vector<std::shared_ptr<reasoner::ASPCommonsVariable>> vars;
 		vars.push_back(make_shared<reasoner::ASPCommonsVariable>());
-		vector<shared_ptr<reasoner::ASPCommonsTerm>> terms;
+		std::vector<std::shared_ptr<reasoner::ASPCommonsTerm>> terms;
 		terms.push_back(term);
-		vector<void*> result;
+		std::vector<void*> result;
 		this->gui->getSolver()->getSolution(vars, terms, result);
-		vector<reasoner::AnnotatedValVec*> castedResults;
+		std::vector<reasoner::AnnotatedValVec*> castedResults;
 		if (result.size() > 0)
 		{
 			castedResults.push_back((reasoner::AnnotatedValVec*)result.at(0));
@@ -115,9 +112,9 @@ namespace cng
 			}
 			else
 			{
-				stringstream ss;
-				ss << "Variable Query: " << term->getQueryRule() << endl;
-				ss << "Result contains the predicates: " << endl;
+				std::stringstream ss;
+				ss << "Variable Query: " << term->getQueryRule() << std::endl;
+				ss << "Result contains the predicates: " << std::endl;
 				ss << "\t";
 				for (int i = 0; i < castedResults.size(); i++)
 				{
@@ -129,16 +126,16 @@ namespace cng
 						}
 					}
 				}
-				ss << endl;
+				ss << std::endl;
 				if (this->gui->getUi()->showModelsCheckBox->isChecked())
 				{
-					ss << "The queried model contains the following predicates: " << endl;
+					ss << "The queried model contains the following predicates: " << std::endl;
 					ss << "\t";
 					for (int i = 0; i < castedResults.at(0)->query->getCurrentModels()->at(0).size(); i++)
 					{
 						ss << castedResults.at(0)->query->getCurrentModels()->at(0).at(i) << " ";
 					}
-					ss << endl;
+					ss << std::endl;
 				}
 				this->gui->getUi()->queryResultsLabel->setText(QString(ss.str().c_str()));
 			}

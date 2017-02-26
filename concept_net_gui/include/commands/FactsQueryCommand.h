@@ -18,7 +18,7 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to create a FactsQuery
 	 */
-	class FactsQueryCommand : public Command, public enable_shared_from_this<FactsQueryCommand>
+	class FactsQueryCommand : public Command, public std::enable_shared_from_this<FactsQueryCommand>
 	{
 		Q_OBJECT
 	public:

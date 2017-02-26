@@ -14,7 +14,7 @@
 namespace cng
 {
 
-	ConceptNetCall::ConceptNetCall(std::string id)
+	ConceptNetCall::ConceptNetCall(QString id)
 	{
 		this->id = id;
 		this->nextEdgesPage = nextEdgesPage;
@@ -28,13 +28,13 @@ namespace cng
 	{
 		std::stringstream ss;
 		ss << "ConceptNetCall:" << std::endl;
-		ss << "ID: " << this->id << std::endl;
+		ss << "ID: " << this->id.toStdString() << std::endl;
 		ss << "Edges:" << std::endl;
 		for(auto edge : this->edges)
 		{
 			ss << edge->toString();
 		}
-		ss << "NextEdgePage: " << this->nextEdgesPage << std::endl;
+		ss << "NextEdgePage: " << this->nextEdgesPage.toStdString() << std::endl;
 		return ss.str();
 	}
 

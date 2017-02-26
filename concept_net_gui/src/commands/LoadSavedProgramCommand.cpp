@@ -49,13 +49,13 @@ namespace cng
 		{
 
 			QJsonObject cmd = cmds[i].toObject();
-			cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/"
-					<< cmds.size() << endl;
+			std::cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/"
+					<< cmds.size() << std::endl;
 			if (cmd["type"].toString().toStdString().compare("New Solver") == 0)
 			{
-				shared_ptr<NewSolverCommand> c = make_shared<NewSolverCommand>(
+				std::shared_ptr<NewSolverCommand> c = std::make_shared<NewSolverCommand>(
 						this->gui,
-						make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
+						std::make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
 													cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
@@ -63,10 +63,10 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Change Settings") == 0)
 			{
-				shared_ptr<ChangeSolverSettingsCommand> c = make_shared<ChangeSolverSettingsCommand>(
+				std::shared_ptr<ChangeSolverSettingsCommand> c = std::make_shared<ChangeSolverSettingsCommand>(
 						this->gui,
 						this->gui->settingsDialog,
-						make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
+						std::make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
 													cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
@@ -74,28 +74,28 @@ namespace cng
 			}
 			else if (cmd["type"].toString().toStdString().compare("Concept Net") == 0)
 			{
-				shared_ptr<ConceptNetQueryCommand> c = make_shared<ConceptNetQueryCommand>(this->gui, cmd["queryString"].toString());
+				std::shared_ptr<ConceptNetQueryCommand> c = std::make_shared<ConceptNetQueryCommand>(this->gui, cmd["queryString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0)
 			{
-				shared_ptr<FactsQueryCommand> c = make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
+				std::shared_ptr<FactsQueryCommand> c = std::make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Ground") == 0)
 			{
-				shared_ptr<GroundCommand> c = make_shared<GroundCommand>(this->gui, cmd["program"].toString());
+				std::shared_ptr<GroundCommand> c = std::make_shared<GroundCommand>(this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Load Logic Program") == 0)
 			{
-				shared_ptr<LoadBackgroundKnowledgeCommand> c = make_shared<LoadBackgroundKnowledgeCommand>(
+				std::shared_ptr<LoadBackgroundKnowledgeCommand> c = std::make_shared<LoadBackgroundKnowledgeCommand>(
 						this->gui, cmd["fileName"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
@@ -107,29 +107,25 @@ namespace cng
 				 * This command should never be part of a saved program,
 				 * since it will result in a recursive load call!
 				 */
-//				shared_ptr<LoadSavedProgramCommand> c = make_shared<LoadSavedProgramCommand>(
-//						this->gui, this->fileName ,this->loadedData));
-//				c->execute();
-//				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0)
 			{
-				shared_ptr<VariableQueryCommand> c = make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
+				std::shared_ptr<VariableQueryCommand> c = std::make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else if (cmd["type"].toString().toStdString().compare("Solve") == 0)
 			{
-				shared_ptr<SolveCommand> c = make_shared<SolveCommand>(this->gui);
+				std::shared_ptr<SolveCommand> c = std::make_shared<SolveCommand>(this->gui);
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
 			}
 			else
 			{
-				cout << "LoadSavedProgramCommand: Command with unknown type found!" << endl;
+				std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;
 			}
 		}
 	}

@@ -29,7 +29,7 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to create a ConceptNet Query
 	 */
-	class ConceptNetQueryCommand : public Command, public enable_shared_from_this<ConceptNetQueryCommand>
+	class ConceptNetQueryCommand : public Command, public std::enable_shared_from_this<ConceptNetQueryCommand>
 	{
 	Q_OBJECT
 	public:
@@ -43,7 +43,7 @@ namespace cng
 
 		ConceptNetGui* gui;
 		QString query;
-		shared_ptr<ConceptNetCall> currentConceptNetCall;
+		ConceptNetCall* currentConceptNetCall;
 
 	private slots:
 		void conceptNetCallFinished(QNetworkReply* reply);
@@ -51,13 +51,15 @@ namespace cng
 
 	private:
 		QNetworkAccessManager *nam;
-		std::string conceptToASPPredicate(std::string concept);
 		QString createWeightedASPPredicates();
 		QString createAvgWeightedASPPredicates();
 		QString createASPPredicates();
+		QString conceptToASPPredicate(QString concept);
 		bool isConceptNetRealtion(QString query);
 		void handleWrongInput();
 		void handleQuery();
+		QString trimTerm(QString term);
+		void callUrl(QUrl url);
 
 	signals:
 		void jsonExtracted();

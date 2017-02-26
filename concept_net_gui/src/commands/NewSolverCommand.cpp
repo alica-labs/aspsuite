@@ -19,12 +19,10 @@
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
 
-using namespace std;
-
 namespace cng
 {
 
-	NewSolverCommand::NewSolverCommand(ConceptNetGui* gui, shared_ptr<SolverSettings> settings)
+	NewSolverCommand::NewSolverCommand(ConceptNetGui* gui, std::shared_ptr<SolverSettings> settings)
 	{
 		this->type = "New Solver";
 		this->settings = settings;

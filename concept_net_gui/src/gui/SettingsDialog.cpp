@@ -11,6 +11,7 @@
 #include "containers/SolverSettings.h"
 
 #include <ui_settingsdialog.h>
+#include <ui_conceptnetgui.h>
 
 #include <iostream>
 #include <memory>
@@ -34,7 +35,7 @@ namespace cng
 		this->connect(this->ui->removeFromSettingsBtn, SIGNAL(released()), this, SLOT(onRemoveBth()));
 		this->connect(this->ui->addToSettingsBtn, SIGNAL(released()), this, SLOT(onAddBtn()));
 		this->ui->safeSortedModelscheckBox->setChecked(true);
-		this->defaultSettings = make_shared<SolverSettings>("Default", "clingo, -W, no-atom-undefined, --number=1");
+		this->defaultSettings = std::make_shared<SolverSettings>("Default", "clingo, -W, no-atom-undefined, --number=1");
 		this->settingsFile = new QFile(QDir::homePath() + "/.conceptNetSettings.txt");
 		this->currentSettings = nullptr;
 		loadSettingsFromConfig();
@@ -73,14 +74,14 @@ namespace cng
 			}
 			this->parameterMap.emplace(
 					set["name"].toString().toStdString(),
-					make_shared<SolverSettings>(set["name"].toString().toStdString(),
+					std::make_shared<SolverSettings>(set["name"].toString().toStdString(),
 												set["parameters"].toString().toStdString()));
 
 		}
 		this->settingsFile->close();
 	}
 
-	shared_ptr<SolverSettings> SettingsDialog::getDefaultSettings()
+	std::shared_ptr<SolverSettings> SettingsDialog::getDefaultSettings()
 	{
 		return defaultSettings;
 	}
@@ -97,9 +98,9 @@ namespace cng
 	void SettingsDialog::fillSettingsLabel(QListWidgetItem* item)
 	{
 		this->currentSettings = this->parameterMap.at(item->text().toStdString());
-		if (this->currentSettings->argString.find(",") != string::npos)
+		if (this->currentSettings->argString.find(",") != std::string::npos)
 		{
-			string parameters = "";
+			std::string parameters = "";
 			for (auto param : this->currentSettings->argumentStrings)
 			{
 				parameters += param;
@@ -120,8 +121,8 @@ namespace cng
 		{
 			return;
 		}
-		cout << "SettingsDialog: applying parameters: " << currentSettings->argString << endl;
-		shared_ptr<ChangeSolverSettingsCommand> cmd = make_shared<ChangeSolverSettingsCommand>(this->mainGui, this,
+		std::cout << "SettingsDialog: applying parameters: " << currentSettings->argString << std::endl;
+		std::shared_ptr<ChangeSolverSettingsCommand> cmd = std::make_shared<ChangeSolverSettingsCommand>(this->mainGui, this,
 																								currentSettings);
 		cmd->execute();
 		writeSettings();
@@ -168,7 +169,7 @@ namespace cng
 		}
 		this->parameterMap.emplace(
 				this->ui->nameLineEdit->text().toStdString(),
-				make_shared<SolverSettings>(this->ui->nameLineEdit->text().toStdString(),
+				std::make_shared<SolverSettings>(this->ui->nameLineEdit->text().toStdString(),
 											this->ui->paramLineEdit->text().toStdString()));
 		fillSettingsList();
 	}

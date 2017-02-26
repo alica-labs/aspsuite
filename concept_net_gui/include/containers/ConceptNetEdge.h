@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <QString>
 
 namespace cng
 {
@@ -17,16 +18,16 @@ namespace cng
 	class ConceptNetEdge
 	{
 	public:
-		ConceptNetEdge(std::string id, std::string language, std::string firstConcept, std::string secondConcept, std::string relation ,double weight);
+		ConceptNetEdge(QString id, QString language, QString firstConcept, QString secondConcept, QString relation ,double weight);
 		virtual ~ConceptNetEdge();
 
-		std::string id;
-		std::string language;
-		std::string firstConcept;
-		std::string secondConcept;
-		std::string relation;
+		QString id;
+		QString language;
+		QString firstConcept;
+		QString secondConcept;
+		QString relation;
 		double weight;
-		std::vector<std::string> sources;
+		std::vector<QString> sources;
 		std::string toString();
 
 	};

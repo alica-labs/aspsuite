@@ -17,7 +17,7 @@
 namespace cng
 {
 
-	ChangeSolverSettingsCommand::ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, shared_ptr<SolverSettings> settings)
+	ChangeSolverSettingsCommand::ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, std::shared_ptr<SolverSettings> settings)
 	{
 		this->previousSettings = gui->getSettings();
 		this->gui = gui;

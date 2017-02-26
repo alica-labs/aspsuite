@@ -10,8 +10,6 @@
 
 #include <QObject>
 
-using namespace std;
-
 namespace cng
 {
 

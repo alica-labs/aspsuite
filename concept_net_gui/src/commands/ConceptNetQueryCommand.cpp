@@ -27,7 +27,11 @@ namespace cng
 	{
 		this->type = "Concept Net";
 		this->gui = gui;
-		this->query = query;
+		this->query = query.trimmed();
+		if(this->query[this->query.size()-1] == '.')
+		{
+			this->query = this->query.remove(this->query.size() - 1, 1);
+		}
 		this->currentConceptNetCall = nullptr;
 		this->nam = new QNetworkAccessManager(this);
 		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
@@ -37,12 +41,12 @@ namespace cng
 	ConceptNetQueryCommand::~ConceptNetQueryCommand()
 	{
 		delete this->nam;
+		delete this->currentConceptNetCall;
 	}
 
 	void ConceptNetQueryCommand::handleWrongInput()
 	{
-		auto pos = query.indexOf("(");
-		auto parsedQuery = query.left(pos);
+		auto parsedQuery = query.left(query.indexOf("("));
 		QMessageBox* msgBox = new QMessageBox(this->gui);
 		msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
 		msgBox->setWindowModality(Qt::NonModal);
@@ -68,6 +72,12 @@ namespace cng
 		this->undo();
 	}
 
+	void ConceptNetQueryCommand::callUrl(QUrl url)
+	{
+		QNetworkRequest request(url);
+		this->nam->get(request);
+	}
+
 	void ConceptNetQueryCommand::handleQuery()
 	{
 		auto pos = this->query.indexOf("(");
@@ -76,31 +86,27 @@ namespace cng
 		{
 			auto wildcardPos = this->query.indexOf("wildcard");
 			auto commaPos = this->query.indexOf(",");
-			if(wildcardPos < commaPos)
+			if (wildcardPos < commaPos)
 			{
 				auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
 				concept = concept.left(concept.size() - 1).trimmed();
 				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
-				QNetworkRequest request(url);
-				this->nam->get(request);
+				callUrl(url);
 			}
 			else
 			{
 				auto concept = this->query.mid(pos + 1, commaPos - pos).trimmed();
 				concept = concept.left(concept.size() - 1);
 				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation);
-				QNetworkRequest request(url);
-				this->nam->get(request);
+				callUrl(url);
 			}
-			// AtLocation(cup, wildcard)
 		}
 		else
 		{
 			auto concept = this->query.right(this->query.size() - pos - 1);
 			concept = concept.left(concept.size() - 1);
 			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation);
-			QNetworkRequest request(url);
-			this->nam->get(request);
+			callUrl(url);
 		}
 	}
 
@@ -121,8 +127,7 @@ namespace cng
 		else
 		{
 			QUrl url("http://api.localhost/c/en/" + this->query);
-			QNetworkRequest request(url);
-			this->nam->get(request);
+			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->getUi()->conceptNetBtn->setEnabled(false);
@@ -141,16 +146,20 @@ namespace cng
 		return ret;
 	}
 
+	QString ConceptNetQueryCommand::trimTerm(QString term)
+	{
+		auto pos = term.lastIndexOf("/");
+		return term.right(term.length() - pos - 1);
+	}
+
 	void ConceptNetQueryCommand::conceptNetCallFinished(QNetworkReply* reply)
 	{
 		QString data = reply->readAll();
-		string fullData = data.toStdString();
+		std::string fullData = data.toStdString();
 		auto start = fullData.find("{\"@context\":");
 		auto end = fullData.find("</script>");
 		fullData = fullData.substr(start, end - start);
-		//		cout << "Data: " << fullData << endl;
 		auto jsonString = QString(fullData.c_str()).toUtf8();
-		//		cout << "DataJson: " << jsonString.toStdString() << endl;
 		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
 		QString id = jsonDoc.object()["@id"].toString();
 		QString nextPage = jsonDoc.object()["view"].toObject()["nextPage"].toString();
@@ -160,40 +169,37 @@ namespace cng
 #endif
 		if (this->currentConceptNetCall == nullptr)
 		{
-			this->currentConceptNetCall = make_shared<ConceptNetCall>(id.toStdString());
+			this->currentConceptNetCall = new ConceptNetCall(id);
 		}
-		this->currentConceptNetCall->nextEdgesPage = nextPage.toStdString();
+		this->currentConceptNetCall->nextEdgesPage = nextPage;
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
 		for (int i = 0; i < edges.size(); i++)
 		{
 			QJsonObject edge = edges[i].toObject();
 			QString edgeId = edge["@id"].toString();
 			QJsonObject end = edge["end"].toObject();
-			//TODO not use label since it contains unecessary info
-			QString endConcept = end["label"].toString();
 			QString endLanguage = end["language"].toString();
 			if (endLanguage != "en")
 			{
-//				cout << "not egnlish " << endLanguage.toStdString() << endl;
 				continue;
 			}
+			QString endTerm = end["term"].toString();
+			endTerm = trimTerm(endTerm);
 			QJsonObject start = edge["start"].toObject();
-			QString startConcept = start["label"].toString();
 			QString startLanguage = start["language"].toString();
 			if (startLanguage != "en")
 			{
-//				cout << "not egnlish " << startLanguage.toStdString() << endl;
 				continue;
 			}
+			QString startTerm = start["term"].toString();
+			startTerm = trimTerm(startTerm);
 			QString relation = edge["rel"].toObject()["label"].toString();
 			double weight = edge["weight"].toDouble();
 			QJsonArray sources = edge["sources"].toArray();
-			auto tmp = make_shared<ConceptNetEdge>(edgeId.toStdString(), startLanguage.toStdString(),
-													startConcept.toStdString(), endConcept.toStdString(),
-													relation.toStdString(), weight);
+			auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, startTerm, endTerm, relation, weight);
 			for (int j = 0; j < sources.size(); j++)
 			{
-				tmp->sources.push_back(sources[j].toObject()["contributor"].toString().toStdString());
+				tmp->sources.push_back(sources[j].toObject()["contributor"].toString());
 			}
 			this->currentConceptNetCall->edges.push_back(tmp);
 		}
@@ -203,8 +209,7 @@ namespace cng
 		if (!nextPage.isEmpty())
 		{
 			QUrl url("http://api.localhost" + nextPage);
-			QNetworkRequest request(url);
-			this->nam->get(request);
+			callUrl(url);
 		}
 		else
 		{
@@ -220,38 +225,21 @@ namespace cng
 		this->gui->getUi()->conceptNetBtn->setFocus();
 	}
 
-	std::string ConceptNetQueryCommand::conceptToASPPredicate(std::string concept)
+	QString ConceptNetQueryCommand::conceptToASPPredicate(QString concept)
 	{
-		vector<string> wordVector;
-		std::size_t prev = 0, pos;
-		while ((pos = concept.find_first_of(" ,.", prev)) != std::string::npos)
+		if(concept.contains('.'))
 		{
-			if (pos > prev)
-			{
-				wordVector.push_back(concept.substr(prev, pos - prev));
-			}
-			prev = pos + 1;
+			concept.replace('.','_');
 		}
-		if (prev < concept.length())
+		if(concept.contains(','))
 		{
-			wordVector.push_back(concept.substr(prev, std::string::npos));
+			concept.replace(',','_');
 		}
-		if (wordVector.size() == 1)
+		if(concept.contains(' '))
 		{
-			return wordVector.at(0);
+			concept.replace(' ','_');
 		}
-		else
-		{
-			stringstream ss;
-			wordVector.at(0)[0] = tolower(wordVector.at(0)[0]);
-			ss << wordVector.at(0);
-			for (int i = 1; i < wordVector.size(); i++)
-			{
-				wordVector.at(i)[0] = toupper(wordVector.at(i)[0]);
-				ss << wordVector.at(i);
-			}
-			return ss.str();
-		}
+		return concept;
 	}
 
 	QString ConceptNetQueryCommand::createWeightedASPPredicates()
@@ -263,16 +251,16 @@ namespace cng
 		 * a possible way is to multiply the weight with 100 and cast it to int keeping the first two digets after the komma and leaving the rest
 		 * are weights even necessary? perhaps to use it during optimization
 		 */
-		stringstream ss;
+		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			string tmp = edge->relation;
-			tmp[0] = tolower(tmp[0]);
-			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
-					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight << ", "
-					<< edge->sources.size() << ")." << endl;
+			QString tmp = edge->relation;
+			tmp[0] = tmp[0].toLower();
+			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+					conceptToASPPredicate(edge->secondConcept)).append(", ").append(QString::number(edge->weight)).append(
+					", ").append(QString::number(edge->sources.size())).append(").\n");
 		}
-		return QString(ss.str().c_str());
+		return ret;
 	}
 
 	QString ConceptNetQueryCommand::createAvgWeightedASPPredicates()
@@ -284,29 +272,29 @@ namespace cng
 		 * this can be caused by unreliable sources like word games and can lower the influence of good source, which are distinguished in weight and only the sum is given.
 		 * perhaps do not use averaged weights
 		 */
-		stringstream ss;
+		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			string tmp = edge->relation;
-			tmp[0] = tolower(tmp[0]);
-			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
-					<< conceptToASPPredicate(edge->secondConcept) << ", " << edge->weight / edge->sources.size() << ")."
-					<< endl;
+			QString tmp = edge->relation;
+			tmp[0] = tmp[0].toLower();
+			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+					conceptToASPPredicate(edge->secondConcept)).append(", ").append(
+					QString::number(edge->weight / edge->sources.size())).append(").\n");
 		}
-		return QString(ss.str().c_str());
+		return ret;
 	}
 
 	QString ConceptNetQueryCommand::createASPPredicates()
 	{
-		stringstream ss;
+		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			string tmp = edge->relation;
-			tmp[0] = tolower(tmp[0]);
-			ss << tmp << "(" << conceptToASPPredicate(edge->firstConcept) << ", "
-					<< conceptToASPPredicate(edge->secondConcept) << ")." << endl;
+			QString tmp = edge->relation;
+			tmp[0] = tmp[0].toLower();
+			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+					conceptToASPPredicate(edge->secondConcept)).append(").\n");
 		}
-		return QString(ss.str().c_str());
+		return ret;
 	}
 
 	bool ConceptNetQueryCommand::isConceptNetRealtion(QString query)

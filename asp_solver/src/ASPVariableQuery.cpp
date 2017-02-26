@@ -292,9 +292,9 @@ namespace reasoner
 		ss << "#program " << this->queryProgramSection << "." << endl;
 		ss << "#external " << "external" << this->queryProgramSection << "." << endl;
 		ss << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;
-//#ifdef ASPVARIABLEQUERY_DEBUG
+#ifdef ASPVARIABLEQUERY_DEBUG
 		cout << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;
-//#endif
+#endif
 		for (auto rule : this->term->getRules())
 		{
 			ss << expandRuleModuleProperty(rule) << endl;

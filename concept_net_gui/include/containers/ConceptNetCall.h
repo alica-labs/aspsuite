@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <QString>
 
 namespace cng
 {
@@ -19,11 +20,11 @@ namespace cng
 	class ConceptNetCall
 	{
 	public:
-		ConceptNetCall(std::string id);
+		ConceptNetCall(QString id);
 		virtual ~ConceptNetCall();
-		std::string id;
+		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
-		std::string nextEdgesPage;
+		QString nextEdgesPage;
 		std::string toString();
 	};
 

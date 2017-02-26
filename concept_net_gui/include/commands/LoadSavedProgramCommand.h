@@ -22,7 +22,7 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to load a saved Json program
 	 */
-	class LoadSavedProgramCommand : public Command, public enable_shared_from_this<LoadSavedProgramCommand>
+	class LoadSavedProgramCommand : public Command, public std::enable_shared_from_this<LoadSavedProgramCommand>
 	{
 		Q_OBJECT
 	public:

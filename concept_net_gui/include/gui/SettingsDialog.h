@@ -15,8 +15,6 @@
 #include <string>
 #include <memory>
 
-using namespace std;
-
 namespace Ui
 {
 	class SettingsDialog;
@@ -35,7 +33,7 @@ namespace cng
 		virtual ~SettingsDialog();
 		Ui::SettingsDialog* getUi();
 		bool isSaveSortedChecked();
-		shared_ptr<SolverSettings> getDefaultSettings();
+		std::shared_ptr<SolverSettings> getDefaultSettings();
 
 	private slots:
 		void fillSettingsLabel(QListWidgetItem * item);
@@ -45,14 +43,14 @@ namespace cng
 
 	private:
 		QFile* settingsFile;
-		shared_ptr<SolverSettings> defaultSettings;
+		std::shared_ptr<SolverSettings> defaultSettings;
 		Ui::SettingsDialog* ui;
 		ConceptNetGui* mainGui;
-		shared_ptr<SolverSettings> currentSettings;
+		std::shared_ptr<SolverSettings> currentSettings;
 		void loadSettingsFromConfig();
 		void fillSettingsList();
-		shared_ptr<vector<string>> parameterSectionNames;
-		map<string, shared_ptr<SolverSettings>> parameterMap;
+		std::shared_ptr<std::vector<std::string>> parameterSectionNames;
+		std::map<std::string, std::shared_ptr<SolverSettings>> parameterMap;
 		void writeSettings();
 	};
 }

@@ -13,8 +13,6 @@
 
 //#define GUIDEUG
 
-using namespace std;
-
 namespace reasoner
 {
 	class ASPSolver;
@@ -62,12 +60,12 @@ namespace cng
 		 * Get current solver settings
 		 * @return shared_ptr<SolverSettings>
 		 */
-		shared_ptr<SolverSettings> getSettings();
+		std::shared_ptr<SolverSettings> getSettings();
 		/**
 		 * Set current solver settings
 		 * @param settings shared_ptr<SolverSettings> settings to be given to the solver
 		 */
-		void setSettings(shared_ptr<SolverSettings> settings);
+		void setSettings(std::shared_ptr<SolverSettings> settings);
 		/**
 		 * Gets the pointer to the QT main window
 		 * @return Ui::ConceptNetGui*
@@ -78,7 +76,7 @@ namespace cng
 		 * Used to save the order of commands
 		 * Undo via ctrl+z
 		 */
-		vector<shared_ptr<Command>> commandHistory;
+		std::vector<std::shared_ptr<Command>> commandHistory;
 		/**
 		 * Pointer to CommandHistoryHandler
 		 * Handles interaction with the command history
@@ -108,7 +106,7 @@ namespace cng
 
 		void setSolver(reasoner::ASPSolver* solver);
 
-		vector<QString> getConceptNetBaseRealtions();
+		std::vector<QString> getConceptNetBaseRealtions();
 
 	private slots:
 
@@ -147,7 +145,7 @@ namespace cng
 		/**
 		 * Current Settings
 		 */
-		shared_ptr<SolverSettings> settings;
+		std::shared_ptr<SolverSettings> settings;
 		/**
 		 * Pointer to main window
 		 */
@@ -173,7 +171,7 @@ namespace cng
 		bool isDockerInstalled;
 		bool isConcneptNetInstalled;
 		void readConceptNetBaseRelations();
-		vector<QString> conceptNetBaseRealtions;
+		std::vector<QString> conceptNetBaseRealtions;
 	signals:
 		/**
 		 * Signal used to redraw the command history

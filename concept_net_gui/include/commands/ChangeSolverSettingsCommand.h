@@ -22,11 +22,11 @@ namespace cng
 	/**
 	 * Class inheriting from Command interface used to Change Solver Settings
 	 */
-	class ChangeSolverSettingsCommand : public Command, public enable_shared_from_this<ChangeSolverSettingsCommand>
+	class ChangeSolverSettingsCommand : public Command, public std::enable_shared_from_this<ChangeSolverSettingsCommand>
 	{
 	Q_OBJECT
 	public:
-		ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, shared_ptr<SolverSettings> settings);
+		ChangeSolverSettingsCommand(ConceptNetGui* gui, SettingsDialog* dialog, std::shared_ptr<SolverSettings> settings);
 		virtual ~ChangeSolverSettingsCommand();
 
 		void execute();
@@ -34,8 +34,8 @@ namespace cng
 
 		QJsonObject toJSON();
 
-		shared_ptr<SolverSettings> previousSettings;
-		shared_ptr<SolverSettings> currentSettings;
+		std::shared_ptr<SolverSettings> previousSettings;
+		std::shared_ptr<SolverSettings> currentSettings;
 		ConceptNetGui* gui;
 		SettingsDialog* dialog;
 	};

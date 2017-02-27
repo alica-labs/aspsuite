@@ -42,7 +42,9 @@ namespace cng
 		 * Not parsed param string
 		 */
 		std::string argString;
-
+		/**
+		 * name of the setting
+		 */
 		std::string name;
 	private:
 		/**

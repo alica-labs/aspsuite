@@ -36,8 +36,8 @@ namespace cng
 
 	void FactsQueryCommand::execute()
 	{
-		auto prgm = this->factsString.trimmed().toStdString();
-		if (prgm.find("\n") != std::string::npos)
+		auto prgm = this->factsString.trimmed();
+		if (prgm.contains("\n"))
 		{
 			std::cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
 			return;
@@ -51,8 +51,8 @@ namespace cng
 		{
 			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
 		}
-		prgm = prgm.substr(0, prgm.size() - 1);
-		term->setQueryRule(prgm);
+		prgm = prgm.left(prgm.size() - 1);
+		term->setQueryRule(prgm.toStdString());
 		std::vector<std::shared_ptr<reasoner::ASPCommonsVariable>> vars;
 		vars.push_back(make_shared<reasoner::ASPCommonsVariable>());
 		std::vector<std::shared_ptr<reasoner::ASPCommonsTerm>> terms;

@@ -15,6 +15,9 @@
 namespace cng
 {
 
+	/**
+	 * Class representing an edge of the concept net graph
+	 */
 	class ConceptNetEdge
 	{
 	public:

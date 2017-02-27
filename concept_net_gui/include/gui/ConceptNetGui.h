@@ -134,12 +134,29 @@ namespace cng
 
 	private:
 
+		/**
+		 * True if docker is installed
+		 */
 		bool checkDockerInstallation();
 
+		/**
+		 * True if the concept net database is available locally
+		 */
 		bool checkConcneptNetInstallation();
 
+		/**
+		 * Checks if all asp rules are dot terminated and informs the user if not
+		 */
 		bool rulesAreDotTerminated();
 
+		/**
+		 * Reads the concept net base relations given in a json file
+		 */
+		void readConceptNetBaseRelations();
+
+		/**
+		 * Solver pointer
+		 */
 		reasoner::ASPSolver* solver;
 
 		/**
@@ -167,11 +184,19 @@ namespace cng
 		 * Connect Gui elements to corresponding slots
 		 */
 		void connectGuiElements();
-
+		/**
+		 * true if docker is installed
+		 */
 		bool isDockerInstalled;
+		/**
+		 * true if concept net is available
+		 */
 		bool isConcneptNetInstalled;
-		void readConceptNetBaseRelations();
+		/**
+		 * contains base relations
+		 */
 		std::vector<QString> conceptNetBaseRealtions;
+
 	signals:
 		/**
 		 * Signal used to redraw the command history

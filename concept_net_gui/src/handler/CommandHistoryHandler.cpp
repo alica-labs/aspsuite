@@ -129,40 +129,40 @@ namespace cng
 
 	void CommandHistoryHandler::addNewSolverCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(
+		auto tmp = new QTableWidgetItem(
 				QString(std::dynamic_pointer_cast<NewSolverCommand>(cmd)->settings->argString.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addChangeSolverSettingsCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(
+		auto tmp = new QTableWidgetItem(
 				QString(std::dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addConceptNetQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString(std::dynamic_pointer_cast<ConceptNetQueryCommand>(cmd)->query));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(std::dynamic_pointer_cast<ConceptNetQueryCommand>(cmd)->query);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addGroundCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(
+		auto tmp = new QTableWidgetItem(
 				QString(std::dynamic_pointer_cast<GroundCommand>(cmd)->historyProgramSection.c_str()));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addLoadSavedProgramCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString(std::dynamic_pointer_cast<LoadSavedProgramCommand>(cmd)->fileName));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(std::dynamic_pointer_cast<LoadSavedProgramCommand>(cmd)->fileName);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addSolveCommandToHistory(std::shared_ptr<Command> cmd, int pos)
@@ -176,30 +176,30 @@ namespace cng
 		{
 			satisfiable = QString("not satisfied");
 		}
-		auto tmp2 = new QTableWidgetItem(satisfiable);
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(satisfiable);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addVariableQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString(std::dynamic_pointer_cast<VariableQueryCommand>(cmd)->toShow));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(std::dynamic_pointer_cast<VariableQueryCommand>(cmd)->toShow);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addLoadBackgroundKnowledgeCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString(std::dynamic_pointer_cast<LoadBackgroundKnowledgeCommand>(cmd)->fileName));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(std::dynamic_pointer_cast<LoadBackgroundKnowledgeCommand>(cmd)->fileName);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addFactsQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto tmp2 = new QTableWidgetItem(QString(std::dynamic_pointer_cast<FactsQueryCommand>(cmd)->factsString));
-		tmp2->setFlags(tmp2->flags() ^ Qt::ItemIsEditable);
-		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp2);
+		auto tmp = new QTableWidgetItem(std::dynamic_pointer_cast<FactsQueryCommand>(cmd)->factsString);
+		tmp->setFlags(tmp->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, tmp);
 	}
 
 	void CommandHistoryHandler::addToCommandHistory(std::shared_ptr<Command> cmd)

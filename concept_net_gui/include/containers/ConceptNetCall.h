@@ -17,6 +17,9 @@ namespace cng
 {
 
 	class ConceptNetEdge;
+	/**
+	 * Class holding the complete information of a concept net query call
+	 */
 	class ConceptNetCall
 	{
 	public:

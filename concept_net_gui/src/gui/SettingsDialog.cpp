@@ -23,17 +23,7 @@ namespace cng
 	{
 		this->mainGui = gui;
 		this->ui->setupUi(this);
-		this->connect(this->ui->cancelBtn, SIGNAL(released()), this, SLOT(close()));
-		this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this,
-						SLOT(fillSettingsLabel(QListWidgetItem * )));
-		this->connect(this->ui->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
-		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
-						SLOT(fillSettingsLabel(QListWidgetItem *)));
-		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
-						SLOT(applySettings()));
-		this->connect(this->ui->addToSettingsBtn, SIGNAL(released()), this, SLOT(onAddBtn()));
-		this->connect(this->ui->removeFromSettingsBtn, SIGNAL(released()), this, SLOT(onRemoveBth()));
-		this->connect(this->ui->addToSettingsBtn, SIGNAL(released()), this, SLOT(onAddBtn()));
+		connectElements();
 		this->ui->safeSortedModelscheckBox->setChecked(true);
 		this->defaultSettings = std::make_shared<SolverSettings>("Default", "clingo, -W, no-atom-undefined, --number=1");
 		this->settingsFile = new QFile(QDir::homePath() + "/.conceptNetSettings.txt");
@@ -53,18 +43,38 @@ namespace cng
 		delete ui;
 	}
 
+
+	void SettingsDialog::connectElements()
+	{
+		this->connect(this->ui->cancelBtn, SIGNAL(released()), this, SLOT(close()));
+		this->connect(this->ui->settingsListWidget, SIGNAL(itemClicked(QListWidgetItem * )), this,
+						SLOT(fillSettingsLabel(QListWidgetItem * )));
+		this->connect(this->ui->okBtn, SIGNAL(released()), this, SLOT(applySettings()));
+		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						SLOT(fillSettingsLabel(QListWidgetItem *)));
+		this->connect(this->ui->settingsListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this,
+						SLOT(applySettings()));
+		this->connect(this->ui->addToSettingsBtn, SIGNAL(released()), this, SLOT(onAddBtn()));
+		this->connect(this->ui->removeFromSettingsBtn, SIGNAL(released()), this, SLOT(onRemoveBth()));
+		this->connect(this->ui->addToSettingsBtn, SIGNAL(released()), this, SLOT(onAddBtn()));
+	}
+
 	void SettingsDialog::loadSettingsFromConfig()
 	{
+		// default settings
 		this->parameterMap.emplace(this->defaultSettings->name, this->defaultSettings);
+		//Open settingsfile
 		if (!this->settingsFile->open(QIODevice::ReadOnly))
 		{
 			qWarning("SettingsDialog: Couldn't open file.");
 			return;
 		}
+		// Extract JSON objects from file
 		QByteArray loadedData = this->settingsFile->readAll();
 		QJsonDocument loadDoc(QJsonDocument::fromJson(loadedData));
 		QJsonObject savedObject = loadDoc.object();
 		QJsonArray settings = savedObject["settings"].toArray();
+		// Parse all saveds settings
 		for (int i = 0; i < settings.size(); i++)
 		{
 			QJsonObject set = settings[i].toObject();
@@ -142,7 +152,6 @@ namespace cng
 			qWarning("SettingsDialog: Couldn't open file.");
 			return;
 		}
-		QJsonObject settings;
 
 		//JSON Array to hold the commandHistory
 		QJsonArray settingsList;
@@ -153,6 +162,7 @@ namespace cng
 			obj["parameters"] = QString(set.second->argString.c_str());
 			settingsList.append(obj);
 		}
+		QJsonObject settings;
 		settings["settings"] = settingsList;
 		//Write to file
 		QJsonDocument settingsDoc(settings);

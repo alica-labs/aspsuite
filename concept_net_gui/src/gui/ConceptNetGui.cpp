@@ -96,6 +96,7 @@ namespace cng
 
 	void ConceptNetGui::readConceptNetBaseRelations()
 	{
+		// File placed in project etc folder
 		QFile file(
 				QString(QCoreApplication::applicationDirPath()
 						+ "/../../../../../src/symrock/concept_net_gui/etc/conceptNetRelations.txt"));
@@ -319,6 +320,7 @@ namespace cng
 	bool ConceptNetGui::rulesAreDotTerminated()
 	{
 		auto program = this->ui->aspRuleTextArea->toPlainText().toStdString();
+		//Separate program by newline
 		std::string delimiter = "\n";
 
 		size_t pos = 0;
@@ -337,6 +339,7 @@ namespace cng
 			{
 				if (line.find(".") == std::string::npos)
 				{
+					// IF a line is not terminated by a dot inform the user that the user can check
 					QMessageBox mBox;
 					mBox.setWindowTitle("Rule not terminated!");
 					mBox.setText("The following rule is not terminated by a dot:");

@@ -34,6 +34,7 @@ namespace cng
 		}
 		this->currentConceptNetCall = nullptr;
 		this->nam = new QNetworkAccessManager(this);
+		// connect signals form handling the http requests
 		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
 	}
@@ -46,10 +47,13 @@ namespace cng
 
 	void ConceptNetQueryCommand::handleWrongInput()
 	{
+		// parse wrong input
 		auto parsedQuery = query.left(query.indexOf("("));
+		//prepare MessageBox
 		QMessageBox* msgBox = new QMessageBox(this->gui);
 		msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
 		msgBox->setWindowModality(Qt::NonModal);
+		// print possible base relations
 		QString relations;
 		auto tmp = this->gui->getConceptNetBaseRealtions();
 		for (int i = 0; i < tmp.size(); i++)
@@ -68,7 +72,9 @@ namespace cng
 		msgBox->setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
 		msgBox->setStandardButtons(QMessageBox::Ok);
 		msgBox->setDefaultButton(QMessageBox::Ok);
+		// show message box
 		int ret = msgBox->exec();
+		//remove from command history
 		this->undo();
 	}
 
@@ -80,12 +86,14 @@ namespace cng
 
 	void ConceptNetQueryCommand::handleQuery()
 	{
+		//handle different queries
 		auto pos = this->query.indexOf("(");
 		auto relation = this->query.left(pos);
 		if (this->query.contains("wildcard"))
 		{
 			auto wildcardPos = this->query.indexOf("wildcard");
 			auto commaPos = this->query.indexOf(",");
+			// relation(wildcard, concept)
 			if (wildcardPos < commaPos)
 			{
 				auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
@@ -93,6 +101,7 @@ namespace cng
 				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
 				callUrl(url);
 			}
+			// relation(concept, wildcard)
 			else
 			{
 				auto concept = this->query.mid(pos + 1, commaPos - pos).trimmed();
@@ -101,6 +110,7 @@ namespace cng
 				callUrl(url);
 			}
 		}
+		//relation(concept)
 		else
 		{
 			auto concept = this->query.right(this->query.size() - pos - 1);
@@ -114,16 +124,19 @@ namespace cng
 	{
 		if (this->query.contains("(") && this->query.contains(")"))
 		{
+			//wrong input relation
 			if (!isConceptNetRealtion(this->query))
 			{
 				handleWrongInput();
 				return;
 			}
+			// query with given relation
 			else
 			{
 				handleQuery();
 			}
 		}
+		//query without relation
 		else
 		{
 			QUrl url("http://api.localhost/c/en/" + this->query);
@@ -154,39 +167,49 @@ namespace cng
 
 	void ConceptNetQueryCommand::conceptNetCallFinished(QNetworkReply* reply)
 	{
+		//get data
 		QString data = reply->readAll();
+		//remove html part
 		std::string fullData = data.toStdString();
 		auto start = fullData.find("{\"@context\":");
 		auto end = fullData.find("</script>");
 		fullData = fullData.substr(start, end - start);
+		// parse json
 		auto jsonString = QString(fullData.c_str()).toUtf8();
 		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
 		QString id = jsonDoc.object()["@id"].toString();
+		// save next page form following get request
 		QString nextPage = jsonDoc.object()["view"].toObject()["nextPage"].toString();
 #ifdef ConceptNetQueryCommandDebug
 		cout << id.toStdString() << endl;
 		cout << nextPage.toStdString() << endl;
 #endif
+		// only null in first query
 		if (this->currentConceptNetCall == nullptr)
 		{
 			this->currentConceptNetCall = new ConceptNetCall(id);
 		}
 		this->currentConceptNetCall->nextEdgesPage = nextPage;
+		// extract edges
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
 		for (int i = 0; i < edges.size(); i++)
 		{
 			QJsonObject edge = edges[i].toObject();
+			//end of edge
 			QString edgeId = edge["@id"].toString();
 			QJsonObject end = edge["end"].toObject();
 			QString endLanguage = end["language"].toString();
+			// skip non English
 			if (endLanguage != "en")
 			{
 				continue;
 			}
 			QString endTerm = end["term"].toString();
 			endTerm = trimTerm(endTerm);
+			//start of edge
 			QJsonObject start = edge["start"].toObject();
 			QString startLanguage = start["language"].toString();
+			// skip non English
 			if (startLanguage != "en")
 			{
 				continue;
@@ -195,6 +218,7 @@ namespace cng
 			startTerm = trimTerm(startTerm);
 			QString relation = edge["rel"].toObject()["label"].toString();
 			double weight = edge["weight"].toDouble();
+			// sources
 			QJsonArray sources = edge["sources"].toArray();
 			auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, startTerm, endTerm, relation, weight);
 			for (int j = 0; j < sources.size(); j++)
@@ -213,6 +237,7 @@ namespace cng
 		}
 		else
 		{
+			// start json processing
 			emit jsonExtracted();
 		}
 
@@ -227,6 +252,7 @@ namespace cng
 
 	QString ConceptNetQueryCommand::conceptToASPPredicate(QString concept)
 	{
+		//  remove chars not supported by asp
 		if(concept.contains('.'))
 		{
 			concept.replace('.','_');

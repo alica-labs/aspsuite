@@ -29,6 +29,7 @@ namespace cng
 
 	void SolverSettings::extractSettingsVector()
 	{
+		//Separate setting by commata
 		if (this->argString.find(",") != std::string::npos)
 		{
 			size_t start = 0;

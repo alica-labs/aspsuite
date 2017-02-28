@@ -32,8 +32,17 @@ namespace cng
 	Q_OBJECT
 
 	public:
+		/**
+		 * Constructor
+		 */
 		SettingsDialog(QWidget *parent = 0, ConceptNetGui* gui = 0);
+		/**
+		 * Destructor
+		 */
 		virtual ~SettingsDialog();
+		/**
+		 * Get Pointer to Settings Dialog
+		 */
 		Ui::SettingsDialog* getUi();
 		/**
 		 * true if save models sorted checkbox is checked
@@ -75,12 +84,37 @@ namespace cng
 		 * save settings to json file
 		 */
 		void writeSettings();
+		/**
+		 * Connect every gui element
+		 */
+		void connectElements();
+		/**
+		 * Pointer to file containing solver settings
+		 */
 		QFile* settingsFile;
+		/**
+		 * Default settings "Default", "clingo, -W, no-atom-undefined, --number=1"
+		 */
 		std::shared_ptr<SolverSettings> defaultSettings;
+		/**
+		 * Pointer to Settings Dialog
+		 */
 		Ui::SettingsDialog* ui;
+		/**
+		 * Pointer to main gui
+		 */
 		ConceptNetGui* mainGui;
+		/**
+		 * Current settings pointer
+		 */
 		std::shared_ptr<SolverSettings> currentSettings;
+		/**
+		 * List of Parameter names show in dialog
+		 */
 		std::shared_ptr<std::vector<std::string>> parameterSectionNames;
+		/**
+		 * Mapping of names to settings
+		 */
 		std::map<std::string, std::shared_ptr<SolverSettings>> parameterMap;
 	};
 }

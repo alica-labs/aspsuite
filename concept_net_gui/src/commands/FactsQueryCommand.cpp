@@ -37,38 +37,46 @@ namespace cng
 	void FactsQueryCommand::execute()
 	{
 		auto prgm = this->factsString.trimmed();
+		//handle Wrong input
 		if (prgm.contains("\n"))
 		{
 			std::cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
 			return;
 		}
+		//create ASP term
 		auto term = make_shared<reasoner::ASPCommonsTerm>();
 		term->setType(reasoner::ASPQueryType::Facts);
 		int queryId = this->gui->getSolver()->getQueryCounter();
 		term->setId(queryId);
 		term->setQueryId(queryId);
+		//get number of models from gui
 		if (this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
 		{
 			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
 		}
 		prgm = prgm.left(prgm.size() - 1);
 		term->setQueryRule(prgm.toStdString());
+		//prepare get solution
 		std::vector<std::shared_ptr<reasoner::ASPCommonsVariable>> vars;
 		vars.push_back(make_shared<reasoner::ASPCommonsVariable>());
 		std::vector<std::shared_ptr<reasoner::ASPCommonsTerm>> terms;
 		terms.push_back(term);
 		std::vector<void*> result;
+		//call get solution from solver
 		this->gui->getSolver()->getSolution(vars, terms, result);
 		std::vector<reasoner::AnnotatedValVec> castedResults;
+		//handle result if there is one
 		if (result.size() > 0)
 		{
 			castedResults.push_back(*((reasoner::AnnotatedValVec*)result.at(0)));
+			//empty result
 			if (castedResults.at(0).factQueryValues.size() == 0)
 			{
 				this->gui->getUi()->queryResultsLabel->setText(QString("No result found!"));
 			}
 			else
 			{
+				//print result
 				std::stringstream ss;
 				ss << "Facts Query: " << term->getQueryRule() << std::endl;
 				ss << "Result contains the predicates: " << std::endl;
@@ -83,6 +91,7 @@ namespace cng
 					}
 				}
 				ss << std::endl;
+				//print models
 				if (this->gui->getUi()->showModelsCheckBox->isChecked())
 				{
 					ss << "The queried model contains the following predicates: " << std::endl;

@@ -42,15 +42,20 @@ namespace cng
 	{
 		this->gui->commandHistory.clear();
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		//Parse loaded data to JSON
 		QJsonDocument loadDoc(QJsonDocument::fromJson(this->loadedData));
 		QJsonObject savedObject = loadDoc.object();
+		//Handle all commands
 		QJsonArray cmds = savedObject["commandHistory"].toArray();
 		for (int i = 0; i < cmds.size(); i++)
 		{
 
 			QJsonObject cmd = cmds[i].toObject();
+			// Show progress to user
 			std::cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/"
 					<< cmds.size() << std::endl;
+
+			//Handle new Solver command
 			if (cmd["type"].toString().toStdString().compare("New Solver") == 0)
 			{
 				std::shared_ptr<NewSolverCommand> c = std::make_shared<NewSolverCommand>(
@@ -61,6 +66,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle change settings command
 			else if (cmd["type"].toString().toStdString().compare("Change Settings") == 0)
 			{
 				std::shared_ptr<ChangeSolverSettingsCommand> c = std::make_shared<ChangeSolverSettingsCommand>(
@@ -72,6 +78,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle concept net command
 			else if (cmd["type"].toString().toStdString().compare("Concept Net") == 0)
 			{
 				std::shared_ptr<ConceptNetQueryCommand> c = std::make_shared<ConceptNetQueryCommand>(this->gui, cmd["queryString"].toString());
@@ -79,6 +86,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle facts query command
 			else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0)
 			{
 				std::shared_ptr<FactsQueryCommand> c = std::make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
@@ -86,6 +94,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle ground command
 			else if (cmd["type"].toString().toStdString().compare("Ground") == 0)
 			{
 				std::shared_ptr<GroundCommand> c = std::make_shared<GroundCommand>(this->gui, cmd["program"].toString());
@@ -93,6 +102,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle load background knowledge command
 			else if (cmd["type"].toString().toStdString().compare("Load Logic Program") == 0)
 			{
 				std::shared_ptr<LoadBackgroundKnowledgeCommand> c = std::make_shared<LoadBackgroundKnowledgeCommand>(
@@ -101,6 +111,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle load program command not used
 			else if (cmd["type"].toString().toStdString().compare("Load Saved Program") == 0)
 			{
 				/**
@@ -109,6 +120,7 @@ namespace cng
 				 */
 				continue;
 			}
+			//Handle Variable query command
 			else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0)
 			{
 				std::shared_ptr<VariableQueryCommand> c = std::make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
@@ -116,6 +128,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle solve command
 			else if (cmd["type"].toString().toStdString().compare("Solve") == 0)
 			{
 				std::shared_ptr<SolveCommand> c = std::make_shared<SolveCommand>(this->gui);
@@ -123,6 +136,7 @@ namespace cng
 				emit this->gui->updateCommandList();
 				continue;
 			}
+			//Handle unknown command
 			else
 			{
 				std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;

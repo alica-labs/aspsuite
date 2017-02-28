@@ -36,8 +36,10 @@ namespace cng
 			qWarning("Couldn't open file.");
 			return;
 		}
+		//Read data from file
 		this->fileContent = file.readAll();
 		file.close();
+		//PRint data into gui
 		this->gui->getUi()->aspRuleTextArea->setText(fileContent);
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}

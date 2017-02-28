@@ -62,6 +62,7 @@ namespace cng
 	void CommandHistoryHandler::fillCommandHistory()
 		{
 			drawHistoryTable();
+			//fill history table with right commands
 			for (auto cmd : this->gui->commandHistory)
 			{
 				int pos = this->gui->getUi()->commandHistoryTable->rowCount();

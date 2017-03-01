@@ -24,6 +24,8 @@ void catchUnixSignals(const std::vector<int>& quitSignals) {
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+	a.setWindowIcon(QIcon(QCoreApplication::applicationDirPath()
+	+ "/../../../../../src/symrock/concept_net_gui/etc/drawing.svg"));
 	catchUnixSignals({SIGQUIT, SIGINT, SIGTERM, SIGHUP});
 	cng::ConceptNetGui w;
 	//Center GUI on screen

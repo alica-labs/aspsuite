@@ -78,6 +78,13 @@ namespace cng
 		this->undo();
 	}
 
+	QString ConceptNetQueryCommand::expandConceptNetPredicate(QString predicate)
+	{
+		QString ret = "";
+		ret.append(predicate).append(" :- not ").append("-").append(predicate).append(".\n");
+		return ret;
+	}
+
 	void ConceptNetQueryCommand::callUrl(QUrl url)
 	{
 		QNetworkRequest request(url);
@@ -283,7 +290,7 @@ namespace cng
 			QString tmp = edge->relation;
 			tmp[0] = tmp[0].toLower();
 			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(", ").append(QString::number(edge->weight)).append(
+					conceptToASPPredicate(edge->secondConcept)).append(", ").append(QString::number((int)(edge->weight * 100))).append(
 					", ").append(QString::number(edge->sources.size())).append(").\n");
 		}
 		return ret;
@@ -305,7 +312,7 @@ namespace cng
 			tmp[0] = tmp[0].toLower();
 			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
 					conceptToASPPredicate(edge->secondConcept)).append(", ").append(
-					QString::number(edge->weight / edge->sources.size())).append(").\n");
+					QString::number((int)(edge->weight / edge->sources.size()))).append(").\n");
 		}
 		return ret;
 	}
@@ -315,10 +322,15 @@ namespace cng
 		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
+//			QString tmp = edge->relation;
+//			tmp[0] = tmp[0].toLower();
+//			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+//					conceptToASPPredicate(edge->secondConcept)).append(").\n");
 			QString tmp = edge->relation;
 			tmp[0] = tmp[0].toLower();
-			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(").\n");
+			tmp.append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+					conceptToASPPredicate(edge->secondConcept)).append(")");
+			ret.append(expandConceptNetPredicate(tmp));
 		}
 		return ret;
 	}

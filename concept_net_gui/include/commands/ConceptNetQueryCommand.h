@@ -59,6 +59,7 @@ namespace cng
 		void extractASPPredicates();
 
 	private:
+		QString expandConceptNetPredicate(QString predicate);
 		/**
 		 * Handles the http requests
 		 */

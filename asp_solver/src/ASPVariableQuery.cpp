@@ -290,7 +290,7 @@ namespace reasoner
 		this->externalName = ss.str();
 		ss.str("");
 		ss << "#program " << this->queryProgramSection << "." << endl;
-		ss << "#external " << "external" << this->queryProgramSection << "." << endl;
+		ss << "#external " << this->externalName << "." << endl;
 		ss << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;
 #ifdef ASPVARIABLEQUERY_DEBUG
 		cout << expandQueryRuleModuleProperty(this->term->getQueryRule()) << endl;

@@ -28,12 +28,14 @@ namespace cng
 		this->type = "Concept Net";
 		this->gui = gui;
 		this->query = query.trimmed();
-		if(this->query[this->query.size()-1] == '.')
+		if (this->query[this->query.size() - 1] == '.')
 		{
 			this->query = this->query.remove(this->query.size() - 1, 1);
 		}
 		this->currentConceptNetCall = nullptr;
 		this->nam = new QNetworkAccessManager(this);
+		this->prefix = QString("cn5_");
+		this->prefixLength = this->prefix.length();
 		// connect signals form handling the http requests
 		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
@@ -50,9 +52,9 @@ namespace cng
 		// parse wrong input
 		auto parsedQuery = query.left(query.indexOf("("));
 		//prepare MessageBox
-		QMessageBox* msgBox = new QMessageBox(this->gui);
-		msgBox->setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
-		msgBox->setWindowModality(Qt::NonModal);
+		QMessageBox msgBox;
+		msgBox.setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
+		msgBox.setWindowModality(Qt::NonModal);
 		// print possible base relations
 		QString relations;
 		auto tmp = this->gui->getConceptNetBaseRealtions();
@@ -69,11 +71,11 @@ namespace cng
 				relations.append("\t");
 			}
 		}
-		msgBox->setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
-		msgBox->setStandardButtons(QMessageBox::Ok);
-		msgBox->setDefaultButton(QMessageBox::Ok);
+		msgBox.setInformativeText(QString("Queries can be formulated using the following relations:" + relations));
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setDefaultButton(QMessageBox::Ok);
 		// show message box
-		int ret = msgBox->exec();
+		int ret = msgBox.exec();
 		//remove from command history
 		this->undo();
 	}
@@ -95,7 +97,9 @@ namespace cng
 	{
 		//handle different queries
 		auto pos = this->query.indexOf("(");
-		auto relation = this->query.left(pos);
+
+		auto relation = this->query.mid(this->prefixLength, pos - this->prefixLength);
+		std::cout << relation.toStdString() << std::endl;
 		if (this->query.contains("wildcard"))
 		{
 			auto wildcardPos = this->query.indexOf("wildcard");
@@ -105,6 +109,7 @@ namespace cng
 			{
 				auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
 				concept = concept.left(concept.size() - 1).trimmed();
+				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
 				callUrl(url);
 			}
@@ -113,6 +118,7 @@ namespace cng
 			{
 				auto concept = this->query.mid(pos + 1, commaPos - pos).trimmed();
 				concept = concept.left(concept.size() - 1);
+				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation);
 				callUrl(url);
 			}
@@ -122,6 +128,7 @@ namespace cng
 		{
 			auto concept = this->query.right(this->query.size() - pos - 1);
 			concept = concept.left(concept.size() - 1);
+			concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation);
 			callUrl(url);
 		}
@@ -129,6 +136,18 @@ namespace cng
 
 	void ConceptNetQueryCommand::execute()
 	{
+		if (!this->query.startsWith(this->prefix))
+		{
+			QMessageBox msgBox;
+			msgBox.setText(QString("ConceptNet 5 queries have to start with the prefix \"cn5_\"."));
+			msgBox.setWindowModality(Qt::NonModal);
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			// show message box
+			int ret = msgBox.exec();
+			this->undo();
+			return;
+		}
 		if (this->query.contains("(") && this->query.contains(")"))
 		{
 			//wrong input relation
@@ -146,7 +165,9 @@ namespace cng
 		//query without relation
 		else
 		{
-			QUrl url("http://api.localhost/c/en/" + this->query);
+			QUrl url(
+					"http://api.localhost/c/en/"
+							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength));
 			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
@@ -260,17 +281,17 @@ namespace cng
 	QString ConceptNetQueryCommand::conceptToASPPredicate(QString concept)
 	{
 		//  remove chars not supported by asp
-		if(concept.contains('.'))
+		if (concept.contains('.'))
 		{
-			concept.replace('.','_');
+			concept.replace('.', '_');
 		}
-		if(concept.contains(','))
+		if (concept.contains(','))
 		{
-			concept.replace(',','_');
+			concept.replace(',', '_');
 		}
-		if(concept.contains(' '))
+		if (concept.contains(' '))
 		{
-			concept.replace(' ','_');
+			concept.replace(' ', '_');
 		}
 		return concept;
 	}
@@ -290,8 +311,9 @@ namespace cng
 			QString tmp = edge->relation;
 			tmp[0] = tmp[0].toLower();
 			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(", ").append(QString::number((int)(edge->weight * 100))).append(
-					", ").append(QString::number(edge->sources.size())).append(").\n");
+					conceptToASPPredicate(edge->secondConcept)).append(", ").append(
+					QString::number((int)(edge->weight * 100))).append(", ").append(
+					QString::number(edge->sources.size())).append(").\n");
 		}
 		return ret;
 	}
@@ -326,11 +348,17 @@ namespace cng
 //			tmp[0] = tmp[0].toLower();
 //			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
 //					conceptToASPPredicate(edge->secondConcept)).append(").\n");
-			QString tmp = edge->relation;
-			tmp[0] = tmp[0].toLower();
-			tmp.append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(")");
-			ret.append(expandConceptNetPredicate(tmp));
+			QString tmp = "";
+			tmp.append(this->prefix).append(edge->relation);
+			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+					this->prefix).append(conceptToASPPredicate(edge->secondConcept)).append(").\n");
+//			ret.append(expandConceptNetPredicate(tmp));
+			ret.append(tmp);
+			QString tmpRel = edge->relation;
+			tmpRel[0] = tmpRel[0].toLower();
+			ret.append(tmpRel).append("(X, Y) :- not -").append(tmpRel).append("(X, Y), ").append(
+					conceptToASPPredicate(edge->firstConcept)).append("(X), ").append(conceptToASPPredicate(edge->secondConcept)).append("(Y)").append(".\n");
+
 		}
 		return ret;
 	}

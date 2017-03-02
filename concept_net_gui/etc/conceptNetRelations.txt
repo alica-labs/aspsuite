@@ -1,124 +1,124 @@
 {
     "relations": [
         {
-            "rel": "RelatedTo"
+            "rel": "cn5_RelatedTo"
         },
         {
-            "rel": "ExternalURL"
+            "rel": "cn5_ExternalURL"
         },
         {
-            "rel": "FormOf"
+            "rel": "cn5_FormOf"
         },
         {
-            "rel": "IsA"
+            "rel": "cn5_IsA"
         },
         {
-            "rel": "PartOf"
+            "rel": "cn5_PartOf"
         },
         {
-            "rel": "HasA"
+            "rel": "cn5_HasA"
         },
         {
-            "rel": "UsedFor"
+            "rel": "cn5_UsedFor"
         },
         {
-            "rel": "CapableOf"
+            "rel": "cn5_CapableOf"
         },
         {
-            "rel": "AtLocation"
+            "rel": "cn5_AtLocation"
         },
         {
-            "rel": "Causes"
+            "rel": "cn5_Causes"
         },
         {
-            "rel": "HasSubevent"
+            "rel": "cn5_HasSubevent"
         },
         {
-            "rel": "HasFirstSubevent"
+            "rel": "cn5_HasFirstSubevent"
         },
         {
-            "rel": "HasLastSubevent"
+            "rel": "cn5_HasLastSubevent"
         },
         {
-            "rel": "HasPrerequisite"
+            "rel": "cn5_HasPrerequisite"
         },
         {
-            "rel": "HasProperty"
+            "rel": "cn5_HasProperty"
         },
         {
-            "rel": "MotivatedByGoal"
+            "rel": "cn5_MotivatedByGoal"
         },
         {
-            "rel": "ObstructedBy"
+            "rel": "cn5_ObstructedBy"
         },
         {
-            "rel": "Desires"
+            "rel": "cn5_Desires"
         },
         {
-            "rel": "CreatedBy"
+            "rel": "cn5_CreatedBy"
         },
         {
-            "rel": "Synonym"
+            "rel": "cn5_Synonym"
         },
         {
-            "rel": "Antonym"
+            "rel": "cn5_Antonym"
         },
         {
-            "rel": "DerivedFrom"
+            "rel": "cn5_DerivedFrom"
         },
         {
-            "rel": "SymbolOf"
+            "rel": "cn5_SymbolOf"
         },
         {
-            "rel": "DefinedAs"
+            "rel": "cn5_DefinedAs"
         },
         {
-            "rel": "Entails"
+            "rel": "cn5_Entails"
         },
         {
-            "rel": "MannerOf"
+            "rel": "cn5_MannerOf"
         },
         {
-            "rel": "LocatedNear"
+            "rel": "cn5_LocatedNear"
         },
         {
-            "rel": "NotDesires"
+            "rel": "cn5_NotDesires"
         },
         {
-            "rel": "NotCapableOf"
+            "rel": "cn5_NotCapableOf"
         },
         {
-            "rel": "NotUsedFor"
+            "rel": "cn5_NotUsedFor"
         },
         {
-            "rel": "NotHasProperty"
+            "rel": "cn5_NotHasProperty"
         },
         {
-            "rel": "dbpedia/genre"
+            "rel": "cn5_dbpedia/genre"
         },
         {
-            "rel": "dbpedia/influencedBy"
+            "rel": "cn5_dbpedia/influencedBy"
         },
         {
-            "rel": "dbpedia/knownFor"
+            "rel": "cn5_dbpedia/knownFor"
         },
         {
-            "rel": "dbpedia/occupation"
+            "rel": "cn5_dbpedia/occupation"
         },
         {
-            "rel": "dbpedia/language"
+            "rel": "cn5_dbpedia/language"
         },
         {
-            "rel": "dbpedia/field"
+            "rel": "cn5_dbpedia/field"
         },
         {
-            "rel": "dbpedia/product"
+            "rel": "cn5_dbpedia/product"
         },
         {
-            "rel": "dbpedia/capital"
+            "rel": "cn5_dbpedia/capital"
         },
         {
-            "rel": "dbpedia/leader"
+            "rel": "cn5_dbpedia/leader"
         }
     ]
 }

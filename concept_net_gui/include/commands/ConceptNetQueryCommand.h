@@ -104,6 +104,9 @@ namespace cng
 		 */
 		void callUrl(QUrl url);
 
+		QString prefix;
+		int prefixLength;
+
 	signals:
 		/**
 		 * Signal used as soon as the extraction from concept net is finished

@@ -10,7 +10,7 @@
 namespace reasoner
 {
 
-	AnnotatedExternal::AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Value> gringoValue, bool value)
+	AnnotatedExternal::AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Symbol> gringoValue, bool value)
 	{
 		this->aspPredicate = aspPredicate;
 		this->gringoValue = gringoValue;
@@ -31,12 +31,12 @@ namespace reasoner
 		this->aspPredicate = aspPredicate;
 	}
 
-	shared_ptr<Gringo::Value> AnnotatedExternal::getGringoValue()
+	shared_ptr<Gringo::Symbol> AnnotatedExternal::getGringoValue()
 	{
 		return this->gringoValue;
 	}
 
-	void AnnotatedExternal::setGringoValue(shared_ptr<Gringo::Value> gringoValue)
+	void AnnotatedExternal::setGringoValue(shared_ptr<Gringo::Symbol> gringoValue)
 	{
 		this->gringoValue = gringoValue;
 	}

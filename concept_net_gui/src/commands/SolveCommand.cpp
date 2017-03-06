@@ -63,7 +63,7 @@ namespace cng
 		return ret;
 	}
 
-	vector<Gringo::ValVec> SolveCommand::getCurrentModels()
+	vector<Gringo::SymVec> SolveCommand::getCurrentModels()
 	{
 		return currentModels;
 	}
@@ -82,6 +82,7 @@ namespace cng
 			for (auto atom : this->currentModels.at(i))
 			{
 				ss << atom;
+				cout << atom << endl;
 				sorted.at(i).push_back(ss.str());
 				ss.str("");
 			}
@@ -97,6 +98,7 @@ namespace cng
 			}
 			ss << std::endl;
 		}
+		cout << ss.str() << endl;
 		this->gui->getUi()->sortedModelsLabel->setText(QString(ss.str().c_str()));
 	}
 

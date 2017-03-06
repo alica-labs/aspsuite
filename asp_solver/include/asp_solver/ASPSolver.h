@@ -47,12 +47,12 @@ namespace reasoner
 		bool loadFileFromConfig(string configKey);
 		void loadFile(string filename);
 
-		void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context);
-		void assignExternal(Gringo::Value ext, Gringo::TruthValue);
-		void releaseExternal(Gringo::Value ext);
+		void ground(Gringo::Control::GroundVec const &vec, Gringo::Context *context);
+		void assignExternal(Gringo::Symbol ext, Potassco::Value_t truthValue);
+		void releaseExternal(Gringo::Symbol ext);
 		bool solve();
 		void add(string const &name, Gringo::FWStringVec const &params, string const &par);
-		Gringo::Value parseValue(std::string const &str);
+		Gringo::Symbol parseValue(std::string const &str);
 
 		int getRegisteredQueriesCount();
 		/**
@@ -78,11 +78,12 @@ namespace reasoner
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
-		vector<Gringo::ValVec> getCurrentModels();
+		vector<Gringo::SymVec> getCurrentModels();
 
 	private:
 		bool onModel(Gringo::Model const &m);
 		shared_ptr<ClingoLib> clingo;
+//		Gringo::Control* clingo;
 		DefaultGringoModule* gringoModule;
 		Gringo::ConfigProxy* conf;
 		unsigned int root;
@@ -91,7 +92,7 @@ namespace reasoner
 		vector<string> alreadyLoaded;
 		vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 		vector<shared_ptr<ASPQuery>> registeredQueries;
-		vector<Gringo::ValVec> currentModels;
+		vector<Gringo::SymVec> currentModels;
 
 		void reduceQueryLifeTime();
 		int prepareSolution(std::vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);

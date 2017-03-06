@@ -10,11 +10,11 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 
-find_package(catkin REQUIRED clingo_cpp cmake_modules alica_engine alica_dummy_proxy asp_commons asp_solver_wrapper asp_solver)
+find_package(catkin REQUIRED clingo cmake_modules alica_engine alica_dummy_proxy asp_commons asp_solver_wrapper asp_solver)
 
 catkin_package(
   INCLUDE_DIRS src/etc/Expr/include
-  CATKIN_DEPENDS cmake_modules alica_engine alica_dummy_proxy asp_commons asp_solver_wrapper clingo_cpp asp_solver
+  CATKIN_DEPENDS cmake_modules alica_engine alica_dummy_proxy asp_commons asp_solver_wrapper clingo asp_solver
 )
 
 include_directories(src/etc/Expr/include  ${catkin_INCLUDE_DIRS})

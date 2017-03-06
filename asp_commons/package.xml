@@ -12,10 +12,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>clingo_cpp</build_depend>
+  <build_depend>clingo</build_depend>
   <build_depend>system_config</build_depend>
 
-  <run_depend>clingo_cpp</run_depend>
+  <run_depend>clingo</run_depend>
   <run_depend>system_config</run_depend>
   
   <export>

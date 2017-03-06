@@ -10,14 +10,14 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 find_package(catkin REQUIRED COMPONENTS
-  clingo_cpp
+  clingo
   system_config
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES asp_commons
-  CATKIN_DEPENDS clingo_cpp system_config
+  CATKIN_DEPENDS clingo system_config
   #DEPENDS lua python
 )
 

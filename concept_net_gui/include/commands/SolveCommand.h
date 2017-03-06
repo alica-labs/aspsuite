@@ -32,14 +32,14 @@ namespace cng
 		void undo();
 
 		QJsonObject toJSON();
-		std::vector<Gringo::ValVec> getCurrentModels();
+		std::vector<Gringo::SymVec> getCurrentModels();
 		bool isSatisfiable();
 
 		ConceptNetGui* gui;
 
 	private:
 		bool satisfiable;
-		std::vector<Gringo::ValVec> currentModels;
+		std::vector<Gringo::SymVec> currentModels;
 
 		void printModels();
 		void printSortedModels();

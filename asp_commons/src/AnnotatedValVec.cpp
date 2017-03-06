@@ -12,7 +12,7 @@
 namespace reasoner
 {
 
-	AnnotatedValVec::AnnotatedValVec(long id, vector<Gringo::ValVec> values, shared_ptr<ASPQuery> query)
+	AnnotatedValVec::AnnotatedValVec(long id, vector<Gringo::SymVec> values, shared_ptr<ASPQuery> query)
 	{
 		this->id = id;
 		this->values = values;

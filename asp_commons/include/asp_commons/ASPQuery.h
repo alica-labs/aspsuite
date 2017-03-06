@@ -9,9 +9,8 @@
 #define SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_
 
 #include <string>
-#include <clingo/clingocontrol.hh>
 #include <memory>
-
+#include <clingo/clingocontrol.hh>
 #include <asp_commons/ASPQueryType.h>
 
 using namespace std;
@@ -30,7 +29,7 @@ namespace reasoner
 		ASPQuery(IASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPQuery();
 
-		shared_ptr<vector<Gringo::ValVec>> getCurrentModels();
+		shared_ptr<vector<Gringo::SymVec>> getCurrentModels();
 
 		int getLifeTime();
 		void setLifeTime(int lifeTime);
@@ -38,7 +37,7 @@ namespace reasoner
 
 		void onModel(ClingoModel& clingoModel);
 
-		map<Gringo::Value, vector<Gringo::Value>> getHeadValues();
+		map<Gringo::Symbol, Gringo::SymVec> getHeadValues();
 
 		IASPSolver* getSolver();
 		vector<string> getRules();
@@ -58,10 +57,10 @@ namespace reasoner
 		 * meaning that there is a rule for every predicate
 		 */
 		IASPSolver* solver;
-		shared_ptr<vector<Gringo::ValVec>> currentModels;
+		shared_ptr<vector<Gringo::SymVec>> currentModels;
 		vector<string> rules;
 		// key := headValue , value := values which satisfies it
-		map<Gringo::Value, vector<Gringo::Value>> headValues;
+		map<Gringo::Symbol, Gringo::SymVec> headValues;
 		// lifeTime == 1 => query is used once
 		// lifeTime == x => query is used x times
 		// LifeTime == -1 => query is used until unregistered
@@ -71,8 +70,8 @@ namespace reasoner
 		ASPQueryType type;
 
 	private:
-		bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);
-		void saveHeadValuePair(Gringo::Value key, Gringo::Value value);
+		bool checkMatchValues(const Gringo::Symbol* value1, const Gringo::Symbol* value2);
+		void saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value);
 
 	};
 

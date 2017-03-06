@@ -19,19 +19,19 @@ using namespace std;
 		class AnnotatedExternal
 		{
 		public:
-			AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Value> gringoValue, bool value);
+			AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Symbol> gringoValue, bool value);
 			virtual ~AnnotatedExternal();
 			string getAspPredicate();
 			void setAspPredicate(string aspPredicate);
-			shared_ptr<Gringo::Value> getGringoValue();
-			void setGringoValue(shared_ptr<Gringo::Value> gringoValue);
+			shared_ptr<Gringo::Symbol> getGringoValue();
+			void setGringoValue(shared_ptr<Gringo::Symbol> gringoValue);
 			bool getValue();
 			void setValue(bool value);
 
 
 		private:
 			string aspPredicate;
-			shared_ptr<Gringo::Value> gringoValue;
+			shared_ptr<Gringo::Symbol> gringoValue;
 			bool value;
 
 

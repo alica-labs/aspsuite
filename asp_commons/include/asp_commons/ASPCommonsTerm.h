@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 #include <map>
-#include "../include/asp_commons/ASPQueryType.h"
+#include "asp_commons/ASPQueryType.h"
 
 using namespace std;
 

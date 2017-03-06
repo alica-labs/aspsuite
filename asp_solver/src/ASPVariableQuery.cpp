@@ -37,10 +37,10 @@ namespace reasoner
 		auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 		if (loaded)
 		{
-			this->solver->ground( { {this->term->getProgramSection(), {}}}, nullptr);
+			this->solver->ground( { {Gringo::String(this->term->getProgramSection().c_str()), {}}}, nullptr);
 		}
-		this->solver->ground( { {this->queryProgramSection, {}}}, nullptr);
-		this->solver->assignExternal(*(this->external), Gringo::TruthValue::True);
+		this->solver->ground( { {Gringo::String(this->queryProgramSection.c_str()), {}}}, nullptr);
+		this->solver->assignExternal(*(this->external), Potassco::Value_t::True);
 	}
 
 	ASPVariableQuery::~ASPVariableQuery()
@@ -307,7 +307,7 @@ namespace reasoner
 		cout << "ASPVariableQuery: create program section: \n" << ss.str();
 #endif
 		this->solver->add(this->queryProgramSection, {}, ss.str());
-		this->external = make_shared<Gringo::Value>(this->solver->parseValue(this->externalName));
+		this->external = make_shared<Gringo::Symbol>(this->solver->parseValue(this->externalName));
 	}
 
 	void ASPVariableQuery::removeExternal()
@@ -370,7 +370,7 @@ namespace reasoner
 			stringstream ss;
 			ss << this->queryProgramSection << "(" << value << ")";
 			auto val = this->solver->parseValue(ss.str());
-			this->headValues.emplace(val, vector<Gringo::Value>());
+			this->headValues.emplace(val, vector<Gringo::Symbol>());
 		}
 	}
 

@@ -9,8 +9,6 @@
 #include "asp_commons/ASPQuery.h"
 
 
-#include <clingo/clingocontrol.hh>
-
 #include "asp_commons/AnnotatedValVec.h"
 #include "asp_commons/IASPSolver.h"
 
@@ -24,7 +22,7 @@ namespace reasoner
 		this->term = term;
 		this->programSection = term->getProgramSection();
 		this->lifeTime = term->getLifeTime();
-		this->currentModels = make_shared<vector<Gringo::ValVec>>();
+		this->currentModels = make_shared<vector<Gringo::SymVec>>();
 	}
 
 	ASPQuery::~ASPQuery()
@@ -39,7 +37,7 @@ namespace reasoner
 		}
 	}
 
-	void ASPQuery::saveHeadValuePair(Gringo::Value key, Gringo::Value value)
+	void ASPQuery::saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value)
 	{
 		auto entry = this->headValues.find(key);
 		if (entry != this->headValues.end())
@@ -50,7 +48,14 @@ namespace reasoner
 
 	void ASPQuery::onModel(ClingoModel& clingoModel)
 	{
-		this->getCurrentModels()->push_back(clingoModel.atoms(Gringo::Model::SHOWN));
+		cout << "On model Called!" << endl;
+		Gringo::SymVec vec;
+		auto tmp = clingoModel.atoms(clingo_show_type_shown);
+		for(int i = 0; i < tmp.size; i++)
+		{
+			vec.push_back(tmp[i]);
+		}
+		this->getCurrentModels()->push_back(vec);
 		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
 
 		// determine the domain of the query predicate
@@ -59,51 +64,52 @@ namespace reasoner
 #ifdef ASPQUERY_DEBUG
 			cout << "ASPQuery::onModel: " << value.first << endl;
 #endif
-			auto it = clingoModel.out.domains.find(value.first.sig());
-			if (it == clingoModel.out.domains.end())
-			{
-				//cout << "ASPQuery: Didn't find any suitable domain!" << endl;
-				continue;
-			}
-
-			for (auto& domainPair : it->second.domain)
-			{
-				//cout << "ASPQuery: Inside domain-loop!" << endl;
-
-				if (&(domainPair.second)
-						&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-				{
-					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
-
-					if (this->checkMatchValues(&value.first, &domainPair.first))
-					{
-						//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
-						this->saveHeadValuePair(value.first, domainPair.first);
-					}
-				}
-			}
+			//TODO find way to use it
+//			auto it = clingoModel.out.domains.find(value.first.sig());
+//			if (it == clingoModel.out.domains.end())
+//			{
+//				//cout << "ASPQuery: Didn't find any suitable domain!" << endl;
+//				continue;
+//			}
+//
+//			for (auto& domainPair : it->second.domain)
+//			{
+//				//cout << "ASPQuery: Inside domain-loop!" << endl;
+//
+//				if (&(domainPair.second)
+//						&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+//				{
+//					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
+//
+//					if (this->checkMatchValues(&value.first, &domainPair.first))
+//					{
+//						//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
+//						this->saveHeadValuePair(value.first, domainPair.first);
+//					}
+//				}
+//			}
 		}
 	}
 
-	bool ASPQuery::checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2)
+	bool ASPQuery::checkMatchValues(const Gringo::Symbol* value1, const Gringo::Symbol* value2)
 	{
-		if (value2->type() != Gringo::Value::Type::FUNC)
+		if (value2->type() != Gringo::SymbolType::Fun)
 			return false;
 
 		if (value1->name() != value2->name())
 			return false;
 
-		if (value1->args().size() != value2->args().size())
+		if (value1->args().size != value2->args().size)
 			return false;
 
-		for (uint i = 0; i < value1->args().size(); ++i)
+		for (uint i = 0; i < value1->args().size; ++i)
 		{
-			Gringo::Value arg = value1->args()[i];
+			Gringo::Symbol arg = value1->args()[i];
 
-			if (arg.type() == Gringo::Value::Type::ID && arg.name() == IASPSolver::WILDCARD_STRING)
+			if (arg.type() == Gringo::SymbolType::Num && std::string(arg.name().c_str()) == IASPSolver::WILDCARD_STRING)
 				continue;
 
-			if (arg.type() == Gringo::Value::Type::FUNC && value2->args()[i].type() == Gringo::Value::Type::FUNC)
+			if (arg.type() == Gringo::SymbolType::Fun && value2->args()[i].type() == Gringo::SymbolType::Fun)
 			{
 				if (false == checkMatchValues(&arg, &value2->args()[i]))
 					return false;
@@ -191,7 +197,7 @@ namespace reasoner
 		return this->solver;
 	}
 
-	shared_ptr<vector<Gringo::ValVec>> ASPQuery::getCurrentModels()
+	shared_ptr<vector<Gringo::SymVec>> ASPQuery::getCurrentModels()
 	{
 		return this->currentModels;
 	}
@@ -211,7 +217,7 @@ namespace reasoner
 		return this->rules;
 	}
 
-	map<Gringo::Value, vector<Gringo::Value>> ASPQuery::getHeadValues()
+	map<Gringo::Symbol, Gringo::SymVec> ASPQuery::getHeadValues()
 	{
 		return this->headValues;
 	}

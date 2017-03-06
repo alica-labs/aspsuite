@@ -19,7 +19,7 @@ namespace reasoner
 	{
 		this->type = ASPQueryType::Facts;
 		this->createQueryValues(term->getRuleHeads());
-		this->currentModels = make_shared<vector<Gringo::ValVec>>();
+		this->currentModels = make_shared<vector<Gringo::SymVec>>();
 
 		if (!term->getProgramSection().empty())
 		{
@@ -35,7 +35,7 @@ namespace reasoner
 			}
 			if (loaded)
 			{
-				this->solver->ground( { {term->getProgramSection(), {}}}, nullptr);
+				this->solver->ground( { {Gringo::String(term->getProgramSection().c_str()), {}}}, nullptr);
 			}
 		}
 	}
@@ -66,7 +66,7 @@ namespace reasoner
 					}
 					currentQuery = queryString.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Value>());
+					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Symbol>());
 					start = queryString.find(",", end);
 					if (start != string::npos)
 					{
@@ -76,22 +76,22 @@ namespace reasoner
 			}
 			else
 			{
-				this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Value>());
+				this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Symbol>());
 			}
 		}
 	}
 
-	map<Gringo::Value, vector<Gringo::Value> > ASPFactsQuery::getFactModelMap()
+	map<Gringo::Symbol, vector<Gringo::Symbol> > ASPFactsQuery::getFactModelMap()
 	{
 		return this->factModelMap;
 	}
 
-	void ASPFactsQuery::setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap)
+	void ASPFactsQuery::setFactModelMap(map<Gringo::Symbol, vector<Gringo::Symbol> > factModelMap)
 	{
 		this->factModelMap = factModelMap;
 	}
 
-	void ASPFactsQuery::saveSatisfiedFact(Gringo::Value key, Gringo::Value value)
+	void ASPFactsQuery::saveSatisfiedFact(Gringo::Symbol key, Gringo::Symbol value)
 	{
 		auto entry = this->factModelMap.find(key);
 		if (entry != this->factModelMap.end())
@@ -100,10 +100,10 @@ namespace reasoner
 		}
 	}
 
-	shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ASPFactsQuery::getSatisfiedFacts()
+	shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol> > > ASPFactsQuery::getSatisfiedFacts()
 	{
-		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ret = make_shared<
-				map<Gringo::Value, vector<Gringo::Value> > >();
+		shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol> > > ret = make_shared<
+				map<Gringo::Symbol, vector<Gringo::Symbol> > >();
 		for (auto pair : this->factModelMap)
 		{
 			if (pair.second.size() > 0)
@@ -142,24 +142,24 @@ namespace reasoner
 	{
 	}
 
-	vector<pair<Gringo::Value, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
+	vector<pair<Gringo::Symbol, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
 	{
-		vector<pair<Gringo::Value, ASPTruthValue>> ret;
+		vector<pair<Gringo::Symbol, ASPTruthValue>> ret;
 		for (auto iter : this->getHeadValues())
 		{
 			if (iter.second.size() == 0)
 			{
-				ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
+				ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
 			}
 			else
 			{
 				if (iter.second.at(0).sign())
 				{
-					ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::True));
+					ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::True));
 				}
 				else
 				{
-					ret.push_back(pair<Gringo::Value, ASPTruthValue>(iter.first, ASPTruthValue::False));
+					ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::False));
 				}
 			}
 

@@ -37,7 +37,7 @@ namespace reasoner
 		string expandFactModuleProperty(string fact);
 		void replaceFittingPredicate(string& ruleBody, string predicate);
 		string replaceHeadPredicates(string head);
-		shared_ptr<Gringo::Value> external;
+		shared_ptr<Gringo::Symbol> external;
 		string queryProgramSection;
 		string externalName;
 		void createProgramSection();

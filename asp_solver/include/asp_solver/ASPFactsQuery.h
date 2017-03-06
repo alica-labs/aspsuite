@@ -24,20 +24,20 @@ namespace reasoner
 	public:
 		ASPFactsQuery(ASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPFactsQuery();
-		map<Gringo::Value, vector<Gringo::Value> > getFactModelMap();
-		void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);
-		shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedFacts();
-	void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
-	bool factsExistForAllModels();
-	bool factsExistForAtLeastOneModel();
-	void removeExternal();
-	vector<pair<Gringo::Value, ASPTruthValue>> getASPTruthValues();
+		map<Gringo::Symbol, vector<Gringo::Symbol> > getFactModelMap();
+		void setFactModelMap(map<Gringo::Symbol, vector<Gringo::Symbol> > factModelMap);
+		shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol>>> getSatisfiedFacts();
+		void saveSatisfiedFact(Gringo::Symbol key, Gringo::Symbol value);
+		bool factsExistForAllModels();
+		bool factsExistForAtLeastOneModel();
+		void removeExternal();
+		vector<pair<Gringo::Symbol, ASPTruthValue>> getASPTruthValues();
 
 private:
-	vector<Gringo::Value> queryValues;
+	vector<Gringo::Symbol> queryValues;
 	void createQueryValues(vector<string> queryString);
 	// key := query value, value := predicates that satisfy the query value
-	map<Gringo::Value, vector<Gringo::Value>> factModelMap;
+	map<Gringo::Symbol, vector<Gringo::Symbol>> factModelMap;
 };
 
 }

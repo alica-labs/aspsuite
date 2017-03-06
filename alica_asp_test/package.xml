@@ -12,7 +12,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>clingo_cpp</build_depend>
+  <build_depend>clingo</build_depend>
   <build_depend>cmake_modules</build_depend>
   <build_depend>alica_engine</build_depend>
   <build_depend>alica_dummy_proxy</build_depend>
@@ -24,7 +24,7 @@
   <run_depend>asp_solver</run_depend>
   <run_depend>asp_commons</run_depend>
   <run_depend>asp_solver_wrapper</run_depend>
-  <run_depend>clingo_cpp</run_depend>
+  <run_depend>clingo</run_depend>
   <run_depend>cmake_modules</run_depend>
   <run_depend>alica_engine</run_depend>
   <run_depend>alica_dummy_proxy</run_depend>

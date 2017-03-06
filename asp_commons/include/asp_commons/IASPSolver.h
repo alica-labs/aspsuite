@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <clingo/clingocontrol.hh>
+#include <clingo.hh>
+#include <memory>
 
 using namespace std;
 
@@ -37,12 +39,12 @@ namespace reasoner
 		virtual bool loadFileFromConfig(string configKey) = 0;
 		virtual void loadFile(string filename) = 0;
 
-		virtual void ground(Gringo::Control::GroundVec const &vec, Gringo::Any &&context) = 0;
-		virtual void assignExternal(Gringo::Value ext, Gringo::TruthValue) = 0;
-		virtual void releaseExternal(Gringo::Value ext) = 0;
+		virtual void ground(Gringo::Control::GroundVec const &vec, Gringo::Context *context) = 0;
+		virtual void assignExternal(Gringo::Symbol ext, Potassco::Value_t truthValue) = 0;
+		virtual void releaseExternal(Gringo::Symbol ext) = 0;
 		virtual bool solve() = 0;
 		virtual void add(string const &name, Gringo::FWStringVec const &params, string const &par) = 0;
-		virtual Gringo::Value parseValue(std::string const &str) = 0;
+		virtual Gringo::Symbol parseValue(std::string const &str) = 0;
 		virtual int getQueryCounter() = 0;
 
 		virtual void removeDeadQueries() = 0;

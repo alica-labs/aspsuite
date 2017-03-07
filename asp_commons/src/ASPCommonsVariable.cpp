@@ -18,7 +18,6 @@ namespace reasoner
 
 	ASPCommonsVariable::~ASPCommonsVariable()
 	{
-		// TODO Auto-generated destructor stub
 	}
 
 } /* namespace reasoner */

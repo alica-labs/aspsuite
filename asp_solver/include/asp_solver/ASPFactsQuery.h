@@ -32,13 +32,14 @@ namespace reasoner
 		bool factsExistForAtLeastOneModel();
 		void removeExternal();
 		vector<pair<Gringo::Symbol, ASPTruthValue>> getASPTruthValues();
+		void onModel(ClingoModel& clingoModel);
 
-private:
-	vector<Gringo::Symbol> queryValues;
-	void createQueryValues(vector<string> queryString);
-	// key := query value, value := predicates that satisfy the query value
-	map<Gringo::Symbol, vector<Gringo::Symbol>> factModelMap;
-};
+	private:
+		vector<Gringo::Symbol> queryValues;
+		void createQueryValues(vector<string> queryString);
+		// key := query value, value := predicates that satisfy the query value
+		map<Gringo::Symbol, vector<Gringo::Symbol>> factModelMap;
+	};
 
 }
 /* namespace reasoner */

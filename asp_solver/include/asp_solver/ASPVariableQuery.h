@@ -28,6 +28,7 @@ namespace reasoner
 		vector<string> getRules();
 		ASPQueryType getType();
 		void removeExternal();
+		void onModel(ClingoModel& clingoModel);
 
 	private:
 		void createHeadQueryValues(vector<string> queryVec);

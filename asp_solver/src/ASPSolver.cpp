@@ -100,7 +100,7 @@ namespace reasoner
 		this->modelCount = 0;
 #endif
 		auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
-		if (result == Gringo::SolveResult::Satisfiable)
+		if (result.satisfiable() == Gringo::SolveResult::Satisfiabily::Satisfiable)
 		{
 			return true;
 		}
@@ -120,13 +120,11 @@ namespace reasoner
 		}
 		cout << endl;
 #endif
-		cout << "on Model Called!" << endl;
 		ClingoModel& clingoModel = (ClingoModel&)m;
 		Gringo::SymVec vec;
 		auto tmp = clingoModel.atoms(clingo_show_type_shown);
 		for(int i = 0; i < tmp.size; i++)
 		{
-			cout << "adding atom " << tmp[i] << endl;
 			vec.push_back(tmp[i]);
 		}
 		this->currentModels.push_back(vec);

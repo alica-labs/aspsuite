@@ -28,30 +28,7 @@ namespace reasoner
 
 	void ASPCommonsTerm::addRule(string rule)
 	{
-		//TODO was needed before query rule
-		//test
-//		if (rule.empty())
-//		{
-//			return;
-//		}
-//
-//		rule = supplementary::Configuration::trim(rule);
-//		size_t endOfHead = rule.find(":-");
-//		if (endOfHead != string::npos)
-//		{
-//			// for rules (including variables)
-//			size_t startOfBody = endOfHead + 2;
-//			this->heads.push_back(supplementary::Configuration::trim(rule.substr(0, endOfHead)));
-//			this->bodies.push_back(
-//					supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
-//		}
-//		else
-//		{
-//			// for ground literals
-//			this->heads.push_back(rule);
-//		}
 		this->rules.push_back(rule);
-//			return true;
 	}
 
 	void ASPCommonsTerm::addFact(string fact)

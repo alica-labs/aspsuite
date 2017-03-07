@@ -379,5 +379,50 @@ namespace reasoner
 		return this->type;
 	}
 
+	void ASPVariableQuery::onModel(ClingoModel& clingoModel)
+	{
+		Gringo::SymVec vec;
+		auto tmp = clingoModel.atoms(clingo_show_type_shown);
+		for (int i = 0; i < tmp.size; i++)
+		{
+			vec.push_back(tmp[i]);
+		}
+		this->getCurrentModels()->push_back(vec);
+		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
+
+		// determine the domain of the query predicate
+		for (auto value : this->getHeadValues())
+		{
+#ifdef ASPQUERY_DEBUG
+			cout << "ASPQuery::onModel: " << value.first << endl;
+#endif
+			//TODO find way to use it
+			auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().find(value.first.sig());
+//			auto it = clingoModel.out.domains.find(value.first.sig());
+			if (it == ((ASPSolver*)this->solver)->clingo->out_->predDoms().end())
+			{
+				cout << "ASPQuery: Didn't find any suitable domain!" << endl;
+				continue;
+			}
+
+			for (auto& domainPair : *(*it))
+			{
+				//cout << "ASPQuery: Inside domain-loop!" << endl;
+
+//				if (&(domainPair.second)
+//						&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+//				{
+//					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
+//
+//					if (this->checkMatchValues(&value.first, &domainPair.first))
+//					{
+//						//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
+//						this->saveHeadValuePair(value.first, domainPair.first);
+//					}
+//				}
+			}
+		}
+	}
+
 } /* namespace reasoner */
 

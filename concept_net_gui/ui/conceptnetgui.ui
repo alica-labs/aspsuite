@@ -112,7 +112,7 @@
     <item>
      <widget class="QTabWidget" name="resultTabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="queryResultsTab">
        <attribute name="title">
@@ -206,35 +206,6 @@
                <string/>
               </property>
              </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="externalStatementsTab">
-       <attribute name="title">
-        <string>External Statements</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QScrollArea" name="externalStatementsScrollArea">
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="externalStatementsScrollAreaWidget">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>98</width>
-             <height>96</height>
-            </rect>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
-            <item>
-             <widget class="QTableWidget" name="externalStatementsTable"/>
             </item>
            </layout>
           </widget>

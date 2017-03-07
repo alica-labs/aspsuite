@@ -79,10 +79,10 @@ namespace reasoner
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
 		vector<Gringo::SymVec> getCurrentModels();
+		shared_ptr<ClingoLib> clingo;
 
 	private:
 		bool onModel(Gringo::Model const &m);
-		shared_ptr<ClingoLib> clingo;
 //		Gringo::Control* clingo;
 		DefaultGringoModule* gringoModule;
 		Gringo::ConfigProxy* conf;

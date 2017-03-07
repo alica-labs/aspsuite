@@ -286,7 +286,6 @@ namespace cng
 	void ConceptNetGui::clear()
 	{
 		this->ui->currentModelsLabel->clear();
-		this->ui->externalStatementsTable->clear();
 		this->ui->sortedModelsLabel->clear();
 		this->ui->queryResultsLabel->clear();
 		this->ui->aspRuleTextArea->clear();

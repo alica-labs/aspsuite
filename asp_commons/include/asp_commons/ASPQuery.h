@@ -35,7 +35,7 @@ namespace reasoner
 		void setLifeTime(int lifeTime);
 		void reduceLifeTime();
 
-		void onModel(ClingoModel& clingoModel);
+		virtual void onModel(ClingoModel& clingoModel) = 0;
 
 		map<Gringo::Symbol, Gringo::SymVec> getHeadValues();
 
@@ -49,6 +49,8 @@ namespace reasoner
 
 		string toString();
 		ASPQueryType getType();
+		void saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value);
+		bool checkMatchValues(Gringo::Symbol value1, Gringo::Symbol value2);
 
 	protected:
 		/**
@@ -68,10 +70,6 @@ namespace reasoner
 		string programSection;
 		shared_ptr<ASPCommonsTerm> term;
 		ASPQueryType type;
-
-	private:
-		bool checkMatchValues(const Gringo::Symbol* value1, const Gringo::Symbol* value2);
-		void saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value);
 
 	};
 

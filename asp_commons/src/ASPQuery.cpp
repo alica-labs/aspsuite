@@ -46,76 +46,89 @@ namespace reasoner
 		}
 	}
 
-	void ASPQuery::onModel(ClingoModel& clingoModel)
+//	void ASPQuery::onModel(ClingoModel& clingoModel)
+//	{
+//		Gringo::SymVec vec;
+//		auto tmp = clingoModel.atoms(clingo_show_type_shown);
+//		for(int i = 0; i < tmp.size; i++)
+//		{
+//			vec.push_back(tmp[i]);
+//		}
+//		this->getCurrentModels()->push_back(vec);
+//		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
+//
+//		// determine the domain of the query predicate
+//		for (auto value : this->getHeadValues())
+//		{
+//#ifdef ASPQUERY_DEBUG
+//			cout << "ASPQuery::onModel: " << value.first << endl;
+//#endif
+//			//TODO find way to use it
+////			auto it = clingoModel.out.domains.find(value.first.sig());
+////			if (it == clingoModel.out.domains.end())
+////			{
+////				//cout << "ASPQuery: Didn't find any suitable domain!" << endl;
+////				continue;
+////			}
+////
+////			for (auto& domainPair : it->second.domain)
+////			{
+////				//cout << "ASPQuery: Inside domain-loop!" << endl;
+////
+////				if (&(domainPair.second)
+////						&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
+////				{
+////					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
+////
+////					if (this->checkMatchValues(&value.first, &domainPair.first))
+////					{
+////						//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
+////						this->saveHeadValuePair(value.first, domainPair.first);
+////					}
+////				}
+////			}
+//		}
+//	}
+
+	bool ASPQuery::checkMatchValues(Gringo::Symbol value1, Gringo::Symbol value2)
 	{
-		cout << "On model Called!" << endl;
-		Gringo::SymVec vec;
-		auto tmp = clingoModel.atoms(clingo_show_type_shown);
-		for(int i = 0; i < tmp.size; i++)
+		if (value2.type() != Gringo::SymbolType::Fun)
 		{
-			vec.push_back(tmp[i]);
+			cout << "is function" << endl;
+			return false;
 		}
-		this->getCurrentModels()->push_back(vec);
-		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
 
-		// determine the domain of the query predicate
-		for (auto value : this->getHeadValues())
+		//TODO fix
+//		if (value1.sig().name() != value2.sig().name())
+//		{
+//			cout << "Name:" << value1.sig().name() << " " << value1.name() << " " << value1.string() << " " << value1 << endl;
+//			return false;
+//		}
+		if (value1.args().size != value2.args().size)
 		{
-#ifdef ASPQUERY_DEBUG
-			cout << "ASPQuery::onModel: " << value.first << endl;
-#endif
-			//TODO find way to use it
-//			auto it = clingoModel.out.domains.find(value.first.sig());
-//			if (it == clingoModel.out.domains.end())
-//			{
-//				//cout << "ASPQuery: Didn't find any suitable domain!" << endl;
-//				continue;
-//			}
-//
-//			for (auto& domainPair : it->second.domain)
-//			{
-//				//cout << "ASPQuery: Inside domain-loop!" << endl;
-//
-//				if (&(domainPair.second)
-//						&& clingoModel.model->isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-//				{
-//					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
-//
-//					if (this->checkMatchValues(&value.first, &domainPair.first))
-//					{
-//						//cout << "ASPQuery: Literal '" << domainPair.first << "' matched!" << endl;
-//						this->saveHeadValuePair(value.first, domainPair.first);
-//					}
-//				}
-//			}
+			return false;
 		}
-	}
 
-	bool ASPQuery::checkMatchValues(const Gringo::Symbol* value1, const Gringo::Symbol* value2)
-	{
-		if (value2->type() != Gringo::SymbolType::Fun)
-			return false;
-
-		if (value1->name() != value2->name())
-			return false;
-
-		if (value1->args().size != value2->args().size)
-			return false;
-
-		for (uint i = 0; i < value1->args().size; ++i)
+		for (uint i = 0; i < value1.args().size; ++i)
 		{
-			Gringo::Symbol arg = value1->args()[i];
+			Gringo::Symbol arg = value1.args()[i];
 
 			if (arg.type() == Gringo::SymbolType::Num && std::string(arg.name().c_str()) == IASPSolver::WILDCARD_STRING)
-				continue;
-
-			if (arg.type() == Gringo::SymbolType::Fun && value2->args()[i].type() == Gringo::SymbolType::Fun)
 			{
-				if (false == checkMatchValues(&arg, &value2->args()[i]))
-					return false;
+				continue;
 			}
-			else if (arg != value2->args()[i])
+
+			if (arg.type() == Gringo::SymbolType::Fun && value2.args()[i].type() == Gringo::SymbolType::Fun)
+			{
+				if (false == checkMatchValues(arg, value2.args()[i]))
+				{
+					return false;
+				}
+			}
+			else if (arg != value2.args()[i])
+			{
 				return false;
+			}
 		}
 
 		return true;

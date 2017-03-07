@@ -181,33 +181,26 @@ namespace reasoner
 		// determine the domain of the query predicate
 		for (auto value : this->getHeadValues())
 		{
-//#ifdef ASPQUERY_DEBUG
+#ifdef ASPQUERY_DEBUG
 			cout << "ASPFactsQuery::onModel: " << value.first << endl;
-//#endif
-			//TODO find way to use it
+#endif
 			auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().find(value.first.sig());
-//			auto it = clingoModel.out.domains.find(value.first.sig());
 			if (it == ((ASPSolver*)this->solver)->clingo->out_->predDoms().end())
 			{
 				cout << "ASPFactsQuery: Didn't find any suitable domain!" << endl;
 				continue;
 			}
-			cout << "ASPFactsQuery: Found a suitable domain!" << endl;
-			for (auto domainPred : *(*it))
+			for (int i = 0; i < (*it).get()->size(); i++)
 			{
-				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
+//				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
 
 //				if (&(domainPred)
 //						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 //				{
-					//cout << "ASPQuery: Found true literal '" << domainPair.first << "'" << endl;
-					cout << "ASPFactsQuery: Literal '" << value.first << endl;
-					if (this->checkMatchValues(value.first, domainPred))
-					{
-						cout << "ASPFactsQuery: Literal '" << value.first << "' matched!" << endl;
-						this->saveHeadValuePair(value.first, domainPred);
-					}
-					cout << "ASPFactsQuery: no match!" << endl;
+				if (this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+				{
+					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
+				}
 //				}
 			}
 		}

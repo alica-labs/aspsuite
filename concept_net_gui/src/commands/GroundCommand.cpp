@@ -32,7 +32,7 @@ namespace cng
 	void GroundCommand::execute()
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
-		std::string aspString = program.toStdString();
+		std::string aspString = this->program.toStdString();
 		this->gui->getSolver()->add(this->programSection, {}, aspString);
 		this->gui->getSolver()->ground( { {Gringo::String(this->programSection.c_str()), {}}}, nullptr);
 	}

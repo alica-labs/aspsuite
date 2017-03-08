@@ -16,6 +16,8 @@
 
 #include "handler/CommandHistoryHandler.h"
 
+#include "asp_solver/ASPSolver.h"
+
 #include <ui_conceptnetgui.h>
 
 #include <QNetworkRequest>
@@ -39,7 +41,7 @@ namespace cng
 		this->prefix = QString("cn5_");
 		this->prefixLength = this->prefix.length();
 		// connect signals form handling the http requests
-		this->connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
+		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
 	}
 
@@ -52,7 +54,7 @@ namespace cng
 	void ConceptNetQueryCommand::handleWrongInput()
 	{
 		// parse wrong input
-		auto parsedQuery = query.left(query.indexOf("("));
+		auto parsedQuery = this->query.left(this->query.indexOf("("));
 		//prepare MessageBox
 		QMessageBox msgBox;
 		msgBox.setText(QString("Relation " + parsedQuery + " is not supported by ConceptNet 5!"));
@@ -275,12 +277,20 @@ namespace cng
 
 	void ConceptNetQueryCommand::extractASPPredicates()
 	{
-		QString program = "#program cn5_metaKnowledge.\n";
-		program.append(createASPPredicates());
+		QString programSection = "#program cn5_metaKnowledge";
+		QString program = programSection;
+		program.append(".\n");
+		auto tmp = createASPPredicates();
+		program.append(tmp);
 		std::shared_ptr<GroundCommand> gc = std::make_shared<GroundCommand>(this->gui, program);
 		gc->execute();
 		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
 		sc->execute();
+		auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
+		for(auto pair : pgmMap)
+		{
+			this->gui->getSolver()->add(programSection.toStdString(), {}, pair.second.toStdString());
+		}
 		this->gui->getUi()->conceptNetBtn->setEnabled(true);
 		this->gui->getUi()->conceptNetBtn->setFocus();
 	}
@@ -302,7 +312,7 @@ namespace cng
 		}
 		if (concept.contains("è"))
 		{
-			concept.replace("è" , "e");
+			concept.replace("è", "e");
 		}
 		if (concept.contains("é"))
 		{
@@ -317,7 +327,7 @@ namespace cng
 		/**
 		 * weights directly from conceptnet can not be used in asp predicates since they are double values containing a dot which violates
 		 * the asp syntax
-		 * a possible way is to multiply the weight with 100 and cast it to int keeping the first two digets after the komma and leaving the rest
+		 * a possible way is to multiply the weight with 100 and cast it to int keeping the first two digits after the comma and leaving the rest
 		 * are weights even necessary? perhaps to use it during optimization
 		 */
 		QString ret = "";
@@ -359,21 +369,12 @@ namespace cng
 		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-//			QString tmp = edge->relation;
-//			tmp[0] = tmp[0].toLower();
-//			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-//					conceptToASPPredicate(edge->secondConcept)).append(").\n");
+
 			QString tmp = "";
 			tmp.append(this->prefix).append(edge->relation);
 			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
 					this->prefix).append(conceptToASPPredicate(edge->secondConcept)).append(").\n");
-//			ret.append(expandConceptNetPredicate(tmp));
 			ret.append(tmp);
-//			QString tmpRel = edge->relation;
-//			tmpRel[0] = tmpRel[0].toLower();
-//			ret.append(tmpRel).append("(X, Y) :- not -").append(tmpRel).append("(X, Y), ").append(
-//					conceptToASPPredicate(edge->firstConcept)).append("(X), ").append(conceptToASPPredicate(edge->secondConcept)).append("(Y)").append(".\n");
-
 		}
 		return ret;
 	}
@@ -392,8 +393,41 @@ namespace cng
 		return false;
 	}
 
-	std::vector<QString> ConceptNetQueryCommand::extractBackgroundKnowledgePrograms(QString conceptNetProgram)
+	std::map<QString, QString> ConceptNetQueryCommand::extractBackgroundKnowledgePrograms(QString conceptNetProgram)
 	{
+		std::map<QString, QString> ret;
+		std::vector<QString> addedRelations;
+		for (auto edge : this->currentConceptNetCall->edges)
+		{
+			QString tmpRel = edge->relation;
+			tmpRel[0] = tmpRel[0].toLower();
+			auto it = find(addedRelations.begin(), addedRelations.end(), tmpRel);
+			if (it == addedRelations.end())
+			{
+				addedRelations.push_back(tmpRel);
+				QString pgm = "#program cn5Knowledge(n,m).\n";
+				pgm.append("#external -").append(tmpRel).append("(n, m).\n");
+				pgm.append(tmpRel).append("(n, m) :- not -").append(tmpRel).append("(n, m), ").append(
+						conceptToASPPredicate(edge->firstConcept)).append("(n), ").append(
+						conceptToASPPredicate(edge->secondConcept)).append("(m)").append(".\n");
+				ret.emplace(tmpRel, pgm);
+
+			}
+			else
+			{
+				ret.at(tmpRel).append(tmpRel).append("(n, m) :- not -").append(tmpRel).append("(n, m), ").append(
+						conceptToASPPredicate(edge->firstConcept)).append("(n), ").append(
+						conceptToASPPredicate(edge->secondConcept)).append("(m)").append(".\n");
+			}
+
+		}
+#ifdef ConceptNetQueryCommandDebug
+		for(auto pgm : ret)
+		{
+			std::cout << pgm.second.toStdString() << std::endl;
+		}
+#endif
+		return ret;
 	}
 
 } /* namespace cng */

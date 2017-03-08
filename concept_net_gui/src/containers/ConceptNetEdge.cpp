@@ -31,8 +31,8 @@ namespace cng
 	std::string ConceptNetEdge::toString()
 	{
 		std::stringstream ss;
-		ss << "Edge: " << firstConcept.toStdString() << " " << relation.toStdString() << " " << secondConcept.toStdString()
-				<< " Weight: " << weight << " Number of sources: " << this->sources.size() << std::endl;
+		ss << "Edge: " << this->firstConcept.toStdString() << " " << this->relation.toStdString() << " " << this->secondConcept.toStdString()
+				<< " Weight: " << this->weight << " Number of sources: " << this->sources.size() << std::endl;
 		return ss.str();
 	}
 

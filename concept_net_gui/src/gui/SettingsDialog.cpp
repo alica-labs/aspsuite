@@ -35,13 +35,13 @@ namespace cng
 
 	Ui::SettingsDialog* SettingsDialog::getUi()
 	{
-		return ui;
+		return this->ui;
 	}
 
 	SettingsDialog::~SettingsDialog()
 	{
 		delete this->settingsFile;
-		delete ui;
+		delete this->ui;
 	}
 
 
@@ -94,7 +94,7 @@ namespace cng
 
 	std::shared_ptr<SolverSettings> SettingsDialog::getDefaultSettings()
 	{
-		return defaultSettings;
+		return this->defaultSettings;
 	}
 
 	void SettingsDialog::fillSettingsList()
@@ -134,7 +134,7 @@ namespace cng
 		}
 		std::cout << "SettingsDialog: applying parameters: " << currentSettings->argString << std::endl;
 		std::shared_ptr<ChangeSolverSettingsCommand> cmd = std::make_shared<ChangeSolverSettingsCommand>(this->mainGui, this,
-																								currentSettings);
+																								this->currentSettings);
 		cmd->execute();
 		writeSettings();
 		this->close();

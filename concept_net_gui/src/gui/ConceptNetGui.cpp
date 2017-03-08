@@ -63,7 +63,7 @@ namespace cng
 		this->connectGuiElements();
 		this->isDockerInstalled = checkDockerInstallation();
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
-		if (isDockerInstalled && isConcneptNetInstalled)
+		if (this->isDockerInstalled && this->isConcneptNetInstalled)
 		{
 			int i = std::system("docker start conceptnet5_conceptnet-web_1");
 			std::cout << "ConceptNetGui: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
@@ -74,7 +74,7 @@ namespace cng
 
 	ConceptNetGui::~ConceptNetGui()
 	{
-		if (isDockerInstalled && isConcneptNetInstalled)
+		if (this->isDockerInstalled && this->isConcneptNetInstalled)
 		{
 			std::cout << "Quitting the application. It may take a few seconds to shutdown ConceptNet 5." << std::endl;
 			int i = std::system("docker stop conceptnet5_conceptnet-web_1");
@@ -121,12 +121,12 @@ namespace cng
 	{
 		if (this->settings == nullptr)
 		{
-			msgBox->setWindowTitle("New Solver");
-			msgBox->setText("No Solver Settings given!");
-			msgBox->setInformativeText("Create Solver with default Settings?");
-			msgBox->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-			msgBox->setDefaultButton(QMessageBox::Cancel);
-			int btn = msgBox->exec();
+			this->msgBox->setWindowTitle("New Solver");
+			this->msgBox->setText("No Solver Settings given!");
+			this->msgBox->setInformativeText("Create Solver with default Settings?");
+			this->msgBox->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			this->msgBox->setDefaultButton(QMessageBox::Cancel);
+			int btn = this->msgBox->exec();
 			if (btn == QMessageBox::Ok)
 			{
 				std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
@@ -167,13 +167,13 @@ namespace cng
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
 			std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(this,
-																				ui->aspRuleTextArea->toPlainText());
+																				this->ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 		else
 		{
 			std::shared_ptr<VariableQueryCommand> cmd = std::make_shared<VariableQueryCommand>(
-					this, ui->aspRuleTextArea->toPlainText());
+					this, this->ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 	}
@@ -202,7 +202,7 @@ namespace cng
 
 		else
 		{
-			if (isDockerInstalled && isConcneptNetInstalled)
+			if (this->isDockerInstalled && this->isConcneptNetInstalled)
 			{
 				this->ui->conceptNetBtn->setEnabled(enable);
 			}
@@ -223,11 +223,15 @@ namespace cng
 		std::string result;
 		std::shared_ptr<FILE> pipe(popen("docker -v", "r"), pclose);
 		if (!pipe)
+		{
 			throw std::runtime_error("popen() failed!");
+		}
 		while (!feof(pipe.get()))
 		{
 			if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+			{
 				result += buffer.data();
+			}
 		}
 #ifdef GUIDEUG
 		cout << "ConceptNetGui: " << result << endl;
@@ -241,11 +245,15 @@ namespace cng
 		std::string result;
 		std::shared_ptr<FILE> pipe(popen("docker ps -a", "r"), pclose);
 		if (!pipe)
+		{
 			throw std::runtime_error("popen() failed!");
+		}
 		while (!feof(pipe.get()))
 		{
 			if (fgets(buffer.data(), 128, pipe.get()) != NULL)
+			{
 				result += buffer.data();
+			}
 		}
 #ifdef GUIDEUG
 		cout << "ConceptNetGui: " << result << endl;
@@ -255,7 +263,7 @@ namespace cng
 
 	std::vector<QString> ConceptNetGui::getConceptNetBaseRealtions()
 	{
-		return conceptNetBaseRealtions;
+		return this->conceptNetBaseRealtions;
 	}
 
 	void ConceptNetGui::connectGuiElements()
@@ -279,8 +287,8 @@ namespace cng
 
 		// Command History
 		this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));
-		this->connect(strgZShortcut, SIGNAL(activated()), this->chHandler, SLOT(undoHistory()));
-		this->connect(escShortcut, SIGNAL(activated()), this->chHandler, SLOT(removeFocus()));
+		this->connect(this->strgZShortcut, SIGNAL(activated()), this->chHandler, SLOT(undoHistory()));
+		this->connect(this->escShortcut, SIGNAL(activated()), this->chHandler, SLOT(removeFocus()));
 	}
 
 	void ConceptNetGui::clear()
@@ -298,17 +306,17 @@ namespace cng
 
 	Ui::ConceptNetGui* ConceptNetGui::getUi()
 	{
-		return ui;
+		return this->ui;
 	}
 
 	std::shared_ptr<SolverSettings> ConceptNetGui::getSettings()
 	{
-		return settings;
+		return this->settings;
 	}
 
 	reasoner::ASPSolver* ConceptNetGui::getSolver()
 	{
-		return solver;
+		return this->solver;
 	}
 
 	void ConceptNetGui::setSolver(reasoner::ASPSolver* solver)

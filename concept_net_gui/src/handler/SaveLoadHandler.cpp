@@ -9,8 +9,6 @@
 
 #include "gui/ConceptNetGui.h"
 #include "gui/SettingsDialog.h"
-#include <ui_conceptnetgui.h>
-#include <ui_settingsdialog.h>
 
 #include "commands/NewSolverCommand.h"
 #include "commands/ChangeSolverSettingsCommand.h"
@@ -22,6 +20,9 @@
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
+
+#include <ui_conceptnetgui.h>
+#include <ui_settingsdialog.h>
 
 #include <QString>
 #include <QFileDialog>

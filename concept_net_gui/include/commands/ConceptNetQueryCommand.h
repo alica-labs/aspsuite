@@ -108,7 +108,7 @@ namespace cng
 
 		int prefixLength;
 
-		std::vector<QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
+		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
 
 	signals:
 		/**

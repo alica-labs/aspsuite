@@ -65,12 +65,12 @@ namespace cng
 
 	vector<Gringo::SymVec> SolveCommand::getCurrentModels()
 	{
-		return currentModels;
+		return this->currentModels;
 	}
 
 	bool SolveCommand::isSatisfiable()
 	{
-		return satisfiable;
+		return this->satisfiable;
 	}
 
 	void SolveCommand::printSortedModels()

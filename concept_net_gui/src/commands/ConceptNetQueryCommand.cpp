@@ -6,6 +6,8 @@
  */
 
 #include "commands/ConceptNetQueryCommand.h"
+#include "commands/GroundCommand.h"
+#include "commands/SolveCommand.h"
 
 #include "containers/ConceptNetCall.h"
 #include "containers/ConceptNetEdge.h"
@@ -273,14 +275,19 @@ namespace cng
 
 	void ConceptNetQueryCommand::extractASPPredicates()
 	{
-		this->gui->getUi()->aspRuleTextArea->setText(createASPPredicates());
+		QString program = "#program cn5_metaKnowledge.\n";
+		program.append(createASPPredicates());
+		std::shared_ptr<GroundCommand> gc = std::make_shared<GroundCommand>(this->gui, program);
+		gc->execute();
+		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
+		sc->execute();
 		this->gui->getUi()->conceptNetBtn->setEnabled(true);
 		this->gui->getUi()->conceptNetBtn->setFocus();
 	}
 
 	QString ConceptNetQueryCommand::conceptToASPPredicate(QString concept)
 	{
-		//  remove chars not supported by asp
+		//  remove chars not supported by asp (UTF-8 or syntax symbols)
 		if (concept.contains('.'))
 		{
 			concept.replace('.', '_');
@@ -292,6 +299,14 @@ namespace cng
 		if (concept.contains(' '))
 		{
 			concept.replace(' ', '_');
+		}
+		if (concept.contains("è"))
+		{
+			concept.replace("è" , "e");
+		}
+		if (concept.contains("é"))
+		{
+			concept.replace("é", "e");
 		}
 		return concept;
 	}
@@ -354,10 +369,10 @@ namespace cng
 					this->prefix).append(conceptToASPPredicate(edge->secondConcept)).append(").\n");
 //			ret.append(expandConceptNetPredicate(tmp));
 			ret.append(tmp);
-			QString tmpRel = edge->relation;
-			tmpRel[0] = tmpRel[0].toLower();
-			ret.append(tmpRel).append("(X, Y) :- not -").append(tmpRel).append("(X, Y), ").append(
-					conceptToASPPredicate(edge->firstConcept)).append("(X), ").append(conceptToASPPredicate(edge->secondConcept)).append("(Y)").append(".\n");
+//			QString tmpRel = edge->relation;
+//			tmpRel[0] = tmpRel[0].toLower();
+//			ret.append(tmpRel).append("(X, Y) :- not -").append(tmpRel).append("(X, Y), ").append(
+//					conceptToASPPredicate(edge->firstConcept)).append("(X), ").append(conceptToASPPredicate(edge->secondConcept)).append("(Y)").append(".\n");
 
 		}
 		return ret;
@@ -375,6 +390,10 @@ namespace cng
 			}
 		}
 		return false;
+	}
+
+	std::vector<QString> ConceptNetQueryCommand::extractBackgroundKnowledgePrograms(QString conceptNetProgram)
+	{
 	}
 
 } /* namespace cng */

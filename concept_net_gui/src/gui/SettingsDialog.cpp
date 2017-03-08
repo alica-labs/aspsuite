@@ -26,7 +26,7 @@ namespace cng
 		connectElements();
 		this->ui->safeSortedModelscheckBox->setChecked(true);
 //		this->defaultSettings = std::make_shared<SolverSettings>("Default", "clingo, -W, no-atom-undefined, --number=1");
-		this->defaultSettings = std::make_shared<SolverSettings>("DefaultCLingo5", "clingo");
+		this->defaultSettings = std::make_shared<SolverSettings>("DefaultClingo5", "clingo");
 		this->settingsFile = new QFile(QDir::homePath() + "/.conceptNetSettings.txt");
 		this->currentSettings = nullptr;
 		loadSettingsFromConfig();

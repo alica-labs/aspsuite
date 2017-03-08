@@ -105,7 +105,10 @@ namespace cng
 		void callUrl(QUrl url);
 
 		QString prefix;
+
 		int prefixLength;
+
+		std::vector<QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
 
 	signals:
 		/**

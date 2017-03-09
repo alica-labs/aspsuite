@@ -34,7 +34,7 @@ namespace cng
 
 		ConceptNetGui* gui;
 		QString program;
-		std::string programSection;
+		QString programSection;
 		std::string historyProgramSection;
 
 	private:

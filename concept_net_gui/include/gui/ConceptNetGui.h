@@ -131,6 +131,10 @@ namespace cng
 		 * Slot for ConceptNet call
 		 */
 		void conceptNetCallBack();
+		/**
+		 * Slot for Add call
+		 */
+		void addCallBack();
 
 	private:
 

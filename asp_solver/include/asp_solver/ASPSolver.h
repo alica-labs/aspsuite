@@ -79,6 +79,8 @@ namespace reasoner
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
 		vector<Gringo::SymVec> getCurrentModels();
+		DefaultGringoModule* getGringoModule();
+
 		shared_ptr<ClingoLib> clingo;
 
 	private:

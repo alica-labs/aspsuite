@@ -21,6 +21,7 @@
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
+#include "commands/AddCommand.h"
 
 #include <ui_conceptnetgui.h>
 
@@ -60,73 +61,78 @@ namespace cng
 	}
 
 	void CommandHistoryHandler::fillCommandHistory()
+	{
+		drawHistoryTable();
+		//fill history table with right commands
+		for (auto cmd : this->gui->commandHistory)
 		{
-			drawHistoryTable();
-			//fill history table with right commands
-			for (auto cmd : this->gui->commandHistory)
+			int pos = this->gui->getUi()->commandHistoryTable->rowCount();
+			this->gui->getUi()->commandHistoryTable->insertRow(pos);
+
+			auto item = new QTableWidgetItem(QString(cmd->getType().c_str()));
+			item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+			this->gui->getUi()->commandHistoryTable->setItem(pos, 0, item);
+
+			if (cmd->getType().compare("New Solver") == 0)
 			{
-				int pos = this->gui->getUi()->commandHistoryTable->rowCount();
-				this->gui->getUi()->commandHistoryTable->insertRow(pos);
-
-				auto item = new QTableWidgetItem(QString(cmd->getType().c_str()));
-				item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-				this->gui->getUi()->commandHistoryTable->setItem(pos, 0, item);
-
-				if (cmd->getType().compare("New Solver") == 0)
-				{
-					this->addNewSolverCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Change Settings") == 0)
-				{
-					this->addChangeSolverSettingsCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Concept Net") == 0)
-				{
-					this->addConceptNetQueryCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Facts Query") == 0)
-				{
-					this->addFactsQueryCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Ground") == 0)
-				{
-					this->addGroundCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Load Logic Program") == 0)
-				{
-					this->addLoadBackgroundKnowledgeCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Load Saved Program") == 0)
-				{
-					this->addLoadSavedProgramCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Variable Query") == 0)
-				{
-					this->addVariableQueryCommandToHistory(cmd, pos);
-					continue;
-				}
-				else if (cmd->getType().compare("Solve") == 0)
-				{
-					this->addSolveCommandToHistory(cmd, pos);
-					continue;
-				}
-				else
-				{
-					std::cout << "ConceptNetGui: Command with unknown type found!" << std::endl;
-					auto item2 = new QTableWidgetItem(QString("Command with unknown type found!"));
-					item2->setFlags(item2->flags() ^ Qt::ItemIsEditable);
-					this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item2);
-				}
+				this->addNewSolverCommandToHistory(cmd, pos);
+				continue;
 			}
-			this->gui->getUi()->commandHistoryTable->scrollToBottom();
+			else if (cmd->getType().compare("Change Settings") == 0)
+			{
+				this->addChangeSolverSettingsCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Concept Net") == 0)
+			{
+				this->addConceptNetQueryCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Facts Query") == 0)
+			{
+				this->addFactsQueryCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Ground") == 0)
+			{
+				this->addGroundCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Load Logic Program") == 0)
+			{
+				this->addLoadBackgroundKnowledgeCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Load Saved Program") == 0)
+			{
+				this->addLoadSavedProgramCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Variable Query") == 0)
+			{
+				this->addVariableQueryCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Solve") == 0)
+			{
+				this->addSolveCommandToHistory(cmd, pos);
+				continue;
+			}
+			else if (cmd->getType().compare("Add") == 0)
+			{
+				this->addAddCommandToHistory(cmd, pos);
+				continue;
+			}
+			else
+			{
+				std::cout << "ConceptNetGui: Command with unknown type found!" << std::endl;
+				auto item2 = new QTableWidgetItem(QString("Command with unknown type found!"));
+				item2->setFlags(item2->flags() ^ Qt::ItemIsEditable);
+				this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item2);
+			}
 		}
+		this->gui->getUi()->commandHistoryTable->scrollToBottom();
+	}
 
 	void CommandHistoryHandler::addNewSolverCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
@@ -138,8 +144,9 @@ namespace cng
 
 	void CommandHistoryHandler::addChangeSolverSettingsCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
-		auto item = new QTableWidgetItem(
-				QString(std::dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
+		auto item =
+				new QTableWidgetItem(
+						QString(std::dynamic_pointer_cast<ChangeSolverSettingsCommand>(cmd)->currentSettings->argString.c_str()));
 		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 	}
@@ -169,7 +176,7 @@ namespace cng
 	void CommandHistoryHandler::addSolveCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
 		QString satisfiable;
-		if(std::dynamic_pointer_cast<SolveCommand>(cmd)->isSatisfiable())
+		if (std::dynamic_pointer_cast<SolveCommand>(cmd)->isSatisfiable())
 		{
 			satisfiable = QString("satisfied");
 		}
@@ -203,6 +210,13 @@ namespace cng
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 	}
 
+	void CommandHistoryHandler::addAddCommandToHistory(std::shared_ptr<Command> cmd, int pos)
+	{
+		auto item = new QTableWidgetItem(
+				QString(std::dynamic_pointer_cast<AddCommand>(cmd)->historyProgramSection.c_str()));
+		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
+	}
 	void CommandHistoryHandler::addToCommandHistory(std::shared_ptr<Command> cmd)
 	{
 		this->gui->commandHistory.push_back(cmd);
@@ -223,3 +237,4 @@ namespace cng
 	}
 
 } /* namespace cng */
+

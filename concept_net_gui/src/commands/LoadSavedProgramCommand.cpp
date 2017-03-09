@@ -22,6 +22,7 @@
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
+#include "commands/AddCommand.h"
 
 namespace cng
 {
@@ -132,6 +133,14 @@ namespace cng
 			else if (cmd["type"].toString().toStdString().compare("Solve") == 0)
 			{
 				std::shared_ptr<SolveCommand> c = std::make_shared<SolveCommand>(this->gui);
+				c->execute();
+				emit this->gui->updateCommandList();
+				continue;
+			}
+			//Handle add command
+			else if (cmd["type"].toString().toStdString().compare("Add") == 0)
+			{
+				std::shared_ptr<AddCommand> c = std::make_shared<AddCommand>(this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

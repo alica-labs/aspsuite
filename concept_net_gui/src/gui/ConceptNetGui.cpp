@@ -15,6 +15,7 @@
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
+#include "commands/AddCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 #include "handler/SaveLoadHandler.h"
@@ -147,7 +148,8 @@ namespace cng
 		{
 			return;
 		}
-		std::shared_ptr<GroundCommand> cmd = std::make_shared<GroundCommand>(this, this->ui->aspRuleTextArea->toPlainText());
+		std::shared_ptr<GroundCommand> cmd = std::make_shared<GroundCommand>(
+				this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
 
@@ -166,8 +168,8 @@ namespace cng
 		}
 		if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard")))
 		{
-			std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(this,
-																				this->ui->aspRuleTextArea->toPlainText());
+			std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(
+					this, this->ui->aspRuleTextArea->toPlainText());
 			cmd->execute();
 		}
 		else
@@ -186,6 +188,16 @@ namespace cng
 		}
 		std::shared_ptr<ConceptNetQueryCommand> cmd = std::make_shared<ConceptNetQueryCommand>(
 				this, this->ui->aspRuleTextArea->toPlainText());
+		cmd->execute();
+	}
+
+	void ConceptNetGui::addCallBack()
+	{
+		if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated())
+		{
+			return;
+		}
+		std::shared_ptr<AddCommand> cmd = std::make_shared<AddCommand>(this, this->ui->aspRuleTextArea->toPlainText());
 		cmd->execute();
 	}
 
@@ -210,6 +222,7 @@ namespace cng
 		this->ui->groundBtn->setEnabled(enable);
 		this->ui->solveBtn->setEnabled(enable);
 		this->ui->queryBtn->setEnabled(enable);
+		this->ui->addBtn->setEnabled(enable);
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
 		this->ui->numberOfModelsSpinBox->setEnabled(enable);
@@ -284,6 +297,7 @@ namespace cng
 		this->connect(this->ui->solveBtn, SIGNAL(released()), this, SLOT(solveCallBack()));
 		this->connect(this->ui->queryBtn, SIGNAL(released()), this, SLOT(queryCallBack()));
 		this->connect(this->ui->conceptNetBtn, SIGNAL(released()), this, SLOT(conceptNetCallBack()));
+		this->connect(this->ui->addBtn, SIGNAL(released()), this, SLOT(addCallBack()));
 
 		// Command History
 		this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));

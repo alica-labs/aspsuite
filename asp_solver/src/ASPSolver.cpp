@@ -463,5 +463,10 @@ namespace reasoner
 		return registeredQueries;
 	}
 
+	DefaultGringoModule* ASPSolver::getGringoModule()
+	{
+		return gringoModule;
+	}
+
 } /* namespace reasoner */
 

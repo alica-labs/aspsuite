@@ -33,8 +33,31 @@ namespace cng
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		std::string aspString = this->program.toStdString();
-		this->gui->getSolver()->add(this->programSection, {}, aspString);
-		this->gui->getSolver()->ground( { {Gringo::String(this->programSection.c_str()), {}}}, nullptr);
+		if (this->program.contains("\n"))
+		{
+			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+		}
+		if (this->programSection.contains("(") && this->programSection.contains(")"))
+		{
+			auto indexLeft = this->programSection.indexOf("(");
+			auto indexRight = this->programSection.indexOf(")");
+			auto gringo = ((reasoner::ASPSolver*)this->gui->getSolver())->getGringoModule();
+			auto tmp = this->programSection.mid(indexLeft + 1, indexRight - indexLeft - 1);
+			this->programSection = this->programSection.left(indexLeft);
+			auto symVec = Gringo::SymVec();
+			auto paramList = tmp.split(",", QString::SplitBehavior::SkipEmptyParts);
+			for (auto it : paramList)
+			{
+				symVec.push_back(gringo->parseValue(it.toStdString().c_str(), nullptr, 20));
+			}
+			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), symVec}},
+											nullptr);
+		}
+		else
+		{
+			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), {}}},
+											nullptr);
+		}
 	}
 
 	void GroundCommand::undo()
@@ -61,7 +84,7 @@ namespace cng
 			size_t end = tmp.find_first_of(".");
 			tmp = tmp.substr(start, end - start);
 			this->historyProgramSection = tmp;
-			this->programSection = QString(tmp.substr(prefixLength, end - prefixLength).c_str()).trimmed().toStdString();
+			this->programSection = QString(tmp.substr(prefixLength, end - prefixLength).c_str()).trimmed();
 		}
 	}
 

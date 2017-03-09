@@ -100,6 +100,10 @@ namespace cng
 		 * Add Facts Query element to history
 		 */
 		void addFactsQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos);
+		/**
+		 * Add Add element to history
+		 */
+		void addAddCommandToHistory(std::shared_ptr<Command> cmd, int pos);
 	};
 
 } /* namespace cng */

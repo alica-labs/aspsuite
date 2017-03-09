@@ -16,8 +16,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
 
-#message("#### ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
-#message("#### ZMQ-Libraries: ${ZeroMQ_LIBRARIES}") 
+message("#### ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
+message("#### ZMQ-Libraries: ${ZeroMQ_LIBRARIES}") 
 
 # Catkin Stuff
 find_package(catkin QUIET)
@@ -41,6 +41,7 @@ include_directories(
   ${ZeroMQ_INCLUDE_DIRS}
 )
 
+## DISCOVERY
 add_executable(${PROJECT_NAME}
   src/Discovery.cpp
 )
@@ -54,3 +55,16 @@ if (NOT catkin_FOUND)
  target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif (NOT catkin_FOUND)
 
+## TEST
+add_executable(Test
+  src/Test.cpp
+)
+
+target_link_libraries(Test
+  ${catkin_LIBRARIES} 
+  ${ZeroMQ_LIBRARIES}
+)
+
+if (NOT catkin_FOUND)
+ target_include_directories(Test PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif (NOT catkin_FOUND)

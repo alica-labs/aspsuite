@@ -7,7 +7,11 @@
   <maintainer email="opfer@vs.uni-kassel.de">Stephan Opfer</maintainer>
 
   <license>MIT</license>
-
+  
+  <build_depend>event_handling</build_depend>
+  
+  <run_depend>event_handling</run_depend>
+  
   <buildtool_depend>catkin</buildtool_depend>
 
   <export>

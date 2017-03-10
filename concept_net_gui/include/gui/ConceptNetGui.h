@@ -135,6 +135,10 @@ namespace cng
 		 * Slot for Add call
 		 */
 		void addCallBack();
+		/**
+		 * Slot for ApplyExternal call
+		 */
+		void applyExternalCallBack();
 
 	private:
 

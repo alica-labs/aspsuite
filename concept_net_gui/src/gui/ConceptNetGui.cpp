@@ -201,6 +201,18 @@ namespace cng
 		cmd->execute();
 	}
 
+	void ConceptNetGui::applyExternalCallBack()
+	{
+		if(!this->ui->externalsTable->selectionModel()->selectedRows().size() != 1)
+		{
+			std::cout << "returning" << std::endl;
+			return;
+		}
+		std::cout << "test" << std::endl;
+		//TODO
+	}
+
+
 	void ConceptNetGui::enableGui(bool enable)
 	{
 		this->ui->actionLoad_Background_Knowledge->setEnabled(enable);
@@ -228,6 +240,7 @@ namespace cng
 		this->ui->numberOfModelsSpinBox->setEnabled(enable);
 		this->ui->numberOfmodelsLabel->setEnabled(enable);
 		this->ui->showModelsCheckBox->setEnabled(enable);
+		this->ui->applyBtn->setEnabled(enable);
 	}
 
 	bool ConceptNetGui::checkDockerInstallation()
@@ -298,6 +311,7 @@ namespace cng
 		this->connect(this->ui->queryBtn, SIGNAL(released()), this, SLOT(queryCallBack()));
 		this->connect(this->ui->conceptNetBtn, SIGNAL(released()), this, SLOT(conceptNetCallBack()));
 		this->connect(this->ui->addBtn, SIGNAL(released()), this, SLOT(addCallBack()));
+		this->connect(this->ui->applyBtn, SIGNAL(released()), this, SLOT(applyExternalCallBack()));
 
 		// Command History
 		this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));

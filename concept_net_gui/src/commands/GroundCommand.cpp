@@ -14,6 +14,8 @@
 
 #include <QString>
 
+#include <ui_conceptnetgui.h>
+
 namespace cng
 {
 
@@ -36,6 +38,7 @@ namespace cng
 		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
 			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
 		}
 		if (this->programSection.contains("(") && this->programSection.contains(")"))
 		{

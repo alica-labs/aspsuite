@@ -192,6 +192,12 @@ namespace cng
 		 * Connect Gui elements to corresponding slots
 		 */
 		void connectGuiElements();
+
+		/**
+		 * Set auto wrap on labels and enable selection with mouse
+		 */
+		void configureLabels();
+
 		/**
 		 * true if docker is installed
 		 */

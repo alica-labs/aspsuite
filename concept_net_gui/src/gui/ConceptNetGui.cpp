@@ -39,6 +39,7 @@
 
 namespace cng
 {
+
 	ConceptNetGui::ConceptNetGui(QWidget *parent) :
 			QMainWindow(parent), ui(new Ui::ConceptNetGui)
 	{
@@ -55,12 +56,7 @@ namespace cng
 		this->settings = nullptr;
 		this->solver = nullptr;
 		this->enableGui(false);
-		this->ui->currentModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-		this->ui->currentModelsLabel->setWordWrap(true);
-		this->ui->queryResultsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-		this->ui->queryResultsLabel->setWordWrap(true);
-		this->ui->sortedModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-		this->ui->sortedModelsLabel->setWordWrap(true);
+		configureLabels();
 		this->ui->showModelsCheckBox->setChecked(true);
 		this->connectGuiElements();
 		this->isDockerInstalled = checkDockerInstallation();
@@ -387,6 +383,18 @@ namespace cng
 			}
 		}
 		return true;
+	}
+
+	void ConceptNetGui::configureLabels()
+	{
+		this->ui->currentModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->currentModelsLabel->setWordWrap(true);
+		this->ui->queryResultsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->queryResultsLabel->setWordWrap(true);
+		this->ui->sortedModelsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->sortedModelsLabel->setWordWrap(true);
+		this->ui->programLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		this->ui->programLabel->setWordWrap(true);
 	}
 
 }

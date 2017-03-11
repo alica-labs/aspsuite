@@ -15,6 +15,8 @@
 
 #include <QString>
 
+#include <ui_conceptnetgui.h>
+
 namespace cng
 {
 
@@ -34,13 +36,25 @@ namespace cng
 	void AssignExternalCommand::execute()
 	{
 		auto external = this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr, 20);
-		auto tmp = this->gui->getSolver()->clingo->lookup(external);
-		if(!this->gui->getSolver()->clingo->external(tmp))
+		auto symbolPos = this->gui->getSolver()->clingo->lookup(external);
+		if(!this->gui->getSolver()->clingo->valid(symbolPos)|| !this->gui->getSolver()->clingo->external(symbolPos))
 		{
+			this->gui->getUi()->externalTextEdit->setText(QString("Invalid or Released External!"));
 			this->undo();
 			return;
 		}
-//		this->gui->getSolver()->assignExternal()
+		if(this->truthValue.compare("True") == 0)
+		{
+			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::True);
+		}
+		else if (this->truthValue.compare("False") == 0)
+		{
+			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::False);
+		}
+		else
+		{
+			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::Release);
+		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 

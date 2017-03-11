@@ -143,7 +143,8 @@ namespace reasoner
 	void ASPSolver::releaseExternal(Gringo::Symbol ext)
 	{
 		this->clingo->assignExternal(ext, Potassco::Value_t::False);
-		this->clingo->assignExternal(ext, Potassco::Value_t::Free);
+		//TODO test was free before
+		this->clingo->assignExternal(ext, Potassco::Value_t::Release);
 	}
 
 	void ASPSolver::add(const string& name, const Gringo::FWStringVec& params, const string& par)

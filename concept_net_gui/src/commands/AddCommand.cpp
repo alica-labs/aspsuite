@@ -13,6 +13,8 @@
 
 #include <asp_solver/ASPSolver.h>
 
+#include <ui_conceptnetgui.h>
+
 namespace cng
 {
 
@@ -32,6 +34,7 @@ namespace cng
 	{
 		std::string aspString = this->program.toStdString();
 		this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+		this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}
 

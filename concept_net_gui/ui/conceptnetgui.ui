@@ -136,8 +136,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -169,8 +169,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -202,8 +202,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -238,8 +238,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>98</width>
+             <height>96</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -299,48 +299,49 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QTableWidget" name="externalsTable">
-              <property name="wordWrap">
-               <bool>true</bool>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
               </property>
-              <property name="columnCount">
-               <number>2</number>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
               </property>
-              <attribute name="horizontalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderDefaultSectionSize">
-               <number>400</number>
-              </attribute>
-              <attribute name="horizontalHeaderHighlightSections">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderDefaultSectionSize">
-               <number>30</number>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>External Statement</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Truth Value</string>
-               </property>
-              </column>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="externalNameLabel">
+              <property name="text">
+               <string>External Name:</string>
+              </property>
              </widget>
             </item>
             <item>
+             <widget class="QLineEdit" name="externalTextEdit"/>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="externalLayout">
+              <item>
+               <widget class="QComboBox" name="truthValueComboBox">
+                <item>
+                 <property name="text">
+                  <string>True</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>False</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Release</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
               <item>
                <widget class="QPushButton" name="applyBtn">
                 <property name="text">
@@ -362,6 +363,19 @@
                </spacer>
               </item>
              </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>

@@ -43,6 +43,7 @@ set(conceptNetGui_SRCS
   src/commands/VariableQueryCommand.cpp
   src/commands/LoadBackgroundKnowledgeCommand.cpp
   src/commands/AddCommand.cpp
+  src/commands/AssignExternalCommand.cpp
   src/handler/SaveLoadHandler.cpp
   src/handler/CommandHistoryHandler.cpp
   
@@ -65,6 +66,7 @@ set(conceptNetGui_HDRS
   include/commands/VariableQueryCommand.h
   include/commands/LoadBackgroundKnowledgeCommand.h
   include/commands/AddCommand.h
+  include/commands/AssignExternalCommand.h
   include/handler/SaveLoadHandler.h
   include/handler/CommandHistoryHandler.h
 )

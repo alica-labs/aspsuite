@@ -203,12 +203,11 @@ namespace cng
 
 	void ConceptNetGui::applyExternalCallBack()
 	{
-		if(!this->ui->externalsTable->selectionModel()->selectedRows().size() != 1)
+		if(this->ui->externalTextEdit->text().isEmpty())
 		{
-			std::cout << "returning" << std::endl;
 			return;
 		}
-		std::cout << "test" << std::endl;
+		std::cout << this->ui->truthValueComboBox->currentText().toStdString() << std::endl;
 		//TODO
 	}
 

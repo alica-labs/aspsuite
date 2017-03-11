@@ -23,6 +23,7 @@
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
 #include "commands/AddCommand.h"
+#include "commands/AssignExternalCommand.h"
 
 namespace cng
 {
@@ -62,7 +63,7 @@ namespace cng
 				std::shared_ptr<NewSolverCommand> c = std::make_shared<NewSolverCommand>(
 						this->gui,
 						std::make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
-													cmd["settingsString"].toString().toStdString()));
+															cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -74,7 +75,7 @@ namespace cng
 						this->gui,
 						this->gui->settingsDialog,
 						std::make_shared<SolverSettings>(cmd["name"].toString().toStdString(),
-													cmd["settingsString"].toString().toStdString()));
+															cmd["settingsString"].toString().toStdString()));
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -82,7 +83,8 @@ namespace cng
 			//Handle concept net command
 			else if (cmd["type"].toString().toStdString().compare("Concept Net") == 0)
 			{
-				std::shared_ptr<ConceptNetQueryCommand> c = std::make_shared<ConceptNetQueryCommand>(this->gui, cmd["queryString"].toString());
+				std::shared_ptr<ConceptNetQueryCommand> c = std::make_shared<ConceptNetQueryCommand>(
+						this->gui, cmd["queryString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -90,7 +92,8 @@ namespace cng
 			//Handle facts query command
 			else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0)
 			{
-				std::shared_ptr<FactsQueryCommand> c = std::make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
+				std::shared_ptr<FactsQueryCommand> c = std::make_shared<FactsQueryCommand>(
+						this->gui, cmd["factsString"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -98,7 +101,8 @@ namespace cng
 			//Handle ground command
 			else if (cmd["type"].toString().toStdString().compare("Ground") == 0)
 			{
-				std::shared_ptr<GroundCommand> c = std::make_shared<GroundCommand>(this->gui, cmd["program"].toString());
+				std::shared_ptr<GroundCommand> c = std::make_shared<GroundCommand>(this->gui,
+																					cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -124,7 +128,8 @@ namespace cng
 			//Handle Variable query command
 			else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0)
 			{
-				std::shared_ptr<VariableQueryCommand> c = std::make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
+				std::shared_ptr<VariableQueryCommand> c = std::make_shared<VariableQueryCommand>(
+						this->gui, cmd["program"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;
@@ -141,6 +146,15 @@ namespace cng
 			else if (cmd["type"].toString().toStdString().compare("Add") == 0)
 			{
 				std::shared_ptr<AddCommand> c = std::make_shared<AddCommand>(this->gui, cmd["program"].toString());
+				c->execute();
+				emit this->gui->updateCommandList();
+				continue;
+			}
+			//Handle assignExternal command
+			else if (cmd["type"].toString().toStdString().compare("Assign External") == 0)
+			{
+				std::shared_ptr<AssignExternalCommand> c = std::make_shared<AssignExternalCommand>(
+						this->gui, cmd["external"].toString(), cmd["truthValue"].toString());
 				c->execute();
 				emit this->gui->updateCommandList();
 				continue;

@@ -104,6 +104,10 @@ namespace cng
 		 * Add Add element to history
 		 */
 		void addAddCommandToHistory(std::shared_ptr<Command> cmd, int pos);
+		/**
+		 * Add Assign External element to history
+		 */
+		void addAssignExternalCommandToHistory(std::shared_ptr<Command> cmd, int pos);
 	};
 
 } /* namespace cng */

@@ -33,7 +33,7 @@ namespace cng
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		std::string aspString = this->program.toStdString();
-		if (this->program.contains("\n"))
+		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
 			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
 		}

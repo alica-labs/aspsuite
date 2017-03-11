@@ -119,7 +119,7 @@
     <item>
      <widget class="QTabWidget" name="resultTabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="queryResultsTab">
        <attribute name="title">
@@ -136,8 +136,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>35</height>
+             <width>970</width>
+             <height>285</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -169,8 +169,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>35</height>
+             <width>970</width>
+             <height>285</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -202,8 +202,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>35</height>
+             <width>970</width>
+             <height>285</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -220,65 +220,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="commandHistoryTab">
-       <attribute name="title">
-        <string>Command History</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QScrollArea" name="commandHistoryScrollArea">
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="commandHistoryScrollAreaWidget">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>98</width>
-             <height>96</height>
-            </rect>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
-            <item>
-             <widget class="QTableWidget" name="commandHistoryTable">
-              <property name="columnCount">
-               <number>2</number>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <column>
-               <property name="text">
-                <string>Command</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Parameters</string>
-               </property>
-              </column>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="externalsTab">
+      <widget class="QWidget" name="externalTab">
        <attribute name="title">
         <string>External Statements</string>
        </attribute>
@@ -299,7 +241,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <spacer name="verticalSpacer_2">
+             <spacer name="verticalSpacerExtUp">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -365,7 +307,7 @@
              </layout>
             </item>
             <item>
-             <spacer name="verticalSpacer">
+             <spacer name="verticalSpacerExtDown">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
@@ -376,6 +318,64 @@
                </size>
               </property>
              </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="commandHistoryTab">
+       <attribute name="title">
+        <string>Command History</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QScrollArea" name="commandHistoryScrollArea">
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="commandHistoryScrollAreaWidget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>970</width>
+             <height>285</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QTableWidget" name="commandHistoryTable">
+              <property name="columnCount">
+               <number>2</number>
+              </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>Command</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Parameters</string>
+               </property>
+              </column>
+             </widget>
             </item>
            </layout>
           </widget>

@@ -22,6 +22,7 @@
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
 #include "commands/AddCommand.h"
+#include "commands/AssignExternalCommand.h"
 
 #include <ui_conceptnetgui.h>
 
@@ -123,6 +124,11 @@ namespace cng
 				this->addAddCommandToHistory(cmd, pos);
 				continue;
 			}
+			else if (cmd->getType().compare("Assign External") == 0)
+			{
+				this->addAssignExternalCommandToHistory(cmd, pos);
+				continue;
+			}
 			else
 			{
 				std::cout << "ConceptNetGui: Command with unknown type found!" << std::endl;
@@ -217,6 +223,14 @@ namespace cng
 		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 	}
+
+	void CommandHistoryHandler::addAssignExternalCommandToHistory(std::shared_ptr<Command> cmd, int pos)
+	{
+		auto item = new QTableWidgetItem(std::dynamic_pointer_cast<AssignExternalCommand>(cmd)->historyString);
+		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
+	}
+
 	void CommandHistoryHandler::addToCommandHistory(std::shared_ptr<Command> cmd)
 	{
 		this->gui->commandHistory.push_back(cmd);

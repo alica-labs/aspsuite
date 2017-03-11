@@ -20,6 +20,8 @@
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
+#include "commands/AddCommand.h"
+#include "commands/AssignExternalCommand.h"
 
 #include <ui_conceptnetgui.h>
 #include <ui_settingsdialog.h>

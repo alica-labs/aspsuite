@@ -16,6 +16,7 @@
 #include "commands/SolveCommand.h"
 #include "commands/VariableQueryCommand.h"
 #include "commands/AddCommand.h"
+#include "commands/AssignExternalCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 #include "handler/SaveLoadHandler.h"
@@ -203,14 +204,14 @@ namespace cng
 
 	void ConceptNetGui::applyExternalCallBack()
 	{
-		if(this->ui->externalTextEdit->text().isEmpty())
+		if (this->ui->externalTextEdit->text().isEmpty())
 		{
 			return;
 		}
-		std::cout << this->ui->truthValueComboBox->currentText().toStdString() << std::endl;
-		//TODO
+		std::shared_ptr<AssignExternalCommand> cmd = std::make_shared<AssignExternalCommand>(
+				this, this->ui->externalTextEdit->text(), this->ui->truthValueComboBox->currentText());
+		cmd->execute();
 	}
-
 
 	void ConceptNetGui::enableGui(bool enable)
 	{

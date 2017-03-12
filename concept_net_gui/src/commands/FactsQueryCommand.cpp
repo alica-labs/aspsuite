@@ -6,9 +6,11 @@
  */
 
 #include "commands/FactsQueryCommand.h"
-#include "gui/ConceptNetGui.h"
 
 #include <ui_conceptnetgui.h>
+
+#include "gui/ConceptNetGui.h"
+#include "gui/ModelSettingDialog.h"
 
 #include "handler/CommandHistoryHandler.h"
 
@@ -50,9 +52,9 @@ namespace cng
 		term->setId(queryId);
 		term->setQueryId(queryId);
 		//get number of models from gui
-		if (this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
+		if (this->gui->modelSettingsDialog->getNumberOfModels() != -1)
 		{
-			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
+			term->setNumberOfModels(to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
 		}
 		prgm = prgm.left(prgm.size() - 1);
 		term->setQueryRule(prgm.toStdString());
@@ -92,7 +94,7 @@ namespace cng
 				}
 				ss << std::endl;
 				//print models
-				if (this->gui->getUi()->showModelsCheckBox->isChecked())
+				if (this->gui->modelSettingsDialog->isShowModelsInQuery())
 				{
 					ss << "The queried model contains the following predicates: " << std::endl;
 					for (int i = 0; i < castedResults.at(0).query->getCurrentModels()->at(0).size(); i++)

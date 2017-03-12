@@ -13,6 +13,7 @@
 #include "containers/ConceptNetEdge.h"
 
 #include "gui/ConceptNetGui.h"
+#include "gui/ModelSettingDialog.h"
 
 #include "handler/CommandHistoryHandler.h"
 
@@ -369,7 +370,10 @@ namespace cng
 		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-
+			if(edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			{
+				continue;
+			}
 			QString tmp = "";
 			tmp.append(this->prefix).append(edge->relation);
 			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
@@ -399,6 +403,10 @@ namespace cng
 		std::vector<QString> addedRelations;
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
+			if(edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			{
+				continue;
+			}
 			QString tmpRel = edge->relation;
 			tmpRel[0] = tmpRel[0].toLower();
 			auto it = find(addedRelations.begin(), addedRelations.end(), tmpRel);

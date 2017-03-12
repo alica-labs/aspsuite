@@ -61,6 +61,7 @@ namespace cng
 			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), {}}},
 											nullptr);
 		}
+		emit this->gui->updateExternalList();
 	}
 
 	void GroundCommand::undo()

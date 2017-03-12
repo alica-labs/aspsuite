@@ -29,7 +29,7 @@
          <x>0</x>
          <y>0</y>
          <width>992</width>
-         <height>336</height>
+         <height>299</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -78,30 +78,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="numberOfmodelsLabel">
-        <property name="text">
-         <string>Number of shown Models:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="numberOfModelsSpinBox">
-        <property name="minimum">
-         <number>-1</number>
-        </property>
-        <property name="value">
-         <number>-1</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="showModelsCheckBox">
-        <property name="text">
-         <string>Show Models in Query?</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="buttonSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -119,7 +95,7 @@
     <item>
      <widget class="QTabWidget" name="resultTabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="queryResultsTab">
        <attribute name="title">
@@ -136,8 +112,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>64</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -169,8 +145,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>64</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -202,8 +178,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>64</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -236,22 +212,48 @@
              <x>0</x>
              <y>0</y>
              <width>970</width>
-             <height>285</height>
+             <height>322</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <spacer name="verticalSpacerExtUp">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+             <widget class="QScrollArea" name="scrollArea_3">
+              <property name="widgetResizable">
+               <bool>true</bool>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
+              <widget class="QWidget" name="scrollAreaWidgetContents">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>950</width>
+                 <height>211</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <item>
+                 <widget class="QTableWidget" name="externalTable">
+                  <attribute name="horizontalHeaderDefaultSectionSize">
+                   <number>350</number>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <column>
+                   <property name="text">
+                    <string>External Statement</string>
+                   </property>
+                  </column>
+                  <column>
+                   <property name="text">
+                    <string>Truth Value</string>
+                   </property>
+                  </column>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="externalNameLabel">
@@ -306,19 +308,6 @@
               </item>
              </layout>
             </item>
-            <item>
-             <spacer name="verticalSpacerExtDown">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </widget>
          </widget>
@@ -340,8 +329,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>64</width>
+             <height>35</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -376,8 +365,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>970</width>
-             <height>285</height>
+             <width>96</width>
+             <height>96</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -446,6 +435,7 @@
      <string>Settings</string>
     </property>
     <addaction name="actionSolver_Settings"/>
+    <addaction name="actionModel_Settings"/>
    </widget>
    <addaction name="menuNew_Program"/>
    <addaction name="menuSettings"/>
@@ -481,6 +471,11 @@
   <action name="actionLoad_Background_Knowledge">
    <property name="text">
     <string>Load Background Knowledge</string>
+   </property>
+  </action>
+  <action name="actionModel_Settings">
+   <property name="text">
+    <string>Model Settings</string>
    </property>
   </action>
  </widget>

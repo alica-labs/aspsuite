@@ -31,6 +31,7 @@ namespace cng
 		QString externalName;
 		QString truthValue;
 		QString historyString;
+		bool previousTruthValue;
 	private:
 		void createHistoryString();
 	};

@@ -1,5 +1,6 @@
 #include "gui/ConceptNetGui.h"
 #include "gui/SettingsDialog.h"
+#include "gui/ModelSettingDialog.h"
 
 #include "containers/SolverSettings.h"
 #include "containers/ConceptNetCall.h"
@@ -20,6 +21,7 @@
 
 #include "handler/CommandHistoryHandler.h"
 #include "handler/SaveLoadHandler.h"
+#include "handler/ExternalTableHandler.h"
 
 #include <ui_conceptnetgui.h>
 #include <ui_settingsdialog.h>
@@ -47,17 +49,18 @@ namespace cng
 		this->ui->resultTabWidget->setCurrentIndex(0);
 
 		this->settingsDialog = new SettingsDialog(parent, this);
+		this->modelSettingsDialog = new ModelSettingDialog(parent, this);
 		this->msgBox = new QMessageBox();
 		this->strgZShortcut = new QShortcut(QKeySequence(QKeySequence::Undo), this->ui->mainWindow);
 		this->escShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), this->ui->mainWindow);
 		this->chHandler = new CommandHistoryHandler(this);
 		this->slHandler = new SaveLoadHandler(this);
+		this->esHandler = new ExternalTableHandler(this);
 
 		this->settings = nullptr;
 		this->solver = nullptr;
 		this->enableGui(false);
 		configureLabels();
-		this->ui->showModelsCheckBox->setChecked(true);
 		this->connectGuiElements();
 		this->isDockerInstalled = checkDockerInstallation();
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
@@ -85,9 +88,11 @@ namespace cng
 		}
 		delete this->chHandler;
 		delete this->slHandler;
+		delete this->esHandler;
 		delete this->strgZShortcut;
 		delete this->escShortcut;
 		delete this->settingsDialog;
+		delete this->modelSettingsDialog;
 		delete this->msgBox;
 		delete this->ui;
 	}
@@ -233,9 +238,6 @@ namespace cng
 		this->ui->addBtn->setEnabled(enable);
 		this->ui->resultTabWidget->setEnabled(enable);
 		this->strgZShortcut->setEnabled(enable);
-		this->ui->numberOfModelsSpinBox->setEnabled(enable);
-		this->ui->numberOfmodelsLabel->setEnabled(enable);
-		this->ui->showModelsCheckBox->setEnabled(enable);
 		this->ui->applyBtn->setEnabled(enable);
 	}
 
@@ -290,8 +292,9 @@ namespace cng
 
 	void ConceptNetGui::connectGuiElements()
 	{
-		// Settings connects
+		// Dialog connects
 		this->connect(this->ui->actionSolver_Settings, SIGNAL(triggered()), this->settingsDialog, SLOT(show()));
+		this->connect(this->ui->actionModel_Settings, SIGNAL(triggered()), this->modelSettingsDialog, SLOT(show()));
 
 		// Menu connects
 		this->connect(this->ui->actionSave_Program, SIGNAL(triggered()), this->slHandler, SLOT(saveProgram()));
@@ -313,6 +316,9 @@ namespace cng
 		this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));
 		this->connect(this->strgZShortcut, SIGNAL(activated()), this->chHandler, SLOT(undoHistory()));
 		this->connect(this->escShortcut, SIGNAL(activated()), this->chHandler, SLOT(removeFocus()));
+
+		// External Statements Table
+		this->connect(this, SIGNAL(updateExternalList()), this->esHandler, SLOT(fillExternalTable()));
 	}
 
 	void ConceptNetGui::clear()

@@ -29,7 +29,7 @@
 namespace cng
 {
 
-	CommandHistoryHandler::CommandHistoryHandler(ConceptNetGui * gui)
+	CommandHistoryHandler::CommandHistoryHandler(ConceptNetGui* gui)
 	{
 		this->gui = gui;
 	}

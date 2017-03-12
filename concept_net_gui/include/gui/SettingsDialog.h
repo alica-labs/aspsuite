@@ -23,7 +23,6 @@ namespace cng
 {
 	class SolverSettings;
 	class ConceptNetGui;
-	class AddSettingsDialog;
 	/**
 	 * Handler for setting ui
 	 */

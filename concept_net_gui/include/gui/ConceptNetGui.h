@@ -27,6 +27,7 @@ namespace cng
 {
 	class SolverSettings;
 	class SettingsDialog;
+	class ModelSettingDialog;
 	class NewSolverDialog;
 	class Command;
 	class NewSolverCommand;
@@ -40,6 +41,7 @@ namespace cng
 	class LoadBackgroundKnowledgeCommand;
 	class SaveLoadHandler;
 	class CommandHistoryHandler;
+	class ExternalTableHandler;
 	class ConceptNetCall;
 	/**
 	 * Class containing the main window and managing the connects, handler and provides the command history
@@ -84,14 +86,22 @@ namespace cng
 		CommandHistoryHandler* chHandler;
 		/**
 		 * Pointer to the SaveLoadHandler
-		 * Handles Save and Load operations
+		 * Handles filling the external table
 		 */
 		SaveLoadHandler* slHandler;
+		/**
+		 * Pointer to the ExternalTableHandler
+		 * Handles Save and Load operations
+		 */
+		ExternalTableHandler* esHandler;
 		/**
 		 * Pointer to SettingsDialog class
 		 * Used to change Solver parameters
 		 */
 		SettingsDialog* settingsDialog;
+
+		ModelSettingDialog* modelSettingsDialog;
+
 		/**
 		 * Enables/Disables Gui elements
 		 * @param enable bool true to enable
@@ -216,6 +226,10 @@ namespace cng
 		 * Signal used to redraw the command history
 		 */
 		void updateCommandList();
+		/**
+		 * Signal used to redraw the ExternalList
+		 */
+		void updateExternalList();
 	};
 }
 #endif // CONCEPTNETGUI_H

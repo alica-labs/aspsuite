@@ -6,7 +6,10 @@
  */
 
 #include "commands/SolveCommand.h"
+
 #include "gui/ConceptNetGui.h"
+#include "gui/ModelSettingDialog.h"
+
 #include <ui_conceptnetgui.h>
 
 #include "handler/CommandHistoryHandler.h"
@@ -44,6 +47,13 @@ namespace cng
 
 	void SolveCommand::execute()
 	{
+		if (this->gui->modelSettingsDialog->getNumberOfModels() != -1)
+		{
+			auto conf = &this->gui->getSolver()->clingo->getConf();
+			auto root = conf->getRootKey();
+			auto modelsKey = conf->getSubKey(root, "solve.models");
+			conf->setKeyValue(modelsKey, std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()).c_str());
+		}
 		this->satisfiable = this->gui->getSolver()->solve();
 		this->currentModels = this->gui->getSolver()->getCurrentModels();
 		this->gui->chHandler->addToCommandHistory(shared_from_this());

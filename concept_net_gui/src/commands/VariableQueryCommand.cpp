@@ -6,15 +6,20 @@
  */
 
 #include "commands/VariableQueryCommand.h"
+
 #include "handler/CommandHistoryHandler.h"
+
 #include "gui/ConceptNetGui.h"
 #include "gui/SettingsDialog.h"
+#include "gui/ModelSettingDialog.h"
+
 #include <ui_conceptnetgui.h>
 
 #include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPCommonsVariable.h>
 #include <asp_commons/AnnotatedValVec.h>
 #include <asp_commons/ASPQuery.h>
+
 #include <asp_solver/ASPSolver.h>
 
 #include <SystemConfig.h>
@@ -54,9 +59,9 @@ namespace cng
 		term->setId(queryId);
 		term->setQueryId(queryId);
 		// Set number of shown models according to the gui
-		if (this->gui->getUi()->numberOfModelsSpinBox->value() != -1)
+		if (this->gui->modelSettingsDialog->getNumberOfModels() != -1)
 		{
-			term->setNumberOfModels(to_string(this->gui->getUi()->numberOfModelsSpinBox->value()));
+			term->setNumberOfModels(to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
 		}
 		for (int i = 0; i < lines.size(); i++)
 		{
@@ -124,7 +129,6 @@ namespace cng
 				std::stringstream ss;
 				ss << "Variable Query: " << term->getQueryRule() << std::endl;
 				ss << "Result contains the predicates: " << std::endl;
-				ss << "\t";
 				//Handle query answer
 				for (int i = 0; i < castedResults.size(); i++)
 				{
@@ -138,10 +142,9 @@ namespace cng
 				}
 				ss << std::endl;
 				//handle used models
-				if (this->gui->getUi()->showModelsCheckBox->isChecked())
+				if (this->gui->modelSettingsDialog->isShowModelsInQuery())
 				{
 					ss << "The queried model contains the following predicates: " << std::endl;
-					ss << "\t";
 					for (int i = 0; i < castedResults.at(0)->query->getCurrentModels()->at(0).size(); i++)
 					{
 						ss << castedResults.at(0)->query->getCurrentModels()->at(0).at(i) << " ";

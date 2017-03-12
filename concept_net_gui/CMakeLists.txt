@@ -30,6 +30,7 @@ set(conceptNetGui_SRCS
   src/main.cpp
   src/gui/ConceptNetGui.cpp
   src/gui/SettingsDialog.cpp
+  src/gui/ModelSettingDialog.cpp
   src/containers/SolverSettings.cpp
   src/containers/ConceptNetCall.cpp
   src/containers/ConceptNetEdge.cpp
@@ -46,12 +47,14 @@ set(conceptNetGui_SRCS
   src/commands/AssignExternalCommand.cpp
   src/handler/SaveLoadHandler.cpp
   src/handler/CommandHistoryHandler.cpp
+  src/handler/ExternalTableHandler.cpp
   
 )
 
 set(conceptNetGui_HDRS
   include/gui/ConceptNetGui.h
   include/gui/SettingsDialog.h
+  include/gui/ModelSettingDialog.h
   include/containers/SolverSettings.h
   include/containers/ConceptNetCall.h
   include/containers/ConceptNetEdge.h
@@ -69,11 +72,13 @@ set(conceptNetGui_HDRS
   include/commands/AssignExternalCommand.h
   include/handler/SaveLoadHandler.h
   include/handler/CommandHistoryHandler.h
+  include/handler/ExternalTableHandler.h
 )
 
 set(conceptNetGui_UIS
   ui/conceptnetgui.ui
   ui/settingsdialog.ui
+  ui/modelsettings.ui
 )
 
 set(conceptNetGui_INCLUDE_DIRECTORIES

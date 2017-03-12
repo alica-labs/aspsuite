@@ -27,7 +27,7 @@ namespace cng
 		 * Constructor
 		 * @param gui pointer to the main window handler
 		 */
-		CommandHistoryHandler(ConceptNetGui * gui);
+		CommandHistoryHandler(ConceptNetGui* gui);
 		virtual ~CommandHistoryHandler();
 		/**
 		 * Add command to history

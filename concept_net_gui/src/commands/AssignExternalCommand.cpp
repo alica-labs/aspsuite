@@ -26,6 +26,7 @@ namespace cng
 		this->gui = gui;
 		this->externalName = externalName;
 		this->truthValue = truthValue;
+		this->previousTruthValue = false;
 		createHistoryString();
 	}
 
@@ -35,15 +36,20 @@ namespace cng
 
 	void AssignExternalCommand::execute()
 	{
-		auto external = this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr, 20);
+		auto external = this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
+																				20);
 		auto symbolPos = this->gui->getSolver()->clingo->lookup(external);
-		if(!this->gui->getSolver()->clingo->valid(symbolPos)|| !this->gui->getSolver()->clingo->external(symbolPos))
+		if (!this->gui->getSolver()->clingo->valid(symbolPos) || !this->gui->getSolver()->clingo->external(symbolPos))
 		{
 			this->gui->getUi()->externalTextEdit->setText(QString("Invalid or Released External!"));
 			this->undo();
 			return;
 		}
-		if(this->truthValue.compare("True") == 0)
+		if (external.sign() == 0)
+		{
+			this->previousTruthValue = true;
+		}
+		if (this->truthValue.compare("True") == 0)
 		{
 			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::True);
 		}
@@ -56,10 +62,27 @@ namespace cng
 			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::Release);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		emit this->gui->updateExternalList();
 	}
 
 	void AssignExternalCommand::undo()
 	{
+		if (!this->truthValue.contains("Release"))
+		{
+			if (this->previousTruthValue)
+			{
+				this->gui->getSolver()->assignExternal(
+						this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
+																				20), Potassco::Value_t::True);
+			}
+			else
+			{
+				this->gui->getSolver()->assignExternal(
+						this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
+																				20), Potassco::Value_t::False);
+			}
+			emit this->gui->updateExternalList();
+		}
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
 	}
 

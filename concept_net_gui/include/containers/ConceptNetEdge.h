@@ -31,6 +31,7 @@ namespace cng
 		QString relation;
 		double weight;
 		std::vector<QString> sources;
+
 		std::string toString();
 
 	};

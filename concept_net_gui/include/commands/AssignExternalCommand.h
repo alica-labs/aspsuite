@@ -16,6 +16,9 @@ namespace cng
 {
 
 	class ConceptNetGui;
+	/**
+	 * Class inheriting from Command interface used assign truth values to an external
+	 */
 	class AssignExternalCommand : public Command, public std::enable_shared_from_this<AssignExternalCommand>
 	{
 	public:

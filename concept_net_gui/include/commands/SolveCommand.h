@@ -32,7 +32,13 @@ namespace cng
 		void undo();
 
 		QJsonObject toJSON();
+		/**
+		 * Get models returned by solve call
+		 */
 		std::vector<Gringo::SymVec> getCurrentModels();
+		/**
+		 * Return solver result
+		 */
 		bool isSatisfiable();
 
 		ConceptNetGui* gui;
@@ -40,8 +46,13 @@ namespace cng
 	private:
 		bool satisfiable;
 		std::vector<Gringo::SymVec> currentModels;
-
+		/**
+		 * Print models unsorted
+		 */
 		void printModels();
+		/**
+		 * Print models sorted
+		 */
 		void printSortedModels();
 	};
 

@@ -18,6 +18,9 @@ namespace cng
 {
 
 	class ConceptNetGui;
+	/**
+	 * Dialog used to change settings for models and cn5
+	 */
 	class ModelSettingDialog : public QDialog
 	{
 	Q_OBJECT
@@ -41,12 +44,23 @@ namespace cng
 		 * Connect every gui element
 		 */
 		void connectElements();
-
+		/**
+		 * Number of models to show
+		 */
 		int numberOfModels;
+		/**
+		 * Are models supposed to be shown in quey result?
+		 */
 		bool showModelsInQuery;
+		/**
+		 * Minimum weight concept net edges need to have to be considered
+		 */
 		double minCN5Weight;
 
 	private slots:
+		/**
+		 * Slot to apply settings
+		 */
 		void applySettings();
 	};
 

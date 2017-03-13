@@ -33,7 +33,9 @@ namespace cng
 	void AddCommand::execute()
 	{
 		std::string aspString = this->program.toStdString();
+		// call add program on solver
 		this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+		// show program string
 		this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 	}

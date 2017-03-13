@@ -25,9 +25,11 @@ namespace cng
 	public:
 		ConceptNetCall(QString id);
 		virtual ~ConceptNetCall();
+
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
 		QString nextEdgesPage;
+
 		std::string toString();
 	};
 

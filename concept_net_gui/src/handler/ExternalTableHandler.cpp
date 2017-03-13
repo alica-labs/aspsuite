@@ -47,8 +47,17 @@ namespace cng
 					auto leftItem = new QTableWidgetItem(QString(ss.str().c_str()));
 					leftItem->setFlags(leftItem->flags() ^ Qt::ItemIsEditable);
 					this->gui->getUi()->externalTable->setItem(pos, 0, leftItem);
+					bool found = false;
+					for(auto vec : this->gui->getSolver()->getCurrentModels())
+					{
+						if(find(vec.begin(), vec.end(),this->gui->getSolver()->clingo->atom(iter)) != vec.end())
+						{
+							found = true;
+							break;
+						}
+					}
 
-					if (this->gui->getSolver()->clingo->atom(iter).sign() == 0)
+					if (found)
 					{
 						auto rightItem = new QTableWidgetItem(QString("True"));
 						rightItem->setFlags(rightItem->flags() ^ Qt::ItemIsEditable);
@@ -61,10 +70,10 @@ namespace cng
 						this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
 					}
 				}
-				//TODO find way to get truth values from an external
-				std::cout << iter << " " << this->gui->getSolver()->clingo->external(iter) << " "
-						<< this->gui->getSolver()->clingo->atom(iter) << " " << std::endl;
-				std::cout << Clasp::valSign(Clasp::trueValue(Clasp::decodeLit(this->gui->getSolver()->clingo->literal(iter)))) << std::endl;
+//				//TODO find way to get truth values from an external
+//				std::cout << iter << " " << this->gui->getSolver()->clingo->external(iter) << " "
+//						<< this->gui->getSolver()->clingo->atom(iter) << " " << std::endl;
+//				std::cout << Clasp::valSign(Clasp::trueValue(Clasp::decodeLit(this->gui->getSolver()->clingo->literal(iter)))) << std::endl;
 
 			}
 			else

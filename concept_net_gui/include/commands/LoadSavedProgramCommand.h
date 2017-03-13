@@ -33,9 +33,9 @@ namespace cng
 		void undo();
 
 		QJsonObject toJSON();
+
 		QByteArray loadedData;
 		QString fileName;
-
 		ConceptNetGui* gui;
 	};
 

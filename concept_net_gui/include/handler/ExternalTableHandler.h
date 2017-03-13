@@ -22,7 +22,13 @@ namespace cng
 	{
 	Q_OBJECT
 	public:
+		/**
+		 * Constructor
+		 */
 		ExternalTableHandler(ConceptNetGui * gui);
+		/**
+		 * Destructor
+		 */
 		virtual ~ExternalTableHandler();
 
 	public slots:

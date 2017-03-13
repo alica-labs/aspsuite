@@ -28,6 +28,9 @@ namespace cng
 		 * @param gui pointer to the main window handler
 		 */
 		CommandHistoryHandler(ConceptNetGui* gui);
+		/**
+		 * Destructor
+		 */
 		virtual ~CommandHistoryHandler();
 		/**
 		 * Add command to history
@@ -63,7 +66,6 @@ namespace cng
 		 * Pointer to main Gui handler
 		 */
 		ConceptNetGui * gui;
-
 		/**
 		 * Add New Solver element to history
 		 */

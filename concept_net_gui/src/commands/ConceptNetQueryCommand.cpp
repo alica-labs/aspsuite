@@ -104,7 +104,6 @@ namespace cng
 		auto pos = this->query.indexOf("(");
 
 		auto relation = this->query.mid(this->prefixLength, pos - this->prefixLength);
-		std::cout << relation.toStdString() << std::endl;
 		if (this->query.contains("wildcard"))
 		{
 			auto wildcardPos = this->query.indexOf("wildcard");
@@ -291,6 +290,7 @@ namespace cng
 		for(auto pair : pgmMap)
 		{
 			this->gui->getSolver()->add(programSection.toStdString(), {}, pair.second.toStdString());
+			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
 		}
 		this->gui->getUi()->conceptNetBtn->setEnabled(true);
 		this->gui->getUi()->conceptNetBtn->setFocus();

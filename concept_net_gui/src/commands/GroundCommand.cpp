@@ -38,7 +38,7 @@ namespace cng
 		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
 			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
-			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
+			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
 		}
 		if (this->programSection.contains("(") && this->programSection.contains(")"))
 		{
@@ -55,6 +55,7 @@ namespace cng
 			}
 			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), symVec}},
 											nullptr);
+			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->programSection).append("\n"));
 		}
 		else
 		{
@@ -67,7 +68,6 @@ namespace cng
 	void GroundCommand::undo()
 	{
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());
-		//TODO extend every rule with an external to remove them ?
 	}
 
 	QJsonObject GroundCommand::toJSON()

@@ -111,11 +111,17 @@ namespace cng
 		 * Clears Gui labels
 		 */
 		void clear();
-
+		/**
+		 * Get Solver pointer
+		 */
 		reasoner::ASPSolver* getSolver();
-
+		/**
+		 * Set solver Pointer
+		 */
 		void setSolver(reasoner::ASPSolver* solver);
-
+		/**
+		 * Get list of basic cn5 relations
+		 */
 		std::vector<QString> getConceptNetBaseRealtions();
 
 	private slots:
@@ -124,7 +130,6 @@ namespace cng
 		 * Slot to create new Solver
 		 */
 		void newSolver();
-
 		/**
 		 * Slot for Ground call
 		 */
@@ -156,27 +161,22 @@ namespace cng
 		 * True if docker is installed
 		 */
 		bool checkDockerInstallation();
-
 		/**
 		 * True if the concept net database is available locally
 		 */
 		bool checkConcneptNetInstallation();
-
 		/**
 		 * Checks if all asp rules are dot terminated and informs the user if not
 		 */
 		bool rulesAreDotTerminated();
-
 		/**
 		 * Reads the concept net base relations given in a json file
 		 */
 		void readConceptNetBaseRelations();
-
 		/**
 		 * Solver pointer
 		 */
 		reasoner::ASPSolver* solver;
-
 		/**
 		 * Current Settings
 		 */
@@ -197,17 +197,14 @@ namespace cng
 		 * Shortcut to esc button
 		 */
 		QShortcut* escShortcut;
-
 		/**
 		 * Connect Gui elements to corresponding slots
 		 */
 		void connectGuiElements();
-
 		/**
 		 * Set auto wrap on labels and enable selection with mouse
 		 */
 		void configureLabels();
-
 		/**
 		 * true if docker is installed
 		 */

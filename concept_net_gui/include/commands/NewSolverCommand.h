@@ -38,6 +38,9 @@ namespace cng
 		ConceptNetGui* gui;
 
 	private:
+		/**
+		 * Gets default setting from settings dialog
+		 */
 		void getDefaultArguments();
 	};
 

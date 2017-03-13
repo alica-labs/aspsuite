@@ -103,11 +103,17 @@ namespace cng
 		 * Executes http get request
 		 */
 		void callUrl(QUrl url);
-
+		/**
+		 * Prefix printed before every meta knowledge predicate
+		 */
 		QString prefix;
-
+		/**
+		 * Length of prefix printed before every meta knowledge predicate
+		 */
 		int prefixLength;
-
+		/**
+		 * Map of metaknowlege relation to asp progsm containing this relation
+		 */
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
 
 	signals:

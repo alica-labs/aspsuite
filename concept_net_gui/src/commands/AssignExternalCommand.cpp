@@ -6,6 +6,7 @@
  */
 
 #include <commands/AssignExternalCommand.h>
+#include <commands/SolveCommand.h>
 
 #include "gui/ConceptNetGui.h"
 
@@ -62,6 +63,8 @@ namespace cng
 			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::Release);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
+		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
+		sc->execute();
 		emit this->gui->updateExternalList();
 	}
 
@@ -81,6 +84,8 @@ namespace cng
 						this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
 																				20), Potassco::Value_t::False);
 			}
+			std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
+			sc->execute();
 			emit this->gui->updateExternalList();
 		}
 		this->gui->chHandler->removeFromCommandHistory(shared_from_this());

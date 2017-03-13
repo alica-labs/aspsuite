@@ -38,6 +38,9 @@ namespace cng
 		std::string historyProgramSection;
 
 	private:
+		/**
+		 * Extract program section from input
+		 */
 		void extractProgramSection();
 	};
 

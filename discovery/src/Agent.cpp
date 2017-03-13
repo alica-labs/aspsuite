@@ -8,6 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 
+//#define DEBUG_AGENT
+
 namespace discovery
 {
 
@@ -35,32 +37,32 @@ Agent::Agent(std::string name, bool sender)
     }
 }
 
-void Agent::setupSendUDPMulticast()
+void Agent::setupReceiveUDPMulticast()
 {
     this->socket = zmq_socket(ctx, ZMQ_DISH);
 
     int rc = zmq_bind(socket, "udp://239.0.0.1:5555");
     if (rc != 0)
     {
-    	std::cout << "Error: " << zmq_strerror(errno) << std::endl;
+        std::cout << "Error: " << zmq_strerror(errno) << std::endl;
+        assert(rc == 0);
+    }
+
+    // Joining
+    rc = zmq_join(socket, "Movies");
+    if (rc != 0)
+    {
+        std::cout << "Error: " << zmq_strerror(errno) << std::endl;
         assert(rc == 0);
     }
 }
 
-void Agent::setupReceiveUDPMulticast()
+void Agent::setupSendUDPMulticast()
 {
     this->socket = zmq_socket(ctx, ZMQ_RADIO);
 
-    // Joining
-    int rc = zmq_join(socket, "Movies");
-    if (rc != 0)
-    {
-        strerror(errno);
-        assert(rc == 0);
-    }
-
     // Connecting
-    rc = zmq_connect(socket, "udp://239.0.0.1:5555");
+    int rc = zmq_connect(socket, "udp://239.0.0.1:5555");
     if (rc != 0)
     {
         std::cout << "Error: " << zmq_strerror(errno) << std::endl;
@@ -92,11 +94,23 @@ void Agent::run()
 
     if (this->sender)
     {
+#ifdef DEBUG_AGENT
+        std::cout << "Error State before sending: " << zmq_strerror(errno) << std::endl;
+#endif
         send();
+#ifdef DEBUG_AGENT
+        std::cout << "Error State after sending: " << zmq_strerror(errno) << std::endl;
+#endif
     }
     else
     {
+#ifdef DEBUG_AGENT
+        std::cout << "Error State before receiving: " << zmq_strerror(errno) << std::endl;
+#endif
         receive();
+#ifdef DEBUG_AGENT
+        std::cout << "Error State after receiving: " << zmq_strerror(errno) << std::endl;
+#endif
     }
 }
 
@@ -105,7 +119,6 @@ void Agent::send()
     zmq_msg_t msg;
     int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
     std::cout << "Sended " << rc << " chars." << std::endl;
-    std::cout << "Error: " << zmq_strerror(errno) << std::endl;
     assert(rc == 9);
 }
 
@@ -114,7 +127,6 @@ void Agent::receive()
     zmq_msg_t msg;
     int rc = msg_recv_cmp(&msg, this->socket, "Movies", "Godfather");
     std::cout << "Received " << rc << " chars." << std::endl;
-    std::cout << "Error: " << zmq_strerror(errno) << std::endl;
     assert(rc == 9);
 }
 
@@ -122,18 +134,25 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
 {
     int rc = zmq_msg_init_size(msg_, strlen(body_));
     if (rc != 0)
+    {
+    	std::cout << "Agent::msg_send: Error after init msg: " << zmq_strerror(errno) << std::endl;
         return rc;
+    }
+
+    std::cout << "Agent::msg_send: Message could be initialised. Size is " << strlen(body_) << std::endl;
 
     memcpy(zmq_msg_data(msg_), body_, strlen(body_));
 
     rc = zmq_msg_set_group(msg_, group_);
     if (rc != 0)
     {
+        std::cout << "Agent::msg_send: Failure by setting the group of a message: " << zmq_strerror(errno) << std::endl;
         zmq_msg_close(msg_);
         return rc;
     }
 
     rc = zmq_msg_send(msg_, s_, 0);
+    std::cout << "Agent::msg_send: Send " << rc << " chars." << std::endl;
 
     zmq_msg_close(msg_);
 
@@ -144,14 +163,21 @@ int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const cha
 {
     int rc = zmq_msg_init(msg_);
     if (rc != 0)
+    {
+    	std::cout << "Agent::msg_recv_cmp: Error after init msg: " << zmq_strerror(errno) << std::endl;
         return -1;
+    }
 
     int recv_rc = zmq_msg_recv(msg_, s_, 0);
     if (recv_rc == -1)
+    {
+    	std::cout << "Agent::msg_recv_cmp: Error after receive msg: " << zmq_strerror(errno) << std::endl;
         return -1;
+    }
 
     if (strcmp(zmq_msg_group(msg_), group_) != 0)
     {
+    	std::cout << "Agent::msg_recv_cmp: Error after compare group: " << zmq_strerror(errno) << std::endl;
         zmq_msg_close(msg_);
         return -1;
     }
@@ -162,6 +188,7 @@ int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const cha
 
     if (strcmp(body, body_) != 0)
     {
+    	std::cout << "Agent::msg_recv_cmp: Message does not fit!" << std::endl;
         zmq_msg_close(msg_);
         return -1;
     }

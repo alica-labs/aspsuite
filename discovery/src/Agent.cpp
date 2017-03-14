@@ -62,7 +62,7 @@ void Agent::setupSendUDPMulticast()
     this->socket = zmq_socket(ctx, ZMQ_RADIO);
 
     // Connecting
-    int rc = zmq_connect(socket, "udp://239.0.0.1:5555");
+    int rc = zmq_connect(socket, "udp://240.0.0.1:5555");
     if (rc != 0)
     {
         std::cout << "Error: " << zmq_strerror(errno) << std::endl;

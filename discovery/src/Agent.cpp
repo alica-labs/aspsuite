@@ -139,8 +139,6 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
         return rc;
     }
 
-    std::cout << "Agent::msg_send: Message could be initialised. Size is " << strlen(body_) << std::endl;
-
     memcpy(zmq_msg_data(msg_), body_, strlen(body_));
 
     rc = zmq_msg_set_group(msg_, group_);
@@ -152,7 +150,6 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
     }
 
     rc = zmq_msg_send(msg_, s_, 0);
-    std::cout << "Agent::msg_send: Send " << rc << " chars." << std::endl;
 
     zmq_msg_close(msg_);
 

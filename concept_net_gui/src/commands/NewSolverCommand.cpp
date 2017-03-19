@@ -40,6 +40,7 @@ namespace cng
 
 	void NewSolverCommand::execute()
 	{
+		this->gui->clear();
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->setSettings(this->settings);
 //		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};

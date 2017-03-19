@@ -104,10 +104,22 @@ namespace cng
 		auto pos = this->query.indexOf("(");
 
 		auto relation = this->query.mid(this->prefixLength, pos - this->prefixLength);
-		if (this->query.contains("wildcard"))
+		auto commaPos = this->query.indexOf(",");
+		//cn5_Wildcard(concept, concept)
+		if (this->query.contains("cn5_Wildcard"))
+		{
+			auto conceptRight = this->query.mid(commaPos + 1, this->query.size() - commaPos);
+			auto conceptLeft = this->query.mid(pos + 1, commaPos - pos).trimmed();
+			conceptRight = conceptRight.left(conceptRight.size() - 1).trimmed();
+			conceptLeft = conceptLeft.left(conceptLeft.size() - 1).trimmed();
+			conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
+			conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
+			QUrl url("http://api.localhost/query?start=/c/en/" + conceptLeft + "&end=/c/en/" + conceptRight);
+			callUrl(url);
+		}
+		else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard"))
 		{
 			auto wildcardPos = this->query.indexOf("wildcard");
-			auto commaPos = this->query.indexOf(",");
 			// relation(wildcard, concept)
 			if (wildcardPos < commaPos)
 			{
@@ -287,10 +299,11 @@ namespace cng
 		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
 		sc->execute();
 		auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
-		for(auto pair : pgmMap)
+		for (auto pair : pgmMap)
 		{
 			this->gui->getSolver()->add(programSection.toStdString(), {}, pair.second.toStdString());
-			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
+			this->gui->getUi()->programLabel->setText(
+					this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
 		}
 		this->gui->getUi()->conceptNetBtn->setEnabled(true);
 		this->gui->getUi()->conceptNetBtn->setFocus();
@@ -370,7 +383,7 @@ namespace cng
 		QString ret = "";
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			if(edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			if (edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
 			{
 				continue;
 			}
@@ -403,7 +416,7 @@ namespace cng
 		std::vector<QString> addedRelations;
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			if(edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			if (edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
 			{
 				continue;
 			}

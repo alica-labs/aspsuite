@@ -119,6 +119,9 @@
         },
         {
             "rel": "cn5_dbpedia/leader"
+        },
+        {
+        	"rel": "cn5_Wildcard"
         }
     ]
 }

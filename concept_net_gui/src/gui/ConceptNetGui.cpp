@@ -327,6 +327,9 @@ namespace cng
 		this->ui->sortedModelsLabel->clear();
 		this->ui->queryResultsLabel->clear();
 		this->ui->aspRuleTextArea->clear();
+		this->ui->commandHistoryTable->clear();
+		this->ui->externalTable->clear();
+		this->ui->programLabel->clear();
 	}
 
 	void ConceptNetGui::setSettings(shared_ptr<SolverSettings> settings)

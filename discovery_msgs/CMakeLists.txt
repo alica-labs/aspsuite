@@ -3,6 +3,10 @@ project(discovery_msgs)
 
 add_definitions(-std=c++11)
 
+# Define where to find macros for generating capnproto 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
+find_package(CapnProto REQUIRED)
+
 find_package(catkin REQUIRED)
 
 catkin_package(
@@ -16,19 +20,42 @@ include_directories(include)
 
 ## Autogenerate the c++ capnproto files
 
-file(GLOB_RECURSE capnp_messages ${CMAKE_CURRENT_SOURCE_DIR}/capmsgs *.capnp)
-message("${PROJECT_NAME}: Found the following *.capnp files: ${capnp_messages}")
+set(capnp_message_folder ${CMAKE_CURRENT_SOURCE_DIR}/capmsg)
+file(GLOB_RECURSE capnp_messages ${capnp_message_folder} *.capnp)
 
-add_custom_command(OUTPUT src/beacon.capnp.c++ include/${PROJECT_NAME}/beacon.capnp.h
-  COMMAND capnp compile ${capnp_messages} -oc++:${CMAKE_CURRENT_SOURCE_DIR}/src
-  DEPENDS ${capnp_messages}
-  COMMENT "${PROJECT_NAME}: Generating *.c++ and *.h files from *.capnp files."
-)
+set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/src")
+capnp_generate_cpp(CAPNP_SRCS CAPNP_HDRS ${capnp_messages})
+
+message("${PROJECT_NAME}: CAPNP_SRCS: ${CAPNP_SRCS}")
+message("${PROJECT_NAME}: CAPNP_HDRS: ${CAPNP_HDRS}")
+
+message("${PROJECT_NAME}: CAPNP_FOUND: ${CAPNP_FOUND}")
 
 add_custom_target(${PROJECT_NAME}_generate_messages_cpp ALL
   COMMENT "${PROJECT_NAME}_generate_messages_cpp: Triggering generation."
-  SOURCES src/beacon.capnp.c++ include/${PROJECT_NAME}/beacon.capnp.h
+  SOURCES ${CAPNP_SRCS} ${CAPNP_HDRS}
 )
+
+#set(capnp_message_folder ${CMAKE_CURRENT_SOURCE_DIR}/capmsg)
+#message("${PROJECT_NAME}: CapnProto message folder: ${capnp_message_folder}")
+
+#file(GLOB_RECURSE capnp_messages RELATIVE ${capnp_message_folder} *.capnp)
+#message("${PROJECT_NAME}: Found the following *.capnp files: ${capnp_messages}")
+
+#message("${PROJECT_NAME}: Working directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+
+#add_custom_command(OUTPUT src/beacon.capnp.c++ include/${PROJECT_NAME}/beacon.capnp.h
+#  COMMAND capnp compile --output=c++:${CMAKE_CURRENT_SOURCE_DIR}/src ${capnp_messages}
+#  DEPENDS ${capnp_messages}
+#  WORKING_DIRECTORY ${capnp_message_folder}
+#  COMMENT "${PROJECT_NAME}: Generating *.c++ and *.h files from *.capnp files."
+#  VERBATIM
+#)
+
+#add_custom_target(${PROJECT_NAME}_generate_messages_cpp ALL
+#  COMMENT "${PROJECT_NAME}_generate_messages_cpp: Triggering generation."
+#  SOURCES src/beacon.capnp.c++ include/${PROJECT_NAME}/beacon.capnp.h
+#)
 
 ## Declare the C++ capnproto library
 

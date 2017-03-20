@@ -4,9 +4,6 @@
             "rel": "cn5_RelatedTo"
         },
         {
-            "rel": "cn5_ExternalURL"
-        },
-        {
             "rel": "cn5_FormOf"
         },
         {
@@ -93,6 +90,9 @@
         {
             "rel": "cn5_NotHasProperty"
         },
+	{
+	    "rel": "cn5_SimilarTo"
+	},
         {
             "rel": "cn5_dbpedia/genre"
         },
@@ -121,7 +121,7 @@
             "rel": "cn5_dbpedia/leader"
         },
         {
-        	"rel": "cn5_Wildcard"
+            "rel": "cn5_Wildcard"
         }
     ]
 }

@@ -250,6 +250,11 @@ namespace cng
 			}
 			QString endTerm = end["term"].toString();
 			endTerm = trimTerm(endTerm);
+			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
+						endTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
+			{
+				this->currentConceptNetCall->concepts.push_back(endTerm.toStdString());
+			}
 			//start of edge
 			QJsonObject start = edge["start"].toObject();
 			QString startLanguage = start["language"].toString();
@@ -260,6 +265,11 @@ namespace cng
 			}
 			QString startTerm = start["term"].toString();
 			startTerm = trimTerm(startTerm);
+			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
+						startTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
+			{
+				this->currentConceptNetCall->concepts.push_back(startTerm.toStdString());
+			}
 			QString relation = edge["rel"].toObject()["label"].toString();
 			double weight = edge["weight"].toDouble();
 			// sources
@@ -271,9 +281,6 @@ namespace cng
 			}
 			this->currentConceptNetCall->edges.push_back(tmp);
 		}
-#ifdef ConceptNetQueryCommandDebug
-		cout << this->currentConceptNetCall->toString();
-#endif
 		if (!nextPage.isEmpty())
 		{
 			QUrl url("http://api.localhost" + nextPage);
@@ -281,7 +288,11 @@ namespace cng
 		}
 		else
 		{
+#ifdef ConceptNetQueryCommandDebug
+			cout << this->currentConceptNetCall->toString();
+#endif
 			// start json processing
+			this->currentConceptNetCall->findAdjectives();
 			emit jsonExtracted();
 		}
 
@@ -335,49 +346,6 @@ namespace cng
 		return concept;
 	}
 
-	QString ConceptNetQueryCommand::createWeightedASPPredicates()
-	{
-		//TODO think about concept net weighting
-		/**
-		 * weights directly from conceptnet can not be used in asp predicates since they are double values containing a dot which violates
-		 * the asp syntax
-		 * a possible way is to multiply the weight with 100 and cast it to int keeping the first two digits after the comma and leaving the rest
-		 * are weights even necessary? perhaps to use it during optimization
-		 */
-		QString ret = "";
-		for (auto edge : this->currentConceptNetCall->edges)
-		{
-			QString tmp = edge->relation;
-			tmp[0] = tmp[0].toLower();
-			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(", ").append(
-					QString::number((int)(edge->weight * 100))).append(", ").append(
-					QString::number(edge->sources.size())).append(").\n");
-		}
-		return ret;
-	}
-
-	QString ConceptNetQueryCommand::createAvgWeightedASPPredicates()
-	{
-		//TODO think about avg weighting
-		/**
-		 * a high value is for example given for a cup holds a liquid which has a weight of 6.9 and 13 supporters
-		 * which results in an average weight of 0.5... which is very low
-		 * this can be caused by unreliable sources like word games and can lower the influence of good source, which are distinguished in weight and only the sum is given.
-		 * perhaps do not use averaged weights
-		 */
-		QString ret = "";
-		for (auto edge : this->currentConceptNetCall->edges)
-		{
-			QString tmp = edge->relation;
-			tmp[0] = tmp[0].toLower();
-			ret.append(tmp).append("(").append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					conceptToASPPredicate(edge->secondConcept)).append(", ").append(
-					QString::number((int)(edge->weight / edge->sources.size()))).append(").\n");
-		}
-		return ret;
-	}
-
 	QString ConceptNetQueryCommand::createASPPredicates()
 	{
 		QString ret = "";
@@ -390,7 +358,9 @@ namespace cng
 			QString tmp = "";
 			tmp.append(this->prefix).append(edge->relation);
 			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
-					this->prefix).append(conceptToASPPredicate(edge->secondConcept)).append(").\n");
+					this->prefix).append(
+					conceptToASPPredicate(edge->secondConcept).append(", ").append(
+							QString::number((int)(edge->weight * edge->sources.size())))).append(").\n");
 			ret.append(tmp);
 		}
 		return ret;

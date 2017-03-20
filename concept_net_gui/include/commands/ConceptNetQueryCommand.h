@@ -65,14 +65,6 @@ namespace cng
 		 */
 		QNetworkAccessManager *nam;
 		/**
-		 * Extracts ASP predicates from concept net answer and adds weight and number of sources
-		 */
-		QString createWeightedASPPredicates();
-		/**
-		 * Extracts ASP predicates from concept net answer and adds weight divided by number of sources
-		 */
-		QString createAvgWeightedASPPredicates();
-		/**
 		 * Extracts ASP predicates from concept net answer
 		 */
 		QString createASPPredicates();

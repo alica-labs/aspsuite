@@ -187,7 +187,7 @@ namespace cng
 			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
-		this->gui->getUi()->conceptNetBtn->setEnabled(false);
+		this->gui->enableGui(false);
 	}
 
 	void ConceptNetQueryCommand::undo()
@@ -292,7 +292,8 @@ namespace cng
 			cout << this->currentConceptNetCall->toString();
 #endif
 			// start json processing
-			this->currentConceptNetCall->findAdjectives();
+//TODO remove comment
+//			this->currentConceptNetCall->findAdjectives();
 			emit jsonExtracted();
 		}
 
@@ -316,7 +317,7 @@ namespace cng
 			this->gui->getUi()->programLabel->setText(
 					this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
 		}
-		this->gui->getUi()->conceptNetBtn->setEnabled(true);
+		this->gui->enableGui(true);
 		this->gui->getUi()->conceptNetBtn->setFocus();
 	}
 
@@ -342,6 +343,10 @@ namespace cng
 		if (concept.contains("é"))
 		{
 			concept.replace("é", "e");
+		}
+		if(concept.contains("æ"))
+		{
+			concept.replace("æ", "ae");
 		}
 		return concept;
 	}
@@ -388,6 +393,12 @@ namespace cng
 		{
 			if (edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
 			{
+				continue;
+			}
+			if (edge->firstConcept.at(0).isDigit() || edge->secondConcept.at(0).isDigit())
+			{
+				std::cout << "ConceptNetQueryCommand: SKipping edge:" << edge->firstConcept.toStdString() << " " << edge->relation.toStdString()
+						<< " " << edge->secondConcept.toStdString() << " since one concept starts with a number!" << std::endl;
 				continue;
 			}
 			QString tmpRel = edge->relation;

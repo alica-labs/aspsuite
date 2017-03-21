@@ -39,7 +39,7 @@ namespace cng
 		std::stringstream ss;
 		ss << "ConceptNetCall:" << std::endl;
 		ss << "ID: " << this->id.toStdString() << std::endl;
-//		ss << "Edges:" << std::endl;
+		ss << "Edges:" << std::endl;
 //		for (auto edge : this->edges)
 //		{
 //			ss << edge->toString();
@@ -55,20 +55,21 @@ namespace cng
 
 	void ConceptNetCall::findAdjectives()
 	{
-			if(this->currentAdjectiveIndex >= this->concepts.size())
+		if (this->currentAdjectiveIndex >= this->concepts.size())
+		{
+			for (auto adj : this->adjectives)
 			{
-				for(auto adj : this->adjectives)
-				{
-					std::cout << adj << std::endl;
-				}
-				return;
+				std::cout << adj << std::endl;
 			}
-			auto concept = this->concepts.at(this->currentAdjectiveIndex);
-			QString urlString = "http://api.localhost/query?node=/c/en/";
-			urlString.append(concept.c_str()).append("/a");
-			QUrl url(urlString);
-			QNetworkRequest request(url);
-			this->nam->get(request);
+			return;
+		}
+
+		auto concept = this->concepts.at(this->currentAdjectiveIndex);
+		QString urlString = "http://api.localhost/query?node=/c/en/";
+		urlString.append(concept.c_str()).append("/a");
+		QUrl url(urlString);
+		QNetworkRequest request(url);
+		this->nam->get(request);
 	}
 
 	void ConceptNetCall::adjectiveChecked(QNetworkReply* reply)
@@ -87,7 +88,7 @@ namespace cng
 		// save next page form following get request
 		QString nextPage = jsonDoc.object()["view"].toObject()["nextPage"].toString();
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
-		if(edges.size() > 0)
+		if (edges.size() > 0)
 		{
 			this->adjectives.push_back(this->concepts.at(this->currentAdjectiveIndex));
 		}

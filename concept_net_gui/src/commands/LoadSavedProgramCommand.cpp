@@ -9,6 +9,7 @@
 #include "gui/SettingsDialog.h"
 
 #include "handler/CommandHistoryHandler.h"
+#include "handler/SaveLoadHandler.h"
 
 #include "containers/SolverSettings.h"
 
@@ -86,6 +87,9 @@ namespace cng
 				std::shared_ptr<ConceptNetQueryCommand> c = std::make_shared<ConceptNetQueryCommand>(
 						this->gui, cmd["queryString"].toString());
 				c->execute();
+				QEventLoop loop;
+				this->connect(this,  SIGNAL(cn5CallFinished()), &loop, SLOT(quit()) );
+				loop.exec();
 				emit this->gui->updateCommandList();
 				continue;
 			}
@@ -165,6 +169,8 @@ namespace cng
 				std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;
 			}
 		}
+		std::cout << "LoadSavedProgramCommand: Loading finished!" << std::endl;
+		this->gui->slHandler->currentLoadCmd = nullptr;
 	}
 
 	void LoadSavedProgramCommand::undo()

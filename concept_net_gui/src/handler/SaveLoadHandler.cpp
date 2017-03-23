@@ -35,7 +35,7 @@ namespace cng
 	SaveLoadHandler::SaveLoadHandler(ConceptNetGui* gui)
 	{
 		this->gui = gui;
-
+		this->currentLoadCmd = nullptr;
 	}
 
 	SaveLoadHandler::~SaveLoadHandler()
@@ -152,6 +152,7 @@ namespace cng
 
 			QByteArray loadedData = file.readAll();
 			std::shared_ptr<LoadSavedProgramCommand> cmd = std::make_shared<LoadSavedProgramCommand>(this->gui, filename, loadedData);
+			this->currentLoadCmd = cmd;
 			cmd->execute();
 		}
 	}

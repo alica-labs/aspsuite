@@ -34,6 +34,7 @@ set(conceptNetGui_SRCS
   src/containers/SolverSettings.cpp
   src/containers/ConceptNetCall.cpp
   src/containers/ConceptNetEdge.cpp
+  src/containers/ConceptNetConcept.cpp
   src/commands/NewSolverCommand.cpp
   src/commands/ChangeSolverSettingsCommand.cpp
   src/commands/ConceptNetQueryCommand.cpp
@@ -58,6 +59,7 @@ set(conceptNetGui_HDRS
   include/containers/SolverSettings.h
   include/containers/ConceptNetCall.h
   include/containers/ConceptNetEdge.h
+  include/containers/ConceptNetConcept.h
   include/commands/Command.h
   include/commands/NewSolverCommand.h
   include/commands/ChangeSolverSettingsCommand.h

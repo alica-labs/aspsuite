@@ -107,7 +107,7 @@ namespace cng
 		 * Map of metaknowlege relation to asp progsm containing this relation
 		 */
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
-
+		QString conceptWithoutPrefix;
 		bool conceptContainsUTF8(QString concept);
 
 	signals:

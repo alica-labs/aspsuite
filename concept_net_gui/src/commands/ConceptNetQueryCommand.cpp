@@ -8,14 +8,17 @@
 #include "commands/ConceptNetQueryCommand.h"
 #include "commands/GroundCommand.h"
 #include "commands/SolveCommand.h"
+#include "commands/LoadSavedProgramCommand.h"
 
 #include "containers/ConceptNetCall.h"
 #include "containers/ConceptNetEdge.h"
+#include "containers/ConceptNetConcept.h"
 
 #include "gui/ConceptNetGui.h"
 #include "gui/ModelSettingDialog.h"
 
 #include "handler/CommandHistoryHandler.h"
+#include "handler/SaveLoadHandler.h"
 
 #include "asp_solver/ASPSolver.h"
 
@@ -72,6 +75,10 @@ namespace cng
 			relations.append(tmp.at(i));
 			relations.append("\t");
 			if (tmp.at(i).size() <= 10)
+			{
+				relations.append("\t");
+			}
+			if (tmp.at(i).size() <= 20)
 			{
 				relations.append("\t");
 			}
@@ -254,12 +261,14 @@ namespace cng
 				continue;
 			}
 			QString endTerm = end["term"].toString();
+			endTerm = trimTerm(endTerm);
 			if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm))
 			{
 				std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
 				continue;
 			}
-			endTerm = trimTerm(endTerm);
+			QString endSenseLabel = end["sense_label"].toString();
+			QString endID = end["@id"].toString();
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
 						endTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
 			{
@@ -274,12 +283,14 @@ namespace cng
 				continue;
 			}
 			QString startTerm = start["term"].toString();
+			startTerm = trimTerm(startTerm);
 			if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm))
 			{
 				std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
 				continue;
 			}
-			startTerm = trimTerm(startTerm);
+			QString startSenseLabel = start["sense_label"].toString();
+			QString startID = start["@id"].toString();
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
 						startTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
 			{
@@ -288,7 +299,9 @@ namespace cng
 			QString relation = edge["rel"].toObject()["label"].toString();
 			// sources
 			QJsonArray sources = edge["sources"].toArray();
-			auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, startTerm, endTerm, relation, weight);
+			auto tmp = std::make_shared<ConceptNetEdge>(
+					edgeId, startLanguage, make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
+					make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
 			for (int j = 0; j < sources.size(); j++)
 			{
 				tmp->sources.push_back(sources[j].toObject()["contributor"].toString());
@@ -322,8 +335,10 @@ namespace cng
 		program.append(tmp);
 		std::shared_ptr<GroundCommand> gc = std::make_shared<GroundCommand>(this->gui, program);
 		gc->execute();
+		this->gui->chHandler->removeFromCommandHistory(gc);
 		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
 		sc->execute();
+		this->gui->chHandler->removeFromCommandHistory(sc);
 		auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
 		for (auto pair : pgmMap)
 		{
@@ -332,12 +347,15 @@ namespace cng
 					this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
 		}
 		this->gui->enableGui(true);
+		if (this->gui->slHandler->currentLoadCmd != nullptr)
+		{
+			emit this->gui->slHandler->currentLoadCmd->cn5CallFinished();
+		}
 		this->gui->getUi()->conceptNetBtn->setFocus();
 	}
 
 	QString ConceptNetQueryCommand::conceptToASPPredicate(QString concept)
 	{
-		//  remove chars not supported by asp (UTF-8 or syntax symbols)
 		if (concept.contains('.'))
 		{
 			concept.replace('.', '_');
@@ -350,18 +368,6 @@ namespace cng
 		{
 			concept.replace(' ', '_');
 		}
-//		if (concept.contains("è"))
-//		{
-//			concept.replace("è", "e");
-//		}
-//		if (concept.contains("é"))
-//		{
-//			concept.replace("é", "e");
-//		}
-//		if(concept.contains("æ"))
-//		{
-//			concept.replace("æ", "ae");
-//		}
 		return concept;
 	}
 
@@ -376,9 +382,9 @@ namespace cng
 			}
 			QString tmp = "";
 			tmp.append(this->prefix).append(edge->relation);
-			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept)).append(", ").append(
+			tmp.append("(").append(this->prefix).append(conceptToASPPredicate(edge->firstConcept->term)).append(", ").append(
 					this->prefix).append(
-					conceptToASPPredicate(edge->secondConcept).append(", ").append(
+					conceptToASPPredicate(edge->secondConcept->term).append(", ").append(
 							QString::number((int)(edge->weight * edge->sources.size())))).append(").\n");
 			ret.append(tmp);
 		}
@@ -414,16 +420,16 @@ namespace cng
 				QString pgm = "#program cn5Knowledge(n,m).\n";
 				pgm.append("#external -").append(tmpRel).append("(n, m).\n");
 				pgm.append(tmpRel).append("(n, m) :- not -").append(tmpRel).append("(n, m), ").append(
-						conceptToASPPredicate(edge->firstConcept)).append("(n), ").append(
-						conceptToASPPredicate(edge->secondConcept)).append("(m)").append(".\n");
+						conceptToASPPredicate(edge->firstConcept->term)).append("(n), ").append(
+						conceptToASPPredicate(edge->secondConcept->term)).append("(m)").append(".\n");
 				ret.emplace(tmpRel, pgm);
 
 			}
 			else
 			{
 				ret.at(tmpRel).append(tmpRel).append("(n, m) :- not -").append(tmpRel).append("(n, m), ").append(
-						conceptToASPPredicate(edge->firstConcept)).append("(n), ").append(
-						conceptToASPPredicate(edge->secondConcept)).append("(m)").append(".\n");
+						conceptToASPPredicate(edge->firstConcept->term)).append("(n), ").append(
+						conceptToASPPredicate(edge->secondConcept->term)).append("(m)").append(".\n");
 			}
 
 		}
@@ -438,9 +444,9 @@ namespace cng
 
 	bool ConceptNetQueryCommand::conceptContainsUTF8(QString concept)
 	{
-		for(int i = 0; i < concept.length(); i++)
+		for (int i = 0; i < concept.length(); i++)
 		{
-			if(concept.at(i).unicode() > 127)
+			if (concept.at(i).unicode() > 127)
 			{
 				return true;
 			}

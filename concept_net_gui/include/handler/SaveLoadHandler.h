@@ -9,10 +9,12 @@
 #define INCLUDE_HANDLER_SAVELOADHANDLER_H_
 
 #include <QObject>
+#include <memory>
 
 namespace cng
 {
 
+	class LoadSavedProgramCommand;
 	class ConceptNetGui;
 	/**
 	 * Handles Save and Load methods
@@ -27,6 +29,8 @@ namespace cng
 		 */
 		SaveLoadHandler(ConceptNetGui* gui);
 		virtual ~SaveLoadHandler();
+
+		std::shared_ptr<LoadSavedProgramCommand> currentLoadCmd;
 
 	public slots:
 		/**
@@ -46,11 +50,13 @@ namespace cng
 		 */
 		void loadBackgroundKnowledge();
 
+
 	private:
 		/**
 		 * Pointer to the main window handler
 		 */
 		ConceptNetGui* gui;
+
 	};
 
 } /* namespace cng */

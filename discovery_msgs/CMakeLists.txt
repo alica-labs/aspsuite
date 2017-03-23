@@ -18,18 +18,12 @@ catkin_package(
 include_directories(src)
  
 ## Autogenerate the c++ capnproto files
-set(capnp_message_folder ${CMAKE_CURRENT_SOURCE_DIR}/msg)
+set(capnp_message_folder "${CMAKE_CURRENT_SOURCE_DIR}/msg")
 file(GLOB_RECURSE capnp_messages ${capnp_message_folder} *.capnp)
-
-message("${PROJECT_NAME}: Found schemas: ${capnp_messages}")
 
 set(CAPNPC_SRC_PREFIX msg)
 set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 capnp_generate_cpp(CAPNP_SRCS CAPNP_HDRS ${capnp_messages})
-
-## Some debug output
-message("${PROJECT_NAME}: CAPNP_SRCS: ${CAPNP_SRCS}")
-message("${PROJECT_NAME}: CAPNP_HDRS: ${CAPNP_HDRS}")
 
 ## Declare the C++ capnproto message library
 add_library(${PROJECT_NAME}

@@ -239,6 +239,11 @@ namespace cng
 		for (int i = 0; i < edges.size(); i++)
 		{
 			QJsonObject edge = edges[i].toObject();
+			double weight = edge["weight"].toDouble();
+			if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			{
+				continue;
+			}
 			//end of edge
 			QString edgeId = edge["@id"].toString();
 			QJsonObject end = edge["end"].toObject();
@@ -249,6 +254,11 @@ namespace cng
 				continue;
 			}
 			QString endTerm = end["term"].toString();
+			if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm))
+			{
+				std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
+				continue;
+			}
 			endTerm = trimTerm(endTerm);
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
 						endTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
@@ -264,6 +274,11 @@ namespace cng
 				continue;
 			}
 			QString startTerm = start["term"].toString();
+			if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm))
+			{
+				std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
+				continue;
+			}
 			startTerm = trimTerm(startTerm);
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
 						startTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
@@ -271,7 +286,6 @@ namespace cng
 				this->currentConceptNetCall->concepts.push_back(startTerm.toStdString());
 			}
 			QString relation = edge["rel"].toObject()["label"].toString();
-			double weight = edge["weight"].toDouble();
 			// sources
 			QJsonArray sources = edge["sources"].toArray();
 			auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, startTerm, endTerm, relation, weight);
@@ -336,18 +350,18 @@ namespace cng
 		{
 			concept.replace(' ', '_');
 		}
-		if (concept.contains("è"))
-		{
-			concept.replace("è", "e");
-		}
-		if (concept.contains("é"))
-		{
-			concept.replace("é", "e");
-		}
-		if(concept.contains("æ"))
-		{
-			concept.replace("æ", "ae");
-		}
+//		if (concept.contains("è"))
+//		{
+//			concept.replace("è", "e");
+//		}
+//		if (concept.contains("é"))
+//		{
+//			concept.replace("é", "e");
+//		}
+//		if(concept.contains("æ"))
+//		{
+//			concept.replace("æ", "ae");
+//		}
 		return concept;
 	}
 
@@ -391,16 +405,6 @@ namespace cng
 		std::vector<QString> addedRelations;
 		for (auto edge : this->currentConceptNetCall->edges)
 		{
-			if (edge->weight < this->gui->modelSettingsDialog->getMinCn5Weight())
-			{
-				continue;
-			}
-			if (edge->firstConcept.at(0).isDigit() || edge->secondConcept.at(0).isDigit())
-			{
-				std::cout << "ConceptNetQueryCommand: SKipping edge:" << edge->firstConcept.toStdString() << " " << edge->relation.toStdString()
-						<< " " << edge->secondConcept.toStdString() << " since one concept starts with a number!" << std::endl;
-				continue;
-			}
 			QString tmpRel = edge->relation;
 			tmpRel[0] = tmpRel[0].toLower();
 			auto it = find(addedRelations.begin(), addedRelations.end(), tmpRel);
@@ -430,6 +434,18 @@ namespace cng
 		}
 #endif
 		return ret;
+	}
+
+	bool ConceptNetQueryCommand::conceptContainsUTF8(QString concept)
+	{
+		for(int i = 0; i < concept.length(); i++)
+		{
+			if(concept.at(i).unicode() > 127)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 } /* namespace cng */

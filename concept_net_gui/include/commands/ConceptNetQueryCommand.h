@@ -108,6 +108,8 @@ namespace cng
 		 */
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
 
+		bool conceptContainsUTF8(QString concept);
+
 	signals:
 		/**
 		 * Signal used as soon as the extraction from concept net is finished

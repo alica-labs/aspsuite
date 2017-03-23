@@ -8,14 +8,14 @@ find_package(catkin REQUIRED)
 find_package(CapnProto)
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES discovery_msgs
+  INCLUDE_DIRS include
+  LIBRARIES discovery_msgs
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
 # make src an include directory, because everything is generated into the src folder
-include_directories(src)
+include_directories(include)
  
 ## Autogenerate the c++ capnproto files
 set(capnp_message_folder "${CMAKE_CURRENT_SOURCE_DIR}/msg")

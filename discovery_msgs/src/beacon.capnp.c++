@@ -83,6 +83,7 @@ const ::capnp::_::RawSchema s_cd7c0e6550ea3ccc = {
 
 // =======================================================================================
 
+namespace discovery_msgs {
 
 // Beacon
 #ifndef _MSC_VER
@@ -96,4 +97,5 @@ constexpr ::capnp::_::RawBrandedSchema const* Beacon::_capnpPrivate::brand;
 #endif  // !CAPNP_LITE
 
 
+}  // namespace
 

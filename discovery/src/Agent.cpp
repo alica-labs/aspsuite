@@ -1,12 +1,24 @@
 #include "discovery/Agent.h"
 
+#include <discovery_msgs/beacon.capnp.h>
 #include <zmq.h>
+
+#include <capnp/message.h>
+#include <capnp/serialize-packed.h>
 
 #include <assert.h>
 #include <chrono>
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+
+// Network stuff
+#include <stdio.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 //#define DEBUG_AGENT
 
@@ -92,6 +104,9 @@ void Agent::run()
     // this->checkZMQVersion();
     // this->testUUIDStuff();
 
+	this->getWirelessAddress();
+
+
     if (this->sender)
     {
 #ifdef DEBUG_AGENT
@@ -114,9 +129,84 @@ void Agent::run()
     }
 }
 
+/**
+ * This method should store the IP address of the W-LAN interface, if available.
+ * @return True, if IP address is determined, false otherwise.
+ */
+bool Agent::getWirelessAddress()
+{
+    struct ifaddrs *ifAddrStruct = NULL;
+    struct ifaddrs *ifa = NULL;
+    void *tmpAddrPtr = NULL;
+
+    getifaddrs(&ifAddrStruct);
+
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (!ifa->ifa_addr)
+        {
+            continue;
+        }
+        // filters for 'w'ireless interfaces with ipv4 addresses
+        if (ifa->ifa_name[0] == 'w' &&ifa->ifa_addr->sa_family == AF_INET)
+        { // check it is IP4
+            // is a valid IP4 Address
+            tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            //char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, this->wirelessIpAddress, INET_ADDRSTRLEN);
+            printf("%s IP Address %s\n", ifa->ifa_name, this->wirelessIpAddress);
+            if (ifAddrStruct != NULL)
+				freeifaddrs(ifAddrStruct);
+			return true;
+        }
+    }
+    if (ifAddrStruct != NULL)
+        freeifaddrs(ifAddrStruct);
+    return false;
+}
+
 void Agent::send()
 {
-    zmq_msg_t msg;
+    ::capnp::MallocMessageBuilder message;
+
+    discovery_msgs::Beacon::Builder beacon = message.initRoot<discovery_msgs::Beacon>();
+    beacon.setIp(this->wirelessIpAddress);
+    beacon.setPort(6666);
+    ::capnp::Data::Builder uuidBuilder = beacon.initUuid(16);
+    uuidBuilder[0] = this->uuid;
+
+    //????
+
+
+
+
+
+        //    ::capnp::List<Person>::Builder people = addressBook.initPeople(2);
+        //
+        //    Person::Builder alice = people[0];
+        //    alice.setId(123);
+        //    alice.setName("Alice");
+        //    alice.setEmail("alice@example.com");
+        //    // Type shown for explanation purposes; normally you'd use auto.
+        //    ::capnp::List<Person::PhoneNumber>::Builder alicePhones = alice.initPhones(1);
+        //    alicePhones[0].setNumber("555-1212");
+        //    alicePhones[0].setType(Person::PhoneNumber::Type::MOBILE);
+        //    alice.getEmployment().setSchool("MIT");
+        //
+        //    Person::Builder bob = people[1];
+        //    bob.setId(456);
+        //    bob.setName("Bob");
+        //    bob.setEmail("bob@example.com");
+        //    auto bobPhones = bob.initPhones(2);
+        //    bobPhones[0].setNumber("555-4567");
+        //    bobPhones[0].setType(Person::PhoneNumber::Type::HOME);
+        //    bobPhones[1].setNumber("555-7654");
+        //    bobPhones[1].setType(Person::PhoneNumber::Type::WORK);
+        //    bob.getEmployment().setUnemployed();
+        //
+    writePackedMessageToFd(fd, message);
+
+        zmq_msg_t msg;
     int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
     std::cout << "Sended " << rc << " chars." << std::endl;
     assert(rc == 9);
@@ -135,7 +225,7 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
     int rc = zmq_msg_init_size(msg_, strlen(body_));
     if (rc != 0)
     {
-    	std::cout << "Agent::msg_send: Error after init msg: " << zmq_strerror(errno) << std::endl;
+        std::cout << "Agent::msg_send: Error after init msg: " << zmq_strerror(errno) << std::endl;
         return rc;
     }
 
@@ -161,20 +251,20 @@ int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const cha
     int rc = zmq_msg_init(msg_);
     if (rc != 0)
     {
-    	std::cout << "Agent::msg_recv_cmp: Error after init msg: " << zmq_strerror(errno) << std::endl;
+        std::cout << "Agent::msg_recv_cmp: Error after init msg: " << zmq_strerror(errno) << std::endl;
         return -1;
     }
 
     int recv_rc = zmq_msg_recv(msg_, s_, 0);
     if (recv_rc == -1)
     {
-    	std::cout << "Agent::msg_recv_cmp: Error after receive msg: " << zmq_strerror(errno) << std::endl;
+        std::cout << "Agent::msg_recv_cmp: Error after receive msg: " << zmq_strerror(errno) << std::endl;
         return -1;
     }
 
     if (strcmp(zmq_msg_group(msg_), group_) != 0)
     {
-    	std::cout << "Agent::msg_recv_cmp: Error after compare group: " << zmq_strerror(errno) << std::endl;
+        std::cout << "Agent::msg_recv_cmp: Error after compare group: " << zmq_strerror(errno) << std::endl;
         zmq_msg_close(msg_);
         return -1;
     }
@@ -185,7 +275,7 @@ int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const cha
 
     if (strcmp(body, body_) != 0)
     {
-    	std::cout << "Agent::msg_recv_cmp: Message does not fit!" << std::endl;
+        std::cout << "Agent::msg_recv_cmp: Message does not fit!" << std::endl;
         zmq_msg_close(msg_);
         return -1;
     }

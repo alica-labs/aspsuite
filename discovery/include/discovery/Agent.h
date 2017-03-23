@@ -30,7 +30,9 @@ class Agent : public Worker
     int msg_recv_cmp (zmq_msg_t *msg_, void *s_, const char* group_, const char* body_);
     void testUUIDStuff();
     void checkZMQVersion();
+    bool getWirelessAddress();
     uuid_t uuid;
+    char* wirelessIpAddress;
 
     // zmq stuff
     bool sender;

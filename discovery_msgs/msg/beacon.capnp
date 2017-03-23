@@ -1,3 +1,6 @@
+using Cxx = import "/capnp/c++.capnp";
+$Cxx.namespace("discovery_msgs");
+
 @0x8c1726f48700b030;
 
 struct Beacon {

@@ -15,31 +15,34 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 # this enables the draft part of the api
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
-message("#### ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
-message("#### ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
+message("${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
+message("${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
 
 find_package(UUID)
-message("#### UUID-Includes: ${UUID_INCLUDE_DIRS}") 
-message("#### UUID-Libraries: ${UUID_LIBRARIES}")
+message("${PROJECT_NAME}: UUID-Includes: ${UUID_INCLUDE_DIRS}") 
+message("${PROJECT_NAME}: UUID-Libraries: ${UUID_LIBRARIES}")
+
+# Introduce CapnProto
+find_package(CapnProto REQUIRED)
 
 
 # Catkin Stuff
 find_package(catkin QUIET)
 if (catkin_FOUND)
-  find_package(catkin REQUIRED COMPONENTS event_handling)
+  find_package(catkin REQUIRED COMPONENTS event_handling discovery_msgs)
 else (catkin_FOUND)
-  set(catkin_LIBRARIES "event_handling")
+  set(catkin_LIBRARIES "event_handling discovery_msgs")
 endif(catkin_FOUND)
 if(catkin_FOUND)
   catkin_package(
     INCLUDE_DIRS include
   # LIBRARIES 
-    CATKIN_DEPENDS event_handling
+    CATKIN_DEPENDS event_handling discovery_msgs
     DEPENDS ZeroMQ UUID
   )
 endif(catkin_FOUND)
-
-message("#### catkin-Libraries: ${catkin_LIBRARIES}")
+#
+message("${PROJECT_NAME}: catkin_LIBRARIES: ${catkin_LIBRARIES}")
 
 include_directories(
   include 
@@ -47,6 +50,8 @@ include_directories(
   ${ZeroMQ_INCLUDE_DIRS}
   ${UUID_INCLUDE_DIRS}
 )
+
+message("${PROJECT_NAME}: catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
 
 ## DISCOVERY
 add_executable(${PROJECT_NAME}
@@ -72,6 +77,7 @@ target_link_libraries(Agent
   ${catkin_LIBRARIES} 
   ${ZeroMQ_LIBRARIES}
   ${UUID_LIBRARIES}
+  ${CAPNP_LIBRARIES}
   pthread
 )
 

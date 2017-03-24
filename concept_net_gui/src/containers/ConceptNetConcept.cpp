@@ -19,7 +19,6 @@ namespace cng
 
 	ConceptNetConcept::~ConceptNetConcept()
 	{
-		// TODO Auto-generated destructor stub
 	}
 
 } /* namespace cng */

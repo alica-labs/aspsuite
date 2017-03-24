@@ -44,14 +44,15 @@ namespace cng
 		std::string toString();
 
 	public slots:
-		void adjectiveChecked(QNetworkReply* reply);
+//		void adjectiveChecked(QNetworkReply* reply);
+		void checkAdjectives();
 		void findAdjectives();
 
 	private:
 		int currentAdjectiveIndex;
 
-	signals:
-		void nextAdjective();
+//	signals:
+//		void nextAdjective();
 	};
 
 } /* namespace cng */

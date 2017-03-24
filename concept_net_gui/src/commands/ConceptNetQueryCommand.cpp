@@ -319,8 +319,8 @@ namespace cng
 			cout << this->currentConceptNetCall->toString();
 #endif
 			// start json processing
-//TODO remove comment
-//			this->currentConceptNetCall->findAdjectives();
+			this->currentConceptNetCall->findAdjectives();
+//			std::cout << this->currentConceptNetCall->toString() << std::endl;
 			emit jsonExtracted();
 		}
 

@@ -44,6 +44,10 @@ namespace cng
 		ConceptNetGui* gui;
 		QString query;
 		/**
+		 * is wildcard in case of wildcard(concept, concept) since its not clear which one is ment
+		 */
+		QString queryConcept;
+		/**
 		 * Encapsulates the results given from COncept Net
 		 */
 		ConceptNetCall* currentConceptNetCall;
@@ -85,6 +89,8 @@ namespace cng
 		 * 1: plain concept
 		 * 2: relation(concept, wildcard)
 		 * 3: relation(wildcard, concept)
+		 * 4: wildcard(concept, concept)
+		 * 5: relation(concept)
 		 */
 		void handleQuery();
 		/**

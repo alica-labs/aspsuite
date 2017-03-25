@@ -88,7 +88,7 @@ namespace cng
 						this->gui, cmd["queryString"].toString());
 				c->execute();
 				QEventLoop loop;
-				this->connect(this,  SIGNAL(cn5CallFinished()), &loop, SLOT(quit()) );
+				this->connect(this, SIGNAL(cn5CallFinished()), &loop, SLOT(quit()) );
 				loop.exec();
 				emit this->gui->updateCommandList();
 				continue;

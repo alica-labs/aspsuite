@@ -115,6 +115,7 @@ namespace cng
 		//cn5_Wildcard(concept, concept)
 		if (this->query.contains("cn5_Wildcard"))
 		{
+			this->queryConcept = QString("wildcard");
 			auto conceptRight = this->query.mid(commaPos + 1, this->query.size() - commaPos);
 			auto conceptLeft = this->query.mid(pos + 1, commaPos - pos).trimmed();
 			conceptRight = conceptRight.left(conceptRight.size() - 1).trimmed();
@@ -133,6 +134,7 @@ namespace cng
 				auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
 				concept = concept.left(concept.size() - 1).trimmed();
 				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
+				this->queryConcept = concept;
 				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
 				callUrl(url);
 			}
@@ -142,6 +144,7 @@ namespace cng
 				auto concept = this->query.mid(pos + 1, commaPos - pos).trimmed();
 				concept = concept.left(concept.size() - 1);
 				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
+				this->queryConcept = concept;
 				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation);
 				callUrl(url);
 			}
@@ -152,6 +155,7 @@ namespace cng
 			auto concept = this->query.right(this->query.size() - pos - 1);
 			concept = concept.left(concept.size() - 1);
 			concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
+			this->queryConcept = concept;
 			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation);
 			callUrl(url);
 		}
@@ -238,7 +242,7 @@ namespace cng
 		// only null in first query
 		if (this->currentConceptNetCall == nullptr)
 		{
-			this->currentConceptNetCall = new ConceptNetCall(id);
+			this->currentConceptNetCall = new ConceptNetCall(this->gui, id, this->queryConcept);
 		}
 		this->currentConceptNetCall->nextEdgesPage = nextPage;
 		// extract edges
@@ -270,9 +274,9 @@ namespace cng
 			QString endSenseLabel = end["sense_label"].toString();
 			QString endID = end["@id"].toString();
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
-						endTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
+						endTerm) == this->currentConceptNetCall->concepts.end())
 			{
-				this->currentConceptNetCall->concepts.push_back(endTerm.toStdString());
+				this->currentConceptNetCall->concepts.push_back(endTerm);
 			}
 			//start of edge
 			QJsonObject start = edge["start"].toObject();
@@ -292,9 +296,9 @@ namespace cng
 			QString startSenseLabel = start["sense_label"].toString();
 			QString startID = start["@id"].toString();
 			if (find(this->currentConceptNetCall->concepts.begin(), this->currentConceptNetCall->concepts.end(),
-						startTerm.toStdString()) == this->currentConceptNetCall->concepts.end())
+						startTerm) == this->currentConceptNetCall->concepts.end())
 			{
-				this->currentConceptNetCall->concepts.push_back(startTerm.toStdString());
+				this->currentConceptNetCall->concepts.push_back(startTerm);
 			}
 			QString relation = edge["rel"].toObject()["label"].toString();
 			// sources

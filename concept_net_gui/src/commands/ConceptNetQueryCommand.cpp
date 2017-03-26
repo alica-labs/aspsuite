@@ -322,9 +322,7 @@ namespace cng
 #ifdef ConceptNetQueryCommandDebug
 			cout << this->currentConceptNetCall->toString();
 #endif
-			// start json processing
-			this->currentConceptNetCall->findAdjectives();
-//			std::cout << this->currentConceptNetCall->toString() << std::endl;
+			this->currentConceptNetCall->findInconsistencies();
 			emit jsonExtracted();
 		}
 

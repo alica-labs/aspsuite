@@ -35,35 +35,41 @@ namespace cng
 
 
 		QNetworkAccessManager *nam;
-		QNetworkAccessManager *nam2;
+//		QNetworkAccessManager *nam2;
+		QNetworkAccessManager *checkNAM;
 
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
-		std::vector<QString> adjectives;
+		std::map<QString, double> adjectives;
 		std::vector<QString> concepts;
+		std::map<QString, double> conceptsToCheck;
+		std::map<QString, double> checkedConcepts;
 		std::map<QString, std::vector<QString>> adjectiveAntonymMap;
 		QString nextEdgesPage;
 		QString queryConcept;
+		std::pair<QString, QString> currentAntonymCheck;
 
 		std::string toString();
 
 	public slots:
 //		void adjectiveChecked(QNetworkReply* reply);
 		void checkFirstAdjectives();
-		void findAdjectives();
+		void inconsistencySearch();
+		void findInconsistencies();
 		void removeIfAntonym(QNetworkReply* reply);
-		void mapAntonyms(QNetworkReply* reply);
+//		void mapAntonyms(QNetworkReply* reply);
+		void collectConcepts(QNetworkReply* reply);
 
 	private:
 		int currentAdjectiveIndex;
-		void collectAntonyms();
+//		void collectAntonyms();
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
 		bool conceptContainsUTF8(QString concept);
 
 	signals:
-		void nextAdjective();
-		void closeLoop();
+		void closeLoopFirstAdjectives();
+		void closeLoopAdjectiveGathering();
 		void closeLoop2();
 	};
 

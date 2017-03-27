@@ -13,12 +13,12 @@
 #include <unistd.h>
 
 // Network stuff
-#include <stdio.h>
-#include <sys/types.h>
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
+#include <stdio.h>
 #include <string.h>
-#include <arpa/inet.h>
+#include <sys/types.h>
 
 //#define DEBUG_AGENT
 
@@ -104,8 +104,7 @@ void Agent::run()
     // this->checkZMQVersion();
     // this->testUUIDStuff();
 
-	this->getWirelessAddress();
-
+    this->getWirelessAddress();
 
     if (this->sender)
     {
@@ -148,16 +147,16 @@ bool Agent::getWirelessAddress()
             continue;
         }
         // filters for 'w'ireless interfaces with ipv4 addresses
-        if (ifa->ifa_name[0] == 'w' &&ifa->ifa_addr->sa_family == AF_INET)
+        if (ifa->ifa_name[0] == 'w' && ifa->ifa_addr->sa_family == AF_INET)
         { // check it is IP4
             // is a valid IP4 Address
             tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
-            //char addressBuffer[INET_ADDRSTRLEN];
+            // char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, this->wirelessIpAddress, INET_ADDRSTRLEN);
             printf("%s IP Address %s\n", ifa->ifa_name, this->wirelessIpAddress);
             if (ifAddrStruct != NULL)
-				freeifaddrs(ifAddrStruct);
-			return true;
+                freeifaddrs(ifAddrStruct);
+            return true;
         }
     }
     if (ifAddrStruct != NULL)
@@ -175,11 +174,20 @@ void Agent::send()
     ::capnp::Data::Builder uuidBuilder = beacon.initUuid(16);
     uuidBuilder[0] = this->uuid;
 
-    //????
+    auto segments = message.getSegmentsForOutput();
 
-    writePackedMessageToFd(fd, message);
+    auto it = segments.begin();
+    auto i = segments.size();
+    assert(i != 0);
+    while (--i != 0)
+    {
+    	zmq_msgs_send();
+        //s_.send_raw(reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::send_more);
+        ++it;
+    }
+    //s_.send_raw(reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::normal);
 
-        zmq_msg_t msg;
+    zmq_msg_t msg;
     int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
     std::cout << "Sended " << rc << " chars." << std::endl;
     assert(rc == 9);

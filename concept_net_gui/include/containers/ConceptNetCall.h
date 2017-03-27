@@ -35,9 +35,9 @@ namespace cng
 		virtual ~ConceptNetCall();
 
 
-		QNetworkAccessManager *nam;
+		QNetworkAccessManager *nam; // namNumber = 0
+		QNetworkAccessManager *checkNAM; // namNumber = 1
 //		QNetworkAccessManager *nam2;
-		QNetworkAccessManager *checkNAM;
 
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
@@ -66,6 +66,10 @@ namespace cng
 //		void collectAntonyms();
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
+		/**
+		 * Executes http get request
+		 */
+		void callUrl(QUrl url, QNetworkAccessManager* n);
 		bool conceptContainsUTF8(QString concept);
 		std::vector<std::vector<std::shared_ptr<ConceptNetEdge>>> inconsistencies;
 

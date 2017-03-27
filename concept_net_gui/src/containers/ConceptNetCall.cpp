@@ -118,16 +118,11 @@ namespace cng
 				{
 					continue;
 				}
-				/**
-				 * is needed to stay in the 600 queries for concept net per minute
-				 */
-//				this->currentThread()->msleep(1000);
 				this->currentAntonymCheck = std::pair<QString, QString>(firstAdjective.first, secondAdjective.first);
 				QUrl url(
 						"http://api.localhost/query?node=/c/en/" + firstAdjective.first + "&other=/c/en/"
 								+ secondAdjective.first + "&rel=/r/Antonym");
-				QNetworkRequest request(url);
-				this->nam->get(request);
+				this->callUrl(url, this->nam);
 				QEventLoop loop;
 				this->connect(this, SIGNAL(closeLoopFirstAdjectives()), &loop, SLOT(quit()));
 				loop.exec();
@@ -138,15 +133,8 @@ namespace cng
 	void ConceptNetCall::removeIfAntonym(QNetworkReply* reply)
 	{
 		QString data = reply->readAll();
-		//remove html part
-//		std::cout << data.toStdString() << std::endl;
-		std::string fullData = data.toStdString();
-		auto start = fullData.find("{\"@context\":");
-		auto end = fullData.find("</script>");
-		fullData = fullData.substr(start, end - start);
 		// parse json
-		auto jsonString = QString(fullData.c_str()).toUtf8();
-		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
+		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
 		if (edges.size() > 0)
 		{
@@ -156,8 +144,8 @@ namespace cng
 				emit closeLoopFirstAdjectives();
 				return;
 			}
-			std::cout << "First weight: " << this->adjectives.at(this->currentAntonymCheck.first)->weight << " Second weight: "
-					<< this->adjectives.at(this->currentAntonymCheck.second)->weight << std::endl;
+			std::cout << "First weight: " << this->adjectives.at(this->currentAntonymCheck.first)->weight
+					<< " Second weight: " << this->adjectives.at(this->currentAntonymCheck.second)->weight << std::endl;
 			std::cout << "ConceptNetCall: Antonym found: ";
 			if (this->adjectives.at(this->currentAntonymCheck.first)
 					< this->adjectives.at(this->currentAntonymCheck.second))
@@ -282,37 +270,28 @@ namespace cng
 	{
 		for (auto adjective : this->adjectives)
 		{
-			/**
-			 * is needed to stay in the 600 queries for concept net per minute
-			 */
-//			this->currentThread()->msleep(1000);
-
 			QEventLoop loopIsA;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopIsA, SLOT(quit()));
 			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA");
-			QNetworkRequest requestIsA(urlIsA);
-			this->checkNAM->get(requestIsA);
+			this->callUrl(urlIsA, this->checkNAM);
 			loopIsA.exec();
 			QEventLoop loopSynonym;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopSynonym, SLOT(quit()));
 			QUrl urlSynonym("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym");
-			QNetworkRequest requestSynonym(urlSynonym);
-			this->checkNAM->get(requestSynonym);
+			this->callUrl(urlSynonym, this->checkNAM);
 			loopSynonym.exec();
 			QEventLoop loopDefinedAs;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopDefinedAs, SLOT(quit()));
 			QUrl urlDefinedAs("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs");
-			QNetworkRequest requestDefinedAs(urlDefinedAs);
-			this->checkNAM->get(requestDefinedAs);
+			this->callUrl(urlDefinedAs, this->checkNAM);
 			loopDefinedAs.exec();
 			QEventLoop loopPartOf;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopPartOf, SLOT(quit()));
 			QUrl urlPartOf("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf");
-			QNetworkRequest requestPartOf(urlPartOf);
-			this->checkNAM->get(requestPartOf);
+			this->callUrl(urlPartOf, this->checkNAM);
 			loopPartOf.exec();
 		}
-		//TODO call emthod to check antonym after this
+		//TODO call method to check antonym after this
 		std::cout << "concepts to check :" << std::endl;
 		for (auto item : this->conceptsToCheck)
 		{
@@ -325,13 +304,7 @@ namespace cng
 	{
 		QString data = reply->readAll();
 		//remove html part
-		std::string fullData = data.toStdString();
-		auto start = fullData.find("{\"@context\":");
-		auto end = fullData.find("</script>");
-		fullData = fullData.substr(start, end - start);
-		// parse json
-		auto jsonString = QString(fullData.c_str()).toUtf8();
-		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
+		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
 		for (int i = 0; i < edges.size(); i++)
 		{
@@ -376,5 +349,11 @@ namespace cng
 		return false;
 	}
 
+	void ConceptNetCall::callUrl(QUrl url, QNetworkAccessManager* n)
+	{
+		QNetworkRequest request(url);
+		request.setRawHeader("Accept", "application/json");
+		n->get(request);
+	}
 } /* namespace cng */
 

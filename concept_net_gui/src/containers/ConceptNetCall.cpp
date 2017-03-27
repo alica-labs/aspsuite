@@ -86,7 +86,7 @@ namespace cng
 			{
 				if (this->adjectives.find(edge->firstConcept->term) == this->adjectives.end())
 				{
-					this->adjectives.emplace(edge->firstConcept->term, edge->weight);
+					this->adjectives.emplace(edge->firstConcept->term, edge);
 				}
 			}
 			if (edge->secondConcept->senseLabel.compare("a") == 0
@@ -94,7 +94,7 @@ namespace cng
 			{
 				if (this->adjectives.find(edge->secondConcept->term) == this->adjectives.end())
 				{
-					this->adjectives.emplace(edge->secondConcept->term, edge->weight);
+					this->adjectives.emplace(edge->secondConcept->term, edge);
 				}
 			}
 
@@ -118,6 +118,10 @@ namespace cng
 				{
 					continue;
 				}
+				/**
+				 * is needed to stay in the 600 queries for concept net per minute
+				 */
+//				this->currentThread()->msleep(1000);
 				this->currentAntonymCheck = std::pair<QString, QString>(firstAdjective.first, secondAdjective.first);
 				QUrl url(
 						"http://api.localhost/query?node=/c/en/" + firstAdjective.first + "&other=/c/en/"
@@ -135,6 +139,7 @@ namespace cng
 	{
 		QString data = reply->readAll();
 		//remove html part
+//		std::cout << data.toStdString() << std::endl;
 		std::string fullData = data.toStdString();
 		auto start = fullData.find("{\"@context\":");
 		auto end = fullData.find("</script>");
@@ -151,16 +156,20 @@ namespace cng
 				emit closeLoopFirstAdjectives();
 				return;
 			}
+			std::cout << "First weight: " << this->adjectives.at(this->currentAntonymCheck.first)->weight << " Second weight: "
+					<< this->adjectives.at(this->currentAntonymCheck.second)->weight << std::endl;
 			std::cout << "ConceptNetCall: Antonym found: ";
 			if (this->adjectives.at(this->currentAntonymCheck.first)
 					< this->adjectives.at(this->currentAntonymCheck.second))
 			{
-				std::cout << ": removing " << this->currentAntonymCheck.first.toStdString() << std::endl;
+				std::cout << ": removing " << this->currentAntonymCheck.first.toStdString() << " : keeping: "
+						<< this->currentAntonymCheck.second.toStdString() << std::endl;
 				this->adjectives.erase(this->currentAntonymCheck.first);
 			}
 			else
 			{
-				std::cout << ": removing " << this->currentAntonymCheck.second.toStdString() << std::endl;
+				std::cout << ": removing " << this->currentAntonymCheck.second.toStdString() << " : keeping: "
+						<< this->currentAntonymCheck.first.toStdString() << std::endl;
 				this->adjectives.erase(this->currentAntonymCheck.second);
 			}
 		}
@@ -273,6 +282,11 @@ namespace cng
 	{
 		for (auto adjective : this->adjectives)
 		{
+			/**
+			 * is needed to stay in the 600 queries for concept net per minute
+			 */
+//			this->currentThread()->msleep(1000);
+
 			QEventLoop loopIsA;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopIsA, SLOT(quit()));
 			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA");

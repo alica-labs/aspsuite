@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QString>
 #include <QObject>
+#include <QThread>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 
@@ -26,7 +27,7 @@ namespace cng
 	/**
 	 * Class holding the complete information of a concept net query call
 	 */
-	class ConceptNetCall : public QObject
+	class ConceptNetCall : public QThread
 	{
 	Q_OBJECT
 	public:
@@ -40,7 +41,7 @@ namespace cng
 
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
-		std::map<QString, double> adjectives;
+		std::map<QString, std::shared_ptr<ConceptNetEdge>> adjectives;
 		std::vector<QString> concepts;
 		std::map<QString, double> conceptsToCheck;
 		std::map<QString, double> checkedConcepts;
@@ -66,6 +67,7 @@ namespace cng
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
 		bool conceptContainsUTF8(QString concept);
+		std::vector<std::vector<std::shared_ptr<ConceptNetEdge>>> inconsistencies;
 
 	signals:
 		void closeLoopFirstAdjectives();

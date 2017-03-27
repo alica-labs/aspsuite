@@ -102,6 +102,7 @@ namespace cng
 	void ConceptNetQueryCommand::callUrl(QUrl url)
 	{
 		QNetworkRequest request(url);
+		request.setRawHeader("Accept", "application/json");
 		this->nam->get(request);
 	}
 
@@ -225,13 +226,7 @@ namespace cng
 		//get data
 		QString data = reply->readAll();
 		//remove html part
-		std::string fullData = data.toStdString();
-		auto start = fullData.find("{\"@context\":");
-		auto end = fullData.find("</script>");
-		fullData = fullData.substr(start, end - start);
-		// parse json
-		auto jsonString = QString(fullData.c_str()).toUtf8();
-		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
+		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
 		QString id = jsonDoc.object()["@id"].toString();
 		// save next page form following get request
 		QString nextPage = jsonDoc.object()["view"].toObject()["nextPage"].toString();

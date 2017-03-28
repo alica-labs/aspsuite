@@ -37,7 +37,6 @@ namespace cng
 
 		QNetworkAccessManager *nam; // namNumber = 0
 		QNetworkAccessManager *checkNAM; // namNumber = 1
-//		QNetworkAccessManager *nam2;
 
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
@@ -48,22 +47,20 @@ namespace cng
 		std::map<QString, std::vector<QString>> adjectiveAntonymMap;
 		QString nextEdgesPage;
 		QString queryConcept;
-		std::pair<QString, QString> currentAntonymCheck;
+		std::pair<std::pair<QString, std::shared_ptr<ConceptNetEdge>>,
+				std::pair<QString, std::shared_ptr<ConceptNetEdge>>> currentAntonymCheck;
 
 		std::string toString();
+		void findInconsistencies();
 
 	public slots:
-//		void adjectiveChecked(QNetworkReply* reply);
-		void checkFirstAdjectives();
-		void inconsistencySearch();
-		void findInconsistencies();
 		void removeIfAntonym(QNetworkReply* reply);
-//		void mapAntonyms(QNetworkReply* reply);
 		void collectConcepts(QNetworkReply* reply);
 
 	private:
+		void gatherConcepts(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
+		void checkAdjectives(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
 		int currentAdjectiveIndex;
-//		void collectAntonyms();
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
 		/**
@@ -73,11 +70,11 @@ namespace cng
 		bool conceptContainsUTF8(QString concept);
 		std::vector<std::vector<std::shared_ptr<ConceptNetEdge>>> inconsistencies;
 		std::shared_ptr<ConceptNetEdge> extractCNEdge(QJsonObject edge);
+		bool newConceptFound;
 
 	signals:
-		void closeLoopFirstAdjectives();
+		void closeLoopAntonym();
 		void closeLoopAdjectiveGathering();
-//		void closeLoop2();
 	};
 
 } /* namespace cng */

@@ -43,8 +43,8 @@ namespace cng
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
 		std::map<QString, std::shared_ptr<ConceptNetEdge>> adjectives;
 		std::vector<QString> concepts;
-		std::map<QString, double> conceptsToCheck;
-		std::map<QString, double> checkedConcepts;
+		std::map<QString, std::shared_ptr<ConceptNetEdge>> conceptsToCheck;
+		std::map<QString, std::shared_ptr<ConceptNetEdge>> checkedConcepts;
 		std::map<QString, std::vector<QString>> adjectiveAntonymMap;
 		QString nextEdgesPage;
 		QString queryConcept;
@@ -72,11 +72,12 @@ namespace cng
 		void callUrl(QUrl url, QNetworkAccessManager* n);
 		bool conceptContainsUTF8(QString concept);
 		std::vector<std::vector<std::shared_ptr<ConceptNetEdge>>> inconsistencies;
+		std::shared_ptr<ConceptNetEdge> extractCNEdge(QJsonObject edge);
 
 	signals:
 		void closeLoopFirstAdjectives();
 		void closeLoopAdjectiveGathering();
-		void closeLoop2();
+//		void closeLoop2();
 	};
 
 } /* namespace cng */

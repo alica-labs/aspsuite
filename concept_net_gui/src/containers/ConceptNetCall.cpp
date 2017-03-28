@@ -144,21 +144,31 @@ namespace cng
 				emit closeLoopFirstAdjectives();
 				return;
 			}
+			//TODO
 			std::cout << "First weight: " << this->adjectives.at(this->currentAntonymCheck.first)->weight
 					<< " Second weight: " << this->adjectives.at(this->currentAntonymCheck.second)->weight << std::endl;
 			std::cout << "ConceptNetCall: Antonym found: ";
-			if (this->adjectives.at(this->currentAntonymCheck.first)
-					< this->adjectives.at(this->currentAntonymCheck.second))
+			std::vector<std::shared_ptr<ConceptNetEdge>> inconsistency;
+			inconsistency.push_back(this->adjectives.at(this->currentAntonymCheck.first));
+			inconsistency.push_back(this->adjectives.at(this->currentAntonymCheck.second));
+			inconsistency.push_back(this->extractCNEdge(edges.at(0).toObject()));
+			if (this->adjectives.at(this->currentAntonymCheck.first)->weight
+					< this->adjectives.at(this->currentAntonymCheck.second)->weight)
 			{
-				std::cout << ": removing " << this->currentAntonymCheck.first.toStdString() << " : keeping: "
+				std::cout << ": removing first" << this->currentAntonymCheck.first.toStdString() << " keeping: "
 						<< this->currentAntonymCheck.second.toStdString() << std::endl;
 				this->adjectives.erase(this->currentAntonymCheck.first);
 			}
-			else
+			else if(this->adjectives.at(this->currentAntonymCheck.second)->weight
+					< this->adjectives.at(this->currentAntonymCheck.first)->weight)
 			{
-				std::cout << ": removing " << this->currentAntonymCheck.second.toStdString() << " : keeping: "
+				std::cout << ": removing second " << this->currentAntonymCheck.second.toStdString() << " keeping: "
 						<< this->currentAntonymCheck.first.toStdString() << std::endl;
 				this->adjectives.erase(this->currentAntonymCheck.second);
+			}
+			else
+			{
+				std::cout << "equal" << std::endl;
 			}
 		}
 		emit closeLoopFirstAdjectives();
@@ -309,29 +319,16 @@ namespace cng
 		for (int i = 0; i < edges.size(); i++)
 		{
 			QJsonObject edge = edges[i].toObject();
-			double weight = edge["weight"].toDouble();
-			if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			auto cn5Edge = extractCNEdge(edge);
+			if(cn5Edge == nullptr)
 			{
 				continue;
 			}
-			//end of edge
-			QJsonObject end = edge["end"].toObject();
-			QString endLanguage = end["language"].toString();
-			// skip non English
-			if (endLanguage != "en")
-			{
-				continue;
-			}
-			QString endTerm = end["term"].toString();
+			QString endTerm = edge["end"].toObject()["term"].toString();
 			endTerm = trimTerm(endTerm);
-			if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm))
+			if (this->conceptsToCheck.find(endTerm) == this->conceptsToCheck.end() && cn5Edge->secondConcept->senseLabel.compare("a") == 0)
 			{
-				std::cout << "ConceptNetCall: Skipping concept:" << endTerm.toStdString() << std::endl;
-				continue;
-			}
-			if (this->conceptsToCheck.find(endTerm) == this->conceptsToCheck.end())
-			{
-				this->conceptsToCheck.emplace(endTerm, weight);
+				this->conceptsToCheck.emplace(endTerm, cn5Edge);
 			}
 		}
 		emit closeLoopAdjectiveGathering();
@@ -355,5 +352,54 @@ namespace cng
 		request.setRawHeader("Accept", "application/json");
 		n->get(request);
 	}
+
+	std::shared_ptr<ConceptNetEdge> ConceptNetCall::extractCNEdge(QJsonObject edge)
+	{
+		QString edgeId = edge["@id"].toString();
+		double weight = edge["weight"].toDouble();
+		if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+		{
+			return nullptr;
+		}
+		//end of edge
+		QJsonObject end = edge["end"].toObject();
+		QString endLanguage = end["language"].toString();
+		// skip non English
+		if (endLanguage != "en")
+		{
+			return nullptr;
+		}
+		QString endTerm = end["term"].toString();
+		endTerm = trimTerm(endTerm);
+		if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm))
+		{
+			std::cout << "ConceptNetCall: Skipping concept:" << endTerm.toStdString() << std::endl;
+			return nullptr;
+		}
+		QString endSenseLabel = end["sense_label"].toString();
+		QString endID = end["@id"].toString();
+		//start of edge
+		QJsonObject start = edge["start"].toObject();
+		QString startLanguage = start["language"].toString();
+		// skip non English
+		if (startLanguage != "en")
+		{
+			return nullptr;
+		}
+		QString startTerm = start["term"].toString();
+		startTerm = trimTerm(startTerm);
+		if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm))
+		{
+			std::cout << "ConceptNetCall: Skipping Antonym:" << startTerm.toStdString() << std::endl;
+			return nullptr;
+		}
+		QString startSenseLabel = start["sense_label"].toString();
+		QString startID = start["@id"].toString();
+		QString relation = edge["rel"].toObject()["label"].toString();
+		return std::make_shared<ConceptNetEdge>(
+				edgeId, startLanguage, std::make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
+				std::make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
+	}
+
 } /* namespace cng */
 

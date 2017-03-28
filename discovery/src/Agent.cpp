@@ -181,7 +181,9 @@ void Agent::send()
     assert(i != 0);
     while (--i != 0)
     {
-    	zmq_msgs_send();
+    	zmq_msg_t msg;
+    	zmq_msg_init_data(&msg, reinterpret_cast<char const *>(&(*it)[0]), it->size()*sizeof(capnp::word), );
+    	//zmq_msg_send();
         //s_.send_raw(reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::send_more);
         ++it;
     }
@@ -190,14 +192,6 @@ void Agent::send()
     zmq_msg_t msg;
     int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
     std::cout << "Sended " << rc << " chars." << std::endl;
-    assert(rc == 9);
-}
-
-void Agent::receive()
-{
-    zmq_msg_t msg;
-    int rc = msg_recv_cmp(&msg, this->socket, "Movies", "Godfather");
-    std::cout << "Received " << rc << " chars." << std::endl;
     assert(rc == 9);
 }
 
@@ -225,6 +219,14 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
     zmq_msg_close(msg_);
 
     return rc;
+}
+
+void Agent::receive()
+{
+    zmq_msg_t msg;
+    int rc = msg_recv_cmp(&msg, this->socket, "Movies", "Godfather");
+    std::cout << "Received " << rc << " chars." << std::endl;
+    assert(rc == 9);
 }
 
 int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)

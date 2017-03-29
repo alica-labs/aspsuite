@@ -181,18 +181,16 @@ void Agent::send()
     assert(i != 0);
     while (--i != 0)
     {
-    	zmq_msg_t msg;
-    	zmq_msg_init_data(&msg, reinterpret_cast<char const *>(&(*it)[0]), it->size()*sizeof(capnp::word), );
-    	//zmq_msg_send();
-        //s_.send_raw(reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::send_more);
+        zmq_send_const(this->socket, reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word),
+                       ZMQ_SNDMORE);
         ++it;
     }
-    //s_.send_raw(reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), zmqpp::socket::normal);
+    zmq_send_const(this->socket, reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), 0);
 
-    zmq_msg_t msg;
-    int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
-    std::cout << "Sended " << rc << " chars." << std::endl;
-    assert(rc == 9);
+    //    zmq_msg_t msg;
+    //    int rc = msg_send(&msg, this->socket, "Movies", "Godfather");
+    //    std::cout << "Sended " << rc << " chars." << std::endl;
+    //    assert(rc == 9);
 }
 
 int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
@@ -224,9 +222,68 @@ int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *b
 void Agent::receive()
 {
     zmq_msg_t msg;
-    int rc = msg_recv_cmp(&msg, this->socket, "Movies", "Godfather");
-    std::cout << "Received " << rc << " chars." << std::endl;
-    assert(rc == 9);
+    segments_.clear();
+    while (true)
+    {
+        zmq_msg_init(&msg);
+        zmq_msg_recv(&msg, this->socket, 0);
+
+        // Received message must contain an integral number of words.
+        assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
+        auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
+
+        if (reinterpret_cast<uintptr_t>(&msg) % sizeof(capnp::word) == 0)
+        {
+        	std::cout << "Agent: Receive(): Message is aligned! " << std::endl;
+        	segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(&msg), num_words));
+        }
+        else
+        {
+        	std::cout << "Agent: Receive(): Message is NOT aligned! " << std::endl;
+        	// TODO :D
+        }
+
+        capnp::SegmentArrayMessageReader reader(kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size()));
+
+        capnp::MallocMessageBuilder builder;
+        auto bla = reader.getRoot<discovery_msgs::Beacon>();
+
+        if (!zmq_msg_more(&msg))
+        {
+            zmq_msg_close(&msg);
+            break;
+        }
+        else
+        {
+            zmq_msg_close(&msg);
+        }
+    }
+}
+
+kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+{
+    do
+    {
+        assert(str.size() % sizeof(capnp::word) == 0); // Received message must contain an integral number of words.
+        auto num_words = str.size() / sizeof(capnp::word);
+        char *buf = &str[0];
+
+        if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
+        {
+            // String buffer is word-aligned, point directly at the start of the string.
+            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf), num_words));
+        }
+        else
+        {
+            // String buffer is not word-aligned, make a copy and point at that.
+            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);
+            memcpy(words.get(), buf, str.size());
+            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));
+            copied_parts_.push_back(move(words));
+        }
+    } while (s_.has_more_parts());
+
+    return kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
 }
 
 int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)

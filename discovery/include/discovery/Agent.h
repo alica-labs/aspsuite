@@ -27,12 +27,21 @@ class Agent : public Worker
     void send();
     int msg_send (zmq_msg_t *msg_, void *s_, const char* group_, const char* body_);
     void receive();
+    kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> genericReceive ();
     int msg_recv_cmp (zmq_msg_t *msg_, void *s_, const char* group_, const char* body_);
     void testUUIDStuff();
     void checkZMQVersion();
     bool getWirelessAddress();
     uuid_t uuid;
     char* wirelessIpAddress;
+
+
+    std::vector<std::string> parts_;
+    std::vector<std::unique_ptr<capnp::word[]>> copied_parts_;
+    std::vector<kj::ArrayPtr<capnp::word const>> segments_;
+
+
+
 
     // zmq stuff
     bool sender;

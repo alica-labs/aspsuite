@@ -90,9 +90,12 @@
         {
             "rel": "cn5_NotHasProperty"
         },
-	{
-	    "rel": "cn5_SimilarTo"
-	},
+		{
+	    	"rel": "cn5_SimilarTo"
+		},
+		{
+		    "rel": "cn5_HasContext"
+		},
         {
             "rel": "cn5_dbpedia/genre"
         },

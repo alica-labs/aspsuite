@@ -123,7 +123,7 @@ namespace cng
 			conceptLeft = conceptLeft.left(conceptLeft.size() - 1).trimmed();
 			conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
 			conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
-			QUrl url("http://api.localhost/query?start=/c/en/" + conceptLeft + "&end=/c/en/" + conceptRight);
+			QUrl url("http://api.localhost/query?node=/c/en/" + conceptLeft + "&other=/c/en/" + conceptRight);
 			callUrl(url);
 		}
 		else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard"))

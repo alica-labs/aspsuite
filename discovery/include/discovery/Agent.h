@@ -4,7 +4,12 @@
 
 #include <zmq.h>
 #include <uuid/uuid.h>
+
+#include <kj/array.h>
+#include <capnp/common.h>
+
 #include <signal.h>
+#include <vector>
 
 
 namespace discovery

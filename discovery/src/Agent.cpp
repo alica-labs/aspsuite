@@ -171,8 +171,8 @@ void Agent::send()
     discovery_msgs::Beacon::Builder beacon = message.initRoot<discovery_msgs::Beacon>();
     beacon.setIp(this->wirelessIpAddress);
     beacon.setPort(6666);
-    ::capnp::Data::Builder uuidBuilder = beacon.initUuid(16);
-    uuidBuilder[0] = this->uuid;
+    std::cout << "Agent: send(): Size of UUID is " << sizeof(this->uuid) << std::endl;
+    beacon.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
 
     auto segments = message.getSegmentsForOutput();
 
@@ -193,31 +193,31 @@ void Agent::send()
     //    assert(rc == 9);
 }
 
-int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
-{
-    int rc = zmq_msg_init_size(msg_, strlen(body_));
-    if (rc != 0)
-    {
-        std::cout << "Agent::msg_send: Error after init msg: " << zmq_strerror(errno) << std::endl;
-        return rc;
-    }
-
-    memcpy(zmq_msg_data(msg_), body_, strlen(body_));
-
-    rc = zmq_msg_set_group(msg_, group_);
-    if (rc != 0)
-    {
-        std::cout << "Agent::msg_send: Failure by setting the group of a message: " << zmq_strerror(errno) << std::endl;
-        zmq_msg_close(msg_);
-        return rc;
-    }
-
-    rc = zmq_msg_send(msg_, s_, 0);
-
-    zmq_msg_close(msg_);
-
-    return rc;
-}
+//int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
+//{
+//    int rc = zmq_msg_init_size(msg_, strlen(body_));
+//    if (rc != 0)
+//    {
+//        std::cout << "Agent::msg_send: Error after init msg: " << zmq_strerror(errno) << std::endl;
+//        return rc;
+//    }
+//
+//    memcpy(zmq_msg_data(msg_), body_, strlen(body_));
+//
+//    rc = zmq_msg_set_group(msg_, group_);
+//    if (rc != 0)
+//    {
+//        std::cout << "Agent::msg_send: Failure by setting the group of a message: " << zmq_strerror(errno) << std::endl;
+//        zmq_msg_close(msg_);
+//        return rc;
+//    }
+//
+//    rc = zmq_msg_send(msg_, s_, 0);
+//
+//    zmq_msg_close(msg_);
+//
+//    return rc;
+//}
 
 void Agent::receive()
 {
@@ -239,14 +239,9 @@ void Agent::receive()
         }
         else
         {
-        	std::cout << "Agent: Receive(): Message is NOT aligned! " << std::endl;
+        	std::cout << "Agent: Receive(): Message is NOT aligned! TODO" << std::endl;
         	// TODO :D
         }
-
-        capnp::SegmentArrayMessageReader reader(kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size()));
-
-        capnp::MallocMessageBuilder builder;
-        auto bla = reader.getRoot<discovery_msgs::Beacon>();
 
         if (!zmq_msg_more(&msg))
         {
@@ -258,33 +253,37 @@ void Agent::receive()
             zmq_msg_close(&msg);
         }
     }
+    auto blub = kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
+    capnp::SegmentArrayMessageReader reader(kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(segments_.data(), segments_.size()));
+    auto beacon = reader.getRoot<discovery_msgs::Beacon>();
+    std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl; // << " IP: " << beacon.getIp() << " Port: " << beacon.getPort() << std::endl;
 }
 
-kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
-{
-    do
-    {
-        assert(str.size() % sizeof(capnp::word) == 0); // Received message must contain an integral number of words.
-        auto num_words = str.size() / sizeof(capnp::word);
-        char *buf = &str[0];
-
-        if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
-        {
-            // String buffer is word-aligned, point directly at the start of the string.
-            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf), num_words));
-        }
-        else
-        {
-            // String buffer is not word-aligned, make a copy and point at that.
-            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);
-            memcpy(words.get(), buf, str.size());
-            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));
-            copied_parts_.push_back(move(words));
-        }
-    } while (s_.has_more_parts());
-
-    return kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
-}
+//kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+//{
+//    do
+//    {
+//        assert(str.size() % sizeof(capnp::word) == 0); // Received message must contain an integral number of words.
+//        auto num_words = str.size() / sizeof(capnp::word);
+//        char *buf = &str[0];
+//
+//        if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
+//        {
+//            // String buffer is word-aligned, point directly at the start of the string.
+//            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf), num_words));
+//        }
+//        else
+//        {
+//            // String buffer is not word-aligned, make a copy and point at that.
+//            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);
+//            memcpy(words.get(), buf, str.size());
+//            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));
+//            copied_parts_.push_back(move(words));
+//        }
+//    } while (s_.has_more_parts());
+//
+//    return kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
+//}
 
 int Agent::msg_recv_cmp(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
 {

@@ -179,6 +179,10 @@ namespace reasoner
 		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
 
 		// determine the domain of the query predicate
+//		for(auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().begin(); it != ((ASPSolver*)this->solver)->clingo->out_->predDoms().end(); it++)
+//		{
+//			cout << "ASPFactsQuery: " << *(*it) << endl;
+//		}
 		for (auto value : this->getHeadValues())
 		{
 #ifdef ASPQUERY_DEBUG

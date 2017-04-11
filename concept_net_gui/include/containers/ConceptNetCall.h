@@ -60,9 +60,10 @@ namespace cng
 	private:
 		void gatherConcepts(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
 		void checkAdjectives(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
-		int currentAdjectiveIndex;
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
+		std::map<QString, std::shared_ptr<ConceptNetEdge>>::iterator it;
+		bool conceptDeleted;
 		/**
 		 * Executes http get request
 		 */

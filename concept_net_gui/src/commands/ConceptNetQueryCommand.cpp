@@ -317,6 +317,7 @@ namespace cng
 #ifdef ConceptNetQueryCommandDebug
 			cout << this->currentConceptNetCall->toString();
 #endif
+			std::cout << this->currentConceptNetCall->edges.size() << std::endl;
 			this->currentConceptNetCall->findInconsistencies();
 			emit jsonExtracted();
 		}

@@ -33,8 +33,8 @@ namespace cng
 		this->nextEdgesPage = nextEdgesPage;
 		this->nam = new QNetworkAccessManager(this);
 		this->checkNAM = new QNetworkAccessManager(this);
-		this->currentAdjectiveIndex = -1;
 		this->queryConcept = queryConcept;
+		this->conceptDeleted = false;
 		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(removeIfAntonym(QNetworkReply*)));
 		this->connect(this->checkNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(collectConcepts(QNetworkReply*)));
 		this->newConceptFound = false;
@@ -108,11 +108,10 @@ namespace cng
 		std::cout << "ConceptNetCall: finished checking Antonyms among the adjectives of the queried concept."
 				<< std::endl;
 		gatherConcepts(this->adjectives);
-		std::cout << "ConceptNetCall: finished gathering related concepts. Numer of found concepts: "
+		std::cout << "ConceptNetCall: finished gathering related concepts. Number of found concepts: "
 				<< checkedConcepts.size() << std::endl;
 		checkAdjectives(this->checkedConcepts);
 		std::cout << "ConceptNetCall: finished checking Antonyms among gathered concepts." << std::endl;
-		//TODO same for parent concepts ?
 //		std::cout << "Adjectives after: ";
 //		for (auto it : this->adjectives)
 //		{
@@ -124,23 +123,32 @@ namespace cng
 	void ConceptNetCall::checkAdjectives(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck)
 	{
 //		auto tmp = this->adjectives;
-		for (auto firstAdjective : this->adjectives)
+		//was this->adjectives before test
+		for (this->it = adjectives.begin(); this->it != this->adjectives.end();)
 		{
 			for (auto secondAdjective : toCheck)
 			{
-				if (firstAdjective == secondAdjective)
+				if (*this->it == secondAdjective)
 				{
 					continue;
 				}
 				this->currentAntonymCheck = std::pair<std::pair<QString, std::shared_ptr<ConceptNetEdge>>,
-						std::pair<QString, std::shared_ptr<ConceptNetEdge>>>(firstAdjective, secondAdjective);
+						std::pair<QString, std::shared_ptr<ConceptNetEdge>>>(*this->it, secondAdjective);
 				QUrl url(
-						"http://api.localhost/query?node=/c/en/" + firstAdjective.first + "&other=/c/en/"
+						"http://api.localhost/query?node=/c/en/" + (*this->it).first + "&other=/c/en/"
 								+ secondAdjective.first + "&rel=/r/Antonym");
 				this->callUrl(url, this->nam);
 				QEventLoop loop;
 				this->connect(this, SIGNAL(closeLoopAntonym()), &loop, SLOT(quit()));
 				loop.exec();
+			}
+			if (!this->conceptDeleted)
+			{
+				this->it++;
+			}
+			else
+			{
+				this->conceptDeleted = false;
 			}
 		}
 	}
@@ -168,15 +176,25 @@ namespace cng
 			inconsistency.push_back(this->extractCNEdge(edges.at(0).toObject()));
 			if (this->currentAntonymCheck.first.second->weight < this->currentAntonymCheck.second.second->weight)
 			{
-				std::cout << " removing: " << this->currentAntonymCheck.first.first.toStdString() << " keeping: "
-						<< this->currentAntonymCheck.second.first.toStdString() << std::endl;
-				this->adjectives.erase(this->currentAntonymCheck.first.first);
+				auto iterator = this->adjectives.find(this->currentAntonymCheck.first.first);
+				if (iterator != this->adjectives.end())
+				{
+					this->it = this->adjectives.erase(iterator);
+					std::cout << " removing: " << this->currentAntonymCheck.first.first.toStdString() << " keeping: "
+							<< this->currentAntonymCheck.second.first.toStdString() << std::endl;
+					this->conceptDeleted = true;
+				}
 			}
 			else
 			{
-				std::cout << " removing: " << this->currentAntonymCheck.second.first.toStdString() << " keeping: "
-						<< this->currentAntonymCheck.first.first.toStdString() << std::endl;
-				this->adjectives.erase(this->currentAntonymCheck.second.first);
+				auto iterator = this->adjectives.find(this->currentAntonymCheck.second.first);
+				if (iterator != this->adjectives.end())
+				{
+					this->it = this->adjectives.erase(iterator);
+					std::cout << " removing: " << this->currentAntonymCheck.second.first.toStdString() << " keeping: "
+							<< this->currentAntonymCheck.first.first.toStdString() << std::endl;
+					this->conceptDeleted = true;
+				}
 			}
 		}
 		emit closeLoopAntonym();

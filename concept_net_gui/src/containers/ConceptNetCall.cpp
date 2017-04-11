@@ -35,6 +35,7 @@ namespace cng
 		this->checkNAM = new QNetworkAccessManager(this);
 		this->queryConcept = queryConcept;
 		this->conceptDeleted = false;
+		this->keepChecking = true;
 		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(removeIfAntonym(QNetworkReply*)));
 		this->connect(this->checkNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(collectConcepts(QNetworkReply*)));
 		this->newConceptFound = false;
@@ -104,6 +105,7 @@ namespace cng
 //			std::cout << it.first.toStdString() << " ";
 //		}
 //		std::cout << std::endl;
+//			this->keepChecking = false;
 		checkAdjectives(this->adjectives);
 		std::cout << "ConceptNetCall: finished checking Antonyms among the adjectives of the queried concept."
 				<< std::endl;
@@ -169,7 +171,6 @@ namespace cng
 //			}
 //			std::cout << "First weight: " << this->currentAntonymCheck.first.second->toString() << "Second weight: "
 //					<< this->currentAntonymCheck.second.second->toString() << std::endl;
-			std::cout << "ConceptNetCall: Antonym found: ";
 			std::vector<std::shared_ptr<ConceptNetEdge>> inconsistency;
 			inconsistency.push_back(this->currentAntonymCheck.first.second);
 			inconsistency.push_back(this->currentAntonymCheck.second.second);
@@ -179,10 +180,12 @@ namespace cng
 				auto iterator = this->adjectives.find(this->currentAntonymCheck.first.first);
 				if (iterator != this->adjectives.end())
 				{
-					this->it = this->adjectives.erase(iterator);
-					std::cout << " removing: " << this->currentAntonymCheck.first.first.toStdString() << " keeping: "
+					this->adjectives.erase(iterator);
+					std::cout << "ConceptNetCall: Antonym found: removing: "
+							<< this->currentAntonymCheck.first.first.toStdString() << " keeping: "
 							<< this->currentAntonymCheck.second.first.toStdString() << std::endl;
 					this->conceptDeleted = true;
+					this->keepChecking = true;
 				}
 			}
 			else
@@ -190,10 +193,12 @@ namespace cng
 				auto iterator = this->adjectives.find(this->currentAntonymCheck.second.first);
 				if (iterator != this->adjectives.end())
 				{
-					this->it = this->adjectives.erase(iterator);
-					std::cout << " removing: " << this->currentAntonymCheck.second.first.toStdString() << " keeping: "
+					this->adjectives.erase(iterator);
+					std::cout << "ConceptNetCall: Antonym found: removing: "
+							<< this->currentAntonymCheck.second.first.toStdString() << " keeping: "
 							<< this->currentAntonymCheck.first.first.toStdString() << std::endl;
 					this->conceptDeleted = true;
+					this->keepChecking = true;
 				}
 			}
 		}

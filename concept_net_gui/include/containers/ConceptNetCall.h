@@ -64,7 +64,6 @@ namespace cng
 		QString trimTerm(QString term);
 		std::map<QString, std::shared_ptr<ConceptNetEdge>>::iterator it;
 		bool conceptDeleted;
-		bool keepChecking;
 		/**
 		 * Executes http get request
 		 */

@@ -35,7 +35,6 @@ namespace cng
 		this->checkNAM = new QNetworkAccessManager(this);
 		this->queryConcept = queryConcept;
 		this->conceptDeleted = false;
-		this->keepChecking = true;
 		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(removeIfAntonym(QNetworkReply*)));
 		this->connect(this->checkNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(collectConcepts(QNetworkReply*)));
 		this->newConceptFound = false;
@@ -105,7 +104,6 @@ namespace cng
 //			std::cout << it.first.toStdString() << " ";
 //		}
 //		std::cout << std::endl;
-//			this->keepChecking = false;
 		checkAdjectives(this->adjectives);
 		std::cout << "ConceptNetCall: finished checking Antonyms among the adjectives of the queried concept."
 				<< std::endl;
@@ -180,12 +178,11 @@ namespace cng
 				auto iterator = this->adjectives.find(this->currentAntonymCheck.first.first);
 				if (iterator != this->adjectives.end())
 				{
-					this->adjectives.erase(iterator);
+					this->adjectives.erase(this->it++);
 					std::cout << "ConceptNetCall: Antonym found: removing: "
 							<< this->currentAntonymCheck.first.first.toStdString() << " keeping: "
 							<< this->currentAntonymCheck.second.first.toStdString() << std::endl;
 					this->conceptDeleted = true;
-					this->keepChecking = true;
 				}
 			}
 			else
@@ -193,12 +190,11 @@ namespace cng
 				auto iterator = this->adjectives.find(this->currentAntonymCheck.second.first);
 				if (iterator != this->adjectives.end())
 				{
-					this->adjectives.erase(iterator);
+					this->adjectives.erase(this->it++);
 					std::cout << "ConceptNetCall: Antonym found: removing: "
 							<< this->currentAntonymCheck.second.first.toStdString() << " keeping: "
 							<< this->currentAntonymCheck.first.first.toStdString() << std::endl;
 					this->conceptDeleted = true;
-					this->keepChecking = true;
 				}
 			}
 		}

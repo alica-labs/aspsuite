@@ -159,16 +159,10 @@ namespace cng
 		// parse json
 		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
+//		std::cout << "First weight: " << this->currentAntonymCheck.first.second->toString() << "Second weight: "
+//				<< this->currentAntonymCheck.second.second->toString() << std::endl;
 		if (edges.size() > 0)
 		{
-//			if (this->adjectives.find(this->currentAntonymCheck.first) == this->adjectives.end()
-//					|| this->adjectives.find(this->currentAntonymCheck.second) == this->adjectives.end())
-//			{
-//				emit closeLoopAntonym();
-//				return;
-//			}
-//			std::cout << "First weight: " << this->currentAntonymCheck.first.second->toString() << "Second weight: "
-//					<< this->currentAntonymCheck.second.second->toString() << std::endl;
 			std::vector<std::shared_ptr<ConceptNetEdge>> inconsistency;
 			inconsistency.push_back(this->currentAntonymCheck.first.second);
 			inconsistency.push_back(this->currentAntonymCheck.second.second);
@@ -237,18 +231,6 @@ namespace cng
 		}
 		if (this->newConceptFound)
 		{
-//			std::cout << "concepts to check :" << std::endl;
-//			for (auto item : this->conceptsToCheck)
-//			{
-//				std::cout << item.first.toStdString() << " ";
-//			}
-//			std::cout << std::endl;
-//			std::cout << "concepts checked :" << std::endl;
-//			for (auto item : this->checkedConcepts)
-//			{
-//				std::cout << item.first.toStdString() << " ";
-//			}
-//			std::cout << std::endl;
 			gatherConcepts(this->conceptsToCheck);
 		}
 	}

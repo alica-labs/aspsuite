@@ -44,10 +44,6 @@ namespace cng
 		 */
 		Ui::SettingsDialog* getUi();
 		/**
-		 * true if save models sorted checkbox is checked
-		 */
-		bool isSaveSortedChecked();
-		/**
 		 * Returns shared_ptr to default settings "Default", "clingo, -W, no-atom-undefined, --number=1"
 		 */
 		std::shared_ptr<SolverSettings> getDefaultSettings();

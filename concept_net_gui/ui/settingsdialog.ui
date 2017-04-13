@@ -120,19 +120,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QCheckBox" name="safeSortedModelscheckBox">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>360</y>
-     <width>181</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save Models sorted?</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="addToSettingsBtn">
    <property name="geometry">
     <rect>

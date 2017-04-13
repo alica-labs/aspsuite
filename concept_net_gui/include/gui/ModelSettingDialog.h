@@ -30,6 +30,7 @@ namespace cng
 		double getMinCn5Weight();
 		int getNumberOfModels();
 		bool isShowModelsInQuery();
+		bool isSaveSortedChecked();
 
 	private:
 		/**
@@ -52,6 +53,10 @@ namespace cng
 		 * Are models supposed to be shown in quey result?
 		 */
 		bool showModelsInQuery;
+		/**
+		 * Are models supposed to be saved sorted?
+		 */
+		bool saveModelsSorted;
 		/**
 		 * Minimum weight concept net edges need to have to be considered
 		 */

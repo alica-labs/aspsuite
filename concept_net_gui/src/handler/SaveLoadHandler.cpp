@@ -9,6 +9,7 @@
 
 #include "gui/ConceptNetGui.h"
 #include "gui/SettingsDialog.h"
+#include "gui/ModelSettingDialog.h"
 
 #include "commands/NewSolverCommand.h"
 #include "commands/ChangeSolverSettingsCommand.h"
@@ -113,7 +114,7 @@ namespace cng
 			}
 
 			QString models;
-			if (this->gui->settingsDialog->isSaveSortedChecked())
+			if (this->gui->modelSettingsDialog->isSaveSortedChecked())
 			{
 				models = this->gui->getUi()->sortedModelsLabel->text();
 			}

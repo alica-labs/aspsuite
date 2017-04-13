@@ -58,7 +58,22 @@ namespace cng
 		{
 			this->showModelsInQuery = false;
 		}
+		if(this->ui->saveModelsComboBox->currentText().contains("Yes"))
+		{
+			this->saveModelsSorted = true;
+		}
+		else
+		{
+			this->saveModelsSorted = false;
+		}
 		this->close();
 	}
 
+	bool ModelSettingDialog::isSaveSortedChecked()
+	{
+		return this->saveModelsSorted;
+	}
+
 } /* namespace cng */
+
+

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ConceptNetGui</string>
+   <string>KnowledgebaseCreator</string>
   </property>
   <widget class="QWidget" name="mainWindow">
    <property name="enabled">
@@ -112,8 +112,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>64</width>
-             <height>35</height>
+             <width>970</width>
+             <height>322</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -145,8 +145,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>64</width>
-             <height>35</height>
+             <width>970</width>
+             <height>322</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -178,8 +178,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>64</width>
-             <height>35</height>
+             <width>970</width>
+             <height>322</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -329,8 +329,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>64</width>
-             <height>35</height>
+             <width>970</width>
+             <height>322</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -365,8 +365,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>96</height>
+             <width>970</width>
+             <height>322</height>
             </rect>
            </property>
            <property name="sizePolicy">

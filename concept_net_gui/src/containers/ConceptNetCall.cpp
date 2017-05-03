@@ -128,7 +128,17 @@ namespace cng
 		{
 			for (auto secondAdjective : toCheck)
 			{
-				if (*this->it == secondAdjective)
+				if(this->conceptDeleted)
+				{
+					this->conceptDeleted = false;
+					break;
+				}
+//				std::cout << "before" << std::endl;
+//				std::cout << secondAdjective.first.toStdString() << std::endl;
+//				std::cout << (*this->it).first.toStdString() << std::endl;
+//				std::cout << (*this->it).first.toStdString() <<  " " << secondAdjective.first.toStdString() << std::endl;
+//				std::cout << "after" << std::endl;
+				if ((*this->it).first == secondAdjective.first)
 				{
 					continue;
 				}

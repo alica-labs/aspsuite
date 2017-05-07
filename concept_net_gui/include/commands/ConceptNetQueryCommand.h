@@ -18,6 +18,7 @@
 #include <QObject>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <chrono>
 
 //#define ConceptNetQueryCommandDebug
 
@@ -115,6 +116,10 @@ namespace cng
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
 		QString conceptWithoutPrefix;
 		bool conceptContainsUTF8(QString concept);
+
+		std::chrono::_V2::system_clock::time_point start;
+
+		bool minWeightPassed;
 
 	signals:
 		/**

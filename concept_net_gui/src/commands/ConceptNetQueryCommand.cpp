@@ -47,6 +47,7 @@ namespace cng
 		// connect signals form handling the http requests
 		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(conceptNetCallFinished(QNetworkReply*)));
 		this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
+		this->minWeightPassed = false;
 	}
 
 	ConceptNetQueryCommand::~ConceptNetQueryCommand()
@@ -193,9 +194,10 @@ namespace cng
 		//query without relation
 		else
 		{
+			start = std::chrono::high_resolution_clock::now();
 			QUrl url(
-					"http://api.localhost/c/en/"
-							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength));
+					"http://api.localhost/query?node=/c/en/"
+							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength) + "&limit=20");
 			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
@@ -248,7 +250,8 @@ namespace cng
 			double weight = edge["weight"].toDouble();
 			if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
 			{
-				continue;
+				this->minWeightPassed = true;
+				break;
 			}
 			//end of edge
 			QString edgeId = edge["@id"].toString();
@@ -307,8 +310,9 @@ namespace cng
 			}
 			this->currentConceptNetCall->edges.push_back(tmp);
 		}
-		if (!nextPage.isEmpty())
+		if (!nextPage.isEmpty() && !this->minWeightPassed)
 		{
+//			std::cout << nextPage.toStdString() << std::endl;
 			QUrl url("http://api.localhost" + nextPage);
 			callUrl(url);
 		}
@@ -318,7 +322,10 @@ namespace cng
 			cout << this->currentConceptNetCall->toString();
 #endif
 			std::cout << this->currentConceptNetCall->edges.size() << std::endl;
-			this->currentConceptNetCall->findInconsistencies();
+			//TODO
+//			this->currentConceptNetCall->findInconsistencies();
+			std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+			std::cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << std::endl;
 			emit jsonExtracted();
 		}
 

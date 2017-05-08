@@ -218,22 +218,22 @@ namespace cng
 		{
 			QEventLoop loopIsA;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopIsA, SLOT(quit()));
-			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA");
+			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA" + "&limit=1000");
 			this->callUrl(urlIsA, this->checkNAM);
 			loopIsA.exec();
 			QEventLoop loopSynonym;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopSynonym, SLOT(quit()));
-			QUrl urlSynonym("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym");
+			QUrl urlSynonym("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym" + "&limit=1000");
 			this->callUrl(urlSynonym, this->checkNAM);
 			loopSynonym.exec();
 			QEventLoop loopDefinedAs;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopDefinedAs, SLOT(quit()));
-			QUrl urlDefinedAs("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs");
+			QUrl urlDefinedAs("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs" + "&limit=1000");
 			this->callUrl(urlDefinedAs, this->checkNAM);
 			loopDefinedAs.exec();
 			QEventLoop loopPartOf;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopPartOf, SLOT(quit()));
-			QUrl urlPartOf("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf");
+			QUrl urlPartOf("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf" + "&limit=1000");
 			this->callUrl(urlPartOf, this->checkNAM);
 			loopPartOf.exec();
 			this->checkedConcepts.emplace(adjective.first, adjective.second);

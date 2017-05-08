@@ -124,7 +124,7 @@ namespace cng
 			conceptLeft = conceptLeft.left(conceptLeft.size() - 1).trimmed();
 			conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
 			conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
-			QUrl url("http://api.localhost/query?node=/c/en/" + conceptLeft + "&other=/c/en/" + conceptRight);
+			QUrl url("http://api.localhost/query?node=/c/en/" + conceptLeft + "&other=/c/en/" + conceptRight + "&limit=1000");
 			callUrl(url);
 		}
 		else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard"))
@@ -137,7 +137,7 @@ namespace cng
 				concept = concept.left(concept.size() - 1).trimmed();
 				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 				this->queryConcept = concept;
-				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation);
+				QUrl url("http://api.localhost/query?end=/c/en/" + concept + "&rel=/r/" + relation + "&limit=1000");
 				callUrl(url);
 			}
 			// relation(concept, wildcard)
@@ -147,7 +147,7 @@ namespace cng
 				concept = concept.left(concept.size() - 1);
 				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 				this->queryConcept = concept;
-				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation);
+				QUrl url("http://api.localhost/query?start=/c/en/" + concept + "&rel=/r/" + relation + "&limit=1000");
 				callUrl(url);
 			}
 		}
@@ -158,7 +158,7 @@ namespace cng
 			concept = concept.left(concept.size() - 1);
 			concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
 			this->queryConcept = concept;
-			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation);
+			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation + "&limit=1000");
 			callUrl(url);
 		}
 	}
@@ -194,10 +194,9 @@ namespace cng
 		//query without relation
 		else
 		{
-			start = std::chrono::high_resolution_clock::now();
 			QUrl url(
 					"http://api.localhost/query?node=/c/en/"
-							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength) + "&limit=20");
+							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength) + "&limit=1000");
 			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
@@ -322,8 +321,8 @@ namespace cng
 			cout << this->currentConceptNetCall->toString();
 #endif
 			std::cout << this->currentConceptNetCall->edges.size() << std::endl;
-			//TODO
-//			this->currentConceptNetCall->findInconsistencies();
+			start = std::chrono::high_resolution_clock::now();
+			this->currentConceptNetCall->findInconsistencies();
 			std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 			std::cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << std::endl;
 			emit jsonExtracted();

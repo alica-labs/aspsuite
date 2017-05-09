@@ -320,7 +320,7 @@ namespace cng
 #ifdef ConceptNetQueryCommandDebug
 			cout << this->currentConceptNetCall->toString();
 #endif
-			std::cout << this->currentConceptNetCall->edges.size() << std::endl;
+			std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
 			start = std::chrono::high_resolution_clock::now();
 			this->currentConceptNetCall->findInconsistencies();
 			std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();

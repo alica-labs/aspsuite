@@ -112,7 +112,7 @@ namespace cng
 				<< gatheredConcepts.size() << std::endl;
 		for (auto adj : this->adjectives)
 		{
-			if(this->gatherMap.at(adj.first)->size() == 1)
+			if (this->gatherMap.at(adj.first)->size() == 1)
 			{
 				this->gatherMap.erase(adj.first);
 			}
@@ -124,16 +124,69 @@ namespace cng
 
 	void ConceptNetCall::checkGatheredConcepts()
 	{
-		for (auto i : gatherMap)
+//		for (auto i : this->gatherMap)
+//		{
+//			std::cout << i.first.toStdString() << ": ";
+//			for (auto j : *i.second)
+//			{
+//				std::cout << j.toStdString() << " ";
+//			}
+//			std::cout << std::endl;
+//		}
+		std::map<QString, std::vector<QString>>::iterator it;
+		bool conceptDeleted = false;
+		for (it = this->adjectiveAntonymMap.begin(); it != this->adjectiveAntonymMap.end();)
 		{
-			std::cout << i.first.toStdString() << ": ";
-			for (auto j : *i.second)
+			if (this->adjectiveAntonymMap.find(it->first) == this->adjectiveAntonymMap.end())
 			{
-				std::cout << j.toStdString() << " ";
+				continue;
 			}
-			std::cout << std::endl;
+			for (auto gathered : this->gatherMap)
+			{
+				for (auto concept : *gathered.second)
+				{
+					if (std::find(it->second.begin(), it->second.end(), concept) != it->second.end())
+					{
+						if (this->adjectives.find(gathered.first) == this->adjectives.end())
+						{
+							continue;
+						}
+						if (this->adjectives.at(it->first)->weight < this->adjectives.at(gathered.first)->weight)
+						{
+							auto iterator = this->adjectives.find(it->first);
+							if (iterator != this->adjectives.end())
+							{
+								std::cout << "ConceptNetCall: Antonym found: removing: " << it->first.toStdString()
+										<< " keeping: " << gathered.first.toStdString() << std::endl;
+								this->adjectives.erase(it->first);
+								this->adjectiveAntonymMap.erase(it->first);
+								conceptDeleted = true;
+							}
+						}
+						else
+						{
+							auto iterator = this->adjectives.find(gathered.first);
+							if (iterator != this->adjectives.end())
+							{
+								std::cout << "ConceptNetCall: Antonym found: removing: " << gathered.first.toStdString()
+										<< " keeping: " << it->first.toStdString() << std::endl;
+								this->adjectives.erase(gathered.first);
+								this->adjectiveAntonymMap.erase(gathered.first);
+								conceptDeleted = true;
+							}
+						}
+					}
+				}
+			}
+			if (!conceptDeleted)
+			{
+				it++;
+			}
+			else
+			{
+				conceptDeleted = false;
+			}
 		}
-		//TODO
 	}
 
 	void ConceptNetCall::checkAdjectives(/*std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck*/)
@@ -258,9 +311,9 @@ namespace cng
 				this->gatheredConcepts.emplace(
 						endTerm, std::pair<QString, std::shared_ptr<ConceptNetEdge>>(this->currentConcept, cn5Edge));
 				this->newConceptFound = true;
-				for(auto p : this->gatherMap)
+				for (auto p : this->gatherMap)
 				{
-					if(std::find(p.second->begin(), p.second->end(), this->currentConcept) != p.second->end())
+					if (std::find(p.second->begin(), p.second->end(), this->currentConcept) != p.second->end())
 					{
 						p.second->push_back(endTerm);
 						break;

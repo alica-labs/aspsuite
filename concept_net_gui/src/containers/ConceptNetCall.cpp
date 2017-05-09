@@ -31,19 +31,17 @@ namespace cng
 		this->gui = gui;
 		this->id = id;
 		this->nextEdgesPage = nextEdgesPage;
-		this->nam = new QNetworkAccessManager(this);
 		this->checkNAM = new QNetworkAccessManager(this);
+		this->nam2 = new QNetworkAccessManager(this);
 		this->queryConcept = queryConcept;
-		this->conceptDeleted = false;
-		this->connect(this->nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(removeIfAntonym(QNetworkReply*)));
 		this->connect(this->checkNAM, SIGNAL(finished(QNetworkReply*)), this, SLOT(collectConcepts(QNetworkReply*)));
+		this->connect(this->nam2, SIGNAL(finished(QNetworkReply*)), this, SLOT(mapAntonyms(QNetworkReply*)));
 		this->newConceptFound = false;
 	}
 
 	ConceptNetCall::~ConceptNetCall()
 	{
-		delete this->nam;
-//		delete this->nam2;
+		delete this->nam2;
 		delete this->checkNAM;
 	}
 
@@ -98,111 +96,96 @@ namespace cng
 			}
 
 		}
-//		std::cout << "Adjectives before: ";
-//		for (auto it : this->adjectives)
-//		{
-//			std::cout << it.first.toStdString() << " ";
-//		}
-//		std::cout << std::endl;
-		checkAdjectives(this->adjectives);
+		std::cout << "Adjectives size: " << this->adjectives.size() << std::endl;
+		collectAntonyms();
+		checkAdjectives();
 		std::cout << "ConceptNetCall: finished checking Antonyms among the adjectives of the queried concept."
 				<< std::endl;
+		for (auto adj : this->adjectives)
+		{
+			auto tmp = std::make_shared<std::vector<QString>>();
+			tmp->push_back(adj.first);
+			this->gatherMap.emplace(adj.first, tmp);
+		}
 		gatherConcepts(this->adjectives);
 		std::cout << "ConceptNetCall: finished gathering related concepts. Number of found concepts: "
-				<< checkedConcepts.size() << std::endl;
-		checkAdjectives(this->checkedConcepts);
+				<< gatheredConcepts.size() << std::endl;
+		for (auto adj : this->adjectives)
+		{
+			if(this->gatherMap.at(adj.first)->size() == 1)
+			{
+				this->gatherMap.erase(adj.first);
+			}
+		}
+		checkGatheredConcepts();
 		std::cout << "ConceptNetCall: finished checking Antonyms among gathered concepts." << std::endl;
-//		std::cout << "Adjectives after: ";
-//		for (auto it : this->adjectives)
-//		{
-//			std::cout << it.first.toStdString() << " ";
-//		}
-//		std::cout << std::endl;
+
 	}
 
-	void ConceptNetCall::checkAdjectives(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck)
+	void ConceptNetCall::checkGatheredConcepts()
 	{
-//		auto tmp = this->adjectives;
-		//was this->adjectives before test
-		for (this->it = adjectives.begin(); this->it != this->adjectives.end();)
+		for (auto i : gatherMap)
 		{
-			for (auto secondAdjective : toCheck)
+			std::cout << i.first.toStdString() << ": ";
+			for (auto j : *i.second)
 			{
-				if(this->conceptDeleted)
-				{
-					this->conceptDeleted = false;
-					break;
-				}
-//				std::cout << "before" << std::endl;
-//				std::cout << secondAdjective.first.toStdString() << std::endl;
-//				std::cout << (*this->it).first.toStdString() << std::endl;
-//				std::cout << (*this->it).first.toStdString() <<  " " << secondAdjective.first.toStdString() << std::endl;
-//				std::cout << "after" << std::endl;
-				if ((*this->it).first == secondAdjective.first)
+				std::cout << j.toStdString() << " ";
+			}
+			std::cout << std::endl;
+		}
+		//TODO
+	}
+
+	void ConceptNetCall::checkAdjectives(/*std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck*/)
+	{
+		std::map<QString, std::vector<QString>>::iterator it;
+		bool conceptDeleted = false;
+		for (it = this->adjectiveAntonymMap.begin(); it != this->adjectiveAntonymMap.end();)
+		{
+			if (this->adjectiveAntonymMap.find(it->first) == this->adjectiveAntonymMap.end())
+			{
+				continue;
+			}
+			for (auto antonym : it->second)
+			{
+				if (this->adjectives.find(antonym) == this->adjectives.end())
 				{
 					continue;
 				}
-				this->currentAntonymCheck = std::pair<std::pair<QString, std::shared_ptr<ConceptNetEdge>>,
-						std::pair<QString, std::shared_ptr<ConceptNetEdge>>>(*this->it, secondAdjective);
-				QUrl url(
-						"http://api.localhost/query?node=/c/en/" + (*this->it).first + "&other=/c/en/"
-								+ secondAdjective.first + "&rel=/r/Antonym");
-				this->callUrl(url, this->nam);
-				QEventLoop loop;
-				this->connect(this, SIGNAL(closeLoopAntonym()), &loop, SLOT(quit()));
-				loop.exec();
+				if (this->adjectives.at(it->first)->weight < this->adjectives.at(antonym)->weight)
+				{
+					auto iterator = this->adjectives.find(it->first);
+					if (iterator != this->adjectives.end())
+					{
+						std::cout << "ConceptNetCall: Antonym found: removing: " << it->first.toStdString()
+								<< " keeping: " << antonym.toStdString() << std::endl;
+						this->adjectives.erase(it->first);
+						this->adjectiveAntonymMap.erase(it->first);
+						conceptDeleted = true;
+					}
+				}
+				else
+				{
+					auto iterator = this->adjectives.find(antonym);
+					if (iterator != this->adjectives.end())
+					{
+						std::cout << "ConceptNetCall: Antonym found: removing: " << antonym.toStdString()
+								<< " keeping: " << it->first.toStdString() << std::endl;
+						this->adjectives.erase(antonym);
+						this->adjectiveAntonymMap.erase(antonym);
+						conceptDeleted = true;
+					}
+				}
 			}
-			if (!this->conceptDeleted)
+			if (!conceptDeleted)
 			{
-				this->it++;
+				it++;
 			}
 			else
 			{
-				this->conceptDeleted = false;
+				conceptDeleted = false;
 			}
 		}
-	}
-
-	void ConceptNetCall::removeIfAntonym(QNetworkReply* reply)
-	{
-		QString data = reply->readAll();
-		// parse json
-		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
-		QJsonArray edges = jsonDoc.object()["edges"].toArray();
-//		std::cout << "First weight: " << this->currentAntonymCheck.first.second->toString() << "Second weight: "
-//				<< this->currentAntonymCheck.second.second->toString() << std::endl;
-		if (edges.size() > 0)
-		{
-			std::vector<std::shared_ptr<ConceptNetEdge>> inconsistency;
-			inconsistency.push_back(this->currentAntonymCheck.first.second);
-			inconsistency.push_back(this->currentAntonymCheck.second.second);
-			inconsistency.push_back(this->extractCNEdge(edges.at(0).toObject()));
-			if (this->currentAntonymCheck.first.second->weight < this->currentAntonymCheck.second.second->weight)
-			{
-				auto iterator = this->adjectives.find(this->currentAntonymCheck.first.first);
-				if (iterator != this->adjectives.end())
-				{
-					this->adjectives.erase(this->it++);
-					std::cout << "ConceptNetCall: Antonym found: removing: "
-							<< this->currentAntonymCheck.first.first.toStdString() << " keeping: "
-							<< this->currentAntonymCheck.second.first.toStdString() << std::endl;
-					this->conceptDeleted = true;
-				}
-			}
-			else
-			{
-				auto iterator = this->adjectives.find(this->currentAntonymCheck.second.first);
-				if (iterator != this->adjectives.end())
-				{
-					this->adjectives.erase(this->it++);
-					std::cout << "ConceptNetCall: Antonym found: removing: "
-							<< this->currentAntonymCheck.second.first.toStdString() << " keeping: "
-							<< this->currentAntonymCheck.first.first.toStdString() << std::endl;
-					this->conceptDeleted = true;
-				}
-			}
-		}
-		emit closeLoopAntonym();
 	}
 
 	QString ConceptNetCall::trimTerm(QString term)
@@ -216,6 +199,7 @@ namespace cng
 		this->newConceptFound = false;
 		for (auto adjective : toCheck)
 		{
+			this->currentConcept = adjective.first;
 			QEventLoop loopIsA;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopIsA, SLOT(quit()));
 			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA" + "&limit=1000");
@@ -223,20 +207,22 @@ namespace cng
 			loopIsA.exec();
 			QEventLoop loopSynonym;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopSynonym, SLOT(quit()));
-			QUrl urlSynonym("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym" + "&limit=1000");
+			QUrl urlSynonym(
+					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym" + "&limit=1000");
 			this->callUrl(urlSynonym, this->checkNAM);
 			loopSynonym.exec();
 			QEventLoop loopDefinedAs;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopDefinedAs, SLOT(quit()));
-			QUrl urlDefinedAs("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs" + "&limit=1000");
+			QUrl urlDefinedAs(
+					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs" + "&limit=1000");
 			this->callUrl(urlDefinedAs, this->checkNAM);
 			loopDefinedAs.exec();
 			QEventLoop loopPartOf;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopPartOf, SLOT(quit()));
-			QUrl urlPartOf("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf" + "&limit=1000");
+			QUrl urlPartOf(
+					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf" + "&limit=1000");
 			this->callUrl(urlPartOf, this->checkNAM);
 			loopPartOf.exec();
-			this->checkedConcepts.emplace(adjective.first, adjective.second);
 			this->conceptsToCheck.erase(adjective.first);
 		}
 		if (this->newConceptFound)
@@ -248,7 +234,6 @@ namespace cng
 	void ConceptNetCall::collectConcepts(QNetworkReply* reply)
 	{
 		QString data = reply->readAll();
-		//remove html part
 		QJsonDocument jsonDoc(QJsonDocument::fromJson(data.toUtf8()));
 		QJsonArray edges = jsonDoc.object()["edges"].toArray();
 		for (int i = 0; i < edges.size(); i++)
@@ -259,14 +244,28 @@ namespace cng
 			{
 				continue;
 			}
+			if (cn5Edge->id.compare("BREAK") == 0)
+			{
+				break;
+			}
 			QString endTerm = edge["end"].toObject()["term"].toString();
 			endTerm = trimTerm(endTerm);
 			if (this->conceptsToCheck.find(endTerm) == this->conceptsToCheck.end()
-					&& this->checkedConcepts.find(endTerm) == this->checkedConcepts.end()
+					&& this->gatheredConcepts.find(endTerm) == this->gatheredConcepts.end()
 					&& cn5Edge->secondConcept->senseLabel.compare("a") == 0)
 			{
 				this->conceptsToCheck.emplace(endTerm, cn5Edge);
+				this->gatheredConcepts.emplace(
+						endTerm, std::pair<QString, std::shared_ptr<ConceptNetEdge>>(this->currentConcept, cn5Edge));
 				this->newConceptFound = true;
+				for(auto p : this->gatherMap)
+				{
+					if(std::find(p.second->begin(), p.second->end(), this->currentConcept) != p.second->end())
+					{
+						p.second->push_back(endTerm);
+						break;
+					}
+				}
 			}
 		}
 		emit closeLoopAdjectiveGathering();
@@ -297,12 +296,12 @@ namespace cng
 		double weight = edge["weight"].toDouble();
 		if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
 		{
-			return nullptr;
+			return std::make_shared<ConceptNetEdge>(QString("BREAK"), QString(""), nullptr, nullptr, QString(""), -1.0);
 		}
-		//end of edge
+//end of edge
 		QJsonObject end = edge["end"].toObject();
 		QString endLanguage = end["language"].toString();
-		// skip non English
+// skip non English
 		if (endLanguage != "en")
 		{
 			return nullptr;
@@ -316,10 +315,10 @@ namespace cng
 		}
 		QString endSenseLabel = end["sense_label"].toString();
 		QString endID = end["@id"].toString();
-		//start of edge
+//start of edge
 		QJsonObject start = edge["start"].toObject();
 		QString startLanguage = start["language"].toString();
-		// skip non English
+// skip non English
 		if (startLanguage != "en")
 		{
 			return nullptr;
@@ -337,6 +336,105 @@ namespace cng
 		return std::make_shared<ConceptNetEdge>(
 				edgeId, startLanguage, std::make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
 				std::make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
+	}
+
+	void ConceptNetCall::mapAntonyms(QNetworkReply* reply)
+	{
+//not current adjective and not already in
+		QString data = reply->readAll();
+//remove html part
+		std::string fullData = data.toStdString();
+		auto start = fullData.find("{\"@context\":");
+		auto end = fullData.find("</script>");
+		fullData = fullData.substr(start, end - start);
+// parse json
+		auto jsonString = QString(fullData.c_str()).toUtf8();
+		QJsonDocument jsonDoc(QJsonDocument::fromJson(jsonString));
+		QJsonArray edges = jsonDoc.object()["edges"].toArray();
+		for (int i = 0; i < edges.size(); i++)
+		{
+			QJsonObject edge = edges[i].toObject();
+			double weight = edge["weight"].toDouble();
+			if (weight < this->gui->modelSettingsDialog->getMinCn5Weight())
+			{
+				break;
+			}
+			//end of edge
+			QJsonObject end = edge["end"].toObject();
+			QString endLanguage = end["language"].toString();
+			// skip non English
+			if (endLanguage != "en")
+			{
+				continue;
+			}
+			QString endTerm = end["term"].toString();
+			endTerm = trimTerm(endTerm);
+			if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm))
+			{
+				std::cout << "ConceptNetCall: Skipping Antonym:" << endTerm.toStdString() << std::endl;
+				continue;
+			}
+			//start of edge
+			QJsonObject start = edge["start"].toObject();
+			QString startLanguage = start["language"].toString();
+			// skip non English
+			if (startLanguage != "en")
+			{
+				continue;
+			}
+			QString startTerm = start["term"].toString();
+			startTerm = trimTerm(startTerm);
+			if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm))
+			{
+				std::cout << "ConceptNetCall: Skipping Antonym:" << startTerm.toStdString() << std::endl;
+				continue;
+			}
+			if (endTerm != currentAdjective)
+			{
+				auto tmp = this->adjectiveAntonymMap.at(currentAdjective);
+				if (std::find(tmp.begin(), tmp.end(), endTerm) == tmp.end())
+				{
+					this->adjectiveAntonymMap.at(currentAdjective).push_back(endTerm);
+				}
+			}
+			if (startTerm != currentAdjective)
+			{
+				auto tmp = this->adjectiveAntonymMap.at(currentAdjective);
+				if (std::find(tmp.begin(), tmp.end(), startTerm) == tmp.end())
+				{
+					this->adjectiveAntonymMap.at(currentAdjective).push_back(startTerm);
+				}
+			}
+		}
+		if (this->adjectiveAntonymMap.at(currentAdjective).size() == 0)
+		{
+			this->adjectiveAntonymMap.erase(currentAdjective);
+		}
+		emit closeLoop2();
+	}
+
+	void ConceptNetCall::collectAntonyms()
+	{
+		for (auto adjective : this->adjectives)
+		{
+			this->adjectiveAntonymMap.emplace(adjective.first, std::vector<QString>());
+			this->currentAdjective = adjective.first;
+			QUrl url("http://api.localhost/query?node=/c/en/" + adjective.first + "&rel=/r/Antonym" + "&limit=1000");
+			this->callUrl(url, this->nam2);
+			QEventLoop loop;
+			this->connect(this, SIGNAL(closeLoop2()), &loop, SLOT(quit()));
+			loop.exec();
+		}
+//		for (auto pair : this->adjectiveAntonymMap)
+//		{
+//			std::cout << "Adjective: " << pair.first.toStdString() << std::endl;
+//			std::cout << "\t Antonyms: ";
+//			for (auto antonym : pair.second)
+//			{
+//				std::cout << antonym.toStdString() << " ";
+//			}
+//			std::cout << std::endl;
+//		}
 	}
 
 } /* namespace cng */

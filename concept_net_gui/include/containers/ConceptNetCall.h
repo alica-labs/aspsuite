@@ -35,18 +35,20 @@ namespace cng
 		virtual ~ConceptNetCall();
 
 
-		QNetworkAccessManager *nam; // namNumber = 0
-		QNetworkAccessManager *checkNAM; // namNumber = 1
+		QNetworkAccessManager *checkNAM;
+		QNetworkAccessManager *nam2;
 
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
 		std::map<QString, std::shared_ptr<ConceptNetEdge>> adjectives;
 		std::vector<QString> concepts;
 		std::map<QString, std::shared_ptr<ConceptNetEdge>> conceptsToCheck;
-		std::map<QString, std::shared_ptr<ConceptNetEdge>> checkedConcepts;
+		std::map<QString, std::pair<QString, std::shared_ptr<ConceptNetEdge>>> gatheredConcepts;
 		std::map<QString, std::vector<QString>> adjectiveAntonymMap;
+		std::map<QString, std::shared_ptr<std::vector<QString>>> gatherMap;
 		QString nextEdgesPage;
 		QString queryConcept;
+		QString currentConcept;
 		std::pair<std::pair<QString, std::shared_ptr<ConceptNetEdge>>,
 				std::pair<QString, std::shared_ptr<ConceptNetEdge>>> currentAntonymCheck;
 
@@ -54,28 +56,30 @@ namespace cng
 		void findInconsistencies();
 
 	public slots:
-		void removeIfAntonym(QNetworkReply* reply);
 		void collectConcepts(QNetworkReply* reply);
+		void mapAntonyms(QNetworkReply* reply);
 
 	private:
 		void gatherConcepts(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
-		void checkAdjectives(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
+		void checkAdjectives();
+		void checkGatheredConcepts();
 		ConceptNetGui* gui;
 		QString trimTerm(QString term);
-		std::map<QString, std::shared_ptr<ConceptNetEdge>>::iterator it;
-		bool conceptDeleted;
 		/**
 		 * Executes http get request
 		 */
+		void collectAntonyms();
 		void callUrl(QUrl url, QNetworkAccessManager* n);
 		bool conceptContainsUTF8(QString concept);
 		std::vector<std::vector<std::shared_ptr<ConceptNetEdge>>> inconsistencies;
 		std::shared_ptr<ConceptNetEdge> extractCNEdge(QJsonObject edge);
 		bool newConceptFound;
+		QString currentAdjective;
 
 	signals:
 		void closeLoopAntonym();
 		void closeLoopAdjectiveGathering();
+		void closeLoop2();
 	};
 
 } /* namespace cng */

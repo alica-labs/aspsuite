@@ -96,10 +96,11 @@ namespace cng
 			}
 
 		}
-		std::cout << "Adjectives size: " << this->adjectives.size() << std::endl;
+		std::cout << "ConceptNetCall: Adjectives size: " << this->adjectives.size() << std::endl;
 		collectAntonyms();
+		std::cout << "ConceptNetCall: Finished collecting Antonyms." << std::endl;
 		checkAdjectives();
-		std::cout << "ConceptNetCall: finished checking Antonyms among the adjectives of the queried concept."
+		std::cout << "ConceptNetCall: Finished checking Antonyms among the adjectives of the queried concept."
 				<< std::endl;
 		for (auto adj : this->adjectives)
 		{
@@ -108,7 +109,7 @@ namespace cng
 			this->gatherMap.emplace(adj.first, tmp);
 		}
 		gatherConcepts(this->adjectives);
-		std::cout << "ConceptNetCall: finished gathering related concepts. Number of found concepts: "
+		std::cout << "ConceptNetCall: Finished gathering related concepts. Number of found concepts: "
 				<< gatheredConcepts.size() << std::endl;
 		for (auto adj : this->adjectives)
 		{
@@ -118,7 +119,7 @@ namespace cng
 			}
 		}
 		checkGatheredConcepts();
-		std::cout << "ConceptNetCall: finished checking Antonyms among gathered concepts." << std::endl;
+		std::cout << "ConceptNetCall: Finished checking Antonyms among gathered concepts." << std::endl;
 
 	}
 
@@ -139,6 +140,7 @@ namespace cng
 		{
 			if (this->adjectiveAntonymMap.find(it->first) == this->adjectiveAntonymMap.end())
 			{
+				it++;
 				continue;
 			}
 			for (auto gathered : this->gatherMap)
@@ -197,6 +199,7 @@ namespace cng
 		{
 			if (this->adjectiveAntonymMap.find(it->first) == this->adjectiveAntonymMap.end())
 			{
+				it++;
 				continue;
 			}
 			for (auto antonym : it->second)

@@ -14,6 +14,7 @@
 #include <QJsonObject>
 #include <QByteArray>
 #include <QJsonDocument>
+//#include <chrono>
 
 namespace cng
 {
@@ -37,6 +38,8 @@ namespace cng
 		QByteArray loadedData;
 		QString fileName;
 		ConceptNetGui* gui;
+
+//		std::chrono::_V2::system_clock::time_point start;
 
 	signals:
 		void cn5CallFinished();

@@ -321,10 +321,7 @@ namespace cng
 			cout << this->currentConceptNetCall->toString();
 #endif
 			std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
-			start = std::chrono::high_resolution_clock::now();
 			this->currentConceptNetCall->findInconsistencies();
-			std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-			std::cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << std::endl;
 			emit jsonExtracted();
 		}
 

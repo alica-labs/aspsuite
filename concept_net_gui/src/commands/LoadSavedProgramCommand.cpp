@@ -49,6 +49,7 @@ namespace cng
 		QJsonDocument loadDoc(QJsonDocument::fromJson(this->loadedData));
 		QJsonObject savedObject = loadDoc.object();
 		//Handle all commands
+//		start = std::chrono::high_resolution_clock::now();
 		QJsonArray cmds = savedObject["commandHistory"].toArray();
 		for (int i = 0; i < cmds.size(); i++)
 		{
@@ -169,6 +170,8 @@ namespace cng
 				std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;
 			}
 		}
+//		std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+//		std::cout << "Measured Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
 		std::cout << "LoadSavedProgramCommand: Loading finished!" << std::endl;
 		this->gui->slHandler->currentLoadCmd = nullptr;
 	}

@@ -124,7 +124,9 @@ namespace cng
 			conceptLeft = conceptLeft.left(conceptLeft.size() - 1).trimmed();
 			conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
 			conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
-			QUrl url("http://api.localhost/query?node=/c/en/" + conceptLeft + "&other=/c/en/" + conceptRight + "&limit=1000");
+			QUrl url(
+					"http://api.localhost/query?node=/c/en/" + conceptLeft + "&other=/c/en/" + conceptRight
+							+ "&limit=1000");
 			callUrl(url);
 		}
 		else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard"))
@@ -151,15 +153,33 @@ namespace cng
 				callUrl(url);
 			}
 		}
-		//relation(concept)
 		else
 		{
-			auto concept = this->query.right(this->query.size() - pos - 1);
-			concept = concept.left(concept.size() - 1);
-			concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
-			this->queryConcept = concept;
-			QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation + "&limit=1000");
-			callUrl(url);
+			if (this->query.contains(","))
+			{
+				// relation(concept, concept)
+				this->queryConcept = QString("wildcard");
+				auto conceptRight = this->query.mid(commaPos + 1, this->query.size() - commaPos);
+				auto conceptLeft = this->query.mid(pos + 1, commaPos - pos).trimmed();
+				conceptRight = conceptRight.left(conceptRight.size() - 1).trimmed();
+				conceptLeft = conceptLeft.left(conceptLeft.size() - 1).trimmed();
+				conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
+				conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
+				QUrl url(
+						"http://api.localhost/query?start=/c/en/" + conceptLeft + "&end=/c/en/" + conceptRight + "&rel=/r/" + relation
+								+ "&limit=1000");
+				callUrl(url);
+			}
+			else
+			{
+				//relation(concept)
+				auto concept = this->query.right(this->query.size() - pos - 1);
+				concept = concept.left(concept.size() - 1);
+				concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
+				this->queryConcept = concept;
+				QUrl url("http://api.localhost/query?node=/c/en/" + concept + "&rel=/r/" + relation + "&limit=1000");
+				callUrl(url);
+			}
 		}
 	}
 
@@ -196,7 +216,8 @@ namespace cng
 		{
 			QUrl url(
 					"http://api.localhost/query?node=/c/en/"
-							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength) + "&limit=1000");
+							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength)
+							+ "&limit=1000");
 			callUrl(url);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());

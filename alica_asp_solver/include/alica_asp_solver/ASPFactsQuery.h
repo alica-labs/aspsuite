@@ -24,8 +24,8 @@ namespace alica
 		public:
 			ASPFactsQuery(ASPSolver* solver, shared_ptr<alica::reasoner::ASPTerm> term);
 			virtual ~ASPFactsQuery();
-			map<Gringo::Value, vector<Gringo::Value> > getFactModelMap();
-			void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);
+//			map<Gringo::Value, vector<Gringo::Value> > getFactModelMap();
+//			void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);
 			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedFacts();
 			void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
 			bool factsExistForAllModels();
@@ -34,10 +34,9 @@ namespace alica
 			vector<pair<Gringo::Value, ASPTruthValue>> getASPTruthValues();
 
 		private:
-			vector<Gringo::Value> queryValues;
 			void createQueryValues(vector<string> queryString);
 			// key := query value, value := predicates that satisfy the query value
-			map<Gringo::Value, vector<Gringo::Value>> factModelMap;
+//			map<Gringo::Value, vector<Gringo::Value>> factModelMap;
 		};
 
 	} /* namespace reasoner */

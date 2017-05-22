@@ -44,8 +44,8 @@ namespace alica
 			vector<string> getRules();
 			shared_ptr<alica::reasoner::ASPTerm> getTerm();
 
-			string getProgrammSection();
-			void setProgrammSection(string programmSection);
+//			string getProgrammSection();
+//			void setProgrammSection(string programmSection);
 			virtual void removeExternal() = 0;
 
 			string toString();
@@ -64,12 +64,11 @@ namespace alica
 			map<Gringo::Value, vector<Gringo::Value>> headValues;
 			// lifeTime == 1 => query is used once
 			// lifeTime == x => query is used x times
-			// LifeTime == -1 => query is used until unregistered
+			// lifeTime == -1 => query is used until unregistered
 			int lifeTime;
-			string programSection;
+//			string programSection;
 			shared_ptr<alica::reasoner::ASPTerm> term;
 			ASPQueryType type;
-
 
 		private:
 			bool checkMatchValues(const Gringo::Value* value1, const Gringo::Value* value2);

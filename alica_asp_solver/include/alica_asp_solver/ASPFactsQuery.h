@@ -26,8 +26,8 @@ namespace alica
 			virtual ~ASPFactsQuery();
 //			map<Gringo::Value, vector<Gringo::Value> > getFactModelMap();
 //			void setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap);
-			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedFacts();
-			void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
+//			shared_ptr<map<Gringo::Value, vector<Gringo::Value>>> getSatisfiedFacts();
+//			void saveSatisfiedFact(Gringo::Value key, Gringo::Value value);
 			bool factsExistForAllModels();
 			bool factsExistForAtLeastOneModel();
 			void removeExternal();

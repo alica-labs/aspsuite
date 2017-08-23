@@ -80,38 +80,38 @@ namespace alica
 			}
 		}
 
-		map<Gringo::Value, vector<Gringo::Value> > ASPFactsQuery::getFactModelMap()
-		{
-			return this->factModelMap;
-		}
+//		map<Gringo::Value, vector<Gringo::Value> > ASPFactsQuery::getFactModelMap()
+//		{
+//			return this->factModelMap;
+//		}
+//
+//		void ASPFactsQuery::setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap)
+//		{
+//			this->factModelMap = factModelMap;
+//		}
 
-		void ASPFactsQuery::setFactModelMap(map<Gringo::Value, vector<Gringo::Value> > factModelMap)
-		{
-			this->factModelMap = factModelMap;
-		}
-
-		void ASPFactsQuery::saveSatisfiedFact(Gringo::Value key, Gringo::Value value)
-		{
-			auto entry = this->factModelMap.find(key);
-			if (entry != this->factModelMap.end())
-			{
-				entry->second.push_back(value);
-			}
-		}
-
-		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ASPFactsQuery::getSatisfiedFacts()
-		{
-			shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ret = make_shared<
-					map<Gringo::Value, vector<Gringo::Value> > >();
-			for (auto pair : this->factModelMap)
-			{
-				if (pair.second.size() > 0)
-				{
-					ret->emplace(pair);
-				}
-			}
-			return ret;
-		}
+//		void ASPFactsQuery::saveSatisfiedFact(Gringo::Value key, Gringo::Value value)
+//		{
+//			auto entry = this->factModelMap.find(key);
+//			if (entry != this->factModelMap.end())
+//			{
+//				entry->second.push_back(value);
+//			}
+//		}
+//
+//		shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ASPFactsQuery::getSatisfiedFacts()
+//		{
+//			shared_ptr<map<Gringo::Value, vector<Gringo::Value> > > ret = make_shared<
+//					map<Gringo::Value, vector<Gringo::Value> > >();
+//			for (auto pair : this->factModelMap)
+//			{
+//				if (pair.second.size() > 0)
+//				{
+//					ret->emplace(pair);
+//				}
+//			}
+//			return ret;
+//		}
 
 		bool ASPFactsQuery::factsExistForAtLeastOneModel()
 		{

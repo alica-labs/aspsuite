@@ -86,11 +86,14 @@ const ::capnp::_::RawSchema s_cd7c0e6550ea3ccc = {
 namespace discovery_msgs {
 
 // Beacon
+#ifndef _MSC_VER
 constexpr uint16_t Beacon::_capnpPrivate::dataWordSize;
 constexpr uint16_t Beacon::_capnpPrivate::pointerCount;
+#endif
 #if !CAPNP_LITE
 constexpr ::capnp::Kind Beacon::_capnpPrivate::kind;
 constexpr ::capnp::_::RawSchema const* Beacon::_capnpPrivate::schema;
+constexpr ::capnp::_::RawBrandedSchema const* Beacon::_capnpPrivate::brand;
 #endif  // !CAPNP_LITE
 
 

@@ -39,12 +39,14 @@ bool Worker::start()
     return this->timer->start();
 }
 
-void Worker::setIntervalMS(std::chrono::milliseconds intervalMS) {
-	this->timer->setInterval(intervalMS.count());
+void Worker::setIntervalMS(std::chrono::milliseconds intervalMS)
+{
+    this->timer->setInterval(intervalMS.count());
 }
 
-void Worker::setDelayedStartMS(std::chrono::milliseconds delayedStartMS) {
-	this->timer->setDelayedStart(delayedStartMS.count());
+void Worker::setDelayedStartMS(std::chrono::milliseconds delayedStartMS)
+{
+    this->timer->setDelayedStart(delayedStartMS.count());
 }
 
 void Worker::runInternal()
@@ -73,4 +75,4 @@ void Worker::runInternal()
     }
 }
 
-} /* namespace msl_bbb */
+}

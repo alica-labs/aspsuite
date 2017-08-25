@@ -221,12 +221,13 @@ void Agent::send()
 
 void Agent::receive()
 {
-    zmq_msg_t msg;
+	zmq_msg_t msg;
     segments_.clear();
     while (true)
     {
         zmq_msg_init(&msg);
-        zmq_msg_recv(&msg, this->socket, 0);
+        int nbytes = zmq_msg_recv(&msg, this->socket, 0);
+    	std::cout << "Agent: Receive(): Received " << nbytes << "!" << std::endl;
 
         // Received message must contain an integral number of words.
         assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
@@ -234,12 +235,12 @@ void Agent::receive()
 
         if (reinterpret_cast<uintptr_t>(&msg) % sizeof(capnp::word) == 0)
         {
-        	std::cout << "Agent: Receive(): Message is aligned! " << std::endl;
+        	std::cout << "Agent: Receive(): Message is aligned!" << std::endl;
         	segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(&msg), num_words));
         }
         else
         {
-        	std::cout << "Agent: Receive(): Message is NOT aligned! TODO" << std::endl;
+        	std::cout << "Agent: Receive(): Message is NOT aligned! Message part is dropped." << std::endl;
         	// TODO :D
         }
 
@@ -253,7 +254,7 @@ void Agent::receive()
             zmq_msg_close(&msg);
         }
     }
-    auto blub = kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
+    //auto blub = kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
     capnp::SegmentArrayMessageReader reader(kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(segments_.data(), segments_.size()));
     auto beacon = reader.getRoot<discovery_msgs::Beacon>();
     std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl; // << " IP: " << beacon.getIp() << " Port: " << beacon.getPort() << std::endl;

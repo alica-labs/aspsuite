@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
+#include <string>
 #include <thread>
 
 #define WORKER_DEBUG
@@ -27,11 +27,11 @@ class Worker
     virtual ~Worker();
     virtual void run() = 0; /** < Meant to be overwritten by derived classes. */
     bool stop();
-	bool start();
-	void setIntervalMS(std::chrono::milliseconds delay);
-	void setDelayedStartMS(std::chrono::milliseconds delayedStartMS);
+    bool start();
+    void setIntervalMS(std::chrono::milliseconds delay);
+    void setDelayedStartMS(std::chrono::milliseconds delayedStartMS);
 
-	std::string name; /** < The name of this worker. */
+    std::string name; /** < The name of this worker. */
 
   protected:
     std::condition_variable runCV;

@@ -10,8 +10,6 @@ find_package(CapnProto)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES discovery_msgs
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
 )
 
 # make src an include directory, because everything is generated into the src folder

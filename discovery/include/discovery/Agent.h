@@ -1,5 +1,9 @@
 #pragma once
 
+/* Next 2 Lines: To get defns of NI_MAXSERV and NI_MAXHOST */
+#define _GNU_SOURCE
+#include <netdb.h>
+
 #include "discovery/Worker.h"
 
 #include <zmq.h>
@@ -38,7 +42,7 @@ class Agent : public Worker
     void checkZMQVersion();
     bool getWirelessAddress();
     uuid_t uuid;
-    char* wirelessIpAddress;
+    char wirelessIpAddress[NI_MAXHOST];
 
 
     std::vector<std::string> parts_;

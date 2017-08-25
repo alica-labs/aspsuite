@@ -104,7 +104,11 @@ void Agent::run()
     // this->checkZMQVersion();
     // this->testUUIDStuff();
 
-    this->getWirelessAddress();
+    if (!this->getWirelessAddress())
+    {
+        std::cerr << "Agent: No WLAN-Address available! " << std::endl;
+        return;
+    }
 
     if (this->sender)
     {
@@ -136,7 +140,6 @@ bool Agent::getWirelessAddress()
 {
     struct ifaddrs *ifAddrStruct = NULL;
     struct ifaddrs *ifa = NULL;
-    void *tmpAddrPtr = NULL;
 
     getifaddrs(&ifAddrStruct);
 
@@ -149,14 +152,24 @@ bool Agent::getWirelessAddress()
         // filters for 'w'ireless interfaces with ipv4 addresses
         if (ifa->ifa_name[0] == 'w' && ifa->ifa_addr->sa_family == AF_INET)
         { // check it is IP4
-            // is a valid IP4 Address
-            tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
-            // char addressBuffer[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, tmpAddrPtr, this->wirelessIpAddress, INET_ADDRSTRLEN);
-            printf("%s IP Address %s\n", ifa->ifa_name, this->wirelessIpAddress);
+            int error = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), this->wirelessIpAddress, NI_MAXHOST,
+                                    NULL, 0, NI_NUMERICHOST);
+            if (error != 0)
+            {
+                std::cout << "Agent:getWirelessAddress: getnameinfo() failed: " << gai_strerror(error) << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            std::cout << "Agent:getWirelessAddress: " << ifa->ifa_name << " IP Address " << this->wirelessIpAddress << std::endl;
+
             if (ifAddrStruct != NULL)
                 freeifaddrs(ifAddrStruct);
             return true;
+        }
+        else
+        {
+            std::cout << "Agent::getWirelessAddress: Interface Name: " << ifa->ifa_name
+                      << " Protocol Family: " << ifa->ifa_addr->sa_family << std::endl;
         }
     }
     if (ifAddrStruct != NULL)
@@ -193,7 +206,7 @@ void Agent::send()
     //    assert(rc == 9);
 }
 
-//int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
+// int Agent::msg_send(zmq_msg_t *msg_, void *s_, const char *group_, const char *body_)
 //{
 //    int rc = zmq_msg_init_size(msg_, strlen(body_));
 //    if (rc != 0)
@@ -207,7 +220,8 @@ void Agent::send()
 //    rc = zmq_msg_set_group(msg_, group_);
 //    if (rc != 0)
 //    {
-//        std::cout << "Agent::msg_send: Failure by setting the group of a message: " << zmq_strerror(errno) << std::endl;
+//        std::cout << "Agent::msg_send: Failure by setting the group of a message: " << zmq_strerror(errno) <<
+//        std::endl;
 //        zmq_msg_close(msg_);
 //        return rc;
 //    }
@@ -221,13 +235,13 @@ void Agent::send()
 
 void Agent::receive()
 {
-	zmq_msg_t msg;
+    zmq_msg_t msg;
     segments_.clear();
     while (true)
     {
         zmq_msg_init(&msg);
         int nbytes = zmq_msg_recv(&msg, this->socket, 0);
-    	std::cout << "Agent: Receive(): Received " << nbytes << "!" << std::endl;
+        std::cout << "Agent: Receive(): Received " << nbytes << "!" << std::endl;
 
         // Received message must contain an integral number of words.
         assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
@@ -235,13 +249,14 @@ void Agent::receive()
 
         if (reinterpret_cast<uintptr_t>(&msg) % sizeof(capnp::word) == 0)
         {
-        	std::cout << "Agent: Receive(): Message is aligned!" << std::endl;
-        	segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(&msg), num_words));
+            std::cout << "Agent: Receive(): Message is aligned!" << std::endl;
+            segments_.push_back(
+                kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(&msg), num_words));
         }
         else
         {
-        	std::cout << "Agent: Receive(): Message is NOT aligned! Message part is dropped." << std::endl;
-        	// TODO :D
+            std::cout << "Agent: Receive(): Message is NOT aligned! Message part is dropped." << std::endl;
+            // TODO :D
         }
 
         if (!zmq_msg_more(&msg))
@@ -254,13 +269,15 @@ void Agent::receive()
             zmq_msg_close(&msg);
         }
     }
-    //auto blub = kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
-    capnp::SegmentArrayMessageReader reader(kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(segments_.data(), segments_.size()));
+    // auto blub = kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
+    capnp::SegmentArrayMessageReader reader(
+        kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(segments_.data(), segments_.size()));
     auto beacon = reader.getRoot<discovery_msgs::Beacon>();
-    std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl; // << " IP: " << beacon.getIp() << " Port: " << beacon.getPort() << std::endl;
+    std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr()
+              << std::endl; // << " IP: " << beacon.getIp() << " Port: " << beacon.getPort() << std::endl;
 }
 
-//kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+// kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
 //{
 //    do
 //    {
@@ -271,7 +288,8 @@ void Agent::receive()
 //        if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
 //        {
 //            // String buffer is word-aligned, point directly at the start of the string.
-//            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf), num_words));
+//            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf),
+//            num_words));
 //        }
 //        else
 //        {

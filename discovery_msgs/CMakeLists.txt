@@ -5,7 +5,10 @@ add_definitions(-std=c++11)
 
 find_package(catkin REQUIRED)
 
-find_package(CapnProto)
+# Define where to find modules for ZeroMQ and UUID
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
+
+find_package(CapnProto REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -13,7 +16,7 @@ catkin_package(
 )
 
 # make src an include directory, because everything is generated into the src folder
-include_directories(include)
+include_directories(include ${CMAKE_CURRENT_BINARY_DIR})
  
 ## Autogenerate the c++ capnproto files
 set(capnp_message_folder "${CMAKE_CURRENT_SOURCE_DIR}/msg")

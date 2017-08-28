@@ -81,6 +81,19 @@ target_link_libraries(Agent
   pthread
 )
 
+## AGENT
+add_executable(ReceiveTest
+  src/ReceiveTest.cpp
+)
+
+target_link_libraries(ReceiveTest
+  ${catkin_LIBRARIES} 
+  ${ZeroMQ_LIBRARIES}
+  ${UUID_LIBRARIES}
+  ${CAPNP_LIBRARIES}
+  pthread
+)
+
 if (NOT catkin_FOUND)
  target_include_directories(Agent PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif (NOT catkin_FOUND)

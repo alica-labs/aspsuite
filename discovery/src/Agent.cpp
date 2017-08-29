@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-//#define DEBUG_AGENT
+#define DEBUG_AGENT
 
 namespace discovery
 {
@@ -52,15 +52,12 @@ void Agent::setupReceiveUDPMulticast()
 {
     this->socket = zmq_socket(ctx, ZMQ_DISH);
 
-//    int rc = zmq_bind(socket, "udp://192.168.122.161:5555");
-    int rc = zmq_bind(socket, "udp://224.0.0.1:5555");
-    if (rc != 0)
-    {
-        std::cerr << "Error: " << zmq_strerror(errno) << std::endl;
-        assert(rc == 0);
-    }
+    // Binding
+    // check(zmq_bind(socket, "udp://192.168.122.161:5555"), "zmq_bind");
+    check(zmq_bind(socket, "udp://224.0.0.1:5555"), "zmq_bind");
 
-    zmq_join(this->socket, "TestMCGroup");
+    // Join ZMQ Publisher-Grou
+    check(zmq_join(this->socket, "TestMCGroup"), "zmq_join");
 }
 
 void Agent::setupSendUDPMulticast()
@@ -68,35 +65,19 @@ void Agent::setupSendUDPMulticast()
     this->socket = zmq_socket(ctx, ZMQ_RADIO);
 
     // Connecting
-    //int rc = zmq_connect(socket, "udp://192.168.122.161:5555");
-    int rc = zmq_connect(socket, "udp://224.0.0.1:5555");
-    if (rc != 0)
-    {
-        std::cerr << "Error: " << zmq_strerror(errno) << std::endl;
-        assert(rc == 0);
-    }
+    // check(zmq_connect(socket, "udp://192.168.122.161:5555"), "zmq_connect", true);
+    check(zmq_connect(socket, "udp://224.0.0.1:5555"), "zmq_connect", true);
 }
 
 Agent::~Agent()
 {
-    int rc = zmq_close(socket);
-    if (rc != 0)
-    {
-        strerror(errno);
-        assert(rc == 0);
-    }
-
-    rc = zmq_ctx_term(this->ctx);
-    if (rc != 0)
-    {
-        strerror(errno);
-        assert(rc == 0);
-    }
+    check(zmq_close(socket), "zmq_close", true);
+    check(zmq_ctx_term(this->ctx), "zmq_ctx_term", true);
 }
 
 void Agent::run()
 {
-    this->checkZMQVersion();
+    // this->checkZMQVersion();
     // this->testUUIDStuff();
 
     if (!this->getWirelessAddress())
@@ -107,65 +88,59 @@ void Agent::run()
 
     if (this->sender)
     {
-#ifdef DEBUG_AGENT
-        std::cout << "Error State before sending: " << zmq_strerror(errno) << std::endl;
-#endif
-        //sendMultiPartZeroCopy();
+        // sendMultiPartZeroCopy();
         send();
-#ifdef DEBUG_AGENT
-        std::cout << "Error State after sending: " << zmq_strerror(errno) << std::endl;
-#endif
     }
     else
     {
-#ifdef DEBUG_AGENT
-        std::cout << "Error State before receiving: " << zmq_strerror(errno) << std::endl;
-#endif
         receive();
-#ifdef DEBUG_AGENT
-        std::cout << "Error State after receiving: " << zmq_strerror(errno) << std::endl;
-#endif
     }
 }
 
 void Agent::send()
 {
-	// Cap'n Proto: create proto message
+    // Cap'n Proto: create proto message
 
-	// init builder
-	::capnp::MallocMessageBuilder msgBuilder;
-	discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
+    // init builder
+    ::capnp::MallocMessageBuilder msgBuilder;
+    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
 
-	// set content
-	beaconMsgBuilder.setIp(this->wirelessIpAddress);
-	beaconMsgBuilder.setPort(6666);
-	beaconMsgBuilder.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
+    // set content
+    beaconMsgBuilder.setIp(this->wirelessIpAddress);
+    beaconMsgBuilder.setPort(6666);
+    beaconMsgBuilder.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
 
-#ifdef AGENT_DEBUG
-	std::cout << "Agent:send(): Message (Size: "  << ") to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
+#ifdef DEBUG_AGENT
+    std::cout << "Agent:send(): Message (Size: "
+              << ") to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-	// ZMQ: send proto message via zmq message
+    // ZMQ: send proto message via zmq message
 
-	// init size
-	zmq_msg_t msg;
-	int rc = zmq_msg_init_size (&msg, beaconMsgBuilder.totalSize().wordCount*sizeof(capnp::word));
-	if (rc != 0)
-	{
-		std::cerr << "Error: " << zmq_strerror(errno) << std::endl;
-		assert(rc == 0);
-	}
+    // copy content
+    zmq_msg_t msg;
+    kj::ArrayPtr<uint8_t> byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
+    check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data");
 
-	// copy content
-	kj::Array<capnp::word> array = capnp::messageToFlatArray(msgBuilder);
-	kj::ArrayPtr<uint8_t> bytes = array.asBytes();
-	memcpy(zmq_msg_data(&msg), bytes.begin(), beaconMsgBuilder.totalSize().wordCount*sizeof(capnp::word));
+    // set group
+    check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group");
 
-	// set group
-	zmq_msg_set_group(&msg, "TestMCGroup");
+    // send
+    check(zmq_msg_send(&msg, this->socket, 0), "zmq_msg_send");
+}
 
-	// send
-	zmq_msg_send(&msg, this->socket,0);
+/**
+ * Checks the return code and reports an error if present.
+ * If abortIfError is true, it also aborts the process.
+ */
+void Agent::check(int returnCode, std::string methodName, bool abortIfError)
+{
+    if (returnCode != 0)
+    {
+        std::cerr << methodName << " returned: " << errno << " - " << zmq_strerror(errno) << std::endl;
+        if (abortIfError)
+            assert(returnCode);
+    }
 }
 
 void Agent::sendMultiPartZeroCopy()
@@ -178,7 +153,8 @@ void Agent::sendMultiPartZeroCopy()
     std::cout << "Agent: send(): Size of UUID is " << sizeof(this->uuid) << std::endl;
     beacon.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
 
-    std::cout << "Agent:send(): Message (Size: "  << ") to send: " << beacon.toString().flatten().cStr() << std::endl;
+    std::cout << "Agent:send(): Message (Size: "
+              << ") to send: " << beacon.toString().flatten().cStr() << std::endl;
 
     auto segments = msgBuilder.getSegmentsForOutput();
 
@@ -187,7 +163,7 @@ void Agent::sendMultiPartZeroCopy()
     assert(i != 0);
     while (--i != 0)
     {
-    	std::cout << "Agent:send(): Size: " << it->size() * sizeof(capnp::word) << std::endl;
+        std::cout << "Agent:send(): Size: " << it->size() * sizeof(capnp::word) << std::endl;
         zmq_send_const(this->socket, reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word),
                        ZMQ_SNDMORE);
         ++it;
@@ -199,53 +175,30 @@ void Agent::sendMultiPartZeroCopy()
 void Agent::receive()
 {
     zmq_msg_t msg;
-    segments_.clear();
 
-    while (true)
-    {
-        std::cout << "Agent:receive(): In While. " << std::endl;
-        int rc = zmq_msg_init(&msg);
-        assert(rc == 0);
-        std::cout << "Agent:receive(): After Init and before Receive. " << std::endl;
-        int nbytes = zmq_msg_recv(&msg, this->socket, 0);
-        std::cout << "Agent: Receive(): Received " << nbytes << "!" << std::endl;
+	check(zmq_msg_init(&msg), "zmq_msg_init", true);
+	int nbytes = zmq_msg_recv(&msg, this->socket, 0);
+	std::cout << "Agent: receive(): nbytes: " << nbytes << std::endl;
 
-        // Received message must contain an integral number of words.
-        assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
-        auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
+	// Received message must contain an integral number of words.
+	assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
+	auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
+	std::cout << "Agent: receive(): num_words: " << num_words << std::endl;
 
-        if (reinterpret_cast<uintptr_t>(&msg) % sizeof(capnp::word) == 0)
-        {
-            std::cout << "Agent: Receive(): Message is aligned!" << std::endl;
-            segments_.push_back(
-                kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(&msg), num_words));
-        }
-        else
-        {
-            std::cout << "Agent: Receive(): Message is NOT aligned! Message part is dropped." << std::endl;
-            // TODO :D
-        }
+	auto wordArray = kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
+	std::cout << "Agent: receive(): wordArray size: " << wordArray.size() << std::endl;
 
-        if (!zmq_msg_more(&msg))
-        {
-            zmq_msg_close(&msg);
-            break;
-        }
-        else
-        {
-            zmq_msg_close(&msg);
-        }
-    }
 
-    capnp::SegmentArrayMessageReader reader(
-        kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(segments_.data(), segments_.size()));
+	::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
 
-    auto beacon = reader.getRoot<discovery_msgs::Beacon>();
+    auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
 
     std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl;
+
+	check(zmq_msg_close(&msg), "zmq_msg_close");
 }
 
-//kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+// kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
 //{
 //    do
 //    {
@@ -334,17 +287,14 @@ bool Agent::getWirelessAddress()
                 exit(EXIT_FAILURE);
             }
 
-            std::cout << "Agent:getWirelessAddress: " << ifa->ifa_name << " IP Address " << this->wirelessIpAddress
-                      << std::endl;
-
             if (ifAddrStruct != NULL)
                 freeifaddrs(ifAddrStruct);
             return true;
         }
         else
         {
-            std::cout << "Agent::getWirelessAddress: Interface Name: " << ifa->ifa_name
-                      << " Protocol Family: " << ifa->ifa_addr->sa_family << std::endl;
+            // std::cout << "Agent::getWirelessAddress: Interface Name: " << ifa->ifa_name
+            //          << " Protocol Family: " << ifa->ifa_addr->sa_family << std::endl;
         }
     }
     if (ifAddrStruct != NULL)

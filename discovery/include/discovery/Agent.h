@@ -43,13 +43,10 @@ class Agent : public Worker
     void testUUIDStuff();
     void checkZMQVersion();
     bool getWirelessAddress();
+    void check(int returnCode, std::string methodName, bool abortIfError = false);
 
     uuid_t uuid;
     char wirelessIpAddress[NI_MAXHOST];
-
-    //std::vector<std::string> parts_;
-    //std::vector<std::unique_ptr<capnp::word[]>> copied_parts_;
-    std::vector<kj::ArrayPtr<capnp::word const>> segments_;
 
     // zmq stuff
     bool sender;

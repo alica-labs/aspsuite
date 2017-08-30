@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+#include <capnp/endian.h>
+
 #define DEBUG_AGENT
 
 namespace discovery
@@ -54,9 +56,9 @@ void Agent::setupReceiveUDPMulticast()
 
     // Binding
     // check(zmq_bind(socket, "udp://192.168.122.161:5555"), "zmq_bind");
-    check(zmq_bind(socket, "udp://224.0.0.1:5555"), "zmq_bind");
+    check(zmq_bind(this->socket, "udp://224.0.0.1:5555"), "zmq_bind");
 
-    // Join ZMQ Publisher-Grou
+    // Join ZMQ Publisher-Group
     check(zmq_join(this->socket, "TestMCGroup"), "zmq_join");
 }
 
@@ -66,12 +68,12 @@ void Agent::setupSendUDPMulticast()
 
     // Connecting
     // check(zmq_connect(socket, "udp://192.168.122.161:5555"), "zmq_connect", true);
-    check(zmq_connect(socket, "udp://224.0.0.1:5555"), "zmq_connect", true);
+    check(zmq_connect(this->socket, "udp://224.0.0.1:5555"), "zmq_connect", true);
 }
 
 Agent::~Agent()
 {
-    check(zmq_close(socket), "zmq_close", true);
+    check(zmq_close(this->socket), "zmq_close", true);
     check(zmq_ctx_term(this->ctx), "zmq_ctx_term", true);
 }
 
@@ -119,19 +121,32 @@ void Agent::send()
 
     // copy content
     zmq_msg_t msg;
-    kj::ArrayPtr<uint8_t> byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
+    auto byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
+
     check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data");
 
     // set group
     check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group");
 
+    auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
+	for (int i = 0; i < zmq_msg_size(&msg); i++)
+	{
+		printf("%02X:", msgByteArray[i]);
+	}
+	printf("\n");
+
     // send
-    check(zmq_msg_send(&msg, this->socket, 0), "zmq_msg_send");
+    int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
+    if (numBytesSend == -1)
+    {
+    	std::cerr << "zmq_msg_send was unsuccessfull: " << errno << " - " << zmq_strerror(errno) << std::endl;
+    	check(zmq_msg_close(&msg), "zmq_msg_close");
+    }
 }
 
 /**
  * Checks the return code and reports an error if present.
- * If abortIfError is true, it also aborts the process.
+ * If abortIfError is set to true, it also aborts the process.
  */
 void Agent::check(int returnCode, std::string methodName, bool abortIfError)
 {
@@ -185,9 +200,22 @@ void Agent::receive()
 	auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
 	std::cout << "Agent: receive(): num_words: " << num_words << std::endl;
 
-	auto wordArray = kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
-	std::cout << "Agent: receive(): wordArray size: " << wordArray.size() << std::endl;
+	if (reinterpret_cast<uintptr_t>(zmq_msg_data(&msg)) % sizeof(capnp::word) == 0) {
+		std::cout << "Agent: receive(): Aligned " << std::endl;
+	}
+	else
+	{
+		std::cerr << "Agent: receive(): Not aligned " << std::endl;
+	}
 
+	auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
+	for (int i = 0; i < zmq_msg_size(&msg); i++)
+	{
+		printf("%02X:", msgByteArray[i]);
+	}
+	printf("\n");
+
+	auto wordArray = kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
 
 	::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
 
@@ -198,7 +226,7 @@ void Agent::receive()
 	check(zmq_msg_close(&msg), "zmq_msg_close");
 }
 
-// kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+//kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
 //{
 //    do
 //    {

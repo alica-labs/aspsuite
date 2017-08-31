@@ -8,6 +8,7 @@
 #include <capnp/serialize-packed.h>
 
 #include <iostream>
+#include <unistd.h>
 
 /**
  * Checks the return code and reports an error if present.
@@ -43,26 +44,24 @@ int main(int argc, char **argv)
     beaconMsgBuilder.setUuid(kj::arrayPtr(uuid, sizeof(uuid)));
 
     zmq_msg_t msg;
-    auto byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
+    auto wordArray = capnp::messageToFlatArray(msgBuilder);
 
-    ::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(capnp::messageToFlatArray(msgBuilder));
+    std::cout << "Send Message: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 
-        auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
+    check(zmq_msg_init_data(&msg, wordArray.begin(), wordArray.size() * sizeof(capnp::word), NULL, NULL),
+          "zmq_msg_init_data", false);
 
-        std::cout << "Received Message: " << beacon.toString().flatten().cStr() << std::endl;
-
-    check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data", false);
+    /* uncomment for printing bytes */
+//    auto msgByteArray = reinterpret_cast<char *>(zmq_msg_data(&msg));
+//    for (int i = 0; i < zmq_msg_size(&msg); i++)
+//    {
+//    	std::cout << std::hex << msgByteArray[i] << ":";
+//
+//    }
+//    std::cout << std::endl;
 
     // set group
     check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group", false);
-
-    /* uncomment for printing bytes */
-//	auto msgByteArray = reinterpret_cast<uintptr_t*>(zmq_msg_data(&msg));
-//	for (int i = 0; i < zmq_msg_size(&msg); i++)
-//	{
-//		printf("%02X:", msgByteArray[i]);
-//	}
-//	printf("\n");
 
     // send
     int numBytesSend = zmq_msg_send(&msg, socket, 0);
@@ -73,6 +72,7 @@ int main(int argc, char **argv)
     }
     else
     {
-    	std::cout << numBytesSend << " bytes sent." << std::endl;
+        std::cout << numBytesSend << " bytes sent." << std::endl;
     }
+    sleep(1);
 }

@@ -117,31 +117,39 @@ void Agent::send()
               << ") to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
+    auto flatArray = capnp::messageToFlatArray(msgBuilder);
+    auto reader = capnp::FlatArrayMessageReader(flatArray);
+    auto beaconReader = reader.getRoot<discovery_msgs::Beacon>();
+#ifdef DEBUG_AGENT
+    std::cout << "Agent:send(): Message (Size: "
+              << ") to send: " << beaconReader.toString().flatten().cStr() << std::endl;
+#endif
+
     // ZMQ: send proto message via zmq message
 
-    // copy content
-    zmq_msg_t msg;
-    auto byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
-
-    check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data");
-
-    // set group
-    check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group");
-
-    auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
-	for (int i = 0; i < zmq_msg_size(&msg); i++)
-	{
-		printf("%02X:", msgByteArray[i]);
-	}
-	printf("\n");
-
-    // send
-    int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
-    if (numBytesSend == -1)
-    {
-    	std::cerr << "zmq_msg_send was unsuccessfull: " << errno << " - " << zmq_strerror(errno) << std::endl;
-    	check(zmq_msg_close(&msg), "zmq_msg_close");
-    }
+//    // copy content
+//    zmq_msg_t msg;
+//    auto byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
+//
+//    check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data");
+//
+//    // set group
+//    check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group");
+//
+//    auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
+//	for (int i = 0; i < zmq_msg_size(&msg); i++)
+//	{
+//		printf("%02X:", msgByteArray[i]);
+//	}
+//	printf("\n");
+//
+//    // send
+//    int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
+//    if (numBytesSend == -1)
+//    {
+//    	std::cerr << "zmq_msg_send was unsuccessfull: " << errno << " - " << zmq_strerror(errno) << std::endl;
+//    	check(zmq_msg_close(&msg), "zmq_msg_close");
+//    }
 }
 
 /**

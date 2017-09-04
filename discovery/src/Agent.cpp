@@ -2,6 +2,7 @@
 
 #include <discovery_msgs/beacon.capnp.h>
 #include <zmq.h>
+#include <capnzero/Publisher.h>
 
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
@@ -32,17 +33,14 @@ Agent::Agent(std::string name, bool sender)
     : Worker(name)
     , sender(sender)
     , socket(nullptr)
+	, ctx(zmq_ctx_new())
 {
     // generate
     uuid_generate(this->uuid);
 
-    // zmq stuff
-    this->ctx = zmq_ctx_new();
-    assert(ctx);
-
     if (this->sender)
     {
-        this->setupSendUDPMulticast();
+    	this->pub = new capnzero::Publisher(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
     }
     else
     {
@@ -52,28 +50,22 @@ Agent::Agent(std::string name, bool sender)
 
 void Agent::setupReceiveUDPMulticast()
 {
-    this->socket = zmq_socket(ctx, ZMQ_DISH);
+    this->socket = zmq_socket(this->ctx, ZMQ_DISH);
 
     // Binding
     // check(zmq_bind(socket, "udp://192.168.122.161:5555"), "zmq_bind");
     check(zmq_bind(this->socket, "udp://224.0.0.1:5555"), "zmq_bind");
 
     // Join ZMQ Publisher-Group
-    check(zmq_join(this->socket, "TestMCGroup"), "zmq_join");
-}
-
-void Agent::setupSendUDPMulticast()
-{
-    this->socket = zmq_socket(ctx, ZMQ_RADIO);
-
-    // Connecting
-    // check(zmq_connect(socket, "udp://192.168.122.161:5555"), "zmq_connect", true);
-    check(zmq_connect(this->socket, "udp://224.0.0.1:5555"), "zmq_connect", true);
+    check(zmq_join(this->socket, "MCGroup"), "zmq_join");
 }
 
 Agent::~Agent()
 {
-    check(zmq_close(this->socket), "zmq_close", true);
+	delete (this->pub);
+	// clean up socket only for receiving agent
+	if (!sender)
+		check(zmq_close(this->socket), "zmq_close", true);
     check(zmq_ctx_term(this->ctx), "zmq_ctx_term", true);
 }
 
@@ -104,8 +96,8 @@ void Agent::send()
     // Cap'n Proto: create proto message
 
     // init builder
-    ::capnp::MallocMessageBuilder msgBuilder;
-    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
+    auto msgBuilder = std::make_shared<::capnp::MallocMessageBuilder>();
+    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder->initRoot<discovery_msgs::Beacon>();
 
     // set content
     beaconMsgBuilder.setIp(this->wirelessIpAddress);
@@ -113,43 +105,14 @@ void Agent::send()
     beaconMsgBuilder.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
 
 #ifdef DEBUG_AGENT
-    std::cout << "Agent:send(): Message (Size: "
-              << ") to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
+    std::cout << "Agent:send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-    auto flatArray = capnp::messageToFlatArray(msgBuilder);
-    auto reader = capnp::FlatArrayMessageReader(flatArray);
-    auto beaconReader = reader.getRoot<discovery_msgs::Beacon>();
+    int numBytesSent = this->pub->send(msgBuilder);
+
 #ifdef DEBUG_AGENT
-    std::cout << "Agent:send(): Message (Size: "
-              << ") to send: " << beaconReader.toString().flatten().cStr() << std::endl;
+    std::cout << "Agent::send(): " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
-
-    // ZMQ: send proto message via zmq message
-
-//    // copy content
-//    zmq_msg_t msg;
-//    auto byteArray = capnp::messageToFlatArray(msgBuilder).asBytes();
-//
-//    check(zmq_msg_init_data(&msg, byteArray.begin(), byteArray.size(), NULL, NULL), "zmq_msg_init_data");
-//
-//    // set group
-//    check(zmq_msg_set_group(&msg, "TestMCGroup"), "zmq_msg_set_group");
-//
-//    auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
-//	for (int i = 0; i < zmq_msg_size(&msg); i++)
-//	{
-//		printf("%02X:", msgByteArray[i]);
-//	}
-//	printf("\n");
-//
-//    // send
-//    int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
-//    if (numBytesSend == -1)
-//    {
-//    	std::cerr << "zmq_msg_send was unsuccessfull: " << errno << " - " << zmq_strerror(errno) << std::endl;
-//    	check(zmq_msg_close(&msg), "zmq_msg_close");
-//    }
 }
 
 /**

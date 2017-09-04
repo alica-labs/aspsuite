@@ -15,6 +15,10 @@
 #include <signal.h>
 #include <vector>
 
+namespace capnzero {
+	class Publisher;
+}
+
 
 namespace discovery
 {
@@ -32,7 +36,6 @@ class Agent : public Worker
 
   private:
     void setupReceiveUDPMulticast();
-    void setupSendUDPMulticast();
 
     void sendMultiPartZeroCopy();
     void send();
@@ -52,6 +55,9 @@ class Agent : public Worker
     bool sender;
     void *ctx;
     void *socket;
+
+    // capnzero stuff
+    capnzero::Publisher* pub;
 };
 
 } /* namespace discovery */

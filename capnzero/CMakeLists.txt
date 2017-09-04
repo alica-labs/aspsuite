@@ -23,6 +23,7 @@ find_package(catkin QUIET)
 if(catkin_FOUND)
   catkin_package(
     INCLUDE_DIRS include
+    LIBRARIES capnzero
     DEPENDS ZeroMQ
   )
 endif(catkin_FOUND)
@@ -33,7 +34,8 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-  src/CapnZero.cpp
+  src/Publisher.cpp
+  src/Subscriber.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 

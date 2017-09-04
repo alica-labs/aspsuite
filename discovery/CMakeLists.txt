@@ -29,15 +29,15 @@ find_package(CapnProto REQUIRED)
 # Catkin Stuff
 find_package(catkin QUIET)
 if (catkin_FOUND)
-  find_package(catkin REQUIRED COMPONENTS event_handling discovery_msgs)
+  find_package(catkin REQUIRED COMPONENTS event_handling discovery_msgs capnzero)
 else (catkin_FOUND)
-  set(catkin_LIBRARIES "event_handling discovery_msgs")
+  set(catkin_LIBRARIES "event_handling discovery_msgs capnzero")
 endif(catkin_FOUND)
 if(catkin_FOUND)
   catkin_package(
     INCLUDE_DIRS include
   # LIBRARIES 
-    CATKIN_DEPENDS event_handling discovery_msgs
+    CATKIN_DEPENDS event_handling discovery_msgs capnzero
     DEPENDS ZeroMQ UUID
   )
 endif(catkin_FOUND)

@@ -201,7 +201,7 @@ namespace reasoner
 //				if (&(domainPred)
 //						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 //				{
-				if (this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+				if (clingoModel.contains(Gringo::Symbol((*(*it))[i])) && this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
 				{
 					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
 				}

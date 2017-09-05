@@ -41,6 +41,20 @@ namespace reasoner
 		}
 		this->solver->ground( { {Gringo::String(this->queryProgramSection.c_str()), {}}}, nullptr);
 		this->solver->assignExternal(*(this->external), Potassco::Value_t::True);
+		if (term->getExternals() != nullptr)
+		{
+			for (auto pair : *term->getExternals())
+			{
+				if (pair.second)
+				{
+					this->solver->assignExternal(this->solver->parseValue(pair.first), Potassco::Value_t::True);
+				}
+				else
+				{
+					this->solver->assignExternal(this->solver->parseValue(pair.first), Potassco::Value_t::False);
+				}
+			}
+		}
 	}
 
 	ASPVariableQuery::~ASPVariableQuery()
@@ -404,16 +418,21 @@ namespace reasoner
 			}
 			for (int i = 0; i < (*it).get()->size(); i++)
 			{
-				//				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
-
+//				cout << "ASPFactsQuery: Inside domain-loop! " << Gringo::Symbol((*(*it))[i]) << endl;
+//				cout << clingoModel.contains(Gringo::Symbol((*(*it))[i])) << endl;
 				//				if (&(domainPred)
 				//						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 				//				{
-				if (this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+				//TODO output domain contains all predicates ... even ones with are currently false
+//				if (this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+//				{
+//					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
+//				}
+//				}
+				if (clingoModel.contains(Gringo::Symbol((*(*it))[i])) && this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
 				{
 					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
 				}
-				//				}
 			}
 		}
 	}

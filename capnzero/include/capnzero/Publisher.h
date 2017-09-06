@@ -15,21 +15,18 @@ namespace capnzero
 
 class Publisher
 {
-
   public:
     Publisher(void *context, std::string connection, std::string multicastGroupName);
     virtual ~Publisher();
 
 
-    int send(std::shared_ptr<::capnp::MallocMessageBuilder> msgBuilder);
+    int send(kj::Array<capnp::word> * wordArrayPtr);
 
     std::string multicastGroupName;
 
   protected:
     void *context;
     void *socket;
-
-    std::vector<std::shared_ptr<::capnp::MallocMessageBuilder>> sentMsgsWaitingForCleanup;
 };
 
 static void cleanUpMsgData(void * data, void * hint);

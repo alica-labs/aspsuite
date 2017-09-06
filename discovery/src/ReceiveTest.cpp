@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 
     // bind socket
     check(zmq_bind(socket, "udp://224.0.0.1:5555"), "zmq_bind", true);
-    check(zmq_join(socket, "TestMCGroup"), "zmq_join", true);
+    check(zmq_join(socket, "MCGroup"), "zmq_join", true);
 
     zmq_msg_t msg;
     check(zmq_msg_init(&msg), "zmq_msg_init", true);

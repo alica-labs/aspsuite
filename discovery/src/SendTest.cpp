@@ -29,8 +29,8 @@ void check(int returnCode, std::string methodName, bool abortIfError)
 
 void send(capnzero::Publisher* pub)
 {
-    auto msgBuilder = std::make_shared<::capnp::MallocMessageBuilder>();
-    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder->initRoot<discovery_msgs::Beacon>();
+    capnp::MallocMessageBuilder msgBuilder;
+    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
 
     // set content
     beaconMsgBuilder.setIp("192.186.0.1");
@@ -39,7 +39,14 @@ void send(capnzero::Publisher* pub)
     uuid_generate(uuid);
     beaconMsgBuilder.setUuid(kj::arrayPtr(uuid, sizeof(uuid)));
 
-    pub->send(msgBuilder);
+    //std::cout << "SendTest::send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
+
+    kj::Array<capnp::word> wordArray = capnp::messageToFlatArray(msgBuilder);
+    kj::Array<capnp::word> *arrayPtr = new kj::Array<capnp::word>(kj::mv(wordArray));// will be delete by zero-mq
+
+    int numBytesSent = pub->send(arrayPtr);
+
+    std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
 }
 
 int main(int argc, char **argv)

@@ -1,6 +1,7 @@
 #include "capnzero/Publisher.h"
 
 #include <zmq.h>
+#include <unistd.h>
 
 capnzero::Publisher::Publisher(void *context, std::string connection, std::string multicastGroupName)
     : socket(nullptr)
@@ -18,38 +19,17 @@ capnzero::Publisher::~Publisher()
 
 static void capnzero::cleanUpMsgData(void *data, void *hint)
 {
-    ((std::shared_ptr<::capnp::MallocMessageBuilder>*) hint)->reset();
-
+	std::cout << "Cleanup" << std::endl;
+    delete reinterpret_cast<kj::Array<capnp::word>*>(hint);
 }
 
-int capnzero::Publisher::send(std::shared_ptr<::capnp::MallocMessageBuilder> msgBuilder)
+int capnzero::Publisher::send(kj::Array<capnp::word> * wordArrayPtr)
 {
-	// clean up deleted msgs
-    for (int i = 0; i < this->sentMsgsWaitingForCleanup.size(); i++)
-    {
-    	if (this->sentMsgsWaitingForCleanup[i])  // test whether it is empty
-    	{
-    		this->sentMsgsWaitingForCleanup.erase(this->sentMsgsWaitingForCleanup.begin()+i);
-    	}
-    }
-
-    // remember new message
-    this->sentMsgsWaitingForCleanup.push_back(msgBuilder);
-
     // setup zmq msg
     zmq_msg_t msg;
-    auto wordArray = capnp::messageToFlatArray(*msgBuilder);
-    check(zmq_msg_init_data(&msg, wordArray.begin(), wordArray.size() * sizeof(capnp::word), cleanUpMsgData,
-                            (void *) &this->sentMsgsWaitingForCleanup.back()),
-          "zmq_msg_init_data");
 
-    /* uncomment for printing bytes */
-    //    auto msgByteArray = reinterpret_cast<char *>(zmq_msg_data(&msg));
-    //    for (int i = 0; i < zmq_msg_size(&msg); i++)
-    //    {
-    //        std::cout << std::hex << std::setfill('0') << std::setw(2) << msgByteArray[i] << ":";
-    //    }
-    //    std::cout << std::endl;
+    check(zmq_msg_init_data(&msg, wordArrayPtr->begin(), wordArrayPtr->size() * sizeof(capnp::word), &cleanUpMsgData, wordArrayPtr),
+          "zmq_msg_init_data");
 
     // set group
     check(zmq_msg_set_group(&msg, this->multicastGroupName.c_str()), "zmq_msg_set_group");

@@ -108,10 +108,10 @@ void Agent::send()
     std::cout << "Agent:send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-    int numBytesSent = this->pub->send(msgBuilder);
+//    int numBytesSent = this->pub->send(msgBuilder);
 
 #ifdef DEBUG_AGENT
-    std::cout << "Agent::send(): " << numBytesSent << " Bytes sent!" << std::endl;
+//    std::cout << "Agent::send(): " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
 }
 

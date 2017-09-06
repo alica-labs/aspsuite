@@ -37,7 +37,7 @@ namespace reasoner
 
 		virtual void onModel(ClingoModel& clingoModel) = 0;
 
-		map<Gringo::Symbol, Gringo::SymVec> getHeadValues();
+		map<Gringo::Symbol, Gringo::SymVec>& getHeadValues();
 
 		IASPSolver* getSolver();
 		vector<string> getRules();

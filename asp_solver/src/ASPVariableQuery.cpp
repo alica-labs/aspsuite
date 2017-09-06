@@ -39,22 +39,14 @@ namespace reasoner
 		{
 			this->solver->ground( { {Gringo::String(this->term->getProgramSection().c_str()), {}}}, nullptr);
 		}
+		//TODO remove again is added manually to recreate eval for LNAI17 paper
+		auto loaded2 = this->solver->loadFileFromConfig("alicaBackgroundKnowledgeFile");
+		if (loaded2)
+		{
+			this->solver->ground( { {"alicaBackground", {}}}, nullptr);
+		}
 		this->solver->ground( { {Gringo::String(this->queryProgramSection.c_str()), {}}}, nullptr);
 		this->solver->assignExternal(*(this->external), Potassco::Value_t::True);
-		if (term->getExternals() != nullptr)
-		{
-			for (auto pair : *term->getExternals())
-			{
-				if (pair.second)
-				{
-					this->solver->assignExternal(this->solver->parseValue(pair.first), Potassco::Value_t::True);
-				}
-				else
-				{
-					this->solver->assignExternal(this->solver->parseValue(pair.first), Potassco::Value_t::False);
-				}
-			}
-		}
 	}
 
 	ASPVariableQuery::~ASPVariableQuery()
@@ -405,8 +397,10 @@ namespace reasoner
 		//	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
 
 		// determine the domain of the query predicate
-		for (auto value : this->getHeadValues())
+		for (auto& value : this->headValues)
 		{
+
+			value.second.clear();
 #ifdef ASPQUERY_DEBUG
 			cout << "ASPVariableQuery::onModel: " << value.first << endl;
 #endif

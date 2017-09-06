@@ -26,7 +26,7 @@ namespace reasoner
 	{
 		this->gringoModule = new DefaultGringoModule();
 //		this->clingo = this->gringoModule->newControl(args.size() - 2, args.data(), nullptr, 20);
-		this->clingo = make_shared<ClingoLib>(this->gringoModule->scripts, args.size() - 2, args.data(), nullptr , 20);
+		this->clingo = make_shared<ClingoLib>(this->gringoModule->scripts, args.size() - 2, args.data(), nullptr, 20);
 		this->disableWarnings(true);
 
 		this->sc = supplementary::SystemConfig::getInstance();
@@ -123,7 +123,7 @@ namespace reasoner
 		ClingoModel& clingoModel = (ClingoModel&)m;
 		Gringo::SymVec vec;
 		auto tmp = clingoModel.atoms(clingo_show_type_shown);
-		for(int i = 0; i < tmp.size; i++)
+		for (int i = 0; i < tmp.size; i++)
 		{
 			vec.push_back(tmp[i]);
 		}
@@ -142,7 +142,8 @@ namespace reasoner
 
 	void ASPSolver::releaseExternal(Gringo::Symbol ext)
 	{
-		this->clingo->assignExternal(ext, Potassco::Value_t::False);
+		cout << "Release" << endl;
+//		this->clingo->assignExternal(ext, Potassco::Value_t::False);
 		//TODO test was free before
 		this->clingo->assignExternal(ext, Potassco::Value_t::Release);
 	}
@@ -230,7 +231,6 @@ namespace reasoner
 			{
 				vals.push_back(pair.second);
 			}
-
 			results.push_back(new AnnotatedValVec(query->getTerm()->getId(), vals, query));
 		}
 		if (results.size() > 0)
@@ -267,11 +267,35 @@ namespace reasoner
 			}
 			if (term->getType() == ASPQueryType::Variable)
 			{
-				this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+				bool found = false;
+				for (auto query : this->registeredQueries)
+				{
+					if (term->getId() == query->getTerm()->getId())
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+				}
 			}
 			else if (term->getType() == ASPQueryType::Facts)
 			{
-				this->registerQuery(make_shared<ASPFactsQuery>(this, term));
+				bool found = false;
+				for (auto query : this->registeredQueries)
+				{
+					if (term->getId() == query->getTerm()->getId())
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					this->registerQuery(make_shared<ASPFactsQuery>(this, term));
+				}
 			}
 			else
 			{

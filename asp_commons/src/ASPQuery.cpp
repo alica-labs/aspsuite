@@ -41,7 +41,11 @@ namespace reasoner
 		auto entry = this->headValues.find(key);
 		if (entry != this->headValues.end())
 		{
-			entry->second.push_back(value);
+			//TODO remove
+			if (find(entry->second.begin(), entry->second.end(), value) == entry->second.end())
+			{
+				entry->second.push_back(value);
+			}
 		}
 	}
 
@@ -179,7 +183,7 @@ namespace reasoner
 		return this->rules;
 	}
 
-	map<Gringo::Symbol, Gringo::SymVec> ASPQuery::getHeadValues()
+	map<Gringo::Symbol, Gringo::SymVec>& ASPQuery::getHeadValues()
 	{
 		return this->headValues;
 	}

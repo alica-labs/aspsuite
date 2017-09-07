@@ -142,7 +142,6 @@ namespace reasoner
 
 	void ASPSolver::releaseExternal(Gringo::Symbol ext)
 	{
-		cout << "Release" << endl;
 //		this->clingo->assignExternal(ext, Potassco::Value_t::False);
 		//TODO test was free before
 		this->clingo->assignExternal(ext, Potassco::Value_t::Release);
@@ -224,23 +223,30 @@ namespace reasoner
 			this->removeDeadQueries();
 			return false;
 		}
-		for (auto query : this->registeredQueries)
+		for (auto& queriedId : this->currentQueryIds)
 		{
-			vector<Gringo::SymVec> vals;
-			for (auto pair : query->getHeadValues())
+			for (auto& query : this->registeredQueries)
 			{
-				vals.push_back(pair.second);
+				vector<Gringo::SymVec> vals;
+				for (auto& pair : query->getHeadValues())
+				{
+					vals.push_back(pair.second);
+				}
+				if (queriedId == query->getTerm()->getId())
+				{
+					results.push_back(new AnnotatedValVec(query->getTerm()->getId(), vals, query));
+					break;
+				}
 			}
-			results.push_back(new AnnotatedValVec(query->getTerm()->getId(), vals, query));
 		}
+		this->removeDeadQueries();
+		this->currentQueryIds.clear();
 		if (results.size() > 0)
 		{
-			this->removeDeadQueries();
 			return true;
 		}
 		else
 		{
-			this->removeDeadQueries();
 			return false;
 		}
 	}
@@ -261,34 +267,41 @@ namespace reasoner
 		}
 		for (auto term : constraint)
 		{
+			this->currentQueryIds.push_back(term->getId());
 			if (!term->getNumberOfModels().empty())
 			{
 				this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
 			}
 			if (term->getType() == ASPQueryType::Variable)
 			{
-				bool found = false;
-				for (auto query : this->registeredQueries)
-				{
-					if (term->getId() == query->getTerm()->getId())
-					{
-						found = true;
-						break;
-					}
-				}
-				if (!found)
+				if (this->registeredQueries.size() == 0)
 				{
 					this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+				}
+				else
+				{
+					bool found = false;
+					for (auto query : this->registeredQueries)
+					{
+						if (term->getId() == query->getTerm()->getId())
+						{
+							found = true;
+						}
+					}
+					if (!found)
+					{
+						this->registerQuery(make_shared<ASPVariableQuery>(this, term));
+					}
 				}
 			}
 			else if (term->getType() == ASPQueryType::Facts)
 			{
-				bool found = false;
+				bool found = true;
 				for (auto query : this->registeredQueries)
 				{
-					if (term->getId() == query->getTerm()->getId())
+					if (term->getId() != query->getTerm()->getId())
 					{
-						found = true;
+						found = false;
 						break;
 					}
 				}

@@ -17,6 +17,7 @@
 #include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPCommonsVariable.h>
 #include <asp_commons/ASPQuery.h>
+#include <asp_commons/AnnotatedValVec.h>
 #include <asp_solver_wrapper/ASPAlicaPlanIntegrator.h>
 #include <asp_solver_wrapper/ASPGenerator.h>
 

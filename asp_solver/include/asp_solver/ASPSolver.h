@@ -90,6 +90,7 @@ namespace reasoner
 		Gringo::ConfigProxy* conf;
 		unsigned int root;
 		unsigned int modelsKey;
+		vector<long> currentQueryIds;
 
 		vector<string> alreadyLoaded;
 		vector<shared_ptr<AnnotatedExternal>> assignedExternals;

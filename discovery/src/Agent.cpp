@@ -44,6 +44,7 @@ Agent::Agent(std::string name, bool sender)
     }
     else
     {
+    	//this->sub = new capnzero::Subscriber(this->ctx, "udp://244.0.0.1:5555", "MCGroup");
         this->setupReceiveUDPMulticast();
     }
 }
@@ -82,7 +83,6 @@ void Agent::run()
 
     if (this->sender)
     {
-        // sendMultiPartZeroCopy();
         send();
     }
     else
@@ -108,10 +108,10 @@ void Agent::send()
     std::cout << "Agent:send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-//    int numBytesSent = this->pub->send(msgBuilder);
+    int numBytesSent = this->pub->send(msgBuilder);
 
 #ifdef DEBUG_AGENT
-//    std::cout << "Agent::send(): " << numBytesSent << " Bytes sent!" << std::endl;
+    std::cout << "Agent::send(): " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
 }
 
@@ -127,35 +127,6 @@ void Agent::check(int returnCode, std::string methodName, bool abortIfError)
         if (abortIfError)
             assert(returnCode);
     }
-}
-
-void Agent::sendMultiPartZeroCopy()
-{
-    ::capnp::MallocMessageBuilder msgBuilder;
-
-    discovery_msgs::Beacon::Builder beacon = msgBuilder.initRoot<discovery_msgs::Beacon>();
-    beacon.setIp(this->wirelessIpAddress);
-    beacon.setPort(6666);
-    std::cout << "Agent: send(): Size of UUID is " << sizeof(this->uuid) << std::endl;
-    beacon.setUuid(kj::arrayPtr(this->uuid, sizeof(this->uuid)));
-
-    std::cout << "Agent:send(): Message (Size: "
-              << ") to send: " << beacon.toString().flatten().cStr() << std::endl;
-
-    auto segments = msgBuilder.getSegmentsForOutput();
-
-    auto it = segments.begin();
-    int i = segments.size();
-    assert(i != 0);
-    while (--i != 0)
-    {
-        std::cout << "Agent:send(): Size: " << it->size() * sizeof(capnp::word) << std::endl;
-        zmq_send_const(this->socket, reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word),
-                       ZMQ_SNDMORE);
-        ++it;
-    }
-    std::cout << "Agent:send(): Size: " << it->size() * sizeof(capnp::word) << std::endl;
-    zmq_send_const(this->socket, reinterpret_cast<char const *>(&(*it)[0]), it->size() * sizeof(capnp::word), 0);
 }
 
 void Agent::receive()

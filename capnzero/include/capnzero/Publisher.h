@@ -19,14 +19,11 @@ class Publisher
     Publisher(void *context, std::string connection, std::string multicastGroupName);
     virtual ~Publisher();
 
-
-    int send(kj::Array<capnp::word> * wordArrayPtr);
-
-    std::string multicastGroupName;
+    int send(capnp::MallocMessageBuilder& msgBuilder);
 
   protected:
-    void *context;
     void *socket;
+    std::string multicastGroupName;
 };
 
 static void cleanUpMsgData(void * data, void * hint);

@@ -1,34 +1,39 @@
 #include "capnzero/Publisher.h"
 
-#include <zmq.h>
 #include <unistd.h>
+#include <zmq.h>
 
-capnzero::Publisher::Publisher(void *context, std::string connection, std::string multicastGroupName)
+namespace capnzero
+{
+
+Publisher::Publisher(void *context, std::string connection, std::string multicastGroupName)
     : socket(nullptr)
-    , context(context)
     , multicastGroupName(multicastGroupName)
 {
-    this->socket = zmq_socket(this->context, ZMQ_RADIO);
+    this->socket = zmq_socket(context, ZMQ_RADIO);
     check(zmq_connect(socket, connection.c_str()), "zmq_connect");
 }
 
-capnzero::Publisher::~Publisher()
+Publisher::~Publisher()
 {
     check(zmq_close(this->socket), "zmq_close");
 }
 
-static void capnzero::cleanUpMsgData(void *data, void *hint)
+static void cleanUpMsgData(void *data, void *hint)
 {
-	std::cout << "Cleanup" << std::endl;
-    delete reinterpret_cast<kj::Array<capnp::word>*>(hint);
+    std::cout << "Cleanup" << std::endl;
+    delete reinterpret_cast<kj::Array<capnp::word> *>(hint);
 }
 
-int capnzero::Publisher::send(kj::Array<capnp::word> * wordArrayPtr)
+int Publisher::send(::capnp::MallocMessageBuilder &msgBuilder)
 {
     // setup zmq msg
     zmq_msg_t msg;
 
-    check(zmq_msg_init_data(&msg, wordArrayPtr->begin(), wordArrayPtr->size() * sizeof(capnp::word), &cleanUpMsgData, wordArrayPtr),
+    kj::Array<capnp::word> wordArray = capnp::messageToFlatArray(msgBuilder);
+    kj::Array<capnp::word> *wordArrayPtr = new kj::Array<capnp::word>(kj::mv(wordArray)); // will be delete by zero-mq
+    check(zmq_msg_init_data(&msg, wordArrayPtr->begin(), wordArrayPtr->size() * sizeof(capnp::word), &cleanUpMsgData,
+                            wordArrayPtr),
           "zmq_msg_init_data");
 
     // set group
@@ -44,4 +49,5 @@ int capnzero::Publisher::send(kj::Array<capnp::word> * wordArrayPtr)
     }
 
     return numBytesSend;
+}
 }

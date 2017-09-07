@@ -41,10 +41,7 @@ void send(capnzero::Publisher* pub)
 
     //std::cout << "SendTest::send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 
-    kj::Array<capnp::word> wordArray = capnp::messageToFlatArray(msgBuilder);
-    kj::Array<capnp::word> *arrayPtr = new kj::Array<capnp::word>(kj::mv(wordArray));// will be delete by zero-mq
-
-    int numBytesSent = pub->send(arrayPtr);
+    int numBytesSent = pub->send(msgBuilder);
 
     std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
 }

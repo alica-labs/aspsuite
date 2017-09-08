@@ -5,6 +5,8 @@
 #include <netdb.h>
 
 #include "discovery/Worker.h"
+#include <capnzero/Subscriber.h>
+#include <discovery_msgs/beacon.capnp.h>
 
 #include <zmq.h>
 #include <uuid/uuid.h>
@@ -19,7 +21,6 @@ namespace capnzero {
 	class Publisher;
 }
 
-
 namespace discovery
 {
 
@@ -30,6 +31,7 @@ class Agent : public Worker
     virtual ~Agent();
 
     void run();
+    void callback(::capnp::FlatArrayMessageReader& reader);
 
     static void sigIntHandler(int sig);
     static bool operating;
@@ -58,6 +60,7 @@ class Agent : public Worker
 
     // capnzero stuff
     capnzero::Publisher* pub;
+    capnzero::Subscriber<Agent>* sub;
 };
 
 } /* namespace discovery */

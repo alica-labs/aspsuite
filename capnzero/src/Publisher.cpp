@@ -43,7 +43,7 @@ int Publisher::send(::capnp::MallocMessageBuilder &msgBuilder)
     int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
     if (numBytesSend == -1)
     {
-        std::cerr << "zmq_msg_send was unsuccessfull: Errno " << errno << " means: " << zmq_strerror(errno)
+        std::cerr << "zmq_msg_send was unsuccessful: Errno " << errno << " means: " << zmq_strerror(errno)
                   << std::endl;
         check(zmq_msg_close(&msg), "zmq_msg_close");
     }

@@ -1,8 +1,8 @@
 #include "discovery/Agent.h"
 
-#include <discovery_msgs/beacon.capnp.h>
-#include <zmq.h>
 #include <capnzero/Publisher.h>
+
+#include <zmq.h>
 
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
@@ -33,20 +33,26 @@ Agent::Agent(std::string name, bool sender)
     : Worker(name)
     , sender(sender)
     , socket(nullptr)
-	, ctx(zmq_ctx_new())
+    , ctx(zmq_ctx_new())
 {
     // generate
     uuid_generate(this->uuid);
 
     if (this->sender)
     {
-    	this->pub = new capnzero::Publisher(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
+        this->pub = new capnzero::Publisher(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
     }
     else
     {
-    	//this->sub = new capnzero::Subscriber(this->ctx, "udp://244.0.0.1:5555", "MCGroup");
-        this->setupReceiveUDPMulticast();
+        this->sub = new capnzero::Subscriber<Agent>(
+            this->ctx, "udp://224.0.0.1:5555", "MCGroup", &Agent::callback, (discovery::Agent *)this);
+        // this->setupReceiveUDPMulticast();
     }
+}
+
+void Agent::callback(::capnp::FlatArrayMessageReader& reader)
+{
+    std::cout << "Agent::callback(): " << reader.getRoot<discovery_msgs::Beacon>().toString().flatten().cStr() << std::endl;
 }
 
 void Agent::setupReceiveUDPMulticast()
@@ -63,10 +69,10 @@ void Agent::setupReceiveUDPMulticast()
 
 Agent::~Agent()
 {
-	delete (this->pub);
-	// clean up socket only for receiving agent
-	if (!sender)
-		check(zmq_close(this->socket), "zmq_close", true);
+    delete (this->pub);
+    // clean up socket only for receiving agent
+    if (!sender)
+        check(zmq_close(this->socket), "zmq_close", true);
     check(zmq_ctx_term(this->ctx), "zmq_ctx_term", true);
 }
 
@@ -87,7 +93,7 @@ void Agent::run()
     }
     else
     {
-        receive();
+        this->sub->receive();
     }
 }
 
@@ -96,8 +102,8 @@ void Agent::send()
     // Cap'n Proto: create proto message
 
     // init builder
-    auto msgBuilder = std::make_shared<::capnp::MallocMessageBuilder>();
-    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder->initRoot<discovery_msgs::Beacon>();
+    ::capnp::MallocMessageBuilder msgBuilder;
+    discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
 
     // set content
     beaconMsgBuilder.setIp(this->wirelessIpAddress);
@@ -133,42 +139,44 @@ void Agent::receive()
 {
     zmq_msg_t msg;
 
-	check(zmq_msg_init(&msg), "zmq_msg_init", true);
-	int nbytes = zmq_msg_recv(&msg, this->socket, 0);
-	std::cout << "Agent: receive(): nbytes: " << nbytes << std::endl;
+    check(zmq_msg_init(&msg), "zmq_msg_init", true);
+    int nbytes = zmq_msg_recv(&msg, this->socket, 0);
+    std::cout << "Agent: receive(): nbytes: " << nbytes << std::endl;
 
-	// Received message must contain an integral number of words.
-	assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
-	auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
-	std::cout << "Agent: receive(): num_words: " << num_words << std::endl;
+    // Received message must contain an integral number of words.
+    assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
+    auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
+    std::cout << "Agent: receive(): num_words: " << num_words << std::endl;
 
-	if (reinterpret_cast<uintptr_t>(zmq_msg_data(&msg)) % sizeof(capnp::word) == 0) {
-		std::cout << "Agent: receive(): Aligned " << std::endl;
-	}
-	else
-	{
-		std::cerr << "Agent: receive(): Not aligned " << std::endl;
-	}
+    if (reinterpret_cast<uintptr_t>(zmq_msg_data(&msg)) % sizeof(capnp::word) == 0)
+    {
+        std::cout << "Agent: receive(): Aligned " << std::endl;
+    }
+    else
+    {
+        std::cerr << "Agent: receive(): Not aligned " << std::endl;
+    }
 
-	auto msgByteArray = reinterpret_cast<char*>(zmq_msg_data(&msg));
-	for (int i = 0; i < zmq_msg_size(&msg); i++)
-	{
-		printf("%02X:", msgByteArray[i]);
-	}
-	printf("\n");
+    auto msgByteArray = reinterpret_cast<char *>(zmq_msg_data(&msg));
+    for (int i = 0; i < zmq_msg_size(&msg); i++)
+    {
+        printf("%02X:", msgByteArray[i]);
+    }
+    printf("\n");
 
-	auto wordArray = kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
+    auto wordArray =
+        kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
 
-	::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
+    ::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
 
     auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
 
     std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl;
 
-	check(zmq_msg_close(&msg), "zmq_msg_close");
+    check(zmq_msg_close(&msg), "zmq_msg_close");
 }
 
-//kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
+// kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
 //{
 //    do
 //    {

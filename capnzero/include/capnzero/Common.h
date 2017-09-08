@@ -12,7 +12,7 @@ namespace capnzero{
 	 * Checks the return code and reports an error if present.
 	 * If abortIfError is set to true, it also aborts the process.
 	 */
-	void check(int returnCode, std::string methodName)
+	inline void check(int returnCode, std::string methodName)
 	{
 		if (returnCode != 0)
 		{

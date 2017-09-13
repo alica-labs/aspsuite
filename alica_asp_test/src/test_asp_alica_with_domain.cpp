@@ -16,12 +16,16 @@
 #include <engine/model/Plan.h>
 #include <engine/model/State.h>
 #include <engine/model/PlanType.h>
-#include <engine/constraintmodul/ConstraintQuery.h>
 #include <engine/IPlanParser.h>
 
 // ALICA ASP Solver
-#include <alica_asp_solver/ASPSolver.h>
-#include <alica_asp_solver/ASPQuery.h>
+#include <asp_commons/IASPSolver.h>
+#include <asp_solver_wrapper/ASPSolverWrapper.h>
+#include <asp_solver_wrapper/ASPGenerator.h>
+#include <asp_commons/ASPCommonsTerm.h>
+#include <asp_solver/ASPFactsQuery.h>
+#include <asp_solver/ASPSolver.h>
+#include <asp_commons/ASPQueryType.h>
 
 class AspAlicaEngineWithDomain : public ::testing::Test
 {
@@ -58,14 +62,16 @@ protected:
 		ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
 		ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
-		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
 		start = std::chrono::high_resolution_clock::now(); // start time measurement
 
-		// "1" stands for the ASPSolver in this test suite only!
-		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
-		alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", nullptr};
+		auto solver = new ::reasoner::ASPSolver(args);
+		auto solverWrapper = new alica::reasoner::ASPSolverWrapper(ae, args);
+		solverWrapper->init(solver);
+		ae->addSolver(1, solverWrapper);
+		alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
 
-		aspSolver->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
+		aspSolver->getSolver()->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
 	}
 
 	virtual void TearDown()
@@ -93,7 +99,7 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
 
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
 
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
@@ -101,46 +107,46 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 	string queryString2 = "brokenPlanBase(leonardo)";
 	string queryString3 = "brokenPlanBase(raphael)";
 	string queryString4 = "brokenPlanBase(michelangelo)";
-	auto constraint1 = make_shared<alica::reasoner::ASPTerm>();
-	constraint1->setRule(queryString1);
+	auto constraint1 = make_shared<::reasoner::ASPCommonsTerm>();
+	constraint1->addRule(queryString1);
 	constraint1->setProgramSection("assistanceTestFacts");
-	constraint1->setType(alica::reasoner::ASPQueryType::Facts);
-	auto constraint2 = make_shared<alica::reasoner::ASPTerm>();
-	constraint2->setRule(queryString2);
+	constraint1->setType(::reasoner::ASPQueryType::Facts);
+	auto constraint2 = make_shared<::reasoner::ASPCommonsTerm>();
+	constraint2->addRule(queryString2);
 	constraint2->setProgramSection("assistanceTestFacts");
-	constraint2->setType(alica::reasoner::ASPQueryType::Facts);
-	auto constraint3 = make_shared<alica::reasoner::ASPTerm>();
-	constraint3->setRule(queryString3);
+	constraint2->setType(::reasoner::ASPQueryType::Facts);
+	auto constraint3 = make_shared<::reasoner::ASPCommonsTerm>();
+	constraint3->addRule(queryString3);
 	constraint3->setProgramSection("assistanceTestFacts");
-	constraint3->setType(alica::reasoner::ASPQueryType::Facts);
-	auto constraint4 = make_shared<alica::reasoner::ASPTerm>();
-	constraint4->setRule(queryString4);
+	constraint3->setType(::reasoner::ASPQueryType::Facts);
+	auto constraint4 = make_shared<::reasoner::ASPCommonsTerm>();
+	constraint4->addRule(queryString4);
 	constraint4->setProgramSection("assistanceTestFacts");
-	constraint4->setType(alica::reasoner::ASPQueryType::Facts);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(
-			aspSolver, constraint1);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject2 = make_shared<alica::reasoner::ASPFactsQuery>(
-			aspSolver, constraint2);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject3 = make_shared<alica::reasoner::ASPFactsQuery>(
-			aspSolver, constraint3);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject4 = make_shared<alica::reasoner::ASPFactsQuery>(
-			aspSolver, constraint4);
-	aspSolver->registerQuery(queryObject1);
-	aspSolver->registerQuery(queryObject2);
-	aspSolver->registerQuery(queryObject3);
-	aspSolver->registerQuery(queryObject4);
+	constraint4->setType(::reasoner::ASPQueryType::Facts);
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject1 = make_shared<::reasoner::ASPFactsQuery>(
+			((::reasoner::ASPSolver*)(aspSolver->getSolver())), constraint1);
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject2 = make_shared<::reasoner::ASPFactsQuery>(
+			((::reasoner::ASPSolver*)(aspSolver->getSolver())), constraint2);
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject3 = make_shared<::reasoner::ASPFactsQuery>(
+			((::reasoner::ASPSolver*)(aspSolver->getSolver())), constraint3);
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject4 = make_shared<::reasoner::ASPFactsQuery>(
+			((::reasoner::ASPSolver*)(aspSolver->getSolver())), constraint4);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->registerQuery(queryObject1);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->registerQuery(queryObject2);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->registerQuery(queryObject3);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->registerQuery(queryObject4);
 
-	aspSolver->ground( { {"assistanceTestFacts", {}}}, nullptr);
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->ground( { {"assistanceTestFacts", {}}}, nullptr);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->ground( { {"assistanceBackground", {}}}, nullptr);
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
-	if (!aspSolver->validatePlan(plan))
+	if (!((alica::reasoner::ASPSolverWrapper*)(aspSolver->getSolver()))->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 	else
 	{
-		aspSolver->printStats();
+		((alica::reasoner::ASPSolverWrapper*)(aspSolver->getSolver()))->printStats();
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: "
@@ -162,31 +168,31 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "ReusePlanFromPlantypeWithoutCycle", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
 
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
 
 	alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
 
 	string queryString1 = "brokenPlanBase(donatello)";
-	auto constraint = make_shared<alica::reasoner::ASPTerm>();
-	constraint->setRule(queryString1);
-	constraint->setType(alica::reasoner::ASPQueryType::Facts);
+	auto constraint = make_shared<::reasoner::ASPCommonsTerm>();
+	constraint->addRule(queryString1);
+	constraint->setType(::reasoner::ASPQueryType::Facts);
 	constraint->setProgramSection("assistanceTestFacts");
 
-	aspSolver->ground( { {"assistanceBackground", {}}}, nullptr);
+	((::reasoner::ASPSolver*)(aspSolver->getSolver()))->ground( { {"assistanceBackground", {}}}, nullptr);
 
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject1 = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver,
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject1 = make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*)(aspSolver->getSolver())),
 																											constraint);
-	aspSolver->registerQuery(queryObject1);
+	((alica::reasoner::ASPSolverWrapper*)(aspSolver->getSolver()))->registerQuery(queryObject1);
 
 	// start time measurement for grounding
 	std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
-	if (!aspSolver->validatePlan(plan))
+	if (!((alica::reasoner::ASPSolverWrapper*)(aspSolver->getSolver()))->validatePlan(plan))
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 	else
 	{
-		aspSolver->printStats();
+		((alica::reasoner::ASPSolverWrapper*)(aspSolver->getSolver()))->printStats();
 	}
 	std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
 	cout << "Measured Grounding Time: "

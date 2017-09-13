@@ -1,0 +1,130 @@
+{
+    "relations": [
+        {
+            "rel": "cn5_RelatedTo"
+        },
+        {
+            "rel": "cn5_FormOf"
+        },
+        {
+            "rel": "cn5_IsA"
+        },
+        {
+            "rel": "cn5_PartOf"
+        },
+        {
+            "rel": "cn5_HasA"
+        },
+        {
+            "rel": "cn5_UsedFor"
+        },
+        {
+            "rel": "cn5_CapableOf"
+        },
+        {
+            "rel": "cn5_AtLocation"
+        },
+        {
+            "rel": "cn5_Causes"
+        },
+        {
+            "rel": "cn5_HasSubevent"
+        },
+        {
+            "rel": "cn5_HasFirstSubevent"
+        },
+        {
+            "rel": "cn5_HasLastSubevent"
+        },
+        {
+            "rel": "cn5_HasPrerequisite"
+        },
+        {
+            "rel": "cn5_HasProperty"
+        },
+        {
+            "rel": "cn5_MotivatedByGoal"
+        },
+        {
+            "rel": "cn5_ObstructedBy"
+        },
+        {
+            "rel": "cn5_Desires"
+        },
+        {
+            "rel": "cn5_CreatedBy"
+        },
+        {
+            "rel": "cn5_Synonym"
+        },
+        {
+            "rel": "cn5_Antonym"
+        },
+        {
+            "rel": "cn5_DerivedFrom"
+        },
+        {
+            "rel": "cn5_SymbolOf"
+        },
+        {
+            "rel": "cn5_DefinedAs"
+        },
+        {
+            "rel": "cn5_Entails"
+        },
+        {
+            "rel": "cn5_MannerOf"
+        },
+        {
+            "rel": "cn5_LocatedNear"
+        },
+        {
+            "rel": "cn5_NotDesires"
+        },
+        {
+            "rel": "cn5_NotCapableOf"
+        },
+        {
+            "rel": "cn5_NotUsedFor"
+        },
+        {
+            "rel": "cn5_NotHasProperty"
+        },
+		{
+	    	"rel": "cn5_SimilarTo"
+		},
+		{
+		    "rel": "cn5_HasContext"
+		},
+        {
+            "rel": "cn5_dbpedia/genre"
+        },
+        {
+            "rel": "cn5_dbpedia/influencedBy"
+        },
+        {
+            "rel": "cn5_dbpedia/knownFor"
+        },
+        {
+            "rel": "cn5_dbpedia/occupation"
+        },
+        {
+            "rel": "cn5_dbpedia/language"
+        },
+        {
+            "rel": "cn5_dbpedia/field"
+        },
+        {
+            "rel": "cn5_dbpedia/product"
+        },
+        {
+            "rel": "cn5_dbpedia/capital"
+        },
+        {
+            "rel": "cn5_dbpedia/leader"
+        },
+        {
+            "rel": "cn5_Wildcard"
+        }
+    ]
+}

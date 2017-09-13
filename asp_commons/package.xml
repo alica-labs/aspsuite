@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>asp_commons</name>
+  <version>0.0.0</version>
+  <description>The asp_commons package</description>
+
+
+  <maintainer email="s.jakob872@gmail.com">Stefan Jakob</maintainer>
+
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>clingo</build_depend>
+  <build_depend>system_config</build_depend>
+
+  <run_depend>clingo</run_depend>
+  <run_depend>system_config</run_depend>
+  
+  <export>
+  </export>
+  
+</package>

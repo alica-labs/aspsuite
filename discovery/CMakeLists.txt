@@ -81,19 +81,6 @@ target_link_libraries(Agent
   pthread
 )
 
-## RECEIVE TEST
-add_executable(ReceiveTest
-  src/ReceiveTest.cpp
-)
-
-target_link_libraries(ReceiveTest
-  ${catkin_LIBRARIES} 
-  ${ZeroMQ_LIBRARIES}
-  ${UUID_LIBRARIES}
-  ${CAPNP_LIBRARIES}
-  pthread
-)
-
 ## SEND TEST
 add_executable(SendTest
   src/SendTest.cpp

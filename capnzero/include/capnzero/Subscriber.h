@@ -9,35 +9,58 @@
 #include <string>
 
 #include <assert.h>
+#include <functional>
 
 namespace capnzero
 {
 
-template <class ObjType>
 class Subscriber
 {
   public:
-	typedef void (ObjType::*callbackFunction)(::capnp::FlatArrayMessageReader&);
+    typedef std::function<void(::capnp::FlatArrayMessageReader &)> callbackFunction;
+    // typedef void (ObjType::*callbackMemberFunction)(::capnp::FlatArrayMessageReader &);
+    // typedef void (*callbackFunction)(::capnp::FlatArrayMessageReader &);
 
-    template <class CallbackObjType>
-    Subscriber(void *context, std::string connection, std::string multicastGroupName,
-               void (CallbackObjType::*callbackFunction)(::capnp::FlatArrayMessageReader&), CallbackObjType *callbackObject)
+    //    template <class CallbackObjType>
+    //    Subscriber(void *context, std::string connection, std::string multicastGroupName,
+    //               void (CallbackObjType::*callbackFunction)(::capnp::FlatArrayMessageReader &),
+    //               CallbackObjType *callbackObject)
+    //        : socket(nullptr)
+    //        , multicastGroupName(multicastGroupName)
+    //        , callbackObject_(callbackObject)
+    //        , callbackFunction_(callbackFunction)
+    //		, callbackMemberFunction_(nullptr)
+    //    {
+    //        this->socket = zmq_socket(context, ZMQ_DISH);
+    //        check(zmq_bind(this->socket, connection.c_str()), "zmq_connect");
+    //        check(zmq_join(this->socket, this->multicastGroupName.c_str()), "zmq_join");
+    //    }
+
+    Subscriber(void *context, std::string connection, std::string multicastGroupName)
         : socket(nullptr)
         , multicastGroupName(multicastGroupName)
-        , callbackObject_(callbackObject)
-        , callbackFunction_(callbackFunction)
+        , callbackFunction_(nullptr)
     {
         this->socket = zmq_socket(context, ZMQ_DISH);
         check(zmq_bind(this->socket, connection.c_str()), "zmq_connect");
         check(zmq_join(this->socket, this->multicastGroupName.c_str()), "zmq_join");
     }
+
     virtual ~Subscriber();
+
+    template <class CallbackObjType>
+    void subscribe(void (CallbackObjType::*callbackFunction)(::capnp::FlatArrayMessageReader &),
+                   CallbackObjType *callbackObject);
+
+    void subscribe(void (*callbackFunction)(::capnp::FlatArrayMessageReader &));
+
     void receive();
 
     static const int wordSize;
 
-    ObjType *callbackObject_;
-    //void (ObjType::*callbackFunction_)(MsgType::Reader);
+    // ObjType *callbackObject_;
+    // void (ObjType::*callbackFunction_)(MsgType::Reader);
+    // callbackMemberFunction callbackMemberFunction_;
     callbackFunction callbackFunction_;
 
   protected:
@@ -45,17 +68,27 @@ class Subscriber
     std::string multicastGroupName;
 };
 
-template <typename ObjType>
-const int Subscriber<ObjType>::wordSize = sizeof(capnp::word);
+const int Subscriber::wordSize = sizeof(capnp::word);
 
-template <typename ObjType>
-Subscriber<ObjType>::~Subscriber()
+Subscriber::~Subscriber()
 {
     check(zmq_close(this->socket), "zmq_close");
 }
 
-template <typename ObjType>
-void Subscriber<ObjType>::receive()
+template <class CallbackObjType>
+void Subscriber::subscribe(void (CallbackObjType::*callbackFunction)(::capnp::FlatArrayMessageReader &),
+                           CallbackObjType *callbackObject)
+{
+	using std::placeholders::_1;
+	this->callbackFunction_ = std::bind(callbackFunction, callbackObject, _1);
+}
+
+void Subscriber::subscribe(void (*callbackFunction)(::capnp::FlatArrayMessageReader &))
+{
+	this->callbackFunction_ = callbackFunction;
+}
+
+void Subscriber::receive()
 {
     zmq_msg_t msg;
     check(zmq_msg_init(&msg), "zmq_msg_init");
@@ -78,7 +111,7 @@ void Subscriber<ObjType>::receive()
 
     ::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
 
-    (this->callbackObject_->*callbackFunction_)(msgReader);
+    (this->callbackFunction_)(msgReader);
 
     //    auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
     //

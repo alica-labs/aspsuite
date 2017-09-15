@@ -37,8 +37,6 @@ class Agent : public Worker
     static bool operating;
 
   private:
-    void setupReceiveUDPMulticast();
-
     void sendMultiPartZeroCopy();
     void send();
 
@@ -60,7 +58,7 @@ class Agent : public Worker
 
     // capnzero stuff
     capnzero::Publisher* pub;
-    capnzero::Subscriber<Agent>* sub;
+    capnzero::Subscriber* sub;
 };
 
 } /* namespace discovery */

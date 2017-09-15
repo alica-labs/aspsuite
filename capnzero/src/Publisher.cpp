@@ -21,7 +21,6 @@ Publisher::~Publisher()
 
 static void cleanUpMsgData(void *data, void *hint)
 {
-    std::cout << "Cleanup" << std::endl;
     delete reinterpret_cast<kj::Array<capnp::word> *>(hint);
 }
 

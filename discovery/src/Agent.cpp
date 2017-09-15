@@ -44,35 +44,28 @@ Agent::Agent(std::string name, bool sender)
     }
     else
     {
-        this->sub = new capnzero::Subscriber<Agent>(
-            this->ctx, "udp://224.0.0.1:5555", "MCGroup", &Agent::callback, (discovery::Agent *)this);
-        // this->setupReceiveUDPMulticast();
+        this->sub = new capnzero::Subscriber(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
+        this->sub->subscribe<discovery::Agent>(&Agent::callback, (discovery::Agent *)this);
     }
 }
 
-void Agent::callback(::capnp::FlatArrayMessageReader& reader)
+void Agent::callback(::capnp::FlatArrayMessageReader &reader)
 {
-    std::cout << "Agent::callback(): " << reader.getRoot<discovery_msgs::Beacon>().toString().flatten().cStr() << std::endl;
-}
-
-void Agent::setupReceiveUDPMulticast()
-{
-    this->socket = zmq_socket(this->ctx, ZMQ_DISH);
-
-    // Binding
-    // check(zmq_bind(socket, "udp://192.168.122.161:5555"), "zmq_bind");
-    check(zmq_bind(this->socket, "udp://224.0.0.1:5555"), "zmq_bind");
-
-    // Join ZMQ Publisher-Group
-    check(zmq_join(this->socket, "MCGroup"), "zmq_join");
+    std::cout << "Agent::callback(): " << reader.getRoot<discovery_msgs::Beacon>().toString().flatten().cStr()
+              << std::endl;
 }
 
 Agent::~Agent()
 {
-    delete (this->pub);
-    // clean up socket only for receiving agent
-    if (!sender)
-        check(zmq_close(this->socket), "zmq_close", true);
+    if (this->sender)
+    {
+        delete (this->pub);
+    }
+    else
+    {
+        delete (this->sub);
+    }
+
     check(zmq_ctx_term(this->ctx), "zmq_ctx_term", true);
 }
 
@@ -134,74 +127,6 @@ void Agent::check(int returnCode, std::string methodName, bool abortIfError)
             assert(returnCode);
     }
 }
-
-void Agent::receive()
-{
-    zmq_msg_t msg;
-
-    check(zmq_msg_init(&msg), "zmq_msg_init", true);
-    int nbytes = zmq_msg_recv(&msg, this->socket, 0);
-    std::cout << "Agent: receive(): nbytes: " << nbytes << std::endl;
-
-    // Received message must contain an integral number of words.
-    assert(zmq_msg_size(&msg) % sizeof(capnp::word) == 0);
-    auto num_words = zmq_msg_size(&msg) / sizeof(capnp::word);
-    std::cout << "Agent: receive(): num_words: " << num_words << std::endl;
-
-    if (reinterpret_cast<uintptr_t>(zmq_msg_data(&msg)) % sizeof(capnp::word) == 0)
-    {
-        std::cout << "Agent: receive(): Aligned " << std::endl;
-    }
-    else
-    {
-        std::cerr << "Agent: receive(): Not aligned " << std::endl;
-    }
-
-    auto msgByteArray = reinterpret_cast<char *>(zmq_msg_data(&msg));
-    for (int i = 0; i < zmq_msg_size(&msg); i++)
-    {
-        printf("%02X:", msgByteArray[i]);
-    }
-    printf("\n");
-
-    auto wordArray =
-        kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(zmq_msg_data(&msg)), num_words);
-
-    ::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
-
-    auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
-
-    std::cout << "Agent: receive(): " << beacon.toString().flatten().cStr() << std::endl;
-
-    check(zmq_msg_close(&msg), "zmq_msg_close");
-}
-
-// kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> Agent::genericReceive()
-//{
-//    do
-//    {
-//        assert(str.size() % sizeof(capnp::word) == 0); // Received message must contain an integral number of words.
-//        auto num_words = str.size() / sizeof(capnp::word);
-//        char *buf = &str[0];
-//
-//        if (reinterpret_cast<uintptr_t>(buf) % sizeof(capnp::word) == 0)
-//        {
-//            // String buffer is word-aligned, point directly at the start of the string.
-//            segments_.push_back(kj::ArrayPtr<capnp::word const>(reinterpret_cast<capnp::word const *>(buf),
-//            num_words));
-//        }
-//        else
-//        {
-//            // String buffer is not word-aligned, make a copy and point at that.
-//            unique_ptr<capnp::word[]> words(new capnp::word[num_words]);
-//            memcpy(words.get(), buf, str.size());
-//            segments_.push_back(kj::ArrayPtr<capnp::word const>(&words[0], num_words));
-//            copied_parts_.push_back(move(words));
-//        }
-//    } while (s_.has_more_parts());
-//
-//    return kj::ArrayPtr<kj::ArrayPtr<capnp::word const>>(&segments_[0], segments_.size());
-//}
 
 void Agent::testUUIDStuff()
 {

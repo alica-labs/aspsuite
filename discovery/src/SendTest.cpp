@@ -1,4 +1,5 @@
 #include <capnzero/Publisher.h>
+#include <capnzero/Subscriber.h>
 
 #include <discovery_msgs/beacon.capnp.h>
 #include <zmq.h>
@@ -10,8 +11,16 @@
 #include <capnp/serialize-packed.h>
 
 #include <iostream>
-#include <unistd.h>
 #include <memory>
+#include <unistd.h>
+
+#include <signal.h>
+
+bool stop;
+void* ctx;
+int msgNumber;
+capnzero::Publisher *pub;
+capnzero::Subscriber *sub;
 
 /**
  * Checks the return code and reports an error if present.
@@ -27,34 +36,76 @@ void check(int returnCode, std::string methodName, bool abortIfError)
     }
 }
 
-void send(capnzero::Publisher* pub)
+void send(capnzero::Publisher *pub, int msgNumber)
 {
     capnp::MallocMessageBuilder msgBuilder;
     discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
 
     // set content
     beaconMsgBuilder.setIp("192.186.0.1");
-    beaconMsgBuilder.setPort(6666);
+    beaconMsgBuilder.setPort(msgNumber);
     uuid_t uuid;
     uuid_generate(uuid);
     beaconMsgBuilder.setUuid(kj::arrayPtr(uuid, sizeof(uuid)));
 
-    //std::cout << "SendTest::send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
+    std::cout << "SendTest::send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 
     int numBytesSent = pub->send(msgBuilder);
 
     std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
 }
 
+void receive(::capnp::FlatArrayMessageReader &reader)
+{
+	std::cout << "Received! " << std::endl;
+    auto beacon = reader.getRoot<discovery_msgs::Beacon>();
+
+    if (beacon.getPort() != msgNumber)
+    {
+        std::cout << "SendTest::receive(..): Received Message '" << beacon.toString().flatten().cStr() << "'"
+                  << std::endl;
+
+        msgNumber = beacon.getPort();
+        if (msgNumber != 100)
+        {
+        	send(pub, msgNumber++);
+        }
+    }
+    else
+    {
+        std::cout << "SendTest::receive(..): Received own Number " << std::endl;
+    }
+}
+
+void sigIntHandler(int sig)
+{
+	stop = true;
+}
+
 int main(int argc, char **argv)
 {
-    auto ctx = zmq_ctx_new();
+	stop = false;
+	// register ctrl+c handler
+	signal(SIGINT, sigIntHandler);
+
+    ctx = zmq_ctx_new();
     assert(ctx);
 
-    capnzero::Publisher* pub = new capnzero::Publisher(ctx, "udp://224.0.0.1:5555", "MCGroup");
+    pub = new capnzero::Publisher(ctx, "udp://224.0.0.1:5555", "MCGroup");
+    sub = new capnzero::Subscriber(ctx, "udp://224.0.0.1:5555", "MCGroup");
+    sub->subscribe(&receive);
 
-    send(pub);
+    if (argc > 1 && strcmp(argv[1], "sender") == 0)
+	{
+    	send(pub, 1);
+    }
 
-    delete(pub);
+    while (msgNumber != 100 && !stop)
+    {
+        usleep(1);
+    }
+
+    delete (pub);
+    delete (sub);
     check(zmq_ctx_term(ctx), "zmq_ctx_term", true);
 }

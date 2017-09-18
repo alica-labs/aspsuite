@@ -17,7 +17,7 @@
 #include <signal.h>
 
 bool stop;
-void* ctx;
+void *ctx;
 int msgNumber;
 capnzero::Publisher *pub;
 capnzero::Subscriber *sub;
@@ -48,27 +48,27 @@ void send(capnzero::Publisher *pub, int msgNumber)
     uuid_generate(uuid);
     beaconMsgBuilder.setUuid(kj::arrayPtr(uuid, sizeof(uuid)));
 
-    std::cout << "SendTest::send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
-
+    std::cout << "SendTest::send(): Message sent: '" << beaconMsgBuilder.toString().flatten().cStr() << "'"
+              << std::endl;
     int numBytesSent = pub->send(msgBuilder);
 
-    std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
+    // std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
 }
 
 void receive(::capnp::FlatArrayMessageReader &reader)
 {
-	std::cout << "Received! " << std::endl;
+    std::cout << "SendTest::receive(..) called!" << std::endl;
     auto beacon = reader.getRoot<discovery_msgs::Beacon>();
 
     if (beacon.getPort() != msgNumber)
     {
-        std::cout << "SendTest::receive(..): Received Message '" << beacon.toString().flatten().cStr() << "'"
+        std::cout << "SendTest::receive(..): Message received: '" << beacon.toString().flatten().cStr() << "'"
                   << std::endl;
 
         msgNumber = beacon.getPort();
         if (msgNumber != 100)
         {
-        	send(pub, msgNumber++);
+            send(pub, ++msgNumber);
         }
     }
     else
@@ -79,14 +79,14 @@ void receive(::capnp::FlatArrayMessageReader &reader)
 
 void sigIntHandler(int sig)
 {
-	stop = true;
+    stop = true;
 }
 
 int main(int argc, char **argv)
 {
-	stop = false;
-	// register ctrl+c handler
-	signal(SIGINT, sigIntHandler);
+    stop = false;
+    // register ctrl+c handler
+    signal(SIGINT, sigIntHandler);
 
     ctx = zmq_ctx_new();
     assert(ctx);
@@ -96,16 +96,16 @@ int main(int argc, char **argv)
     sub->subscribe(&receive);
 
     if (argc > 1 && strcmp(argv[1], "sender") == 0)
-	{
-    	send(pub, 1);
+    {
+        send(pub, 1);
     }
 
-    while (msgNumber != 100 && !stop)
+    while (!stop && msgNumber != 100)
     {
         usleep(1);
     }
 
-    delete (pub);
-    delete (sub);
+    delete pub;
+    delete sub;
     check(zmq_ctx_term(ctx), "zmq_ctx_term", true);
 }

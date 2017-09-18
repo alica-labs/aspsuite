@@ -95,9 +95,10 @@ int main(int argc, char **argv)
     sub = new capnzero::Subscriber(ctx, "udp://224.0.0.1:5555", "MCGroup");
     sub->subscribe(&receive);
 
+    msgNumber = 0;
     if (argc > 1 && strcmp(argv[1], "sender") == 0)
     {
-        send(pub, 1);
+        send(pub, ++msgNumber);
     }
 
     while (!stop && msgNumber != 100)

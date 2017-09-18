@@ -12,9 +12,9 @@ namespace capnzero{
 	 * Checks the return code and reports an error if present.
 	 * If abortIfError is set to true, it also aborts the process.
 	 */
-	inline void check(int returnCode, std::string methodName, int expectedReturnCode = 0)
+	inline void check(int returnCode, std::string methodName)
 	{
-		if (returnCode != expectedReturnCode)
+		if (returnCode != 0)
 		{
 			std::cerr << methodName << " returned: " << errno << " - " << zmq_strerror(errno) << std::endl;
 		}

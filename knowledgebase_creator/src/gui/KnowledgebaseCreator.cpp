@@ -66,8 +66,9 @@ namespace kbcr
 		this->isConcneptNetInstalled = checkConcneptNetInstallation();
 		if (this->isDockerInstalled && this->isConcneptNetInstalled)
 		{
-			int i = std::system("docker start conceptnet5_conceptnet-web_1");
-			std::cout << "KnowledgebaseCreator: \"docker start conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+			//conceptnet5_conceptnet-web_1
+			int i = std::system("docker start conceptnet5_api_1");
+			std::cout << "KnowledgebaseCreator: \"docker start conceptnet5_api_1\" was called with exit code: " << i
 					<< std::endl;
 			readConceptNetBaseRelations();
 		}
@@ -78,8 +79,8 @@ namespace kbcr
 		if (this->isDockerInstalled && this->isConcneptNetInstalled)
 		{
 			std::cout << "Quitting the application. It may take a few seconds to shutdown ConceptNet 5." << std::endl;
-			int i = std::system("docker stop conceptnet5_conceptnet-web_1");
-			std::cout << "KnowledgebaseCreator: \"docker stop conceptnet5_conceptnet-web_1\" was called with exit code: " << i
+			int i = std::system("docker stop conceptnet5_api_1");
+			std::cout << "KnowledgebaseCreator: \"docker stop conceptnet5_api_1\" was called with exit code: " << i
 					<< std::endl;
 		}
 		if (this->solver != nullptr)
@@ -282,7 +283,9 @@ namespace kbcr
 #ifdef GUIDEUG
 		cout << "KnowledgebaseCreator: " << result << endl;
 #endif
-		return (result.find("conceptnet5_conceptnet-web_1") != string::npos);
+
+		//conceptnet5_conceptnet-web_1
+		return (result.find("conceptnet5_api_1") != string::npos);
 	}
 
 	std::vector<QString> KnowledgebaseCreator::getConceptNetBaseRealtions()

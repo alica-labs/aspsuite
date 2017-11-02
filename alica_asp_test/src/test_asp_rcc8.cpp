@@ -1,7 +1,8 @@
-#include <alica_asp_solver/ASPQuery.h>
+#include <asp_commons/ASPQuery.h>
 #include <gtest/gtest.h>
 
 #include <SystemConfig.h>
+#include <memory>
 
 // ALICA Additional Modules
 #include <communication/AlicaDummyCommunication.h>
@@ -20,9 +21,12 @@
 #include <engine/IPlanParser.h>
 
 // ALICA ASP Solver
-#include <alica_asp_solver/ASPSolver.h>
-#include <alica_asp_solver/ASPTerm.h>
-#include <engine/constraintmodul/Query.h>
+#include <asp_commons/IASPSolver.h>
+#include <asp_commons/ASPCommonsTerm.h>
+#include <asp_commons/ASPQueryType.h>
+#include <asp_solver_wrapper/ASPSolverWrapper.h>
+#include <asp_solver/ASPSolver.h>
+#include <asp_solver/ASPFactsQuery.h>
 
 class ASPRCC8 : public ::testing::Test
 {
@@ -63,7 +67,10 @@ protected:
 
 		start = std::chrono::high_resolution_clock::now(); // start time measurement
 		// "1" stands for the ASPSolver in this test suite only!
-		ae->addSolver(1, new alica::reasoner::ASPSolver(ae, args));
+		auto solver = new ::reasoner::ASPSolver(args);
+		auto solverWrapper = new alica::reasoner::ASPSolverWrapper(ae, args);
+		solverWrapper->init(solver);
+		ae->addSolver(1, solverWrapper);
 
 	}
 
@@ -118,26 +125,26 @@ TEST_F(ASPRCC8, Department)
 	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
 			<< "Unable to initialise the ALICA Engine!";
 
-	alica::reasoner::ASPSolver* aspSolver = dynamic_cast<alica::reasoner::ASPSolver*>(ae->getSolver(1)); // "1" for ASPSolver
+	alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
 
 	string queryString = "externallyConnected(studentArea, mainHallA), disconnected(studentArea, mainHallB)";
-	auto constraint = make_shared<alica::reasoner::ASPTerm>();
+	auto constraint = make_shared<::reasoner::ASPCommonsTerm>();
 //	constraint->setRule("c(CountOfExCon) :- CountOfExCon = #count{S : externallyConnected(X, S)}.");
-	constraint->setRule(queryString);
+	constraint->addRule(queryString);
 	constraint->setProgramSection("department_sections");
-	constraint->setType(alica::reasoner::ASPQueryType::Facts);
-	shared_ptr<alica::reasoner::ASPFactsQuery> queryObject = make_shared<alica::reasoner::ASPFactsQuery>(aspSolver, constraint);
-	aspSolver->registerQuery(queryObject);
-	auto satified = aspSolver->solve();
+	constraint->setType(::reasoner::ASPQueryType::Facts);
+	shared_ptr<::reasoner::ASPFactsQuery> queryObject = make_shared<::reasoner::ASPFactsQuery>((reasoner::ASPSolver*)aspSolver->getSolver(), constraint);
+	((reasoner::ASPSolver*)aspSolver->getSolver())->registerQuery(queryObject);
+	auto satified = aspSolver->getSolver()->solve();
 	if (!satified)
 	{
 		cout << "ASPAlicaTest: No Model found!" << endl;
 	}
 	else
 	{
-		aspSolver->printStats();
+		((reasoner::ASPSolver*)aspSolver->getSolver())->printStats();
 	}
-	aspSolver->removeDeadQueries();
+	((reasoner::ASPSolver*)aspSolver->getSolver())->removeDeadQueries();
 	EXPECT_TRUE(satified)
 			<< "The StudentArea should be externallyConnected to mainHallA) and disconnected to mainHallB).";
 
@@ -147,8 +154,8 @@ TEST_F(ASPRCC8, Department)
 	EXPECT_TRUE(queryObject->getLifeTime() == 0) << "The query should be expired but lifetime is:"
 			<< queryObject->getLifeTime() << ".";
 
-	EXPECT_TRUE(aspSolver->getRegisteredQueriesCount() == 0) << "There shouldn't be any query left but there are "
-			<< aspSolver->getRegisteredQueriesCount() << " left.";
+	EXPECT_TRUE(((reasoner::ASPSolver*)aspSolver->getSolver())->getRegisteredQueriesCount() == 0) << "There shouldn't be any query left but there are "
+			<< ((reasoner::ASPSolver*)aspSolver->getSolver())->getRegisteredQueriesCount() << " left.";
 
 	cout << queryObject->toString() << endl;
 }

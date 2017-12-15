@@ -3,12 +3,14 @@
 
 #include "engine/BasicBehaviour.h"
 
+#include <string>
+
 namespace alica
 {
     class DomainBehaviour : public BasicBehaviour
     {
     public:
-        DomainBehaviour(string name);
+        DomainBehaviour(std::string name);
         virtual ~DomainBehaviour();
 
     };

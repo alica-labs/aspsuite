@@ -18,7 +18,7 @@
 #include <engine/model/Plan.h>
 #include <engine/model/State.h>
 #include <engine/model/PlanType.h>
-#include <engine/IPlanParser.h>
+#include <engine/parser/PlanParser.h>
 
 // ALICA ASP Solver
 #include <asp_commons/IASPSolver.h>
@@ -55,7 +55,7 @@ protected:
 		sc->setHostname("nase");
 
 		// setup the engine
-		ae = new alica::AlicaEngine();
+		ae = new alica::AlicaEngine(new supplementary::AgentIDManager(new supplementary::AgentIDFactory()), "ReusePlanWithoutCycle", "CarryBookMaster", ".", false);
 		bc = new alica::BehaviourCreator();
 		cc = new alica::ConditionCreator();
 		uc = new alica::UtilityFunctionCreator();
@@ -122,7 +122,7 @@ protected:
 
 TEST_F(ASPRCC8, Department)
 {
-	EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false))
+	EXPECT_TRUE(ae->init(bc, cc, uc, crc))
 			<< "Unable to initialise the ALICA Engine!";
 
 	alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver

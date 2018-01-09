@@ -114,7 +114,7 @@ namespace reasoner
 	{
 #ifdef ASPSolver_DEBUG
 		cout << "ASPSolver: Found the following model which is number " << endl;
-		for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+		for (auto &atom : m.atoms(clingo_show_type_shown))
 		{
 			cout << atom << " ";
 		}
@@ -286,6 +286,7 @@ namespace reasoner
 						if (term->getId() == query->getTerm()->getId())
 						{
 							found = true;
+							break;
 						}
 					}
 					if (!found)
@@ -296,12 +297,12 @@ namespace reasoner
 			}
 			else if (term->getType() == ASPQueryType::Facts)
 			{
-				bool found = true;
+				bool found = false;
 				for (auto query : this->registeredQueries)
 				{
-					if (term->getId() != query->getTerm()->getId())
+					if (term->getId() == query->getTerm()->getId())
 					{
-						found = false;
+						found = true;
 						break;
 					}
 				}

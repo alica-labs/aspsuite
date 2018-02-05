@@ -70,7 +70,6 @@ endif (NOT catkin_FOUND)
 ## AGENT
 add_executable(Agent
   src/Agent.cpp
-  src/Worker.cpp
 )
 
 target_link_libraries(Agent

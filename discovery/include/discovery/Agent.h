@@ -4,7 +4,7 @@
 //#define _GNU_SOURCE
 #include <netdb.h>
 
-#include "discovery/Worker.h"
+#include <supplementary/Worker.h>
 #include <capnzero/Subscriber.h>
 #include <discovery_msgs/beacon.capnp.h>
 
@@ -24,7 +24,7 @@ namespace capnzero {
 namespace discovery
 {
 
-class Agent : public Worker
+class Agent : public supplementary::Worker
 {
   public:
     Agent(std::string name, bool sender);

@@ -1,10 +1,3 @@
-/*
- * ASPSolverWrapper.cpp
- *
- *  Created on: Jan 24, 2017
- *      Author: stefan
- */
-
 #include "asp_solver_wrapper/ASPSolverWrapper.h"
 
 #include <engine/constraintmodul/ProblemDescriptor.h>

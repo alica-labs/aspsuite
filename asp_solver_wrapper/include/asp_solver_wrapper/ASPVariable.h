@@ -1,12 +1,4 @@
-/*
- * Variable.h
- *
- *  Created on: Jul 13, 2016
- *      Author: Stefan Jakob
- */
-
-#ifndef INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
-#define INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
+#pragma once
 
 #include <engine/constraintmodul/SolverVariable.h>
 #include <string>
@@ -25,11 +17,9 @@ namespace alica
 			virtual ~ASPVariable();
 
 		private:
-			int ownId;
-			static int var_id;
+			int id;
+			static int idCounter;
 		};
 
 	} /* namespace reasoner */
 } /* namespace alica */
-
-#endif /* INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_ */

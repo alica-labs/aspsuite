@@ -15,12 +15,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 # this enables the draft part of the api
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
-message("${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
-message("${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
+#message("${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
+#message("${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
 
 find_package(UUID)
-message("${PROJECT_NAME}: UUID-Includes: ${UUID_INCLUDE_DIRS}") 
-message("${PROJECT_NAME}: UUID-Libraries: ${UUID_LIBRARIES}")
+#message("${PROJECT_NAME}: UUID-Includes: ${UUID_INCLUDE_DIRS}") 
+#message("${PROJECT_NAME}: UUID-Libraries: ${UUID_LIBRARIES}")
 
 # Introduce CapnProto
 find_package(CapnProto REQUIRED)
@@ -41,8 +41,8 @@ if(catkin_FOUND)
     DEPENDS ZeroMQ UUID
   )
 endif(catkin_FOUND)
-#
-message("${PROJECT_NAME}: catkin_LIBRARIES: ${catkin_LIBRARIES}")
+
+#message("${PROJECT_NAME}: catkin_LIBRARIES: ${catkin_LIBRARIES}")
 
 include_directories(
   include 
@@ -51,7 +51,7 @@ include_directories(
   ${UUID_INCLUDE_DIRS}
 )
 
-message("${PROJECT_NAME}: catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
+#message("${PROJECT_NAME}: catkin_INCLUDE_DIRS: ${catkin_INCLUDE_DIRS}")
 
 ## DISCOVERY
 add_executable(${PROJECT_NAME}

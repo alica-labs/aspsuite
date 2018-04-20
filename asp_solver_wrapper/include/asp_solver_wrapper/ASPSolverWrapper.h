@@ -41,9 +41,9 @@ namespace alica
 			ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args);
 			virtual ~ASPSolverWrapper();
 
-			bool existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls);
-			bool getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls,
-								vector<void*>& results);
+			bool existsSolution(const VariableGrp& vars, std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
+			bool getSolution(const VariableGrp& vars, std::vector<std::shared_ptr<ProblemDescriptor>>& calls,
+									 std::vector<void*>& results);
 			shared_ptr<SolverVariable> createVariable(long id);
 			::reasoner::IASPSolver* getSolver();
 			void init(::reasoner::IASPSolver* solver);

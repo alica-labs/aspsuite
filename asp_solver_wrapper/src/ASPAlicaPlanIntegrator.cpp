@@ -1,7 +1,7 @@
 #include "asp_solver_wrapper/ASPAlicaPlanIntegrator.h"
 #include "asp_solver_wrapper/ASPGenerator.h"
 
-#include <engine/model/BehaviourConfiguration.h>
+#include <engine/model/Behaviour.h>
 #include <engine/model/Condition.h>
 #include <engine/model/EntryPoint.h>
 #include <engine/model/FailureState.h>
@@ -152,13 +152,12 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElement
                         this->processPlan(childPlan, instanceElementHash);
                     }
                 }
-                else if (const alica::BehaviourConfiguration *childBehaviourConf =
-                             dynamic_cast<const alica::BehaviourConfiguration *>(abstractChildPlan))
+                else if (const alica::Behaviour *childBehaviour =
+                             dynamic_cast<const alica::Behaviour *>(abstractChildPlan))
                 {
-                    // TODO: Handle BehaviourConfigurations
-                    this->solver->add("planBase", {}, gen->behaviourConf(childBehaviourConf));
-                    this->solver->add("planBase", {}, gen->hasBehaviourConf(state, childBehaviourConf));
-                    // TODO behaviour necessary ?
+                    // TODO: Handle Behaviour
+                    this->solver->add("planBase", {}, gen->behaviour(childBehaviour));
+                    this->solver->add("planBase", {}, gen->hasBehaviour(state, childBehaviour));
                     // TODO handle pre- and runtime condition of beh conf
                 }
             }

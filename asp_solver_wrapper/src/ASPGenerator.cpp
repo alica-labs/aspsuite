@@ -5,7 +5,7 @@ namespace alica
 	namespace reasoner
 	{
 		ASPGenerator::ASPGenerator(const void* wildcard_pointer, string wildcard_string) :
-				wildcard_pointer(wildcard_pointer), wildcard_string(wildcard_string)
+				wildcard_pointer(wildcard_pointer), wildcard_string(std::move(wildcard_string))
 		{
 		}
 
@@ -116,9 +116,9 @@ namespace alica
 			return "brokenRunningPlan(" + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::behaviourConf(const BehaviourConfiguration* behConf, bool dotTerminated)
+		string ASPGenerator::behaviour(const Behaviour* beh, bool dotTerminated)
 		{
-			return "behaviourConf(" + get(behConf) + (dotTerminated ? ")." : ")");
+			return "behaviourConf(" + get(beh) + (dotTerminated ? ")." : ")");
 		}
 
 		// BINARY Predicates
@@ -190,7 +190,7 @@ namespace alica
 
 		string ASPGenerator::inRefPlan(string prefix, const Condition* c, string plan, bool dotTerminated)
 		{
-			return "inRefPlan(" + get(prefix, c) + ", " + plan + (dotTerminated ? ")." : ")");
+			return "inRefPlan(" + get(std::move(prefix), c) + ", " + plan + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated)
@@ -213,9 +213,9 @@ namespace alica
 			return "hasRunningRealisation(" + get(pt) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasBehaviourConf(const State* s, const BehaviourConfiguration* behConf, bool dotTerminated)
+		string ASPGenerator::hasBehaviour(const State* s, const Behaviour* beh, bool dotTerminated)
 		{
-			return "hasBehaviourConf(" + get(s) + ", " + get(behConf) + (dotTerminated ? ")." : ")");
+			return "hasBehaviour(" + get(s) + ", " + get(beh) + (dotTerminated ? ")." : ")");
 		}
 
 		// TERNARY Predicates
@@ -227,12 +227,12 @@ namespace alica
 
 		string ASPGenerator::inRefPlanTask(string prefix, const Condition* c, string plan, string task, bool dotTerminated)
 		{
-			return "inRefPlanTask(" + get(prefix, c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
+			return "inRefPlanTask(" + get(std::move(prefix), c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
 		}
 
 		string ASPGenerator::inRefPlanState(string prefix, const Condition* c, string plan, string state, bool dotTerminated)
 		{
-			return "inRefPlanState(" + get(prefix, c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
+			return "inRefPlanState(" + get(std::move(prefix), c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
 		}
 
 		// QUATERNARY Predicates
@@ -240,7 +240,7 @@ namespace alica
 		string ASPGenerator::inRefPlanTaskState(string prefix, const Condition* c, string plan, string task, string state,
 												bool dotTerminated)
 		{
-			return "inRefPlanTaskState(" + get(prefix, c) + ", " + plan + ", " + task + ", " + state
+			return "inRefPlanTaskState(" + get(std::move(prefix), c) + ", " + plan + ", " + task + ", " + state
 					+ (dotTerminated ? ")." : ")");
 		}
 
@@ -350,7 +350,7 @@ namespace alica
 
 		string ASPGenerator::get(string prefix, uint64_t instanceElementHash)
 		{
-			if (prefix == "")
+			if (prefix.empty())
 				return this->wildcard_string;
 
 			auto&& iter = this->instanceElements.find(instanceElementHash);
@@ -374,15 +374,15 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(const BehaviourConfiguration* behConf)
+		string ASPGenerator::get(const Behaviour* beh)
 		{
-			if (behConf == this->wildcard_pointer)
+			if (beh == this->wildcard_pointer)
 				return this->wildcard_string;
 
-			auto&& iter = this->elements.find(behConf->getId());
+			auto&& iter = this->elements.find(beh->getId());
 			if (iter == this->elements.end())
 			{
-				return this->elements[behConf->getId()] = "behaviourConf" + std::to_string(behConf->getId());
+				return this->elements[beh->getId()] = "behaviour" + std::to_string(beh->getId());
 			}
 			return iter->second;
 		}

@@ -12,7 +12,7 @@
 #include <engine/model/Condition.h>
 #include <engine/model/PreCondition.h>
 #include <engine/model/RuntimeCondition.h>
-#include <engine/model/BehaviourConfiguration.h>
+#include <engine/model/Behaviour.h>
 
 namespace alica
 {
@@ -37,7 +37,7 @@ namespace alica
 			string preCondition(const PreCondition* cond, bool dotTerminated = true);
 			string runtimeCondition(const RuntimeCondition* cond, bool dotTerminated = true);
 			string runningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
-			string behaviourConf(const BehaviourConfiguration* behConf, bool dotTerminated = true);
+			string behaviour(const Behaviour* beh, bool dotTerminated = true);
 
 			string brokenPlan(const Plan* s, bool dotTerminated = true);
 			string cyclic(const Plan* p, bool dotTerminated = true);
@@ -68,7 +68,7 @@ namespace alica
 			string hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasRunningPlan(const State* s, uint64_t instanceElementHash, bool dotTerminated = true);
 			string hasRunningRealisation(const PlanType* pt, uint64_t instanceElementHash, bool dotTerminated = true);
-			string hasBehaviourConf(const State* s, const BehaviourConfiguration* behConf, bool dotTerminated = true);
+			string hasBehaviour(const State* s, const Behaviour* behConf, bool dotTerminated = true);
 
 			// TERNARY PREDICATES
 			string hasEntryPoint(const Plan* p, const Task* t, const EntryPoint* ep, bool dotTerminated = true);
@@ -92,7 +92,7 @@ namespace alica
 			string get(const SyncTransition* sync);
 			string get(string prefix, const Condition* cond);
 			string get(string prefix, uint64_t instanceElementHash);
-			string get(const BehaviourConfiguration* behConf);
+			string get(const Behaviour* beh);
 
 		private:
 			// maps from id to asp string for all ALICA elements

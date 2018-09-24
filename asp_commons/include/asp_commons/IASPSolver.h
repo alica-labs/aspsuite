@@ -44,7 +44,7 @@ namespace reasoner
 		virtual void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue) = 0;
 		virtual void releaseExternal(Clingo::Symbol ext) = 0;
 		virtual bool solve() = 0;
-		virtual void add(string const &name, Clingo::StringSpan const &params, string const &par) = 0;
+		virtual void add(char const *name, Clingo::StringSpan const &params, char const *par) = 0;
 		virtual Clingo::Symbol parseValue(std::string const &str) = 0;
 		virtual int getQueryCounter() = 0;
 

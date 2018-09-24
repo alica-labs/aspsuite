@@ -24,9 +24,9 @@ namespace reasoner
 	ASPSolver::ASPSolver(vector<char const*> args) :
 			IASPSolver()
 	{
-		this->gringoModule = new DefaultGringoModule();
+		//this->gringoModule = new DefaultGringoModule();
 //		this->clingo = this->gringoModule->newControl(args.size() - 2, args.data(), nullptr, 20);
-		this->clingo = make_shared<ClingoLib>(this->gringoModule->scripts, args.size() - 2, args.data(), nullptr, 20);
+		this->clingo = make_shared<Clingo::Control>(args.data(), logger, 20);
 		this->disableWarnings(true);
 
 		this->sc = supplementary::SystemConfig::getInstance();
@@ -34,10 +34,11 @@ namespace reasoner
 #ifdef ASPSolver_DEBUG
 		this->modelCount = 0;
 #endif
-		this->conf = &this->clingo->getConf();
-		this->root = this->conf->getRootKey();
-		this->modelsKey = this->conf->getSubKey(this->root, "solve.models");
-		this->conf->setKeyValue(this->modelsKey, "0");
+		this->conf = this->clingo->configuration();
+		//this->root = this->conf->getRootKey();
+		this->modelsKey = this->conf["solve.models"]; //->getSubKey(this->root, "solve.models");
+		this->modelsKey = "0";
+		//this->conf->setKeyValue(this->modelsKey, "0");
 #ifdef SOLVER_OPTIONS
 		traverseOptions(conf, root, "");
 #endif
@@ -52,7 +53,7 @@ namespace reasoner
 
 	void ASPSolver::loadFile(string absolutFilename)
 	{
-		this->clingo->load(absolutFilename);
+		this->clingo->load(absolutFilename.c_str());
 	}
 
 	bool ASPSolver::loadFileFromConfig(string configKey)
@@ -74,19 +75,19 @@ namespace reasoner
 		this->alreadyLoaded.push_back(configKey.c_str());
 		backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(),
 																			backGroundKnowledgeFile);
-		this->clingo->load(backGroundKnowledgeFile);
+		this->clingo->load(backGroundKnowledgeFile.c_str());
 		return true;
 	}
 
 	/**
 	 * Let the internal solver ground a given program part (context).
 	 */
-	void ASPSolver::ground(Gringo::Control::GroundVec const &vec, Gringo::Context *context)
+	void ASPSolver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 	{
 #ifdef ASPSOLVER_DEBUG
 		cout << "ASPSolver_ground: " << vec.at(0).first << endl;
 #endif
-		this->clingo->ground(vec, context);
+		this->clingo->ground(vec, callBack);
 	}
 
 	/**
@@ -99,18 +100,14 @@ namespace reasoner
 #ifdef ASPSolver_DEBUG
 		this->modelCount = 0;
 #endif
-		auto result = this->clingo->solve(bind(&ASPSolver::onModel, this, placeholders::_1), {});
-		if (result.satisfiable() == Gringo::SolveResult::Satisfiabily::Satisfiable)
-		{
-			return true;
-		}
-		return false;
+		auto result = this->clingo->solve({}, bind(&ASPSolver::onModel, this, placeholders::_1));
+		return result.satisfiable();
 	}
 
 	/**
 	 * Callback for created models during solving.
 	 */
-	bool ASPSolver::onModel(const Gringo::Model& m)
+	bool ASPSolver::onModel(const Clingo::Model& m)
 	{
 #ifdef ASPSolver_DEBUG
 		cout << "ASPSolver: Found the following model which is number " << endl;
@@ -120,10 +117,10 @@ namespace reasoner
 		}
 		cout << endl;
 #endif
-		ClingoModel& clingoModel = (ClingoModel&)m;
-		Gringo::SymVec vec;
-		auto tmp = clingoModel.atoms(clingo_show_type_shown);
-		for (int i = 0; i < tmp.size; i++)
+		Clingo::Model& clingoModel = (Clingo::Model&)m;
+		Clingo::SymbolVector vec;
+		auto tmp = clingoModel.symbols(clingo_show_type_shown);
+		for (int i = 0; i < tmp.size(); i++)
 		{
 			vec.push_back(tmp[i]);
 		}
@@ -135,24 +132,24 @@ namespace reasoner
 		return true;
 	}
 
-	void ASPSolver::assignExternal(Gringo::Symbol ext, Potassco::Value_t truthValue)
+	void ASPSolver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
 	{
-		this->clingo->assignExternal(ext, truthValue);
+		this->clingo->assign_external(ext, truthValue);
 	}
 
-	void ASPSolver::releaseExternal(Gringo::Symbol ext)
+	void ASPSolver::releaseExternal(Clingo::Symbol ext)
 	{
 //		this->clingo->assignExternal(ext, Potassco::Value_t::False);
 		//TODO test was free before
-		this->clingo->assignExternal(ext, Potassco::Value_t::Release);
+		this->clingo->release_external(ext);
 	}
 
-	void ASPSolver::add(const string& name, const Gringo::FWStringVec& params, const string& par)
+	void ASPSolver::add(char const *name, const Clingo::StringSpan& params, char const *par)
 	{
 		this->clingo->add(name, params, par);
 	}
 
-	Gringo::Symbol ASPSolver::parseValue(const std::string& str)
+	Clingo::Symbol ASPSolver::parseValue(const std::string& str)
 	{
 		return this->gringoModule->parseValue(str, nullptr, 20);
 	}
@@ -182,20 +179,21 @@ namespace reasoner
 
 	void ASPSolver::disableWarnings(bool disable)
 	{
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_atom_undefined, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_file_included, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_global_variable, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_variable_unbounded, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_other, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_operation_undefined, !disable);
-		this->clingo->logger().enable(Gringo::Warnings::clingo_warning_runtime_error, !disable);
+		this->logger.enable(Clingo::WarningCode::AtomUndefined, !disable);
+		this->logger.enable(Clingo::WarningCode::FileIncluded, !disable);
+		this->logger.enable(Clingo::WarningCode::GlobalVariable, !disable);
+		this->logger.enable(Clingo::WarningCode::VariableUnbounded, !disable);
+		this->logger.enable(Clingo::WarningCode::Other, !disable);
+		this->logger.enable(Clingo::WarningCode::OperationUndefined, !disable);
+		this->logger.enable(Clingo::WarningCode::RuntimeError, !disable);
 	}
 
 	bool ASPSolver::existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars,
 									vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
-		this->conf->setKeyValue(this->modelsKey, "1");
+		//this->conf->setKeyValue(this->modelsKey, "1");
+		this->modelsKey = "1";
 		int dim = prepareSolution(vars, calls);
 		if (dim == -1)
 		{
@@ -210,7 +208,8 @@ namespace reasoner
 								vector<void*>& results)
 	{
 
-		this->conf->setKeyValue(this->modelsKey, "0");
+        //this->conf->setKeyValue(this->modelsKey, "0");
+        this->modelsKey = "0";
 		int dim = prepareSolution(vars, calls);
 		if (dim == -1)
 		{
@@ -227,7 +226,7 @@ namespace reasoner
 		{
 			for (auto& query : this->registeredQueries)
 			{
-				vector<Gringo::SymVec> vals;
+				vector<Clingo::SymbolVector> vals;
 				for (auto& pair : query->getHeadValues())
 				{
 					vals.push_back(pair.second);
@@ -270,7 +269,8 @@ namespace reasoner
 			this->currentQueryIds.push_back(term->getId());
 			if (!term->getNumberOfModels().empty())
 			{
-				this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
+				//this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
+                this->modelsKey = term->getNumberOfModels().c_str();
 			}
 			if (term->getType() == ASPQueryType::Variable)
 			{
@@ -324,20 +324,18 @@ namespace reasoner
 										{	return element->getAspPredicate() == p.first;});
 					if (it == this->assignedExternals.end())
 					{
-
-						shared_ptr<Gringo::Symbol> val = make_shared<Gringo::Symbol>(
-								this->gringoModule->parseValue(p.first, nullptr, 20));
-						this->clingo->assignExternal(*val,
-														p.second ? Potassco::Value_t::True : Potassco::Value_t::False);
+						shared_ptr<Clingo::Symbol> val = make_shared<Clingo::Symbol>(p.first, nullptr, 20);
+						this->clingo->assign_external(*val,
+														p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
 						this->assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
 					}
 					else
 					{
 						if (p.second != (*it)->getValue())
 						{
-							this->clingo->assignExternal(
+							this->clingo->assign_external(
 									*((*it)->getGringoValue()),
-									p.second ? Potassco::Value_t::True : Potassco::Value_t::False);
+									p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
 							(*it)->setValue(p.second);
 						}
 					}
@@ -392,47 +390,33 @@ namespace reasoner
 		}
 	}
 
-	const long long ASPSolver::getSolvingTime()
+	const double ASPSolver::getSolvingTime()
 	{
-		auto clasp = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (clasp == nullptr)
-			return -1;
+        auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return clasp->summary().solveTime * 1000;
+		return statistics["time_solve"] * 1000;
 	}
 
-	const long long ASPSolver::getSatTime()
+	const double ASPSolver::getSatTime()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return -1;
+        auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return claspFacade->summary().satTime * 1000;
+		return statistics["time_sat"] * 1000;
 	}
 
-	const long long ASPSolver::getUnsatTime()
+	const double ASPSolver::getUnsatTime()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return -1;
+        auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return claspFacade->summary().unsatTime * 1000;
+		return statistics["time_unsat"]* 1000;
 	}
 
-	const long ASPSolver::getModelCount()
+	const double ASPSolver::getModelCount()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return -1;
-
-		return claspFacade->summary().numEnum;
+        return this->clingo->statistics()["summary"]["lp"]["numEnum"];
 	}
 
 	int ASPSolver::getQueryCounter()
@@ -443,55 +427,37 @@ namespace reasoner
 		return this->queryCounter;
 	}
 
-	const long ASPSolver::getAtomCount()
+	const double ASPSolver::getAtomCount()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->statistics();
-
-		if (claspFacade == nullptr)
-			return -1;
-
-		return claspFacade->summary().lpStats()->atoms;
+        return this->clingo->statistics()["problem"]["lp"]["atoms"];
 	}
 
-	const long ASPSolver::getBodiesCount()
+	const double ASPSolver::getBodiesCount()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return -1;
-
-		return claspFacade->summary().lpStats()->bodies[1].numKeys();
+        return this->clingo->statistics()["problem"]["lp"]["bodies"];
 	}
 
-	const long ASPSolver::getAuxAtomsCount()
+	const double ASPSolver::getAuxAtomsCount()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return -1;
-
-		return claspFacade->summary().lpStats()->auxAtoms;
+        return this->clingo->statistics()["problem"]["lp"]["aux_atoms"];
 	}
 
-	vector<Gringo::SymVec> ASPSolver::getCurrentModels()
+	vector<Clingo::SymbolVector> ASPSolver::getCurrentModels()
 	{
 		return this->currentModels;
 	}
 
 	void ASPSolver::printStats()
 	{
-		auto claspFacade = (Clasp::ClaspFacade*)this->clingo->claspFacade();
-
-		if (claspFacade == nullptr)
-			return;
+		auto statistics = this->clingo->statistics();
 
 		stringstream ss;
 		ss << "Solve Statistics:" << endl;
-		ss << "TOTAL Time: " << claspFacade->summary().totalTime << "s" << endl;
-		ss << "CPU Time: " << claspFacade->summary().cpuTime << "s" << endl;
-		ss << "SAT Time: " << (claspFacade->summary().satTime * 1000.0) << "ms" << endl;
-		ss << "UNSAT Time: " << (claspFacade->summary().unsatTime * 1000.0) << "ms" << endl;
-		ss << "SOLVE Time: " << (claspFacade->summary().solveTime * 1000.0) << "ms" << endl;
+		ss << "TOTAL Time: " << statistics["time_total"] << "s" << endl;
+		ss << "CPU Time: " << statistics["time_cpu"] << "s" << endl;
+		ss << "SAT Time: " << (statistics["time_sat"] * 1000.0) << "ms" << endl;
+		ss << "UNSAT Time: " << (statistics["time_unsat"] * 1000.0) << "ms" << endl;
+		ss << "SOLVE Time: " << (statistics["time_solve"] * 1000.0) << "ms" << endl;
 
 		cout << ss.str() << flush;
 	}
@@ -501,10 +467,10 @@ namespace reasoner
 		return registeredQueries;
 	}
 
-	DefaultGringoModule* ASPSolver::getGringoModule()
+	/*DefaultGringoModule* ASPSolver::getGringoModule()
 	{
 		return gringoModule;
-	}
+	}*/
 
 } /* namespace reasoner */
 

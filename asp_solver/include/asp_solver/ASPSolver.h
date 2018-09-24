@@ -48,11 +48,11 @@ namespace reasoner
 		bool loadFileFromConfig(string configKey);
 		void loadFile(string filename);
 
-		void ground(Clingo::SymbolSpan const &vec, Clingo::GroundCallback *context);
+		void ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack);
 		void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue);
 		void releaseExternal(Clingo::Symbol ext);
 		bool solve();
-		void add(string const &name, Clingo::StringSpan const &params, string const &par);
+		void add(char const *name, Clingo::StringSpan const &params, char const *par);
 		Clingo::Symbol parseValue(std::string const &str);
 
 		int getRegisteredQueriesCount();
@@ -68,29 +68,30 @@ namespace reasoner
 		bool unregisterQuery(shared_ptr<ASPQuery> query);
 		void printStats();
 
-		const long long getSolvingTime();
-		const long long getSatTime();
-		const long long getUnsatTime();
-		const long getModelCount();
-		const long getAtomCount();
-		const long getBodiesCount();
-		const long getAuxAtomsCount();
+		const double getSolvingTime();
+		const double getSatTime();
+		const double getUnsatTime();
+		const double getModelCount();
+		const double getAtomCount();
+		const double getBodiesCount();
+		const double getAuxAtomsCount();
 
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
 		vector<Clingo::SymbolVector> getCurrentModels();
-		DefaultGringoModule* getGringoModule();
+		//DefaultGringoModule* getGringoModule();
 
-		shared_ptr<ClingoLib> clingo;
+		shared_ptr<Clingo::Control> clingo;
 
 	private:
 		bool onModel(Clingo::Model const &m);
 //		Gringo::Control* clingo;
-		DefaultGringoModule* gringoModule;
-		Gringo::ConfigProxy* conf;
-		unsigned int root;
-		unsigned int modelsKey;
+        Clingo::Logger logger;
+		//DefaultGringoModule* gringoModule;
+		Clingo::Configuration conf;
+		//unsigned int root;
+		Clingo::Configuration modelsKey;
 		vector<long> currentQueryIds;
 
 		vector<string> alreadyLoaded;

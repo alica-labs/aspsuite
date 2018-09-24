@@ -8,7 +8,8 @@
 #ifndef INCLUDE_ASP_SOLVER_ASPFACTSQUERY_H_
 #define INCLUDE_ASP_SOLVER_ASPFACTSQUERY_H_
 
-#include <clingo/clingocontrol.hh>
+//#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
@@ -24,21 +25,21 @@ namespace reasoner
 	public:
 		ASPFactsQuery(ASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPFactsQuery();
-		map<Gringo::Symbol, vector<Gringo::Symbol> > getFactModelMap();
-		void setFactModelMap(map<Gringo::Symbol, vector<Gringo::Symbol> > factModelMap);
-		shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol>>> getSatisfiedFacts();
-		void saveSatisfiedFact(Gringo::Symbol key, Gringo::Symbol value);
+		map<Clingo::Symbol, vector<Clingo::Symbol> > getFactModelMap();
+		void setFactModelMap(map<Clingo::Symbol, vector<Clingo::Symbol> > factModelMap);
+		shared_ptr<map<Clingo::Symbol, vector<Clingo::Symbol>>> getSatisfiedFacts();
+		void saveSatisfiedFact(Clingo::Symbol key, Clingo::Symbol value);
 		bool factsExistForAllModels();
 		bool factsExistForAtLeastOneModel();
 		void removeExternal();
-		vector<pair<Gringo::Symbol, ASPTruthValue>> getASPTruthValues();
-		void onModel(ClingoModel& clingoModel);
+		vector<pair<Clingo::Symbol, ASPTruthValue>> getASPTruthValues();
+		void onModel(Clingo::Model& clingoModel);
 
 	private:
-		vector<Gringo::Symbol> queryValues;
+		vector<Clingo::Symbol> queryValues;
 		void createQueryValues(vector<string> queryString);
 		// key := query value, value := predicates that satisfy the query value
-		map<Gringo::Symbol, vector<Gringo::Symbol>> factModelMap;
+		map<Clingo::Symbol, vector<Clingo::Symbol>> factModelMap;
 	};
 
 }

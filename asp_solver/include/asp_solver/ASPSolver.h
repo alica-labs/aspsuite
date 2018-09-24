@@ -8,7 +8,8 @@
 #ifndef SRC_ASPSOLVER_H_
 #define SRC_ASPSOLVER_H_
 
-#include <clingo/clingocontrol.hh>
+//#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 #include <SystemConfig.h>
 #include <mutex>
 
@@ -47,12 +48,12 @@ namespace reasoner
 		bool loadFileFromConfig(string configKey);
 		void loadFile(string filename);
 
-		void ground(Gringo::Control::GroundVec const &vec, Gringo::Context *context);
-		void assignExternal(Gringo::Symbol ext, Potassco::Value_t truthValue);
-		void releaseExternal(Gringo::Symbol ext);
+		void ground(Clingo::SymbolSpan const &vec, Clingo::GroundCallback *context);
+		void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue);
+		void releaseExternal(Clingo::Symbol ext);
 		bool solve();
-		void add(string const &name, Gringo::FWStringVec const &params, string const &par);
-		Gringo::Symbol parseValue(std::string const &str);
+		void add(string const &name, Clingo::StringSpan const &params, string const &par);
+		Clingo::Symbol parseValue(std::string const &str);
 
 		int getRegisteredQueriesCount();
 		/**
@@ -78,13 +79,13 @@ namespace reasoner
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
-		vector<Gringo::SymVec> getCurrentModels();
+		vector<Clingo::SymbolVector> getCurrentModels();
 		DefaultGringoModule* getGringoModule();
 
 		shared_ptr<ClingoLib> clingo;
 
 	private:
-		bool onModel(Gringo::Model const &m);
+		bool onModel(Clingo::Model const &m);
 //		Gringo::Control* clingo;
 		DefaultGringoModule* gringoModule;
 		Gringo::ConfigProxy* conf;
@@ -95,7 +96,7 @@ namespace reasoner
 		vector<string> alreadyLoaded;
 		vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 		vector<shared_ptr<ASPQuery>> registeredQueries;
-		vector<Gringo::SymVec> currentModels;
+		vector<Clingo::SymbolVector> currentModels;
 
 		void reduceQueryLifeTime();
 		int prepareSolution(std::vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);

@@ -8,7 +8,8 @@
 #ifndef INCLUDE_ASP_SOLVER_ASPVARIABLEQUERY_H_
 #define INCLUDE_ASP_SOLVER_ASPVARIABLEQUERY_H_
 
-#include <clingo/clingocontrol.hh>
+//#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
@@ -28,7 +29,7 @@ namespace reasoner
 		vector<string> getRules();
 		ASPQueryType getType();
 		void removeExternal();
-		void onModel(ClingoModel& clingoModel);
+		void onModel(Clingo::Model& clingoModel);
 
 	private:
 		void createHeadQueryValues(vector<string> queryVec);
@@ -38,7 +39,7 @@ namespace reasoner
 		string expandFactModuleProperty(string fact);
 		void replaceFittingPredicate(string& ruleBody, string predicate);
 		string replaceHeadPredicates(string head);
-		shared_ptr<Gringo::Symbol> external;
+		shared_ptr<Clingo::Symbol> external;
 		string queryProgramSection;
 		string externalName;
 		void createProgramSection();

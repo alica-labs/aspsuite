@@ -10,7 +10,7 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 find_package(catkin REQUIRED COMPONENTS
-  clingo
+	#clingo
   system_config
   system_util
   fsystem
@@ -20,7 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES asp_solver
-  CATKIN_DEPENDS clingo system_config fsystem asp_commons
+  CATKIN_DEPENDS system_config fsystem asp_commons system_util
+  #clingo
   #DEPENDS lua python
 )
 

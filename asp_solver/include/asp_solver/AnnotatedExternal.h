@@ -8,7 +8,8 @@
 #ifndef SRC_ANNOTATEDEXTERNAL_H_
 #define SRC_ANNOTATEDEXTERNAL_H_
 
-#include <clingo/clingocontrol.hh>
+//#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 #include <memory>
 
 using namespace std;
@@ -19,19 +20,19 @@ using namespace std;
 		class AnnotatedExternal
 		{
 		public:
-			AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Symbol> gringoValue, bool value);
+			AnnotatedExternal(string aspPredicate, shared_ptr<Clingo::Symbol> gringoValue, bool value);
 			virtual ~AnnotatedExternal();
 			string getAspPredicate();
 			void setAspPredicate(string aspPredicate);
-			shared_ptr<Gringo::Symbol> getGringoValue();
-			void setGringoValue(shared_ptr<Gringo::Symbol> gringoValue);
+			shared_ptr<Clingo::Symbol> getGringoValue();
+			void setGringoValue(shared_ptr<Clingo::Symbol> gringoValue);
 			bool getValue();
 			void setValue(bool value);
 
 
 		private:
 			string aspPredicate;
-			shared_ptr<Gringo::Symbol> gringoValue;
+			shared_ptr<Clingo::Symbol> gringoValue;
 			bool value;
 
 

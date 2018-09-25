@@ -188,23 +188,24 @@ namespace reasoner
 #ifdef ASPQUERY_DEBUG
 			cout << "ASPFactsQuery::onModel: " << value.first << endl;
 #endif
-			auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().find(value.first.signature());
-			if (it == ((ASPSolver*)this->solver)->clingo->out_->predDoms().end())
+			auto it = ((ASPSolver*)this->solver)->clingo->symbolic_atoms().begin(Clingo::Signature(value.first.name(), value.first.number(), value.first.is_positive())); //value.first.signature();
+			if (it == ((ASPSolver*)this->solver)->clingo->symbolic_atoms().end())
 			{
 				cout << "ASPFactsQuery: Didn't find any suitable domain!" << endl;
 				continue;
 			}
-			for (int i = 0; i < (*it).get()->size(); i++)
+			while(it)
 			{
 //				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
 
 //				if (&(domainPred)
 //						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 //				{
-				if (clingoModel.contains(Clingo::Symbol((*(*it))[i])) && this->checkMatchValues(Clingo::Symbol(value.first), Clingo::Symbol((*(*it))[i])))
+				if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol()))
 				{
-					this->saveHeadValuePair(Clingo::Symbol(value.first), Clingo::Symbol((*(*it))[i]));
+					this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
 				}
+				it++;
 //				}
 			}
 		}

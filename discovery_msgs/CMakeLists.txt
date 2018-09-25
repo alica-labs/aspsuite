@@ -26,7 +26,29 @@ set(CAPNPC_SRC_PREFIX msg)
 set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 capnp_generate_cpp(CAPNP_SRCS CAPNP_HDRS ${capnp_messages})
 
+set(position "")
+set(length "")
+
+string(LENGTH ${CAPNP_HDRS} length)
+
+string(FIND ${CAPNP_HDRS} "/" position REVERSE)
+message("irgend ${position}")
+message("was ${length}")
+
+set(sub "")
+string(SUBSTRING ${CAPNP_HDRS} ${position}+1 ${length}-1  sub)
+message("anderes ${sub}")
+
+add_custom_target(MoveHeaderToIncludeFolder ALL
+	COMMAND ${CMAKE_COMMAND} -E copy ${CAPNP_HDRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}/${sub}
+)
+message("location include/${PROJECT_NAME}/${sub}")
+
+message("HEADERS: ${CAPNP_HDRS}")
+
 ## Declare the C++ capnproto message library
 add_library(${PROJECT_NAME}
   ${CAPNP_SRCS}
 )
+
+add_dependencies(${PROJECT_NAME} MoveHeaderToIncludeFolder)

@@ -26,18 +26,33 @@ namespace reasoner
 	{
 		//this->gringoModule = new DefaultGringoModule();
 //		this->clingo = this->gringoModule->newControl(args.size() - 2, args.data(), nullptr, 20);
-		this->clingo = make_shared<Clingo::Control>(args.data(), logger, 20);
-		this->disableWarnings(true);
-
+		Clingo::Logger logger = [](Clingo::WarningCode warningCode, char const *message) {
+			switch(warningCode) {
+				case Clingo::WarningCode::AtomUndefined:
+				case Clingo::WarningCode::FileIncluded:
+				case Clingo::WarningCode::GlobalVariable:
+				case Clingo::WarningCode::VariableUnbounded:
+				case Clingo::WarningCode::Other:
+				case Clingo::WarningCode::OperationUndefined:
+				case Clingo::WarningCode::RuntimeError:
+					break;
+				default:
+					std::cerr << message << std::endl;
+			}
+		};
+		this->clingo = make_shared<Clingo::Control>(args, logger, 20);
 		this->sc = supplementary::SystemConfig::getInstance();
 		this->queryCounter = 0;
 #ifdef ASPSolver_DEBUG
 		this->modelCount = 0;
 #endif
-		this->conf = this->clingo->configuration();
+		for (auto stuff : this->clingo->configuration().keys()) {
+			auto stuff2 = this->clingo->configuration().get(stuff);
+		}
 		//this->root = this->conf->getRootKey();
-		this->modelsKey = this->conf["solve.models"]; //->getSubKey(this->root, "solve.models");
-		this->modelsKey = "0";
+		// should make the solver return all models (because you set it to 0)
+		this->clingo->configuration()["solve"]["models"] = "0";
+		//this->conf["solve.models"] = "0"; //->getSubKey(this->root, "solve.models");
 		//this->conf->setKeyValue(this->modelsKey, "0");
 #ifdef SOLVER_OPTIONS
 		traverseOptions(conf, root, "");
@@ -100,14 +115,16 @@ namespace reasoner
 #ifdef ASPSolver_DEBUG
 		this->modelCount = 0;
 #endif
-		auto result = this->clingo->solve({}, bind(&ASPSolver::onModel, this, placeholders::_1));
-		return result.satisfiable();
+		//bind(&ASPSolver::onModel, this, placeholders::_1)
+		Clingo::SymbolicLiteralSpan span = {};
+		auto result = this->clingo->solve(span, this);
+		return result.get().is_satisfiable();
 	}
 
 	/**
 	 * Callback for created models during solving.
 	 */
-	bool ASPSolver::onModel(const Clingo::Model& m)
+	bool ASPSolver::onModel(Clingo::Model& m)
 	{
 #ifdef ASPSolver_DEBUG
 		cout << "ASPSolver: Found the following model which is number " << endl;
@@ -140,7 +157,6 @@ namespace reasoner
 	void ASPSolver::releaseExternal(Clingo::Symbol ext)
 	{
 //		this->clingo->assignExternal(ext, Potassco::Value_t::False);
-		//TODO test was free before
 		this->clingo->release_external(ext);
 	}
 
@@ -151,7 +167,7 @@ namespace reasoner
 
 	Clingo::Symbol ASPSolver::parseValue(const std::string& str)
 	{
-		return this->gringoModule->parseValue(str, nullptr, 20);
+		return Clingo::parse_term(str.c_str(), nullptr, 20);
 	}
 
 	bool ASPSolver::registerQuery(shared_ptr<ASPQuery> query)
@@ -177,23 +193,12 @@ namespace reasoner
 		return false;
 	}
 
-	void ASPSolver::disableWarnings(bool disable)
-	{
-		this->logger.enable(Clingo::WarningCode::AtomUndefined, !disable);
-		this->logger.enable(Clingo::WarningCode::FileIncluded, !disable);
-		this->logger.enable(Clingo::WarningCode::GlobalVariable, !disable);
-		this->logger.enable(Clingo::WarningCode::VariableUnbounded, !disable);
-		this->logger.enable(Clingo::WarningCode::Other, !disable);
-		this->logger.enable(Clingo::WarningCode::OperationUndefined, !disable);
-		this->logger.enable(Clingo::WarningCode::RuntimeError, !disable);
-	}
-
 	bool ASPSolver::existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars,
 									vector<shared_ptr<ASPCommonsTerm>>& calls)
 	{
 
 		//this->conf->setKeyValue(this->modelsKey, "1");
-		this->modelsKey = "1";
+		this->clingo->configuration()["solve"]["models"] = "1";
 		int dim = prepareSolution(vars, calls);
 		if (dim == -1)
 		{
@@ -209,7 +214,7 @@ namespace reasoner
 	{
 
         //this->conf->setKeyValue(this->modelsKey, "0");
-        this->modelsKey = "0";
+		this->clingo->configuration()["solve"]["models"] = "0";
 		int dim = prepareSolution(vars, calls);
 		if (dim == -1)
 		{
@@ -270,7 +275,7 @@ namespace reasoner
 			if (!term->getNumberOfModels().empty())
 			{
 				//this->conf->setKeyValue(this->modelsKey, term->getNumberOfModels().c_str());
-                this->modelsKey = term->getNumberOfModels().c_str();
+				this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
 			}
 			if (term->getType() == ASPQueryType::Variable)
 			{
@@ -324,7 +329,7 @@ namespace reasoner
 										{	return element->getAspPredicate() == p.first;});
 					if (it == this->assignedExternals.end())
 					{
-						shared_ptr<Clingo::Symbol> val = make_shared<Clingo::Symbol>(p.first, nullptr, 20);
+						shared_ptr<Clingo::Symbol> val = make_shared<Clingo::Symbol>(Clingo::parse_term(p.first.c_str()));
 						this->clingo->assign_external(*val,
 														p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
 						this->assignedExternals.push_back(make_shared<AnnotatedExternal>(p.first, val, p.second));
@@ -395,7 +400,7 @@ namespace reasoner
         auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return statistics["time_solve"] * 1000;
+		return statistics["sumary"]["times"]["solve"] * 1000;
 	}
 
 	const double ASPSolver::getSatTime()
@@ -403,7 +408,7 @@ namespace reasoner
         auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return statistics["time_sat"] * 1000;
+		return statistics["sumary"]["times"]["sat"] * 1000;
 	}
 
 	const double ASPSolver::getUnsatTime()
@@ -411,12 +416,12 @@ namespace reasoner
         auto statistics = this->clingo->statistics();
 
 		// time in seconds
-		return statistics["time_unsat"]* 1000;
+		return statistics["sumary"]["times"]["unsat"] * 1000;
 	}
 
 	const double ASPSolver::getModelCount()
 	{
-        return this->clingo->statistics()["summary"]["lp"]["numEnum"];
+        return this->clingo->statistics()["summary"]["models"]["enumerated"];
 	}
 
 	int ASPSolver::getQueryCounter()
@@ -439,7 +444,7 @@ namespace reasoner
 
 	const double ASPSolver::getAuxAtomsCount()
 	{
-        return this->clingo->statistics()["problem"]["lp"]["aux_atoms"];
+        return this->clingo->statistics()["problem"]["lp"]["atoms_aux"];
 	}
 
 	vector<Clingo::SymbolVector> ASPSolver::getCurrentModels()
@@ -453,11 +458,11 @@ namespace reasoner
 
 		stringstream ss;
 		ss << "Solve Statistics:" << endl;
-		ss << "TOTAL Time: " << statistics["time_total"] << "s" << endl;
-		ss << "CPU Time: " << statistics["time_cpu"] << "s" << endl;
-		ss << "SAT Time: " << (statistics["time_sat"] * 1000.0) << "ms" << endl;
-		ss << "UNSAT Time: " << (statistics["time_unsat"] * 1000.0) << "ms" << endl;
-		ss << "SOLVE Time: " << (statistics["time_solve"] * 1000.0) << "ms" << endl;
+		ss << "TOTAL Time: " << statistics["sumary"]["times"]["total"]  << "s" << endl;
+		ss << "CPU Time: " << statistics["sumary"]["times"]["cpu"]  << "s" << endl;
+		ss << "SAT Time: " << (statistics["sumary"]["times"]["sat"]  * 1000.0) << "ms" << endl;
+		ss << "UNSAT Time: " << (statistics["sumary"]["times"]["unsat"]  * 1000.0) << "ms" << endl;
+		ss << "SOLVE Time: " << (statistics["sumary"]["times"]["solve"]  * 1000.0) << "ms" << endl;
 
 		cout << ss.str() << flush;
 	}

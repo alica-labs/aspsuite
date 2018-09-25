@@ -33,7 +33,7 @@ namespace reasoner
 	class ASPVariableQuery;
 	class ASPCommonsVariable;
 	class AnnotatedValVec;
-	class ASPSolver : public IASPSolver
+	class ASPSolver : public IASPSolver, Clingo::SolveEventHandler
 	{
 	public:
 		ASPSolver(std::vector<char const*> args);
@@ -44,7 +44,6 @@ namespace reasoner
 							vector<void*>& results);
 		shared_ptr<ASPCommonsVariable> createVariable(long id);
 
-		void disableWarnings(bool noWarns);
 		bool loadFileFromConfig(string configKey);
 		void loadFile(string filename);
 
@@ -85,13 +84,10 @@ namespace reasoner
 		shared_ptr<Clingo::Control> clingo;
 
 	private:
-		bool onModel(Clingo::Model const &m);
+		bool onModel(Clingo::Model &m);
 //		Gringo::Control* clingo;
-        Clingo::Logger logger;
 		//DefaultGringoModule* gringoModule;
-		Clingo::Configuration conf;
 		//unsigned int root;
-		Clingo::Configuration modelsKey;
 		vector<long> currentQueryIds;
 
 		vector<string> alreadyLoaded;

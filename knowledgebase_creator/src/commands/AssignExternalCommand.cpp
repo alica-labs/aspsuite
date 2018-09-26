@@ -36,30 +36,30 @@ namespace kbcr
 
 	void AssignExternalCommand::execute()
 	{
-		auto external = this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
-																				20);
-		auto symbolPos = this->gui->getSolver()->clingo->lookup(external);
-		if (!this->gui->getSolver()->clingo->valid(symbolPos) || !this->gui->getSolver()->clingo->external(symbolPos))
-		{
-			this->gui->getUi()->externalTextEdit->setText(QString("Invalid or Released External!"));
-			this->undo();
-			return;
-		}
-		if (external.sign() == 0)
+		auto external = this->gui->getSolver()->parseValue(this->externalName.toStdString());
+		// Maybe not necessary anymore!?
+//		auto symbolPos = this->gui->getSolver()->clingo->lookup(external);
+//		if (!this->gui->getSolver()->clingo->valid(symbolPos) || !this->gui->getSolver()->clingo->external(symbolPos))
+//		{
+//			this->gui->getUi()->externalTextEdit->setText(QString("Invalid or Released External!"));
+//			this->undo();
+//			return;
+//		}
+		if (external.is_positive())
 		{
 			this->previousTruthValue = true;
 		}
 		if (this->truthValue.compare("True") == 0)
 		{
-			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::True);
+			this->gui->getSolver()->assignExternal(external, Clingo::TruthValue::True);
 		}
 		else if (this->truthValue.compare("False") == 0)
 		{
-			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::False);
+			this->gui->getSolver()->assignExternal(external, Clingo::TruthValue::False);
 		}
 		else
 		{
-			this->gui->getSolver()->assignExternal(external, Potassco::Value_t::Release);
+			this->gui->getSolver()->releaseExternal(external);
 		}
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
@@ -74,14 +74,12 @@ namespace kbcr
 			if (this->previousTruthValue)
 			{
 				this->gui->getSolver()->assignExternal(
-						this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
-																				20), Potassco::Value_t::True);
+						this->gui->getSolver()->parseValue(this->externalName.toStdString()), Clingo::TruthValue::True);
 			}
 			else
 			{
 				this->gui->getSolver()->assignExternal(
-						this->gui->getSolver()->getGringoModule()->parseValue(this->externalName.toStdString(), nullptr,
-																				20), Potassco::Value_t::False);
+						this->gui->getSolver()->parseValue(this->externalName.toStdString()), Clingo::TruthValue::False);
 			}
 			std::shared_ptr<SolveCommand> sc = std::make_shared<SolveCommand>(this->gui);
 			sc->execute();

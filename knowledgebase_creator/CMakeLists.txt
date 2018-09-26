@@ -90,7 +90,6 @@ set(knowledgebaseCreator_INCLUDE_DIRECTORIES
     ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5WebKitWidgets_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR}
 	"${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}"
 )
 
@@ -104,6 +103,7 @@ catkin_package(
   INCLUDE_DIRS ${knowledgebaseCreator_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS qt_gui asp_commons asp_solver
+
 )
 
 QT5_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})
@@ -116,7 +116,10 @@ set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
 #add_library(${PROJECT_NAME} ${knowledgebaseCreator_SRCS} ${knowledgebaseCreator_MOCS} ${knowledgebaseCreator_UIS_H} ${QT_RESOURCES_CPP})
 add_executable (${PROJECT_NAME} ${knowledgebaseCreator_SRCS} ${knowledgebaseCreator_MOCS} ${knowledgebaseCreator_UIS_H} ${QT_RESOURCES_CPP})
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5Script_location} ${Qt5WebKitWidgets_location})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5Script_location} ${Qt5WebKitWidgets_location} clingo)
+
+find_package(class_loader)
+class_loader_hide_library_symbols(${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

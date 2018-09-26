@@ -35,7 +35,6 @@ namespace reasoner
 							vector<void*>& results) = 0;
 		virtual shared_ptr<ASPCommonsVariable> createVariable(long id) = 0;
 
-		virtual void disableWarnings(bool noWarns) = 0;
 		virtual bool loadFileFromConfig(string configKey) = 0;
 		virtual void loadFile(string filename) = 0;
 

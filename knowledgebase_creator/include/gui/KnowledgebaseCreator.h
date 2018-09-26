@@ -9,7 +9,7 @@
 #include <iostream>
 #include <memory>
 
-#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 
 //#define GUIDEUG
 

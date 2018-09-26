@@ -10,17 +10,19 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 # Define where to find modules for ZeroMQ and UUID
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 
 # this enables the draft part of the api
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
-find_package(ZeroMQ)
-#message("${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}") 
-#message("${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
+#find_package(ZeroMQ REQUIRED)
+message("${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}")
+message("############################ ${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
 
 find_package(UUID)
 #message("${PROJECT_NAME}: UUID-Includes: ${UUID_INCLUDE_DIRS}") 
 #message("${PROJECT_NAME}: UUID-Libraries: ${UUID_LIBRARIES}")
+
 
 # Introduce CapnProto
 find_package(CapnProto REQUIRED)
@@ -61,6 +63,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
   ${catkin_LIBRARIES}
   ${ZeroMQ_LIBRARIES}
+  /usr/lib/x86_64-linux-gnu/libzmq.a
 )
 
 if (NOT catkin_FOUND)
@@ -72,12 +75,13 @@ add_executable(Agent
   src/Agent.cpp
 )
 
+
 target_link_libraries(Agent
   ${catkin_LIBRARIES} 
   ${ZeroMQ_LIBRARIES}
   ${UUID_LIBRARIES}
   ${CAPNP_LIBRARIES}
-  pthread
+  pthread /usr/lib/x86_64-linux-gnu/libzmq.a
 )
 
 ## SEND TEST
@@ -90,7 +94,7 @@ target_link_libraries(SendTest
   ${ZeroMQ_LIBRARIES}
   ${UUID_LIBRARIES}
   ${CAPNP_LIBRARIES}
-  pthread
+  pthread /usr/lib/x86_64-linux-gnu/libzmq.a
 )
 
 if (NOT catkin_FOUND)

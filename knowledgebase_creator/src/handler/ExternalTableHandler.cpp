@@ -13,9 +13,9 @@
 
 #include <asp_solver/ASPSolver.h>
 
-#include <clingo/clingocontrol.hh>
-#include <clasp/solver.h>
+#include <clingo.hh>
 #include <gui/KnowledgebaseCreator.h>
+#include <QtWidgets/QTableWidgetItem>
 
 namespace kbcr
 {
@@ -32,52 +32,37 @@ namespace kbcr
 	void ExternalTableHandler::fillExternalTable()
 	{
 		drawExternalTable();
-		for (auto iter = this->gui->getSolver()->clingo->begin(); iter != this->gui->getSolver()->clingo->end(); iter =
-				this->gui->getSolver()->clingo->next(iter))
-		{
-			if (this->gui->getSolver()->clingo->valid(iter))
-			{
-				if (this->gui->getSolver()->clingo->external(iter))
-				{
-					int pos = this->gui->getUi()->externalTable->rowCount();
-					this->gui->getUi()->externalTable->insertRow(pos);
-					std::stringstream ss;
-					ss << this->gui->getSolver()->clingo->atom(iter);
-					auto leftItem = new QTableWidgetItem(QString(ss.str().c_str()));
-					leftItem->setFlags(leftItem->flags() ^ Qt::ItemIsEditable);
-					this->gui->getUi()->externalTable->setItem(pos, 0, leftItem);
-					bool found = false;
-					for(auto vec : this->gui->getSolver()->getCurrentModels())
-					{
-						if(find(vec.begin(), vec.end(),this->gui->getSolver()->clingo->atom(iter)) != vec.end())
-						{
-							found = true;
-							break;
-						}
-					}
+		for (Clingo::SymbolicAtom atom : this->gui->getSolver()->clingo->symbolic_atoms()) {
+			if (atom.is_external()) {
+                int pos = this->gui->getUi()->externalTable->rowCount();
+                this->gui->getUi()->externalTable->insertRow(pos);
+                std::stringstream ss;
+                ss << atom.symbol().name();
+                auto leftItem = new QTableWidgetItem(QString(ss.str().c_str()));
+                leftItem->setFlags(leftItem->flags() ^ Qt::ItemIsEditable);
+                this->gui->getUi()->externalTable->setItem(pos, 0, leftItem);
+                bool found = false;
+                for(auto vec : this->gui->getSolver()->getCurrentModels())
+                {
+                    if(find(vec.begin(), vec.end(),atom.symbol()) != vec.end())
+                    {
+                        found = true;
+                        break;
+                    }
+                }
 
-					if (found)
-					{
-						auto rightItem = new QTableWidgetItem(QString("True"));
-						rightItem->setFlags(rightItem->flags() ^ Qt::ItemIsEditable);
-						this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
-					}
-					else
-					{
-						auto rightItem = new QTableWidgetItem(QString("False"));
-						rightItem->setFlags(rightItem->flags() ^ Qt::ItemIsEditable);
-						this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
-					}
-				}
-//				//TODO find way to get truth values from an external
-//				std::cout << iter << " " << this->gui->getSolver()->clingo->external(iter) << " "
-//						<< this->gui->getSolver()->clingo->atom(iter) << " " << std::endl;
-//				std::cout << Clasp::valSign(Clasp::trueValue(Clasp::decodeLit(this->gui->getSolver()->clingo->literal(iter)))) << std::endl;
-
-			}
-			else
-			{
-				break;
+                if (found)
+                {
+                    auto rightItem = new QTableWidgetItem(QString("True"));
+                    rightItem->setFlags(rightItem->flags() ^ Qt::ItemIsEditable);
+                    this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
+                }
+                else
+                {
+                    auto rightItem = new QTableWidgetItem(QString("False"));
+                    rightItem->setFlags(rightItem->flags() ^ Qt::ItemIsEditable);
+                    this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
+                }
 			}
 		}
 	}

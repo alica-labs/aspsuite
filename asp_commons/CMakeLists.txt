@@ -14,12 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
   system_config
 )
 
+set(clingo_DIR "/usr/local/lib")
+set(clingo_INCLUDE_DIRS "/usr/local/include")
+
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES asp_commons
   CATKIN_DEPENDS system_config
-  #clingo
-  #DEPENDS lua python
+  DEPENDS clingo
 )
 
 add_definitions(-DWITH_THREADS=1) # for libclasp...
@@ -40,4 +42,4 @@ add_library(${PROJECT_NAME}
     src/AnnotatedValVec.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} clingo)

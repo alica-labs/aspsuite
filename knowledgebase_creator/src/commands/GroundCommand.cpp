@@ -36,29 +36,28 @@ namespace kbcr
 		std::string aspString = this->program.toStdString();
 		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
-			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+			this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
 			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
 		}
 		if (this->programSection.contains("(") && this->programSection.contains(")"))
 		{
 			auto indexLeft = this->programSection.indexOf("(");
 			auto indexRight = this->programSection.indexOf(")");
-			auto gringo = ((reasoner::ASPSolver*)this->gui->getSolver())->getGringoModule();
 			auto tmp = this->programSection.mid(indexLeft + 1, indexRight - indexLeft - 1);
 			this->programSection = this->programSection.left(indexLeft);
-			auto symVec = Gringo::SymVec();
+			auto symVec = Clingo::SymbolVector();
 			auto paramList = tmp.split(",", QString::SplitBehavior::SkipEmptyParts);
 			for (auto it : paramList)
 			{
-				symVec.push_back(gringo->parseValue(it.toStdString().c_str(), nullptr, 20));
+				symVec.push_back(this->gui->getSolver()->parseValue(it.toStdString().c_str()));
 			}
-			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), symVec}},
+			this->gui->getSolver()->ground( { {this->programSection.toStdString().c_str(), symVec}},
 											nullptr);
 			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->programSection).append("\n"));
 		}
 		else
 		{
-			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), {}}},
+			this->gui->getSolver()->ground( { {this->programSection.toStdString().c_str(), {}}},
 											nullptr);
 		}
 		emit this->gui->updateExternalList();

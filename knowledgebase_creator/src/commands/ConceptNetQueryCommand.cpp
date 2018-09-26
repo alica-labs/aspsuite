@@ -364,7 +364,7 @@ namespace kbcr
 		auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
 		for (auto pair : pgmMap)
 		{
-			this->gui->getSolver()->add(programSection.toStdString(), {}, pair.second.toStdString());
+			this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
 			this->gui->getUi()->programLabel->setText(
 					this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
 		}

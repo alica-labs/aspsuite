@@ -13,12 +13,11 @@ namespace alica
 		class ASPVariable : public alica::reasoner::ASPTerm, public alica::SolverVariable
 		{
 		public:
-			ASPVariable();
+			ASPVariable(uint64_t id);
 			virtual ~ASPVariable();
 
 		private:
-			int id;
-			static int idCounter;
+            uint64_t id;
 		};
 
 	} /* namespace reasoner */

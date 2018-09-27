@@ -13,13 +13,15 @@
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver_wrapper/ASPAlicaPlanIntegrator.h>
 #include <asp_solver_wrapper/ASPGenerator.h>
+#include <asp_solver_wrapper/ASPSolverContext.h>
+
 
 namespace alica
 {
 namespace reasoner
 {
 ASPSolverWrapper::ASPSolverWrapper(AlicaEngine *ae, std::vector<char const *> args)
-    : alica::ISolver(ae)
+    : alica::ISolver<ASPSolverWrapper, ::reasoner::AnnotatedValVec>(ae)
 {
     this->ae = ae;
     this->solver = nullptr;
@@ -39,8 +41,9 @@ int ASPSolverWrapper::getQueryCounter()
     return this->solver->getQueryCounter();
 }
 
-bool ASPSolverWrapper::existsSolution(const VariableGrp &vars, std::vector<std::shared_ptr<ProblemDescriptor>> &calls)
+bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>> &calls)
 {
+    ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
     if (!masterPlanLoaded)
     {
@@ -48,15 +51,15 @@ bool ASPSolverWrapper::existsSolution(const VariableGrp &vars, std::vector<std::
         masterPlanLoaded = true;
     }
 
-    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(vars.size());
-    for (int i = 0; i < vars.size(); ++i)
+    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(solverCtx->getVariables().size());
+    for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i)
     {
-        cVars.at(i) = dynamic_pointer_cast<::reasoner::ASPCommonsVariable>(vars.at(i)->getSolverVar());
+        cVars.at(i) = std::dynamic_pointer_cast<::reasoner::ASPCommonsVariable>(solverCtx->getVariables().at(i));
     }
     vector<shared_ptr<::reasoner::ASPCommonsTerm>> constraint;
     for (auto &c : calls)
     {
-        if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
+        if (!(std::dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
         {
             cerr << "ASPSolverWrapper: Type of constraint not compatible with selected solver." << endl;
             continue;
@@ -67,16 +70,18 @@ bool ASPSolverWrapper::existsSolution(const VariableGrp &vars, std::vector<std::
     return ret;
 }
 
-bool ASPSolverWrapper::getSolution(const VariableGrp &vars, std::vector<std::shared_ptr<ProblemDescriptor>> &calls,
-                 std::vector<void *> &results)
+bool ASPSolverWrapper::getSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>> &calls,
+                 std::vector<::reasoner::AnnotatedValVec> &results)
 {
+    ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
+
     if (!masterPlanLoaded)
     {
         this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
         masterPlanLoaded = true;
     }
-    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(vars.size());
-    for (int i = 0; i < vars.size(); ++i)
+    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(solverCtx->getVariables().size());
+    for (int i = 0; i < solverCtx->getVariables().size(); ++i)
     {
         cVars.at(i) = dynamic_pointer_cast<::reasoner::ASPCommonsVariable>(vars.at(i)->getSolverVar());
     }
@@ -94,9 +99,9 @@ bool ASPSolverWrapper::getSolution(const VariableGrp &vars, std::vector<std::sha
     return ret;
 }
 
-shared_ptr<SolverVariable> ASPSolverWrapper::createVariable(long id)
+shared_ptr<SolverVariable> ASPSolverWrapper::createVariable(uint64_t id)
 {
-    return make_shared<alica::reasoner::ASPVariable>();
+    return make_shared<alica::reasoner::ASPVariable>(id);
 }
 
 shared_ptr<::reasoner::ASPCommonsTerm> ASPSolverWrapper::toCommonsTerm(shared_ptr<SolverTerm> term)

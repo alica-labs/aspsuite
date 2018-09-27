@@ -21,87 +21,87 @@ namespace alica
 		class ASPGenerator
 		{
 		public:
-			ASPGenerator(const void* wildcard_pointer, string wildcard_string);
+			ASPGenerator(const void* wildcard_pointer, std::string wildcard_string);
 
 			// UNARY PREDICATES
-			string plan(const Plan* p, bool dotTerminated = true);
-			string entryPoint(const EntryPoint* ep, bool dotTerminated = true);
-			string state(const State* s, bool dotTerminated = true);
-			string task(const Task* t, bool dotTerminated = true);
-			string failureState(const State* s, bool dotTerminated = true);
-			string successState(const State* s, bool dotTerminated = true);
-			string planType(const PlanType* s, bool dotTerminated = true);
-			string successRequired(const EntryPoint* ep, bool dotTerminated = true);
-			string transition(const Transition* t, bool dotTerminated = true);
-			string synchronisation(const SyncTransition* sync, bool dotTerminated = true);
-			string preCondition(const PreCondition* cond, bool dotTerminated = true);
-			string runtimeCondition(const RuntimeCondition* cond, bool dotTerminated = true);
-			string runningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
-			string behaviour(const Behaviour* beh, bool dotTerminated = true);
+			std::string plan(const Plan* p, bool dotTerminated = true);
+			std::string entryPoint(const EntryPoint* ep, bool dotTerminated = true);
+			std::string state(const State* s, bool dotTerminated = true);
+			std::string task(const Task* t, bool dotTerminated = true);
+			std::string failureState(const State* s, bool dotTerminated = true);
+			std::string successState(const State* s, bool dotTerminated = true);
+			std::string planType(const PlanType* s, bool dotTerminated = true);
+			std::string successRequired(const EntryPoint* ep, bool dotTerminated = true);
+			std::string transition(const Transition* t, bool dotTerminated = true);
+			std::string synchronisation(const SyncTransition* sync, bool dotTerminated = true);
+			std::string preCondition(const PreCondition* cond, bool dotTerminated = true);
+			std::string runtimeCondition(const RuntimeCondition* cond, bool dotTerminated = true);
+			std::string runningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
+			std::string behaviour(const Behaviour* beh, bool dotTerminated = true);
 
-			string brokenPlan(const Plan* s, bool dotTerminated = true);
-			string cyclic(const Plan* p, bool dotTerminated = true);
-			string cycleFree(const Plan* p, bool dotTerminated = true);
-			string brokenState(const State* s, bool dotTerminated = true);
-			string brokenEntryPoint(const EntryPoint* e, bool dotTerminated = true);
-			string brokenSynchronisation(const SyncTransition* sync, bool dotTerminated = true);
-			string neglocal(const PreCondition* cond, bool dotTerminated = true);
-			string brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
+			std::string brokenPlan(const Plan* s, bool dotTerminated = true);
+			std::string cyclic(const Plan* p, bool dotTerminated = true);
+			std::string cycleFree(const Plan* p, bool dotTerminated = true);
+			std::string brokenState(const State* s, bool dotTerminated = true);
+			std::string brokenEntryPoint(const EntryPoint* e, bool dotTerminated = true);
+			std::string brokenSynchronisation(const SyncTransition* sync, bool dotTerminated = true);
+			std::string neglocal(const PreCondition* cond, bool dotTerminated = true);
+			std::string brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
 
 
 			// BINARY PREDICATES
-			string hasTask(const Plan* p, const Task* t, bool dotTerminated = true);
-			string hasMinCardinality(const EntryPoint* ep, int minCard, bool dotTerminated = true);
-			string hasMaxCardinality(const EntryPoint* ep, int maxCard, bool dotTerminated = true);
-			string hasState(const Plan* p, const State* s, bool dotTerminated = true);
-			string hasInitialState(const EntryPoint* ep, const State* s, bool dotTerminated = true);
-			string hasPlan(const State* s, const Plan* p, bool dotTerminated = true);
-			string hasPlanType(const State* s, const PlanType* pt, bool dotTerminated = true);
-			string hasRealisation(const PlanType* pt, const Plan* p, bool dotTerminated = true);
-			string hasPreCondition(const Plan* p, const PreCondition* cond, bool dotTerminated = true);
-			string hasRuntimeCondition(const Plan* p, const RuntimeCondition* cond, bool dotTerminated = true);
-			string hasInTransition(const State* s, const Transition* t, bool dotTerminated = true);
-			string hasOutTransition(const State* s, const Transition* t, bool dotTerminated = true);
-			string hasSynchedTransition(const SyncTransition* sync, const Transition* t, bool dotTerminated = true);
-			string brokenPlanTaskPair(const Plan* p, const Task*t, bool dotTerminated = true);
-			string inRefPlan(string prefix, const Condition* c, string plan, bool dotTerminated = true);
-			string hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
-			string hasRunningPlan(const State* s, uint64_t instanceElementHash, bool dotTerminated = true);
-			string hasRunningRealisation(const PlanType* pt, uint64_t instanceElementHash, bool dotTerminated = true);
-			string hasBehaviour(const State* s, const Behaviour* behConf, bool dotTerminated = true);
+			std::string hasTask(const Plan* p, const Task* t, bool dotTerminated = true);
+			std::string hasMinCardinality(const EntryPoint* ep, int minCard, bool dotTerminated = true);
+			std::string hasMaxCardinality(const EntryPoint* ep, int maxCard, bool dotTerminated = true);
+			std::string hasState(const Plan* p, const State* s, bool dotTerminated = true);
+			std::string hasInitialState(const EntryPoint* ep, const State* s, bool dotTerminated = true);
+			std::string hasPlan(const State* s, const Plan* p, bool dotTerminated = true);
+			std::string hasPlanType(const State* s, const PlanType* pt, bool dotTerminated = true);
+			std::string hasRealisation(const PlanType* pt, const Plan* p, bool dotTerminated = true);
+			std::string hasPreCondition(const Plan* p, const PreCondition* cond, bool dotTerminated = true);
+			std::string hasRuntimeCondition(const Plan* p, const RuntimeCondition* cond, bool dotTerminated = true);
+			std::string hasInTransition(const State* s, const Transition* t, bool dotTerminated = true);
+			std::string hasOutTransition(const State* s, const Transition* t, bool dotTerminated = true);
+			std::string hasSynchedTransition(const SyncTransition* sync, const Transition* t, bool dotTerminated = true);
+			std::string brokenPlanTaskPair(const Plan* p, const Task*t, bool dotTerminated = true);
+			std::string inRefPlan(std::string prefix, const Condition* c, std::string plan, bool dotTerminated = true);
+			std::string hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
+			std::string hasRunningPlan(const State* s, uint64_t instanceElementHash, bool dotTerminated = true);
+			std::string hasRunningRealisation(const PlanType* pt, uint64_t instanceElementHash, bool dotTerminated = true);
+			std::string hasBehaviour(const State* s, const Behaviour* behConf, bool dotTerminated = true);
 
 			// TERNARY PREDICATES
-			string hasEntryPoint(const Plan* p, const Task* t, const EntryPoint* ep, bool dotTerminated = true);
-			string inRefPlanTask(string prefix, const Condition* c, string plan, string task, bool dotTerminated = true);
-			string inRefPlanState(string prefix, const Condition* c, string plan, string state, bool dotTerminated = true);
+			std::string hasEntryPoint(const Plan* p, const Task* t, const EntryPoint* ep, bool dotTerminated = true);
+			std::string inRefPlanTask(std::string prefix, const Condition* c, std::string plan, std::string task, bool dotTerminated = true);
+			std::string inRefPlanState(std::string prefix, const Condition* c, std::string plan, std::string state, bool dotTerminated = true);
 
 			// QUATERNARY PREDICATES
-			string inRefPlanTaskState(string prefix, const Condition* c, string plan, string task, string state, bool dotTerminated = true);
+			std::string inRefPlanTaskState(std::string prefix, const Condition* c, std::string plan, std::string task, std::string state, bool dotTerminated = true);
 
 			// RULES
-			string preConditionHolds(const PreCondition* cond);
-			string runtimeConditionHolds(const RuntimeCondition* cond);
+			std::string preConditionHolds(const PreCondition* cond);
+			std::string runtimeConditionHolds(const RuntimeCondition* cond);
 
 
-			string get(const Plan* p);
-			string get(const EntryPoint* ep);
-			string get(const State* s);
-			string get(const Task* t);
-			string get(const PlanType* pt);
-			string get(const Transition* t);
-			string get(const SyncTransition* sync);
-			string get(string prefix, const Condition* cond);
-			string get(string prefix, uint64_t instanceElementHash);
-			string get(const Behaviour* beh);
+			std::string get(const Plan* p);
+			std::string get(const EntryPoint* ep);
+			std::string get(const State* s);
+			std::string get(const Task* t);
+			std::string get(const PlanType* pt);
+			std::string get(const Transition* t);
+			std::string get(const SyncTransition* sync);
+			std::string get(std::string prefix, const Condition* cond);
+			std::string get(std::string prefix, uint64_t instanceElementHash);
+			std::string get(const Behaviour* beh);
 
 		private:
-			// maps from id to asp string for all ALICA elements
-			std::map<long, string> elements;
-			// maps from id to asp string for all instance elements
-			std::map<long, string> instanceElements;
+			// maps from id to asp std::string for all ALICA elements
+			std::map<long, std::string> elements;
+			// maps from id to asp std::string for all instance elements
+			std::map<long, std::string> instanceElements;
 
 			const void* wildcard_pointer;
-			string wildcard_string;
+			std::string wildcard_string;
 		};
 	}
 }

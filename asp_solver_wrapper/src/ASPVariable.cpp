@@ -4,10 +4,9 @@ namespace alica
 {
 	namespace reasoner
 	{
-		int ASPVariable::idCounter = 0;
-		ASPVariable::ASPVariable()
+		ASPVariable::ASPVariable(uint64_t id) : SolverVariable(id)
 		{
-			id = idCounter++;
+			this->id = id;
 		}
 
 		ASPVariable::~ASPVariable()

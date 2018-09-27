@@ -34,5 +34,5 @@ add_library(${PROJECT_NAME}
     src/ASPSolverWrapper.cpp
     src/ASPGenerator.cpp
     src/ASPAlicaPlanIntegrator.cpp
-)
+        src/ASPSolverContext.cpp include/asp_solver_wrapper/ASPSolverContext.h)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

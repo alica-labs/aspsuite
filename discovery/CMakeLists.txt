@@ -16,8 +16,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 # this enables the draft part of the api
 add_definitions(-DZMQ_BUILD_DRAFT_API=1 -DENABLE_DRAFTS=On)
 find_package(ZeroMQ REQUIRED)
-message("############################ ${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}")
-message("############################ ${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
+#message("############################ ${PROJECT_NAME}: ZMQ-Includes: ${ZeroMQ_INCLUDE_DIRS}")
+#message("############################ ${PROJECT_NAME}: ZMQ-Libraries: ${ZeroMQ_LIBRARIES}")
 
 find_package(UUID)
 #message("${PROJECT_NAME}: UUID-Includes: ${UUID_INCLUDE_DIRS}") 

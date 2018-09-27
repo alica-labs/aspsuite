@@ -154,7 +154,7 @@ void ASPSolverWrapper::integrateRules()
     {
         for (auto rule : query->getRules())
         {
-            this->solver->add("planBase", {}, rule);
+            this->solver->add("planBase", {}, rule.c_str());
         }
     }
     this->solver->ground({{"planBase", {}}}, nullptr);

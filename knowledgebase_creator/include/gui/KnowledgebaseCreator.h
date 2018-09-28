@@ -208,11 +208,11 @@ namespace kbcr
 		/**
 		 * true if docker is installed
 		 */
-		bool isDockerInstalled;
+//		bool isDockerInstalled;
 		/**
 		 * true if concept net is available
 		 */
-		bool isConcneptNetInstalled;
+//		bool isConcneptNetInstalled;
 		/**
 		 * contains base relations
 		 */

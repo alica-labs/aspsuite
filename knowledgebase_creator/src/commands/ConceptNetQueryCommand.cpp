@@ -215,7 +215,7 @@ namespace kbcr
 		else
 		{
 			QUrl url(
-					"http://api.localhost/query?node=/c/en/"
+					"http://api.localhost:8084/query?node=/c/en/"
 							+ this->query.mid(this->prefixLength, this->query.length() - this->prefixLength)
 							+ "&limit=1000");
 			callUrl(url);
@@ -318,7 +318,8 @@ namespace kbcr
 			{
 				this->currentConceptNetCall->concepts.push_back(startTerm);
 			}
-			QString relation = edge["rel"].toObject()["label"].toString();
+			QString relation = edge["rel"].toObject()["@id"].toString();
+			relation = relation.right(relation.size() - relation.lastIndexOf('/') -1);
 			// sources
 			QJsonArray sources = edge["sources"].toArray();
 			auto tmp = std::make_shared<ConceptNetEdge>(
@@ -333,7 +334,7 @@ namespace kbcr
 		if (!nextPage.isEmpty() && !this->minWeightPassed)
 		{
 //			std::cout << nextPage.toStdString() << std::endl;
-			QUrl url("http://api.localhost" + nextPage);
+			QUrl url("http://api.localhost:8084" + nextPage);
 			callUrl(url);
 		}
 		else

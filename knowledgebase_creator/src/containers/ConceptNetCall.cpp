@@ -258,25 +258,25 @@ namespace kbcr
 			this->currentConcept = adjective.first;
 			QEventLoop loopIsA;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopIsA, SLOT(quit()));
-			QUrl urlIsA("http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/IsA" + "&limit=1000");
+			QUrl urlIsA("http://api.localhost:8084/query?start=/c/en/" + adjective.first + "&rel=/r/IsA" + "&limit=1000");
 			this->callUrl(urlIsA, this->checkNAM);
 			loopIsA.exec();
 			QEventLoop loopSynonym;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopSynonym, SLOT(quit()));
 			QUrl urlSynonym(
-					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym" + "&limit=1000");
+					"http://api.localhost:8084/query?start=/c/en/" + adjective.first + "&rel=/r/Synonym" + "&limit=1000");
 			this->callUrl(urlSynonym, this->checkNAM);
 			loopSynonym.exec();
 			QEventLoop loopDefinedAs;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopDefinedAs, SLOT(quit()));
 			QUrl urlDefinedAs(
-					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs" + "&limit=1000");
+					"http://api.localhost:8084/query?start=/c/en/" + adjective.first + "&rel=/r/DefinedAs" + "&limit=1000");
 			this->callUrl(urlDefinedAs, this->checkNAM);
 			loopDefinedAs.exec();
 			QEventLoop loopPartOf;
 			this->connect(this, SIGNAL(closeLoopAdjectiveGathering()), &loopPartOf, SLOT(quit()));
 			QUrl urlPartOf(
-					"http://api.localhost/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf" + "&limit=1000");
+					"http://api.localhost:8084/query?start=/c/en/" + adjective.first + "&rel=/r/PartOf" + "&limit=1000");
 			this->callUrl(urlPartOf, this->checkNAM);
 			loopPartOf.exec();
 			this->conceptsToCheck.erase(adjective.first);
@@ -388,7 +388,8 @@ namespace kbcr
 		}
 		QString startSenseLabel = start["sense_label"].toString();
 		QString startID = start["@id"].toString();
-		QString relation = edge["rel"].toObject()["label"].toString();
+		QString relation = edge["rel"].toObject()["@id"].toString();
+		relation = relation.right(relation.size() - relation.lastIndexOf('/') -1);
 		return std::make_shared<ConceptNetEdge>(
 				edgeId, startLanguage, std::make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
 				std::make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
@@ -475,7 +476,7 @@ namespace kbcr
 		{
 			this->adjectiveAntonymMap.emplace(adjective.first, std::vector<QString>());
 			this->currentAdjective = adjective.first;
-			QUrl url("http://api.localhost/query?node=/c/en/" + adjective.first + "&rel=/r/Antonym" + "&limit=1000");
+			QUrl url("http://api.localhost:8084/query?node=/c/en/" + adjective.first + "&rel=/r/Antonym" + "&limit=1000");
 			this->callUrl(url, this->nam2);
 			QEventLoop loop;
 			this->connect(this, SIGNAL(closeLoop2()), &loop, SLOT(quit()));

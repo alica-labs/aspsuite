@@ -1,12 +1,4 @@
-/*
- * ConceptNetQueryCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_
-#define SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_
+#pragma once
 
 #include <commands/Command.h>
 
@@ -128,4 +120,3 @@ namespace kbcr
 
 } /* namespace kbcr */
 
-#endif /* SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_ */

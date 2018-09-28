@@ -1,10 +1,3 @@
-/*
- * SolveCommand.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "commands/SolveCommand.h"
 
 #include "gui/ModelSettingDialog.h"

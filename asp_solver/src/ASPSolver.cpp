@@ -1,10 +1,3 @@
-/*
- * ASPSolver.cpp
- *
- *  Created on: Sep 8, 2015
- *      Author: Stephan Opfer
- */
-
 #include <asp_solver/ASPSolver.h>
 
 #include <asp_commons/AnnotatedValVec.h>
@@ -124,11 +117,11 @@ namespace reasoner
 	/**
 	 * Callback for created models during solving.
 	 */
-	bool ASPSolver::onModel(Clingo::Model& m)
+	bool ASPSolver::on_model(Clingo::Model& m)
 	{
 #ifdef ASPSolver_DEBUG
 		cout << "ASPSolver: Found the following model which is number " << endl;
-		for (auto &atom : m.atoms(Gringo::Model::SHOWN))
+		for (auto &atom : m.symbols(Clingo::ShowType::Shown))
 		{
 			cout << atom << " ";
 		}

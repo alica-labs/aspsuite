@@ -1,14 +1,3 @@
-/*
- * ASPSolver.h
- *
- *  Created on: Sep 8, 2015
- *      Author: Stephan Opfer
- */
-
-#ifndef SRC_ASPSOLVER_H_
-#define SRC_ASPSOLVER_H_
-
-//#include <clingo/clingocontrol.hh>
 #include <clingo.hh>
 #include <SystemConfig.h>
 #include <mutex>
@@ -18,7 +7,7 @@
 
 #include <asp_commons/IASPSolver.h>
 
-//#define ASPSolver_DEBUG
+#define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
 //#define SOLVER_OPTIONS
 
@@ -79,15 +68,11 @@ namespace reasoner
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
 		vector<Clingo::SymbolVector> getCurrentModels();
-		//DefaultGringoModule* getGringoModule();
 
 		shared_ptr<Clingo::Control> clingo;
 
 	private:
-		bool onModel(Clingo::Model &m);
-//		Gringo::Control* clingo;
-		//DefaultGringoModule* gringoModule;
-		//unsigned int root;
+		bool on_model(Clingo::Model &m);
 		vector<long> currentQueryIds;
 
 		vector<string> alreadyLoaded;
@@ -135,5 +120,3 @@ namespace reasoner
 	}
 
 } /* namespace reasoner */
-
-#endif /* SRC_ASPSOLVER_H_ */

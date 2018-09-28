@@ -25,12 +25,15 @@ namespace reasoner
 		{
 			auto loaded = this->solver->loadFileFromConfig(term->getProgramSection());
 #ifdef ASPSolver_DEBUG
-			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
+			std::cout << "ASPSolver: Query contains rule: " << std::endl;
+			for (auto rule : this->term->getRules()) {
+				std::cout << rule << std::endl;
+			}
 #endif
 			for (auto fact : this->term->getFacts())
 			{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << fact << endl;
+				std::cout << "ASPSolver: Query contains fact: " << fact << std::endl;
 #endif
 			}
 			if (loaded)

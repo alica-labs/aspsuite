@@ -1,14 +1,5 @@
-/*
- * ASPFactsQuery.h
- *
- *  Created on: Nov 1, 2016
- *      Author: stefan
- */
+#pragma once
 
-#ifndef INCLUDE_ASP_SOLVER_ASPFACTSQUERY_H_
-#define INCLUDE_ASP_SOLVER_ASPFACTSQUERY_H_
-
-//#include <clingo/clingocontrol.hh>
 #include <clingo.hh>
 
 #include <asp_commons/ASPQuery.h>
@@ -23,26 +14,24 @@ namespace reasoner
 	class ASPFactsQuery : public ASPQuery
 	{
 	public:
-		ASPFactsQuery(ASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
+		ASPFactsQuery(ASPSolver* solver, std::shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPFactsQuery();
-		map<Clingo::Symbol, vector<Clingo::Symbol> > getFactModelMap();
-		void setFactModelMap(map<Clingo::Symbol, vector<Clingo::Symbol> > factModelMap);
-		shared_ptr<map<Clingo::Symbol, vector<Clingo::Symbol>>> getSatisfiedFacts();
+		std::map<Clingo::Symbol, std::vector<Clingo::Symbol> > getFactModelMap();
+		void setFactModelMap(std::map<Clingo::Symbol, std::vector<Clingo::Symbol> > factModelMap);
+		std::shared_ptr<std::map<Clingo::Symbol, std::vector<Clingo::Symbol>>> getSatisfiedFacts();
 		void saveSatisfiedFact(Clingo::Symbol key, Clingo::Symbol value);
 		bool factsExistForAllModels();
 		bool factsExistForAtLeastOneModel();
 		void removeExternal();
-		vector<pair<Clingo::Symbol, ASPTruthValue>> getASPTruthValues();
+		std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> getASPTruthValues();
 		void onModel(Clingo::Model& clingoModel);
 
 	private:
-		vector<Clingo::Symbol> queryValues;
-		void createQueryValues(vector<string> queryString);
+		std::vector<Clingo::Symbol> queryValues;
+		void createQueryValues(std::vector<std::string> queryString);
 		// key := query value, value := predicates that satisfy the query value
-		map<Clingo::Symbol, vector<Clingo::Symbol>> factModelMap;
+		std::map<Clingo::Symbol, std::vector<Clingo::Symbol>> factModelMap;
 	};
 
 }
 /* namespace reasoner */
-
-#endif /* INCLUDE_ASP_SOLVER_ASPFACTSQUERY_H_ */

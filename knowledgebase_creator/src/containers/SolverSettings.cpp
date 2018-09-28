@@ -1,10 +1,3 @@
-/*
- * SolverSettings.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "containers/SolverSettings.h"
 #include <QString>
 

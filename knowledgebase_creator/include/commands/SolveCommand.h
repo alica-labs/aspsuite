@@ -1,13 +1,3 @@
-/*
- * SolveCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_SOLVECOMMAND_H_
-#define SRC_COMMANDS_SOLVECOMMAND_H_
-
 #include <commands/Command.h>
 
 #include <clingo.hh>
@@ -58,5 +48,3 @@ namespace kbcr
 	};
 
 } /* namespace kbcr */
-
-#endif /* SRC_COMMANDS_SOLVECOMMAND_H_ */

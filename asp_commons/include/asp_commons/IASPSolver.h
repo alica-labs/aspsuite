@@ -1,42 +1,32 @@
-/*
- * IASPSolver.h
- *
- *  Created on: Jan 26, 2017
- *      Author: stefan
- */
+#pragma once
 
-#ifndef INCLUDE_ASP_COMMONS_IASPSOLVER_H_
-#define INCLUDE_ASP_COMMONS_IASPSOLVER_H_
+#include <clingo.hh>
 
 #include <string>
 #include <vector>
-//#include <clingo/clingocontrol.hh>
-#include <clingo.hh>
 #include <memory>
-
-using namespace std;
 
 namespace reasoner
 {
 	class ASPCommonsTerm;
 	class ASPCommonsVariable;
 	class ASPQuery;
-	class IASPSolver : public enable_shared_from_this<IASPSolver>
+class IASPSolver : public std::enable_shared_from_this<IASPSolver>
 	{
 	public:
 		static const void* const WILDCARD_POINTER;
-		static const string WILDCARD_STRING;
+		static const std::string WILDCARD_STRING;
 
 		IASPSolver();
 		virtual ~IASPSolver();
 
-		virtual bool existsSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls) = 0;
-		virtual bool getSolution(vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls,
-							vector<void*>& results) = 0;
-		virtual shared_ptr<ASPCommonsVariable> createVariable(long id) = 0;
+		virtual bool existsSolution(std::vector<std::shared_ptr<ASPCommonsVariable>>& vars, std::vector<std::shared_ptr<ASPCommonsTerm>>& calls) = 0;
+		virtual bool getSolution(std::vector<std::shared_ptr<ASPCommonsVariable>>& vars, std::vector<std::shared_ptr<ASPCommonsTerm>>& calls,
+								 std::vector<void*>& results) = 0;
+		virtual std::shared_ptr<ASPCommonsVariable> createVariable(long id) = 0;
 
-		virtual bool loadFileFromConfig(string configKey) = 0;
-		virtual void loadFile(string filename) = 0;
+		virtual bool loadFileFromConfig(std::string configKey) = 0;
+		virtual void loadFile(std::string filename) = 0;
 
 		//virtual void ground(Clingo::GroundVec const &vec, Clingo::Context *context) = 0;
 		virtual void ground(Clingo::PartSpan parts, Clingo::GroundCallback = nullptr) = 0; 
@@ -48,13 +38,11 @@ namespace reasoner
 		virtual int getQueryCounter() = 0;
 
 		virtual void removeDeadQueries() = 0;
-		virtual bool registerQuery(shared_ptr<ASPQuery> query) = 0;
-		virtual bool unregisterQuery(shared_ptr<ASPQuery> query) = 0;
+		virtual bool registerQuery(std::shared_ptr<ASPQuery> query) = 0;
+		virtual bool unregisterQuery(std::shared_ptr<ASPQuery> query) = 0;
 		virtual void printStats() = 0;
-		virtual vector<shared_ptr<ASPQuery>> getRegisteredQueries() = 0;
+		virtual std::vector<std::shared_ptr<ASPQuery>> getRegisteredQueries() = 0;
 
 	};
 
 } /* namespace reasoner */
-
-#endif /* INCLUDE_ASP_COMMONS_IASPSOLVER_H_ */

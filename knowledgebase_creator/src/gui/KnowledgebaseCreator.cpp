@@ -72,6 +72,7 @@ KnowledgebaseCreator::KnowledgebaseCreator(QWidget* parent)
     //			std::cout << "KnowledgebaseCreator: \"docker start conceptnet5_api_1\" was called with exit code: " << i
     //					<< std::endl;
     //		}
+    //Q_INIT_RESOURCE(resources);
     readConceptNetBaseRelations();
 }
 
@@ -101,7 +102,7 @@ KnowledgebaseCreator::~KnowledgebaseCreator()
 void KnowledgebaseCreator::readConceptNetBaseRelations()
 {
     // File placed in project etc folder
-    QFile file(QString(QCoreApplication::applicationDirPath() + "/../../../../../src/symrock/knowledgebase_creator/etc/conceptNetRelations.txt"));
+    QFile file(":/conceptNetRelations.txt");
 
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open file conceptNetRelations.txt.");

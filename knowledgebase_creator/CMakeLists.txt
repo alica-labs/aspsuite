@@ -106,6 +106,8 @@ catkin_package(
 
 )
 
+file(GLOB QT_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
+
 QT5_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})
 QT5_WRAP_CPP(knowledgebaseCreator_MOCS ${knowledgebaseCreator_HDRS})
 # ensure generated header files are being created in the devel space
@@ -114,7 +116,6 @@ set(CMAKE_CURRENT_BINARY_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DES
 QT5_WRAP_UI(knowledgebaseCreator_UIS_H ${knowledgebaseCreator_UIS})
 set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
-#add_library(${PROJECT_NAME} ${knowledgebaseCreator_SRCS} ${knowledgebaseCreator_MOCS} ${knowledgebaseCreator_UIS_H} ${QT_RESOURCES_CPP})
 add_executable (${PROJECT_NAME} ${knowledgebaseCreator_SRCS} ${knowledgebaseCreator_MOCS} ${knowledgebaseCreator_UIS_H} ${QT_RESOURCES_CPP})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5Script_location} ${Qt5WebKitWidgets_location} clingo)
 

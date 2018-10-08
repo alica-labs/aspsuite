@@ -23,8 +23,7 @@ void catchUnixSignals(const std::vector<int>& quitSignals) {
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	a.setWindowIcon(QIcon(QCoreApplication::applicationDirPath()
-	+ "/../../../../../src/symrock/knowledgebase_creator/etc/drawing.svg"));
+	a.setWindowIcon(QIcon(":/drawing.svg"));
 	catchUnixSignals({SIGQUIT, SIGINT, SIGTERM, SIGHUP});
 	kbcr::KnowledgebaseCreator w;
 	//Center GUI on screen

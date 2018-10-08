@@ -123,6 +123,18 @@ namespace kbcr
 		 * Get list of basic cn5 relations
 		 */
 		std::vector<QString> getConceptNetBaseRealtions();
+		/**
+		 * Containts the begin of a concept net query url.
+		 */
+		static const QString CONCEPTNET_BASE_URL;
+		/**
+		 * Query part: /query?start=/c/en/
+		 */
+        static const QString CONCEPTNET_URL_QUERYPART;
+		/**
+		 * Containts the cn5_ prefix.
+		 */
+		static const QString CONCEPTNET_PREFIX;
 
 	private slots:
 

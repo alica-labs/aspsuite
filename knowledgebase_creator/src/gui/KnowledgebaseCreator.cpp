@@ -42,6 +42,10 @@
 namespace kbcr
 {
 
+    const QString KnowledgebaseCreator::CONCEPTNET_BASE_URL = "http://api.localhost:8084";
+    const QString KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART = "/query?start=/c/en/";
+    const QString KnowledgebaseCreator::CONCEPTNET_PREFIX = "cn5_";
+
 KnowledgebaseCreator::KnowledgebaseCreator(QWidget* parent)
         : QMainWindow(parent)
         , ui(new Ui::KnowledgebaseCreator)

@@ -118,6 +118,7 @@ set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
 add_executable (${PROJECT_NAME} ${knowledgebaseCreator_SRCS} ${knowledgebaseCreator_MOCS} ${knowledgebaseCreator_UIS_H} ${QT_RESOURCES_CPP})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Qt5Widgets_location} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location} ${Qt5Script_location} ${Qt5WebKitWidgets_location} clingo)
+qt5_use_modules(${PROJECT_NAME} Core Gui Network Widgets WebKitWidgets Script)
 
 find_package(class_loader)
 class_loader_hide_library_symbols(${PROJECT_NAME})

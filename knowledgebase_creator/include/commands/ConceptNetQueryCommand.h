@@ -17,6 +17,7 @@ namespace kbcr
 {
 
 	class ConceptNetCall;
+	class ConceptNetEdge;
 	class KnowledgebaseCreator;
 	/**
 	 * Class inheriting from Command interface used to create a ConceptNet Query
@@ -94,21 +95,16 @@ namespace kbcr
 		 */
 		void callUrl(QUrl url);
 		/**
-		 * Prefix printed before every meta knowledge predicate
-		 */
-		QString prefix;
-		/**
-		 * Length of prefix printed before every meta knowledge predicate
-		 */
-		int prefixLength;
-		/**
 		 * Map of metaknowlege relation to asp progsm containing this relation
 		 */
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
+        QString createBackgroundKnowledgeRule(QString relation, std::shared_ptr<ConceptNetEdge> edge);
 		QString conceptWithoutPrefix;
 		bool conceptContainsUTF8(QString concept);
 
 		bool minWeightPassed;
+
+		int prefixLength;
 
 	signals:
 		/**

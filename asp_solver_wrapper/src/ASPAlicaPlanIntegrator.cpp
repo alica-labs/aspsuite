@@ -211,9 +211,9 @@ void ASPAlicaPlanIntegrator::processPreCondition(const PreCondition *cond)
     // asp encoded precondition
     if (cond->getConditionString() != "")
     {
-        const string &condString = cond->getConditionString();
+        const std::string &condString = cond->getConditionString();
 
-        cout << "ASP-Integrator: " << gen->preConditionHolds(cond) << endl;
+        std::cout << "ASP-Integrator: " << gen->preConditionHolds(cond) << std::endl;
         this->solver->add("planBase", {}, gen->preConditionHolds(cond).c_str());
 
         // analysis of asp encoded precondition, because of non-local in relations
@@ -238,9 +238,9 @@ void ASPAlicaPlanIntegrator::processRuntimeCondition(const RuntimeCondition *con
 
     if (cond->getConditionString() != "")
     {
-        const string &condString = cond->getConditionString();
+        const std::string &condString = cond->getConditionString();
 
-        cout << "ASP-Integrator: " << gen->runtimeConditionHolds(cond) << endl;
+        std::cout << "ASP-Integrator: " << gen->runtimeConditionHolds(cond) << std::endl;
         this->solver->add("planBase", {}, gen->runtimeConditionHolds(cond).c_str());
 
         // analysis of asp encoded precondition, because of non-local in relations
@@ -275,7 +275,7 @@ uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *plan, const State
     return instanceElementHash;
 }
 
-void ASPAlicaPlanIntegrator::handleCondString(const string &condString, string prefix, const Condition *cond)
+void ASPAlicaPlanIntegrator::handleCondString(const std::string &condString, std::string prefix, const Condition *cond)
 {
     // analysis of asp encoded precondition, because of non-local in relations
     std::regex words_regex("((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+("
@@ -291,15 +291,15 @@ void ASPAlicaPlanIntegrator::handleCondString(const string &condString, string p
         //<< std::endl;
         ;
         size_t start = inPredicateString.find(',');
-        size_t end = string::npos;
-        string plan = "";
-        string task = "";
-        string state = "";
+        size_t end = std::string::npos;
+        std::string plan = "";
+        std::string task = "";
+        std::string state = "";
         // plan
-        if (start != string::npos)
+        if (start != std::string::npos)
         {
             end = inPredicateString.find(',', start + 1);
-            if (end != string::npos)
+            if (end != std::string::npos)
             {
                 plan = inPredicateString.substr(start + 1, end - start - 1);
                 this->solver->add("planBase", {}, gen->inRefPlan(prefix, cond, plan).c_str());
@@ -310,10 +310,10 @@ void ASPAlicaPlanIntegrator::handleCondString(const string &condString, string p
         }
         // task
         start = end + 1;
-        if (start != string::npos)
+        if (start != std::string::npos)
         {
             end = inPredicateString.find(',', start);
-            if (end != string::npos)
+            if (end != std::string::npos)
             {
                 task = inPredicateString.substr(start, end - start);
                 task = supplementary::Configuration::trim(task);
@@ -332,10 +332,10 @@ void ASPAlicaPlanIntegrator::handleCondString(const string &condString, string p
         }
         // state
         start = end + 1;
-        if (start != string::npos)
+        if (start != std::string::npos)
         {
             end = inPredicateString.find(')', start);
-            if (end != string::npos)
+            if (end != std::string::npos)
             {
                 state = inPredicateString.substr(start, end - start);
                 state = supplementary::Configuration::trim(state);

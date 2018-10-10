@@ -105,7 +105,7 @@ namespace kbcr {
             conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
             conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
             QUrl url(
-                    KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART + conceptLeft + "&other=/c/en/" + conceptRight
+                    KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE + conceptLeft + "&other=/c/en/" + conceptRight
                     + "&limit=1000");
             callUrl(url);
         } else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard")) {
@@ -116,7 +116,7 @@ namespace kbcr {
                 concept = concept.left(concept.size() - 1).trimmed();
                 concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
                 this->queryConcept = concept;
-                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART + concept + "&rel=/r/" + relation + "&limit=1000");
+                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYEND + concept + "&rel=/r/" + relation + "&limit=1000");
                 callUrl(url);
             }
                 // relation(concept, wildcard)
@@ -125,7 +125,7 @@ namespace kbcr {
                 concept = concept.left(concept.size() - 1);
                 concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
                 this->queryConcept = concept;
-                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART + concept + "&rel=/r/" + relation + "&limit=1000");
+                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYSTART + concept + "&rel=/r/" + relation + "&limit=1000");
                 callUrl(url);
             }
         } else {
@@ -139,7 +139,7 @@ namespace kbcr {
                 conceptRight = conceptRight.mid(this->prefixLength, conceptRight.length() - this->prefixLength);
                 conceptLeft = conceptLeft.mid(this->prefixLength, conceptLeft.length() - this->prefixLength);
                 QUrl url(
-                        KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART + conceptLeft + "&end=/c/en/" + conceptRight +
+                        KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYSTART + conceptLeft + "&end=/c/en/" + conceptRight +
                         "&rel=/r/" + relation
                         + "&limit=1000");
                 callUrl(url);
@@ -149,7 +149,7 @@ namespace kbcr {
                 concept = concept.left(concept.size() - 1);
                 concept = concept.mid(this->prefixLength, concept.length() - this->prefixLength);
                 this->queryConcept = concept;
-                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART + concept + "&rel=/r/" + relation + "&limit=1000");
+                QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE + concept + "&rel=/r/" + relation + "&limit=1000");
                 callUrl(url);
             }
         }
@@ -169,7 +169,7 @@ namespace kbcr {
         }
         if (this->query.contains("(") && this->query.contains(")")) {
             //wrong input relation
-            if (!isConceptNetRealtion(this->query)) {
+            if (!isConceptNetRelation(this->query)) {
                 handleWrongInput();
                 return;
             }
@@ -181,7 +181,7 @@ namespace kbcr {
             //query without relation
         else {
             QUrl url(
-                    KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYPART
+                    KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE
                     + this->query.mid(this->prefixLength, this->query.length() - this->prefixLength)
                     + "&limit=1000");
             callUrl(url);
@@ -355,7 +355,7 @@ namespace kbcr {
         return ret;
     }
 
-    bool ConceptNetQueryCommand::isConceptNetRealtion(QString query) {
+    bool ConceptNetQueryCommand::isConceptNetRelation(QString query) {
         auto pos = query.indexOf("(");
         auto tmp = query.left(pos);
         for (auto relation : this->gui->getConceptNetBaseRealtions()) {

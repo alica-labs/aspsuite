@@ -130,7 +130,19 @@ namespace kbcr
 		/**
 		 * Query part: /query?start=/c/en/
 		 */
-        static const QString CONCEPTNET_URL_QUERYPART;
+        static const QString CONCEPTNET_URL_QUERYSTART;
+        /**
+        * Query part: /query?end=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYEND;
+        /**
+        * Query part: /query?node=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYNODE;
+        /**
+        * Query part: /query?other=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYOTHER;
 		/**
 		 * Containts the cn5_ prefix.
 		 */
@@ -166,6 +178,8 @@ namespace kbcr
 		 * Slot for ApplyExternal call
 		 */
 		void applyExternalCallBack();
+
+		void serveCallBack();
 
 	private:
 

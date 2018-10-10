@@ -24,6 +24,7 @@ namespace kbcr
 {
 	class KnowledgebaseCreator;
 	class ConceptNetEdge;
+    class ConceptNetConcept;
 	/**
 	 * Class holding the complete information of a concept net query call
 	 */
@@ -34,13 +35,15 @@ namespace kbcr
 		ConceptNetCall(KnowledgebaseCreator* gui, QString id, QString queryConcept);
 		virtual ~ConceptNetCall();
 
+		QNetworkAccessManager *collectSynonymConceptsNAM;
+		QNetworkAccessManager *collectAntonymConceptsNAM;
+        QNetworkAccessManager *collectUsedForConceptsNAM;
 
-		QNetworkAccessManager *checkNAM;
-		QNetworkAccessManager *nam2;
+        std::map<QString, std::shared_ptr<ConceptNetEdge>> connectedConcepts;
 
+		// INCONSISTENCY STUFF
 		QString id;
 		std::vector<std::shared_ptr<ConceptNetEdge>> edges;
-		std::map<QString, std::shared_ptr<ConceptNetEdge>> adjectives;
 		std::vector<QString> concepts;
 		std::map<QString, std::shared_ptr<ConceptNetEdge>> conceptsToCheck;
 		std::map<QString, std::pair<QString, std::shared_ptr<ConceptNetEdge>>> gatheredConcepts;
@@ -52,14 +55,21 @@ namespace kbcr
 		std::pair<std::pair<QString, std::shared_ptr<ConceptNetEdge>>,
 				std::pair<QString, std::shared_ptr<ConceptNetEdge>>> currentAntonymCheck;
 
+
+		// SERVICE STUFF
+        std::map<QString, std::vector<QString>> motivatedConceptMap;
+
 		std::string toString();
 		void findInconsistencies();
+        void findServices();
 
 	public slots:
 		void collectConcepts(QNetworkReply* reply);
 		void mapAntonyms(QNetworkReply* reply);
+        void mapServices(QNetworkReply* reply);
 
 	private:
+        void collectMotivatedByGoals();
 		void gatherConcepts(std::map<QString, std::shared_ptr<ConceptNetEdge>> toCheck);
 		void checkAdjectives();
 		void checkGatheredConcepts();
@@ -75,11 +85,12 @@ namespace kbcr
 		std::shared_ptr<ConceptNetEdge> extractCNEdge(QJsonObject edge);
 		bool newConceptFound;
 		QString currentAdjective;
+        QString currentMotivatedConcept;
 
 	signals:
 		void closeLoopAntonym();
 		void closeLoopAdjectiveGathering();
-		void closeLoop2();
+		void closeCollectLoop();
 	};
 
 } /* namespace kbcr */

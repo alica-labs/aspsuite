@@ -7,7 +7,7 @@
 
 #include <asp_commons/IASPSolver.h>
 
-#define ASPSolver_DEBUG
+//#define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
 //#define SOLVER_OPTIONS
 

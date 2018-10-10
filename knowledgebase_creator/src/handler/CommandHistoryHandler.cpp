@@ -22,6 +22,7 @@
 #include "commands/VariableQueryCommand.h"
 #include "commands/AddCommand.h"
 #include "commands/AssignExternalCommand.h"
+#include "commands/OfferServicesCommand.h"
 
 #include <ui_knowledgebasecreator.h>
 
@@ -128,6 +129,11 @@ namespace kbcr
 				this->addAssignExternalCommandToHistory(cmd, pos);
 				continue;
 			}
+			else if (cmd->getType().compare("Offer Services") == 0)
+			{
+				this->addOfferServiceCommandToHistory(cmd, pos);
+				continue;
+			}
 			else
 			{
 				std::cout << "KnowledgebaseCreator: Command with unknown type found!" << std::endl;
@@ -226,6 +232,13 @@ namespace kbcr
 	void CommandHistoryHandler::addAssignExternalCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 	{
 		auto item = new QTableWidgetItem(std::dynamic_pointer_cast<AssignExternalCommand>(cmd)->historyString);
+		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
+	}
+
+	void CommandHistoryHandler::addOfferServiceCommandToHistory(std::shared_ptr<Command> cmd, int pos)
+	{
+		auto item = new QTableWidgetItem(std::dynamic_pointer_cast<OfferServicesCommand>(cmd)->queryString);
 		item->setFlags(item->flags() ^ Qt::ItemIsEditable);
 		this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 	}

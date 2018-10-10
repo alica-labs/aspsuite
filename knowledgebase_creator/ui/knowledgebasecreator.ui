@@ -78,6 +78,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="serveBtn">
+        <property name="text">
+         <string>Get service suggestions</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="buttonSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

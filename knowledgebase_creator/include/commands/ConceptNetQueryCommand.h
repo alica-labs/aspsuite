@@ -11,6 +11,9 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 
+#include <chrono>
+#include <fstream>
+
 //#define ConceptNetQueryCommandDebug
 
 namespace kbcr
@@ -72,7 +75,7 @@ namespace kbcr
 		/**
 		 * Checks if query is one of the concept net base relations
 		 */
-		bool isConceptNetRealtion(QString query);
+		bool isConceptNetRelation(QString query);
 		/**
 		 * Informs the user that the given query is not supported by concept net
 		 */
@@ -105,6 +108,10 @@ namespace kbcr
 		bool minWeightPassed;
 
 		int prefixLength;
+
+
+        std::chrono::_V2::system_clock::time_point start;
+        std::ofstream outFS;
 
 	signals:
 		/**

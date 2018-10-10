@@ -1,12 +1,4 @@
-/*
- * LoadSavedProgramCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_LOADSAVEDPROGRAMCOMMAND_H_
-#define SRC_COMMANDS_LOADSAVEDPROGRAMCOMMAND_H_
+#pragma once
 
 #include <commands/Command.h>
 #include <memory>
@@ -14,7 +6,7 @@
 #include <QJsonObject>
 #include <QByteArray>
 #include <QJsonDocument>
-//#include <chrono>
+#include <chrono>
 
 namespace kbcr
 {
@@ -39,12 +31,9 @@ namespace kbcr
 		QString fileName;
 		KnowledgebaseCreator* gui;
 
-//		std::chrono::_V2::system_clock::time_point start;
-
 	signals:
 		void cn5CallFinished();
 	};
 
 } /* namespace kbcr */
 
-#endif /* SRC_COMMANDS_LOADSAVEDPROGRAMCOMMAND_H_ */

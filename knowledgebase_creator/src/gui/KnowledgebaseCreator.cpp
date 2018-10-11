@@ -292,8 +292,11 @@ namespace kbcr {
         this->ui->queryResultsLabel->clear();
         this->ui->aspRuleTextArea->clear();
         this->ui->commandHistoryTable->clear();
+        this->commandHistory.clear();
         this->ui->externalTable->clear();
         this->ui->programLabel->clear();
+        delete this->solver;
+        this->solver = nullptr;
     }
 
     void KnowledgebaseCreator::setSettings(shared_ptr<SolverSettings> settings) {

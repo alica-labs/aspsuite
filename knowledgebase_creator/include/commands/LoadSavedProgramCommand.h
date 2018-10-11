@@ -7,6 +7,7 @@
 #include <QByteArray>
 #include <QJsonDocument>
 #include <chrono>
+#include <fstream>
 
 namespace kbcr
 {
@@ -30,6 +31,7 @@ namespace kbcr
 		QByteArray loadedData;
 		QString fileName;
 		KnowledgebaseCreator* gui;
+        std::ofstream outFS;
 
 	signals:
 		void cn5CallFinished();

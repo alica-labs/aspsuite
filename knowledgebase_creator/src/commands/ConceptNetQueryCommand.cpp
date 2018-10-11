@@ -38,6 +38,7 @@ namespace kbcr {
         this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
         this->minWeightPassed = false;
         this->prefixLength = KnowledgebaseCreator::CONCEPTNET_PREFIX.size();
+        //this->outFS = ofstream("outfile.txt", std::ios::app);
     }
 
     ConceptNetQueryCommand::~ConceptNetQueryCommand() {
@@ -180,6 +181,7 @@ namespace kbcr {
         }
             //query without relation
         else {
+            //start = std::chrono::high_resolution_clock::now();
             QUrl url(
                     KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE
                     + this->query.mid(this->prefixLength, this->query.length() - this->prefixLength)
@@ -243,7 +245,7 @@ namespace kbcr {
             QString endTerm = end["term"].toString();
             endTerm = trimTerm(endTerm);
             if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm)) {
-                std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
+//                std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
                 continue;
             }
             QString endSenseLabel = end["sense_label"].toString();
@@ -262,7 +264,7 @@ namespace kbcr {
             QString startTerm = start["term"].toString();
             startTerm = trimTerm(startTerm);
             if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm)) {
-                std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
+//                std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
                 continue;
             }
             QString startSenseLabel = start["sense_label"].toString();
@@ -291,14 +293,17 @@ namespace kbcr {
 #ifdef ConceptNetQueryCommandDebug
             cout << this->currentConceptNetCall->toString();
 #endif
-            std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
-            this->currentConceptNetCall->findInconsistencies();
+//            std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
+            //std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+            //outFS << this->query.toStdString() << " \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            //this->currentConceptNetCall->findInconsistencies();
             emit jsonExtracted();
         }
 
     }
 
     void ConceptNetQueryCommand::extractASPPredicates() {
+        //start = std::chrono::high_resolution_clock::now();
         QString programSection = "#program cn5_commonsenseKnowledge";
         QString program = programSection;
         program.append(".\n");
@@ -313,10 +318,12 @@ namespace kbcr {
         auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
         for (auto pair : pgmMap) {
             this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
-            this->gui->getUi()->programLabel->setText(
-                    this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
+            //this->gui->getUi()->programLabel->setText(
+            //        this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
         }
         this->gui->enableGui(true);
+        //std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+        //outFS << " \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
         if (this->gui->slHandler->currentLoadCmd != nullptr) {
             emit
             this->gui->slHandler->currentLoadCmd->cn5CallFinished();

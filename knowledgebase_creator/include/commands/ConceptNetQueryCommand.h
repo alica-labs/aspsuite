@@ -110,8 +110,8 @@ namespace kbcr
 		int prefixLength;
 
 
-        std::chrono::_V2::system_clock::time_point start;
-        std::ofstream outFS;
+        //std::chrono::_V2::system_clock::time_point start;
+        //std::ofstream outFS;
 
 	signals:
 		/**

@@ -63,7 +63,7 @@ namespace kbcr
 
 	void CommandHistoryHandler::fillCommandHistory()
 	{
-		drawHistoryTable();
+		/*drawHistoryTable();
 		//fill history table with right commands
 		for (auto cmd : this->gui->commandHistory)
 		{
@@ -142,7 +142,7 @@ namespace kbcr
 				this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item2);
 			}
 		}
-		this->gui->getUi()->commandHistoryTable->scrollToBottom();
+		this->gui->getUi()->commandHistoryTable->scrollToBottom();*/
 	}
 
 	void CommandHistoryHandler::addNewSolverCommandToHistory(std::shared_ptr<Command> cmd, int pos)
@@ -245,8 +245,8 @@ namespace kbcr
 
 	void CommandHistoryHandler::addToCommandHistory(std::shared_ptr<Command> cmd)
 	{
-		this->gui->commandHistory.push_back(cmd);
-		emit this->gui->updateCommandList();
+		//this->gui->commandHistory.push_back(cmd);
+		//emit this->gui->updateCommandList();
 	}
 
 	void CommandHistoryHandler::removeFromCommandHistory(std::shared_ptr<Command> cmd)

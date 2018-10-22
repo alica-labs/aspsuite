@@ -9,6 +9,8 @@
 #include <chrono>
 #include <fstream>
 
+//#define LSPC_EVALCODE
+
 namespace kbcr
 {
 	class SettingsDialog;
@@ -31,7 +33,9 @@ namespace kbcr
 		QByteArray loadedData;
 		QString fileName;
 		KnowledgebaseCreator* gui;
+#ifdef LSPC_EVALCODE
         std::ofstream outFS;
+#endif
 
 	signals:
 		void cn5CallFinished();

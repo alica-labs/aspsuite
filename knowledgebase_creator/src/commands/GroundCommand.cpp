@@ -34,11 +34,13 @@ namespace kbcr
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		std::string aspString = this->program.toStdString();
+		std::cout << "aspstring: " <<  aspString << std::endl;
 		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
 			this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
 			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
 		}
+		std::cout << "ps1" <<this->programSection.toStdString() << std::endl;
 		if (this->programSection.contains("(") && this->programSection.contains(")"))
 		{
 			auto indexLeft = this->programSection.indexOf("(");
@@ -47,13 +49,14 @@ namespace kbcr
 			this->programSection = this->programSection.left(indexLeft);
 			auto symVec = Clingo::SymbolVector();
 			auto paramList = tmp.split(",", QString::SplitBehavior::SkipEmptyParts);
+			std::cout << "ps2" << this->programSection.toStdString() << std::endl;
 			for (auto it : paramList)
 			{
 				symVec.push_back(this->gui->getSolver()->parseValue(it.toStdString().c_str()));
-			}
+				std::cout << "param: " << it.toStdString() << std::endl;
+ 			}
 			this->gui->getSolver()->ground( { {this->programSection.toStdString().c_str(), symVec}},
 											nullptr);
-			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->programSection).append("\n"));
 		}
 		else
 		{

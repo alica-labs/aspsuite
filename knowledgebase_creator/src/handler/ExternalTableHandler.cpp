@@ -31,7 +31,7 @@ namespace kbcr
 
 	void ExternalTableHandler::fillExternalTable()
 	{
-		/*drawExternalTable();
+		drawExternalTable();
 		for (Clingo::SymbolicAtom atom : this->gui->getSolver()->clingo->symbolic_atoms()) {
 			if (atom.is_external()) {
                 int pos = this->gui->getUi()->externalTable->rowCount();
@@ -64,7 +64,7 @@ namespace kbcr
                     this->gui->getUi()->externalTable->setItem(pos, 1, rightItem);
                 }
 			}
-		}*/
+		}
 	}
 
 	void ExternalTableHandler::drawExternalTable()

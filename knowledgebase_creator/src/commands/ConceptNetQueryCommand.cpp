@@ -38,7 +38,9 @@ namespace kbcr {
         this->connect(this, SIGNAL(jsonExtracted()), this, SLOT(extractASPPredicates()));
         this->minWeightPassed = false;
         this->prefixLength = KnowledgebaseCreator::CONCEPTNET_PREFIX.size();
-        //this->outFS = ofstream("outfile.txt", std::ios::app);
+#ifdef CNQC_EVALCODE
+        this->outFS = ofstream("outfile.txt", std::ios::app);
+#endif
     }
 
     ConceptNetQueryCommand::~ConceptNetQueryCommand() {
@@ -181,7 +183,9 @@ namespace kbcr {
         }
             //query without relation
         else {
-            //start = std::chrono::high_resolution_clock::now();
+#ifdef CNQC_EVALCODE
+            start = std::chrono::high_resolution_clock::now();
+#endif
             QUrl url(
                     KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE
                     + this->query.mid(this->prefixLength, this->query.length() - this->prefixLength)
@@ -245,7 +249,7 @@ namespace kbcr {
             QString endTerm = end["term"].toString();
             endTerm = trimTerm(endTerm);
             if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm)) {
-//                std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
+                std::cout << "ConceptNetQueryCommand: Skipping Concept:" << endTerm.toStdString() << std::endl;
                 continue;
             }
             QString endSenseLabel = end["sense_label"].toString();
@@ -264,7 +268,7 @@ namespace kbcr {
             QString startTerm = start["term"].toString();
             startTerm = trimTerm(startTerm);
             if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm)) {
-//                std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
+                std::cout << "ConceptNetQueryCommand: Skipping concept:" << startTerm.toStdString() << std::endl;
                 continue;
             }
             QString startSenseLabel = start["sense_label"].toString();
@@ -286,24 +290,28 @@ namespace kbcr {
             this->currentConceptNetCall->edges.push_back(tmp);
         }
         if (!nextPage.isEmpty() && !this->minWeightPassed) {
-//			std::cout << nextPage.toStdString() << std::endl;
+			std::cout << nextPage.toStdString() << std::endl;
             QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + nextPage);
             callUrl(url);
         } else {
 #ifdef ConceptNetQueryCommandDebug
             cout << this->currentConceptNetCall->toString();
 #endif
-//            std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
+            std::cout << "Number of connected Concepts: " << this->currentConceptNetCall->edges.size() << std::endl;
+#ifdef CNQC_EVALCODE
             //std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
             //outFS << this->query.toStdString() << " \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            //this->currentConceptNetCall->findInconsistencies();
+#endif
+            this->currentConceptNetCall->findInconsistencies();
             emit jsonExtracted();
         }
 
     }
 
     void ConceptNetQueryCommand::extractASPPredicates() {
-        //start = std::chrono::high_resolution_clock::now();
+#ifdef CNQC_EVALCODE
+        start = std::chrono::high_resolution_clock::now();
+#endif
         QString programSection = "#program cn5_commonsenseKnowledge";
         QString program = programSection;
         program.append(".\n");
@@ -318,12 +326,14 @@ namespace kbcr {
         auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
         for (auto pair : pgmMap) {
             this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
-            //this->gui->getUi()->programLabel->setText(
-            //        this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
+            this->gui->getUi()->programLabel->setText(
+                    this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
         }
         this->gui->enableGui(true);
-        //std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-        //outFS << " \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+#ifdef CNQC_EVALCODE
+        std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
+        outFS << " \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
+#endif
         if (this->gui->slHandler->currentLoadCmd != nullptr) {
             emit
             this->gui->slHandler->currentLoadCmd->cn5CallFinished();
@@ -401,9 +411,12 @@ namespace kbcr {
 
     QString ConceptNetQueryCommand::createBackgroundKnowledgeRule(QString relation, std::shared_ptr<ConceptNetEdge> edge) {
         QString ret = relation;
-        ret.append("(n, m, W) :- not -").append(relation).append("(n, m), typeOf(n, ").append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(
-                conceptToASPPredicate(edge->firstConcept->term)).append("), typeOf(m, ").append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(
-                conceptToASPPredicate(edge->secondConcept->term)).append("), ").append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(relation.replace(0,1, relation.at(0).toUpper())).append("(n, m, W).\n");
+        ret.append("(n, m, W) :- not -").append(relation).append("(n, m), typeOf(n, ")
+        .append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(conceptToASPPredicate(edge->firstConcept->term)).append("), typeOf(m, ")
+        .append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(conceptToASPPredicate(edge->secondConcept->term)).append("), ")
+        .append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(relation.replace(0,1, relation.at(0).toUpper())).append("(")
+        .append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(conceptToASPPredicate(edge->firstConcept->term)).append(",")
+        .append(KnowledgebaseCreator::CONCEPTNET_PREFIX).append(conceptToASPPredicate(edge->secondConcept->term)).append(", W).\n");
         return ret;
     }
 

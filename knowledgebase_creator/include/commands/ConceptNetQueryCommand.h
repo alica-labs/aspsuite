@@ -15,6 +15,7 @@
 #include <fstream>
 
 //#define ConceptNetQueryCommandDebug
+//#define CNQC_EVALCODE
 
 namespace kbcr
 {
@@ -109,9 +110,10 @@ namespace kbcr
 
 		int prefixLength;
 
-
-        //std::chrono::_V2::system_clock::time_point start;
-        //std::ofstream outFS;
+#ifdef CNQC_EVALCODE
+        std::chrono::_V2::system_clock::time_point start;
+        std::ofstream outFS;
+#endif
 
 	signals:
 		/**

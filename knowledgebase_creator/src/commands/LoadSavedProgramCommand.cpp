@@ -26,7 +26,9 @@ namespace kbcr {
         this->gui = gui;
         this->loadedData = loadedData;
         this->fileName = fileName;
+#ifdef LSPC_EVALCODE
         this->outFS = std::ofstream("outfile.txt", std::ios::app);
+#endif
         std::cout << "load created" << std::endl;
     }
 
@@ -43,9 +45,10 @@ namespace kbcr {
         std::cout << "Start loading" << std::endl;
 
         QJsonArray cmds = savedObject["commandHistory"].toArray();
-
+#ifdef LSPC_EVALCODE
         for (int j = 0; j < 10000; j++) {
             std::chrono::_V2::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+#endif
             for (int i = 0; i < cmds.size(); i++) {
                 QJsonObject cmd = cmds[i].toObject();
                 // Show progress to user
@@ -152,11 +155,12 @@ namespace kbcr {
                 }
 
             }
+#ifdef LSPC_EVALCODE
             std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
             outFS << "Measured Time: \t" << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << std::endl;
         }
-        //outFS.close();
-//		std::cout << "LoadSavedProgramCommand: Loading finished!" << std::endl;
+#endif
+		std::cout << "LoadSavedProgramCommand: Loading finished!" << std::endl;
         this->gui->slHandler->currentLoadCmd = nullptr;
     }
 

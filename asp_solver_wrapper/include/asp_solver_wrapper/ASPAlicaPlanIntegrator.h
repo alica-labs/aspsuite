@@ -25,22 +25,22 @@ class ASPGenerator;
  */
 class ASPAlicaPlanIntegrator
 {
-  public:
-    ASPAlicaPlanIntegrator(::reasoner::IASPSolver *solver, ASPGenerator *gen);
+public:
+    ASPAlicaPlanIntegrator(::reasoner::IASPSolver* solver, ASPGenerator* gen);
     virtual ~ASPAlicaPlanIntegrator();
-    void loadPlanTree(const Plan *p);
+    void loadPlanTree(const Plan* p);
 
-  private:
-    void processPlan(const Plan *p, uint64_t instanceElementHash);
-    void processPreCondition(const PreCondition *cond);
-    void processRuntimeCondition(const RuntimeCondition *cond);
-    uint64_t handleRunningPlan(const Plan *rootPlan);
-    uint64_t handleRunningPlan(const Plan *childPlan, const State *state, uint64_t instanceElementHash);
-    uint64_t handleRunningPlan(const Plan *childPlan, const State *state, const PlanType *planType, uint64_t instanceElementHash);
-    void handleCondString(const std::string &condString, std::string prefix, const Condition *cond);
+private:
+    void processPlan(const Plan* p, uint64_t instanceElementHash);
+    void processPreCondition(const PreCondition* cond);
+    void processRuntimeCondition(const RuntimeCondition* cond);
+    uint64_t handleRunningPlan(const Plan* rootPlan);
+    uint64_t handleRunningPlan(const Plan* childPlan, const State* state, uint64_t instanceElementHash);
+    uint64_t handleRunningPlan(const Plan* childPlan, const State* state, const PlanType* planType, uint64_t instanceElementHash);
+    void handleCondString(const std::string& condString, std::string prefix, const Condition* cond);
 
-    ASPGenerator *gen;
-    ::reasoner::IASPSolver *solver;
+    ASPGenerator* gen;
+    ::reasoner::IASPSolver* solver;
 
     std::vector<long> processedPlanIds;
 };

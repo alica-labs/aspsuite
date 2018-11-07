@@ -17,10 +17,10 @@
 #include <signal.h>
 
 bool stop;
-void *ctx;
+void* ctx;
 int msgNumber;
-capnzero::Publisher *pub;
-capnzero::Subscriber *sub;
+capnzero::Publisher* pub;
+capnzero::Subscriber* sub;
 
 /**
  * Checks the return code and reports an error if present.
@@ -28,15 +28,14 @@ capnzero::Subscriber *sub;
  */
 void check(int returnCode, std::string methodName, bool abortIfError)
 {
-    if (returnCode != 0)
-    {
+    if (returnCode != 0) {
         std::cerr << methodName << " returned: " << errno << " - " << zmq_strerror(errno) << std::endl;
         if (abortIfError)
             assert(returnCode);
     }
 }
 
-void send(capnzero::Publisher *pub, int msgNumber)
+void send(capnzero::Publisher* pub, int msgNumber)
 {
     capnp::MallocMessageBuilder msgBuilder;
     discovery_msgs::Beacon::Builder beaconMsgBuilder = msgBuilder.initRoot<discovery_msgs::Beacon>();
@@ -48,31 +47,25 @@ void send(capnzero::Publisher *pub, int msgNumber)
     uuid_generate(uuid);
     beaconMsgBuilder.setUuid(kj::arrayPtr(uuid, sizeof(uuid)));
 
-    std::cout << "SendTest::send(): Message sent: '" << beaconMsgBuilder.toString().flatten().cStr() << "'"
-              << std::endl;
+    std::cout << "SendTest::send(): Message sent: '" << beaconMsgBuilder.toString().flatten().cStr() << "'" << std::endl;
     int numBytesSent = pub->send(msgBuilder);
 
     // std::cout << "SendTest::send(): " << numBytesSent << " Bytes sent! " << std::endl;
 }
 
-void receive(::capnp::FlatArrayMessageReader &reader)
+void receive(::capnp::FlatArrayMessageReader& reader)
 {
     std::cout << "SendTest::receive(..) called!" << std::endl;
     auto beacon = reader.getRoot<discovery_msgs::Beacon>();
 
-    if (beacon.getPort() != msgNumber)
-    {
-        std::cout << "SendTest::receive(..): Message received: '" << beacon.toString().flatten().cStr() << "'"
-                  << std::endl;
+    if (beacon.getPort() != msgNumber) {
+        std::cout << "SendTest::receive(..): Message received: '" << beacon.toString().flatten().cStr() << "'" << std::endl;
 
         msgNumber = beacon.getPort();
-        if (msgNumber != 100)
-        {
+        if (msgNumber != 100) {
             send(pub, ++msgNumber);
         }
-    }
-    else
-    {
+    } else {
         std::cout << "SendTest::receive(..): Received own Number " << std::endl;
     }
 }
@@ -82,7 +75,7 @@ void sigIntHandler(int sig)
     stop = true;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     stop = false;
     // register ctrl+c handler
@@ -96,13 +89,11 @@ int main(int argc, char **argv)
     sub->subscribe(&receive);
 
     msgNumber = 0;
-    if (argc > 1 && strcmp(argv[1], "sender") == 0)
-    {
+    if (argc > 1 && strcmp(argv[1], "sender") == 0) {
         send(pub, ++msgNumber);
     }
 
-    while (!stop && msgNumber != 100)
-    {
+    while (!stop && msgNumber != 100) {
         usleep(1);
     }
 

@@ -10,10 +10,12 @@
 
 namespace reasoner
 {
-	enum ASPQueryType
-	{
-		Facts, Variable, Undefined
-	};
+enum ASPQueryType
+{
+    Facts,
+    Variable,
+    Undefined
+};
 } /* namespace reasoner */
 
 #endif /* INCLUDE_QUERYTYPE_H_ */

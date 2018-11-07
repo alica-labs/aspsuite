@@ -15,13 +15,12 @@
 #include <asp_solver_wrapper/ASPGenerator.h>
 #include <asp_solver_wrapper/ASPSolverContext.h>
 
-
 namespace alica
 {
 namespace reasoner
 {
-ASPSolverWrapper::ASPSolverWrapper(AlicaEngine *ae, std::vector<char const *> args)
-    : alica::ISolver<ASPSolverWrapper, ::reasoner::AnnotatedValVec>(ae)
+ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args)
+        : alica::ISolver<ASPSolverWrapper, ::reasoner::AnnotatedValVec*>(ae)
 {
     this->ae = ae;
     this->solver = nullptr;
@@ -41,84 +40,76 @@ int ASPSolverWrapper::getQueryCounter()
     return this->solver->getQueryCounter();
 }
 
-bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>> &calls)
+bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls)
 {
     ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
-    if (!masterPlanLoaded)
-    {
+    if (!masterPlanLoaded) {
         this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
         masterPlanLoaded = true;
     }
 
-    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(solverCtx->getVariables().size());
-    for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i)
-    {
-        cVars.at(i) = std::dynamic_pointer_cast<::reasoner::ASPCommonsVariable>(solverCtx->getVariables().at(i));
+    auto cVars = std::vector<::reasoner::ASPCommonsVariable*>(solverCtx->getVariables().size());
+    for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i) {
+        cVars.at(i) = (::reasoner::ASPCommonsVariable*) solverCtx->getVariables().at(i).get();
     }
-    vector<shared_ptr<::reasoner::ASPCommonsTerm>> constraint;
-    for (auto &c : calls)
-    {
-        if (!(std::dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
-        {
-            cerr << "ASPSolverWrapper: Type of constraint not compatible with selected solver." << endl;
-            continue;
-        }
+    std::vector<::reasoner::ASPCommonsTerm*> constraint;
+    for (auto& c : calls) {
         constraint.push_back(toCommonsTerm(c->getConstraint()));
     }
     bool ret = this->solver->existsSolution(cVars, constraint);
     return ret;
 }
 
-bool ASPSolverWrapper::getSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>> &calls,
-                 std::vector<::reasoner::AnnotatedValVec> &results)
+bool ASPSolverWrapper::getSolutionImpl(
+        SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<::reasoner::AnnotatedValVec*>& results)
 {
     ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
-    if (!masterPlanLoaded)
-    {
+    if (!masterPlanLoaded) {
         this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
         masterPlanLoaded = true;
     }
-    auto cVars = vector<shared_ptr<::reasoner::ASPCommonsVariable>>(solverCtx->getVariables().size());
-    for (int i = 0; i < solverCtx->getVariables().size(); ++i)
-    {
-        cVars.at(i) = dynamic_pointer_cast<::reasoner::ASPCommonsVariable>(vars.at(i)->getSolverVar());
+
+    auto cVars = std::vector<::reasoner::ASPCommonsVariable*>(solverCtx->getVariables().size());
+    for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i) {
+        cVars.at(i) = (::reasoner::ASPCommonsVariable*) solverCtx->getVariables().at(i).get();
     }
-    vector<shared_ptr<::reasoner::ASPCommonsTerm>> constraint;
-    for (auto &c : calls)
-    {
-        if (!(dynamic_pointer_cast<alica::reasoner::ASPTerm>(c->getConstraint()) != 0))
-        {
-            cerr << "ASPSolverWrapper: Type of constraint not compatible with selected solver." << endl;
-            continue;
-        }
+
+    std::vector<::reasoner::ASPCommonsTerm*> constraint;
+    for (auto& c : calls) {
         constraint.push_back(toCommonsTerm(c->getConstraint()));
     }
     bool ret = this->solver->getSolution(cVars, constraint, results);
     return ret;
 }
 
-shared_ptr<SolverVariable> ASPSolverWrapper::createVariable(uint64_t id)
+SolverVariable* ASPSolverWrapper::createVariable(int64_t representingVariableID, SolverContext* ctx)
 {
-    return make_shared<alica::reasoner::ASPVariable>(id);
+    return static_cast<ASPSolverContext*>(ctx)->createVariable(representingVariableID);
 }
 
-shared_ptr<::reasoner::ASPCommonsTerm> ASPSolverWrapper::toCommonsTerm(shared_ptr<SolverTerm> term)
+std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
 {
-    auto tmp = dynamic_pointer_cast<alica::reasoner::ASPTerm>(term);
-    if (tmp == nullptr)
-    {
-        return nullptr;
-    }
-    shared_ptr<::reasoner::ASPCommonsTerm> ret = make_shared<::reasoner::ASPCommonsTerm>(tmp->getLifeTime());
+    return std::unique_ptr<SolverContext>(new ASPSolverContext());
+}
+
+/**
+ * TODO: Why does this method copy the Solver Term?
+ * @param term
+ * @return
+ */
+::reasoner::ASPCommonsTerm* ASPSolverWrapper::toCommonsTerm(SolverTerm* term)
+{
+    auto tmp = (::reasoner::ASPCommonsTerm*) term;
+
+    ::reasoner::ASPCommonsTerm* ret = new ::reasoner::ASPCommonsTerm();
+    ret->setLifeTime(tmp->getLifeTime());
     ret->setQueryRule(tmp->getQueryRule());
-    for (auto it : tmp->getRules())
-    {
+    for (auto it : tmp->getRules()) {
         ret->addRule(it);
     }
-    for (auto it : tmp->getFacts())
-    {
+    for (auto it : tmp->getFacts()) {
         ret->addFact(it);
     }
     ret->setId(tmp->getId());
@@ -130,23 +121,12 @@ shared_ptr<::reasoner::ASPCommonsTerm> ASPSolverWrapper::toCommonsTerm(shared_pt
     return ret;
 }
 
-shared_ptr<::reasoner::ASPCommonsVariable> ASPSolverWrapper::toCommonsVariable(shared_ptr<SolverVariable> var)
-{
-    auto tmp = dynamic_pointer_cast<alica::reasoner::ASPVariable>(var);
-    if (tmp == nullptr)
-    {
-        return nullptr;
-    }
-    shared_ptr<::reasoner::ASPCommonsVariable> ret = make_shared<::reasoner::ASPCommonsVariable>();
-    return ret;
-}
-
-::reasoner::IASPSolver *ASPSolverWrapper::getSolver()
+::reasoner::IASPSolver* ASPSolverWrapper::getSolver()
 {
     return solver;
 }
 
-void ASPSolverWrapper::init(::reasoner::IASPSolver *solver)
+void ASPSolverWrapper::init(::reasoner::IASPSolver* solver)
 {
     this->solver = solver;
     this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
@@ -155,10 +135,8 @@ void ASPSolverWrapper::init(::reasoner::IASPSolver *solver)
 
 void ASPSolverWrapper::integrateRules()
 {
-    for (auto query : this->getRegisteredQueries())
-    {
-        for (auto rule : query->getRules())
-        {
+    for (auto query : this->getRegisteredQueries()) {
+        for (auto rule : query->getRules()) {
             this->solver->add("planBase", {}, rule.c_str());
         }
     }
@@ -170,14 +148,13 @@ void ASPSolverWrapper::integrateRules()
  *
  * @returns False, if the plan is not valid. True, otherwise.
  */
-bool ASPSolverWrapper::validatePlan(Plan *plan)
+bool ASPSolverWrapper::validatePlan(Plan* plan)
 {
     // adds all facts about the given plan tree in to clingo
     this->planIntegrator->loadPlanTree(plan);
 
     this->integrateRules();
-    for (auto query : this->getRegisteredQueries())
-    {
+    for (auto query : this->getRegisteredQueries()) {
         query->reduceLifeTime();
     }
     auto result = this->solver->solve();
@@ -209,6 +186,6 @@ vector<shared_ptr<::reasoner::ASPQuery>> alica::reasoner::ASPSolverWrapper::getR
 {
     return this->solver->getRegisteredQueries();
 }
-}
+} // namespace reasoner
 
 } /* namespace alica */

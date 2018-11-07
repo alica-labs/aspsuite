@@ -4,27 +4,27 @@
 #include <capnp/serialize-packed.h>
 #include <zmq.h>
 
-#include <iostream>
-#include <string>
 #include <iomanip>
-#include <vector>
+#include <iostream>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace capnzero
 {
 
 class Publisher
 {
-  public:
-    Publisher(void *context, std::string connection, std::string multicastGroupName);
+public:
+    Publisher(void* context, std::string connection, std::string multicastGroupName);
     virtual ~Publisher();
 
     int send(capnp::MallocMessageBuilder& msgBuilder);
 
-  protected:
-    void *socket;
+protected:
+    void* socket;
     std::string multicastGroupName;
 };
 
-static void cleanUpMsgData(void * data, void * hint);
-}
+static void cleanUpMsgData(void* data, void* hint);
+} // namespace capnzero

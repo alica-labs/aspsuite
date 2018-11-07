@@ -3,40 +3,35 @@ using namespace std;
 #include "BehaviourCreator.h"
 #include "engine/BasicBehaviour.h"
 
-#include  "Plans/Assistance/HandOver.h"
+#include "Plans/Assistance/HandOver.h"
 
-#include  "Plans/Assistance/Carry.h"
+#include "Plans/Assistance/Carry.h"
 
 namespace alica
 {
 
-    BehaviourCreator::BehaviourCreator()
-    {
-    }
+BehaviourCreator::BehaviourCreator() {}
 
-    BehaviourCreator::~BehaviourCreator()
-    {
-    }
+BehaviourCreator::~BehaviourCreator() {}
 
-    shared_ptr<BasicBehaviour> BehaviourCreator::createBehaviour(long behaviourConfId)
-    {
-        switch (behaviourConfId)
-        {
+shared_ptr<BasicBehaviour> BehaviourCreator::createBehaviour(long behaviourConfId)
+{
+    switch (behaviourConfId) {
 
-            case 1463404677134:
+    case 1463404677134:
 
-                return make_shared<HandOver>();
-                break;
+        return make_shared<HandOver>();
+        break;
 
-            case 1463077955666:
+    case 1463077955666:
 
-                return make_shared<Carry>();
-                break;
+        return make_shared<Carry>();
+        break;
 
-            default:
-                cerr << "BehaviourCreator: Unknown behaviour requested: " << behaviourConfId << endl;
-                throw new exception();
-                break;
-        }
+    default:
+        cerr << "BehaviourCreator: Unknown behaviour requested: " << behaviourConfId << endl;
+        throw new exception();
+        break;
     }
 }
+} // namespace alica

@@ -30,39 +30,32 @@ namespace discovery
 bool Agent::operating = true;
 
 Agent::Agent(std::string name, bool sender)
-    : Worker(name)
-    , sender(sender)
-    , socket(nullptr)
-    , ctx(zmq_ctx_new())
+        : Worker(name)
+        , sender(sender)
+        , socket(nullptr)
+        , ctx(zmq_ctx_new())
 {
     // generate
     uuid_generate(this->uuid);
 
-    if (this->sender)
-    {
+    if (this->sender) {
         this->pub = new capnzero::Publisher(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
-    }
-    else
-    {
+    } else {
         this->sub = new capnzero::Subscriber(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
-        this->sub->subscribe<discovery::Agent>(&Agent::callback, (discovery::Agent *)this);
+        this->sub->subscribe<discovery::Agent>(&Agent::callback, (discovery::Agent*) this);
     }
 }
 
-void Agent::callback(::capnp::FlatArrayMessageReader &reader)
+void Agent::callback(::capnp::FlatArrayMessageReader& reader)
 {
-    std::cout << "Agent::callback(): " << reader.getRoot<discovery_msgs::Beacon>().toString().flatten().cStr()
-              << std::endl;
+    std::cout << "Agent::callback(): " << reader.getRoot<discovery_msgs::Beacon>().toString().flatten().cStr() << std::endl;
 }
 
 Agent::~Agent()
 {
-    if (this->sender)
-    {
+    if (this->sender) {
         delete (this->pub);
-    }
-    else
-    {
+    } else {
         delete (this->sub);
     }
 
@@ -74,18 +67,14 @@ void Agent::run()
     // this->checkZMQVersion();
     // this->testUUIDStuff();
 
-    if (!this->getWirelessAddress())
-    {
+    if (!this->getWirelessAddress()) {
         std::cerr << "Agent: No WLAN-Address available! " << std::endl;
         return;
     }
 
-    if (this->sender)
-    {
+    if (this->sender) {
         send();
-    }
-    else
-    {
+    } else {
         this->sub->receive();
     }
 }
@@ -120,8 +109,7 @@ void Agent::send()
  */
 void Agent::check(int returnCode, std::string methodName, bool abortIfError)
 {
-    if (returnCode != 0)
-    {
+    if (returnCode != 0) {
         std::cerr << methodName << " returned: " << errno << " - " << zmq_strerror(errno) << std::endl;
         if (abortIfError)
             assert(returnCode);
@@ -168,24 +156,19 @@ void Agent::testUUIDStuff()
  */
 bool Agent::getWirelessAddress()
 {
-    struct ifaddrs *ifAddrStruct = NULL;
-    struct ifaddrs *ifa = NULL;
+    struct ifaddrs* ifAddrStruct = NULL;
+    struct ifaddrs* ifa = NULL;
 
     getifaddrs(&ifAddrStruct);
 
-    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        if (!ifa->ifa_addr)
-        {
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
             continue;
         }
         // filters for 'w'ireless interfaces with ipv4 addresses
-        if (ifa->ifa_name[0] == 'w' && ifa->ifa_addr->sa_family == AF_INET)
-        { // check it is IP4
-            int error = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), this->wirelessIpAddress, NI_MAXHOST,
-                                    NULL, 0, NI_NUMERICHOST);
-            if (error != 0)
-            {
+        if (ifa->ifa_name[0] == 'w' && ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+            int error = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), this->wirelessIpAddress, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+            if (error != 0) {
                 std::cout << "Agent:getWirelessAddress: getnameinfo() failed: " << gai_strerror(error) << std::endl;
                 exit(EXIT_FAILURE);
             }
@@ -193,9 +176,7 @@ bool Agent::getWirelessAddress()
             if (ifAddrStruct != NULL)
                 freeifaddrs(ifAddrStruct);
             return true;
-        }
-        else
-        {
+        } else {
             // std::cout << "Agent::getWirelessAddress: Interface Name: " << ifa->ifa_name
             //          << " Protocol Family: " << ifa->ifa_addr->sa_family << std::endl;
         }
@@ -216,18 +197,15 @@ void Agent::sigIntHandler(int sig)
 {
     operating = false;
 }
-}
+} // namespace discovery
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    discovery::Agent *agent;
-    if (argc > 1 && strcmp(argv[1], "sender") == 0)
-    {
+    discovery::Agent* agent;
+    if (argc > 1 && strcmp(argv[1], "sender") == 0) {
         std::cout << "Creating sending agent!" << std::endl;
         agent = new discovery::Agent("Sender", true);
-    }
-    else
-    {
+    } else {
         std::cout << "Creating receiving agent!" << std::endl;
         agent = new discovery::Agent("Receiver", false);
     }
@@ -241,8 +219,7 @@ int main(int argc, char **argv)
     signal(SIGINT, discovery::Agent::sigIntHandler);
 
     // start running
-    while (discovery::Agent::operating)
-    {
+    while (discovery::Agent::operating) {
         sleep(1);
     }
 

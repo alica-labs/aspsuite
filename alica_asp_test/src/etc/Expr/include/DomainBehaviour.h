@@ -5,14 +5,12 @@
 
 namespace alica
 {
-    class DomainBehaviour : public BasicBehaviour
-    {
-    public:
-        DomainBehaviour(string name);
-        virtual ~DomainBehaviour();
-
-    };
+class DomainBehaviour : public BasicBehaviour
+{
+public:
+    DomainBehaviour(string name);
+    virtual ~DomainBehaviour();
+};
 } /* namespace alica */
 
 #endif /* DomainBehaviour_H_ */
-

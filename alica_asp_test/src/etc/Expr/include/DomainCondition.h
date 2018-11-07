@@ -5,13 +5,12 @@
 
 namespace alica
 {
-    class DomainCondition : public BasicCondition
-    {
-    public:
-        DomainCondition();
-        virtual ~DomainCondition();
-    };
+class DomainCondition : public BasicCondition
+{
+public:
+    DomainCondition();
+    virtual ~DomainCondition();
+};
 } /* namespace alica */
 
 #endif /* DomainBehaviour_H_ */
-

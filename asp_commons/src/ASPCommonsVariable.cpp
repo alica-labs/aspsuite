@@ -9,15 +9,12 @@
 
 namespace reasoner
 {
-	int ASPCommonsVariable::var_id = 0;
-	ASPCommonsVariable::ASPCommonsVariable()
-	{
-		ownId = var_id++;
+int ASPCommonsVariable::var_id = 0;
+ASPCommonsVariable::ASPCommonsVariable()
+{
+    ownId = var_id++;
+}
 
-	}
-
-	ASPCommonsVariable::~ASPCommonsVariable()
-	{
-	}
+ASPCommonsVariable::~ASPCommonsVariable() {}
 
 } /* namespace reasoner */

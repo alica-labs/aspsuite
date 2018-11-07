@@ -4,21 +4,22 @@
 //#define _GNU_SOURCE
 #include <netdb.h>
 
-#include <supplementary/Worker.h>
 #include <capnzero/Subscriber.h>
 #include <discovery_msgs/beacon.capnp.h>
+#include <supplementary/Worker.h>
 
-#include <zmq.h>
 #include <uuid/uuid.h>
+#include <zmq.h>
 
-#include <kj/array.h>
 #include <capnp/common.h>
+#include <kj/array.h>
 
 #include <signal.h>
 #include <vector>
 
-namespace capnzero {
-	class Publisher;
+namespace capnzero
+{
+class Publisher;
 }
 
 namespace discovery
@@ -26,7 +27,7 @@ namespace discovery
 
 class Agent : public supplementary::Worker
 {
-  public:
+public:
     Agent(std::string name, bool sender);
     virtual ~Agent();
 
@@ -36,12 +37,12 @@ class Agent : public supplementary::Worker
     static void sigIntHandler(int sig);
     static bool operating;
 
-  private:
+private:
     void sendMultiPartZeroCopy();
     void send();
 
     void receive();
-    kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> genericReceive ();
+    kj::ArrayPtr<kj::ArrayPtr<capnp::word const>> genericReceive();
 
     void testUUIDStuff();
     void checkZMQVersion();
@@ -53,8 +54,8 @@ class Agent : public supplementary::Worker
 
     // zmq stuff
     bool sender;
-    void *ctx;
-    void *socket;
+    void* ctx;
+    void* socket;
 
     // capnzero stuff
     capnzero::Publisher* pub;

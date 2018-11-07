@@ -14,29 +14,26 @@
 
 using namespace std;
 
-	namespace reasoner
-	{
+namespace reasoner
+{
 
-		class AnnotatedExternal
-		{
-		public:
-			AnnotatedExternal(string aspPredicate, shared_ptr<Clingo::Symbol> gringoValue, bool value);
-			virtual ~AnnotatedExternal();
-			string getAspPredicate();
-			void setAspPredicate(string aspPredicate);
-			shared_ptr<Clingo::Symbol> getGringoValue();
-			void setGringoValue(shared_ptr<Clingo::Symbol> gringoValue);
-			bool getValue();
-			void setValue(bool value);
+class AnnotatedExternal
+{
+public:
+    AnnotatedExternal(string aspPredicate, shared_ptr<Clingo::Symbol> gringoValue, bool value);
+    virtual ~AnnotatedExternal();
+    string getAspPredicate();
+    void setAspPredicate(string aspPredicate);
+    shared_ptr<Clingo::Symbol> getGringoValue();
+    void setGringoValue(shared_ptr<Clingo::Symbol> gringoValue);
+    bool getValue();
+    void setValue(bool value);
 
+private:
+    string aspPredicate;
+    shared_ptr<Clingo::Symbol> gringoValue;
+    bool value;
+};
 
-		private:
-			string aspPredicate;
-			shared_ptr<Clingo::Symbol> gringoValue;
-			bool value;
-
-
-		};
-
-	} /* namespace reasoner */
+} /* namespace reasoner */
 #endif /* SRC_ANNOTATEDEXTERNAL_H_ */

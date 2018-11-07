@@ -2,8 +2,10 @@
 
 namespace reasoner
 {
-	enum ASPTruthValue
-	{
-		False, True, Unknown
-	};
+enum ASPTruthValue
+{
+    False,
+    True,
+    Unknown
+};
 } /* namespace reasoner */

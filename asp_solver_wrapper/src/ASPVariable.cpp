@@ -2,16 +2,15 @@
 
 namespace alica
 {
-	namespace reasoner
-	{
-		ASPVariable::ASPVariable(uint64_t id) : SolverVariable(id)
-		{
-			this->id = id;
-		}
+namespace reasoner
+{
+ASPVariable::ASPVariable(uint64_t id)
+        : SolverVariable(id)
+{
+    this->id = id;
+}
 
-		ASPVariable::~ASPVariable()
-		{
-		}
+ASPVariable::~ASPVariable() {}
 
-	} /* namespace reasoner */
+} /* namespace reasoner */
 } /* namespace alica */

@@ -22,17 +22,15 @@ namespace alica
 namespace reasoner
 {
 
-ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(::reasoner::IASPSolver *solver, ASPGenerator *gen)
+ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(::reasoner::IASPSolver* solver, ASPGenerator* gen)
 {
     this->solver = solver;
     this->gen = gen;
 }
 
-ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator()
-{
-}
+ASPAlicaPlanIntegrator::~ASPAlicaPlanIntegrator() {}
 
-void ASPAlicaPlanIntegrator::loadPlanTree(const Plan *p)
+void ASPAlicaPlanIntegrator::loadPlanTree(const Plan* p)
 {
     this->processedPlanIds.clear();
 
@@ -56,11 +54,10 @@ void ASPAlicaPlanIntegrator::loadPlanTree(const Plan *p)
  * @param Plan p.
  * @return Returns true, if the processed plan is a tree.
  */
-void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElementHash)
+void ASPAlicaPlanIntegrator::processPlan(const Plan* p, uint64_t instanceElementHash)
 {
     long currentPlanId = p->getId();
-    if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end())
-    { // already processed
+    if (find(processedPlanIds.begin(), processedPlanIds.end(), currentPlanId) != processedPlanIds.end()) { // already processed
         return;
     }
 
@@ -77,9 +74,8 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElement
     this->processRuntimeCondition(p->getRuntimeCondition());
 
     // add entry points and their tasks
-    for (const EntryPoint* entryPoint : p->getEntryPoints())
-    {
-        const Task *task = entryPoint->getTask();
+    for (const EntryPoint* entryPoint : p->getEntryPoints()) {
+        const Task* task = entryPoint->getTask();
 
         // add task
         // TODO: what is, if we add the task two or more times to planBase?
@@ -90,8 +86,7 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElement
 
         // add entry point
         this->solver->add("planBase", {}, gen->entryPoint(entryPoint).c_str());
-        if (entryPoint->isSuccessRequired())
-        {
+        if (entryPoint->isSuccessRequired()) {
             this->solver->add("planBase", {}, gen->successRequired(entryPoint).c_str());
         }
         this->solver->add("planBase", {}, gen->hasInitialState(entryPoint, entryPoint->getState()).c_str());
@@ -102,59 +97,46 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElement
     }
 
     // add state
-    for (auto &state : p->getStates())
-    {
+    for (auto& state : p->getStates()) {
 
         this->solver->add("planBase", {}, gen->hasState(p, state).c_str());
 
-        if (state->isFailureState())
-        {
+        if (state->isFailureState()) {
             // add failure state
             this->solver->add("planBase", {}, gen->failureState(state).c_str());
 
             // TODO: handle post-condition of failure state
             // ((FailureState) state).getPostCondition();
-        }
-        else if (state->isSuccessState())
-        {
+        } else if (state->isSuccessState()) {
             // add success state
             this->solver->add("planBase", {}, gen->successState(state).c_str());
 
             // TODO: handle post-condition of success state
             // ((SuccessState) state).getPostCondition();
-        }
-        else // normal state
+        } else // normal state
         {
             // add state
             this->solver->add("planBase", {}, gen->state(state).c_str());
 
-            for (const AbstractPlan* abstractChildPlan : state->getPlans())
-            {
-                if (const alica::Plan *childPlan = dynamic_cast<const alica::Plan *>(abstractChildPlan))
-                {
+            for (const AbstractPlan* abstractChildPlan : state->getPlans()) {
+                if (const alica::Plan* childPlan = dynamic_cast<const alica::Plan*>(abstractChildPlan)) {
                     this->solver->add("planBase", {}, gen->hasPlan(state, childPlan).c_str());
 
                     instanceElementHash = handleRunningPlan(childPlan, state, instanceElementHash);
 
                     this->processPlan(childPlan, instanceElementHash);
-                }
-                else if (const alica::PlanType *childPlanType = dynamic_cast<const alica::PlanType *>(abstractChildPlan))
-                {
+                } else if (const alica::PlanType* childPlanType = dynamic_cast<const alica::PlanType*>(abstractChildPlan)) {
                     this->solver->add("planBase", {}, gen->planType(childPlanType).c_str());
                     this->solver->add("planBase", {}, gen->hasPlanType(state, childPlanType).c_str());
 
-                    for (auto &childPlan : childPlanType->getPlans())
-                    {
+                    for (auto& childPlan : childPlanType->getPlans()) {
                         this->solver->add("planBase", {}, gen->hasRealisation(childPlanType, childPlan).c_str());
 
                         instanceElementHash = handleRunningPlan(childPlan, state, childPlanType, instanceElementHash);
 
                         this->processPlan(childPlan, instanceElementHash);
                     }
-                }
-                else if (const alica::Behaviour *childBehaviour =
-                             dynamic_cast<const alica::Behaviour *>(abstractChildPlan))
-                {
+                } else if (const alica::Behaviour* childBehaviour = dynamic_cast<const alica::Behaviour*>(abstractChildPlan)) {
                     // TODO: Handle Behaviour
                     this->solver->add("planBase", {}, gen->behaviour(childBehaviour).c_str());
                     this->solver->add("planBase", {}, gen->hasBehaviour(state, childBehaviour).c_str());
@@ -164,54 +146,46 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan *p, uint64_t instanceElement
         }
 
         // add state transition relations
-        for (auto &inTransition : state->getInTransitions())
-        {
+        for (auto& inTransition : state->getInTransitions()) {
             this->solver->add("planBase", {}, gen->hasInTransition(state, inTransition).c_str());
         }
-        for (auto &outTransition : state->getOutTransitions())
-        {
+        for (auto& outTransition : state->getOutTransitions()) {
             this->solver->add("planBase", {}, gen->hasOutTransition(state, outTransition).c_str());
         }
     }
 
     // add transitions
-    for (auto &transition : p->getTransitions())
-    {
+    for (auto& transition : p->getTransitions()) {
         this->solver->add("planBase", {}, gen->transition(transition).c_str());
 
         // TODO: handle pre-conditions of transitions
     }
 
     // add synchronisations
-    for (auto &syncTransition : p->getSyncTransitions())
-    {
+    for (auto& syncTransition : p->getSyncTransitions()) {
         this->solver->add("planBase", {}, gen->synchronisation(syncTransition).c_str());
-        for (auto &transition : syncTransition->getInSync())
-        {
+        for (auto& transition : syncTransition->getInSync()) {
             this->solver->add("planBase", {}, gen->hasSynchedTransition(syncTransition, transition).c_str());
         }
         // TODO: maybe it is nice to have the timeouts of a sync transition
     }
 }
 
-void ASPAlicaPlanIntegrator::processPreCondition(const PreCondition *cond)
+void ASPAlicaPlanIntegrator::processPreCondition(const PreCondition* cond)
 {
-    if (!cond || !cond->isEnabled())
-    {
+    if (!cond || !cond->isEnabled()) {
         return;
     }
 
     // alica program facts
     this->solver->add("planBase", {}, gen->preCondition(cond).c_str());
-    if (const Plan *plan = dynamic_cast<const Plan *>(cond->getAbstractPlan()))
-    {
+    if (const Plan* plan = dynamic_cast<const Plan*>(cond->getAbstractPlan())) {
         this->solver->add("planBase", {}, gen->hasPreCondition(plan, cond).c_str());
     }
 
     // asp encoded precondition
-    if (cond->getConditionString() != "")
-    {
-        const std::string &condString = cond->getConditionString();
+    if (cond->getConditionString() != "") {
+        const std::string& condString = cond->getConditionString();
 
         std::cout << "ASP-Integrator: " << gen->preConditionHolds(cond) << std::endl;
         this->solver->add("planBase", {}, gen->preConditionHolds(cond).c_str());
@@ -221,24 +195,21 @@ void ASPAlicaPlanIntegrator::processPreCondition(const PreCondition *cond)
     }
 }
 
-void ASPAlicaPlanIntegrator::processRuntimeCondition(const RuntimeCondition *cond)
+void ASPAlicaPlanIntegrator::processRuntimeCondition(const RuntimeCondition* cond)
 {
     // TODO finish RuntimeCondition
-    if (!cond)
-    {
+    if (!cond) {
         return;
     }
 
     // alica program facts
     this->solver->add("planBase", {}, gen->runtimeCondition(cond).c_str());
-    if (const Plan *plan = dynamic_cast<const Plan *>(cond->getAbstractPlan()))
-    {
+    if (const Plan* plan = dynamic_cast<const Plan*>(cond->getAbstractPlan())) {
         this->solver->add("planBase", {}, gen->hasRuntimeCondition(plan, cond).c_str());
     }
 
-    if (cond->getConditionString() != "")
-    {
-        const std::string &condString = cond->getConditionString();
+    if (cond->getConditionString() != "") {
+        const std::string& condString = cond->getConditionString();
 
         std::cout << "ASP-Integrator: " << gen->runtimeConditionHolds(cond) << std::endl;
         this->solver->add("planBase", {}, gen->runtimeConditionHolds(cond).c_str());
@@ -248,16 +219,15 @@ void ASPAlicaPlanIntegrator::processRuntimeCondition(const RuntimeCondition *con
     }
 }
 
-uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *rootPlan)
+uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* rootPlan)
 {
-    uint64_t instanceElementHash =
-        supplementary::CustomHashes::FNV_OFFSET ^ rootPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+    uint64_t instanceElementHash = supplementary::CustomHashes::FNV_OFFSET ^ rootPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
     this->solver->add("planBase", {}, gen->hasPlanInstance(rootPlan, instanceElementHash).c_str());
     this->solver->add("planBase", {}, gen->runningPlan(instanceElementHash).c_str());
     return instanceElementHash;
 }
 
-uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *plan, const State *state, uint64_t instanceElementHash)
+uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* plan, const State* state, uint64_t instanceElementHash)
 {
     instanceElementHash = instanceElementHash ^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
     this->solver->add("planBase", {}, gen->hasRunningPlan(state, instanceElementHash).c_str());
@@ -266,8 +236,7 @@ uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *plan, const State
     return instanceElementHash;
 }
 
-uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *plan, const State *state, const PlanType *planType,
-                                                   uint64_t instanceElementHash)
+uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* plan, const State* state, const PlanType* planType, uint64_t instanceElementHash)
 {
     instanceElementHash = instanceElementHash ^ planType->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
     instanceElementHash = handleRunningPlan(plan, state, instanceElementHash);
@@ -275,15 +244,14 @@ uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan *plan, const State
     return instanceElementHash;
 }
 
-void ASPAlicaPlanIntegrator::handleCondString(const std::string &condString, std::string prefix, const Condition *cond)
+void ASPAlicaPlanIntegrator::handleCondString(const std::string& condString, std::string prefix, const Condition* cond)
 {
     // analysis of asp encoded precondition, because of non-local in relations
     std::regex words_regex("((\\s|,){1}|^)in\\((\\s*)([A-Z]+(\\w*))(\\s*),(\\s*)([a-z]+(\\w*))(\\s*)(,(\\s*)([a-zA-Z]+("
                            "\\w*))(\\s*)){2}\\)");
     auto words_begin = std::sregex_iterator(condString.begin(), condString.end(), words_regex);
     auto words_end = std::sregex_iterator();
-    for (std::sregex_iterator i = words_begin; i != words_end; ++i)
-    {
+    for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
         std::smatch match = *i;
         std::string inPredicateString = match.str();
         //				std::cout << "ASPAlicaPlanInegrator: ALL MATCH>>>>>>" << inPredicateString <<
@@ -296,11 +264,9 @@ void ASPAlicaPlanIntegrator::handleCondString(const std::string &condString, std
         std::string task = "";
         std::string state = "";
         // plan
-        if (start != std::string::npos)
-        {
+        if (start != std::string::npos) {
             end = inPredicateString.find(',', start + 1);
-            if (end != std::string::npos)
-            {
+            if (end != std::string::npos) {
                 plan = inPredicateString.substr(start + 1, end - start - 1);
                 this->solver->add("planBase", {}, gen->inRefPlan(prefix, cond, plan).c_str());
                 //						std::cout << "ASPAlicaPlanInegrator: PLAN MATCH>>>>>>" << plan
@@ -310,51 +276,40 @@ void ASPAlicaPlanIntegrator::handleCondString(const std::string &condString, std
         }
         // task
         start = end + 1;
-        if (start != std::string::npos)
-        {
+        if (start != std::string::npos) {
             end = inPredicateString.find(',', start);
-            if (end != std::string::npos)
-            {
+            if (end != std::string::npos) {
                 task = inPredicateString.substr(start, end - start);
                 task = supplementary::Configuration::trim(task);
                 //						std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task
                 //<<
                 //"<<<<<<" << std::endl;
-                if (islower(task.at(0)))
-                {
+                if (islower(task.at(0))) {
                     this->solver->add("planBase", {}, gen->inRefPlanTask(prefix, cond, plan, task).c_str());
-                }
-                else
-                {
+                } else {
                     task = "";
                 }
             }
         }
         // state
         start = end + 1;
-        if (start != std::string::npos)
-        {
+        if (start != std::string::npos) {
             end = inPredicateString.find(')', start);
-            if (end != std::string::npos)
-            {
+            if (end != std::string::npos) {
                 state = inPredicateString.substr(start, end - start);
                 state = supplementary::Configuration::trim(state);
                 //						std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" <<
-                //state
+                // state
                 //<< "<<<<<<" << std::endl;
-                if (islower(state.at(0)))
-                {
+                if (islower(state.at(0))) {
                     this->solver->add("planBase", {}, gen->inRefPlanState(prefix, cond, plan, state).c_str());
-                }
-                else
-                {
+                } else {
                     state = "";
                 }
             }
         }
         // plan, task, state
-        if (task != "" && state != "")
-        {
+        if (task != "" && state != "") {
             this->solver->add("planBase", {}, gen->inRefPlanTaskState(prefix, cond, plan, task, state).c_str());
         }
     }

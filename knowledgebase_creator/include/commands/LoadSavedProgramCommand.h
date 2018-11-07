@@ -3,9 +3,9 @@
 #include <commands/Command.h>
 #include <memory>
 
-#include <QJsonObject>
 #include <QByteArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <chrono>
 #include <fstream>
 
@@ -13,33 +13,32 @@
 
 namespace kbcr
 {
-	class SettingsDialog;
-	class KnowledgebaseCreator;
-	/**
-	 * Class inheriting from Command interface used to load a saved Json program
-	 */
-	class LoadSavedProgramCommand : public Command, public std::enable_shared_from_this<LoadSavedProgramCommand>
-	{
-	Q_OBJECT
-	public:
-		LoadSavedProgramCommand(KnowledgebaseCreator* gui, QString fileName, QByteArray loadedData);
-		virtual ~LoadSavedProgramCommand();
+class SettingsDialog;
+class KnowledgebaseCreator;
+/**
+ * Class inheriting from Command interface used to load a saved Json program
+ */
+class LoadSavedProgramCommand : public Command, public std::enable_shared_from_this<LoadSavedProgramCommand>
+{
+    Q_OBJECT
+public:
+    LoadSavedProgramCommand(KnowledgebaseCreator* gui, QString fileName, QByteArray loadedData);
+    virtual ~LoadSavedProgramCommand();
 
-		void execute();
-		void undo();
+    void execute();
+    void undo();
 
-		QJsonObject toJSON();
+    QJsonObject toJSON();
 
-		QByteArray loadedData;
-		QString fileName;
-		KnowledgebaseCreator* gui;
+    QByteArray loadedData;
+    QString fileName;
+    KnowledgebaseCreator* gui;
 #ifdef LSPC_EVALCODE
-        std::ofstream outFS;
+    std::ofstream outFS;
 #endif
 
-	signals:
-		void cn5CallFinished();
-	};
+signals:
+    void cn5CallFinished();
+};
 
 } /* namespace kbcr */
-

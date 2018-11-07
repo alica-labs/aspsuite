@@ -2,12 +2,10 @@
 
 namespace alica
 {
-    DomainCondition::DomainCondition() :
-            BasicCondition()
-    {
-    }
+DomainCondition::DomainCondition()
+        : BasicCondition()
+{
+}
 
-    DomainCondition::~DomainCondition()
-    {
-    }
+DomainCondition::~DomainCondition() {}
 } /* namespace alica */

@@ -17,26 +17,26 @@
 namespace kbcr
 {
 
-	class KnowledgebaseCreator;
-	/**
-	 * Class inheriting from Command interface used to create a VariableQuery
-	 */
-	class VariableQueryCommand : public Command, public std::enable_shared_from_this<VariableQueryCommand>
-	{
-		Q_OBJECT
-	public:
-		VariableQueryCommand(KnowledgebaseCreator* gui, QString program);
-		virtual ~VariableQueryCommand();
+class KnowledgebaseCreator;
+/**
+ * Class inheriting from Command interface used to create a VariableQuery
+ */
+class VariableQueryCommand : public Command, public std::enable_shared_from_this<VariableQueryCommand>
+{
+    Q_OBJECT
+public:
+    VariableQueryCommand(KnowledgebaseCreator* gui, QString program);
+    virtual ~VariableQueryCommand();
 
-		void execute();
-		void undo();
+    void execute();
+    void undo();
 
-		QJsonObject toJSON();
+    QJsonObject toJSON();
 
-		KnowledgebaseCreator* gui;
-		QString program;
-		QString toShow;
-	};
+    KnowledgebaseCreator* gui;
+    QString program;
+    QString toShow;
+};
 
 } /* namespace kbcr */
 

@@ -19,23 +19,26 @@ namespace reasoner
 	{
 		this->type = ASPQueryType::Facts;
 		this->createQueryValues(term->getRuleHeads());
-		this->currentModels = make_shared<vector<Gringo::SymVec>>();
+		this->currentModels = make_shared<vector<Clingo::SymbolVector>>();
 
 		if (!term->getProgramSection().empty())
 		{
 			auto loaded = this->solver->loadFileFromConfig(term->getProgramSection());
 #ifdef ASPSolver_DEBUG
-			cout << "ASPSolver: Query contains rule: " << this->term->getRule() << endl;
+			std::cout << "ASPSolver: Query contains rule: " << std::endl;
+			for (auto rule : this->term->getRules()) {
+				std::cout << rule << std::endl;
+			}
 #endif
 			for (auto fact : this->term->getFacts())
 			{
 #ifdef ASPSolver_DEBUG
-				cout << "ASPSolver: Query contains fact: " << fact << endl;
+				std::cout << "ASPSolver: Query contains fact: " << fact << std::endl;
 #endif
 			}
 			if (loaded)
 			{
-				this->solver->ground( { {Gringo::String(term->getProgramSection().c_str()), {}}}, nullptr);
+				this->solver->ground( { {term->getProgramSection().c_str(), {}}}, nullptr);
 			}
 		}
 	}
@@ -66,7 +69,7 @@ namespace reasoner
 					}
 					currentQuery = queryString.substr(start, end - start + 1);
 					currentQuery = supplementary::Configuration::trim(currentQuery);
-					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Gringo::Symbol>());
+					this->headValues.emplace(this->solver->parseValue(currentQuery), vector<Clingo::Symbol>());
 					start = queryString.find(",", end);
 					if (start != string::npos)
 					{
@@ -76,22 +79,22 @@ namespace reasoner
 			}
 			else
 			{
-				this->headValues.emplace(this->solver->parseValue(queryString), vector<Gringo::Symbol>());
+				this->headValues.emplace(this->solver->parseValue(queryString), vector<Clingo::Symbol>());
 			}
 		}
 	}
 
-	map<Gringo::Symbol, vector<Gringo::Symbol> > ASPFactsQuery::getFactModelMap()
+	map<Clingo::Symbol, vector<Clingo::Symbol> > ASPFactsQuery::getFactModelMap()
 	{
 		return this->factModelMap;
 	}
 
-	void ASPFactsQuery::setFactModelMap(map<Gringo::Symbol, vector<Gringo::Symbol> > factModelMap)
+	void ASPFactsQuery::setFactModelMap(map<Clingo::Symbol, vector<Clingo::Symbol> > factModelMap)
 	{
 		this->factModelMap = factModelMap;
 	}
 
-	void ASPFactsQuery::saveSatisfiedFact(Gringo::Symbol key, Gringo::Symbol value)
+	void ASPFactsQuery::saveSatisfiedFact(Clingo::Symbol key, Clingo::Symbol value)
 	{
 		auto entry = this->factModelMap.find(key);
 		if (entry != this->factModelMap.end())
@@ -100,10 +103,10 @@ namespace reasoner
 		}
 	}
 
-	shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol> > > ASPFactsQuery::getSatisfiedFacts()
+	shared_ptr<map<Clingo::Symbol, vector<Clingo::Symbol> > > ASPFactsQuery::getSatisfiedFacts()
 	{
-		shared_ptr<map<Gringo::Symbol, vector<Gringo::Symbol> > > ret = make_shared<
-				map<Gringo::Symbol, vector<Gringo::Symbol> > >();
+		shared_ptr<map<Clingo::Symbol, vector<Clingo::Symbol> > > ret = make_shared<
+				map<Clingo::Symbol, vector<Clingo::Symbol> > >();
 		for (auto pair : this->factModelMap)
 		{
 			if (pair.second.size() > 0)
@@ -142,24 +145,24 @@ namespace reasoner
 	{
 	}
 
-	vector<pair<Gringo::Symbol, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
+	vector<pair<Clingo::Symbol, ASPTruthValue> > ASPFactsQuery::getASPTruthValues()
 	{
-		vector<pair<Gringo::Symbol, ASPTruthValue>> ret;
+		vector<pair<Clingo::Symbol, ASPTruthValue>> ret;
 		for (auto iter : this->getHeadValues())
 		{
 			if (iter.second.size() == 0)
 			{
-				ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
+				ret.push_back(pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
 			}
 			else
 			{
-				if (iter.second.at(0).sign())
+				if (iter.second.at(0).is_positive())
 				{
-					ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::True));
+					ret.push_back(pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::True));
 				}
 				else
 				{
-					ret.push_back(pair<Gringo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::False));
+					ret.push_back(pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::False));
 				}
 			}
 
@@ -167,11 +170,11 @@ namespace reasoner
 		return ret;
 	}
 
-	void ASPFactsQuery::onModel(ClingoModel& clingoModel)
+	void ASPFactsQuery::onModel(Clingo::Model& clingoModel)
 	{
-		Gringo::SymVec vec;
-		auto tmp = clingoModel.atoms(clingo_show_type_shown);
-		for (int i = 0; i < tmp.size; i++)
+		Clingo::SymbolVector vec;
+		auto tmp = clingoModel.symbols(clingo_show_type_shown);
+		for (int i = 0; i < tmp.size(); i++)
 		{
 			vec.push_back(tmp[i]);
 		}
@@ -188,23 +191,24 @@ namespace reasoner
 #ifdef ASPQUERY_DEBUG
 			cout << "ASPFactsQuery::onModel: " << value.first << endl;
 #endif
-			auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().find(value.first.sig());
-			if (it == ((ASPSolver*)this->solver)->clingo->out_->predDoms().end())
+			auto it = ((ASPSolver*)this->solver)->clingo->symbolic_atoms().begin(Clingo::Signature(value.first.name(), value.first.number(), value.first.is_positive())); //value.first.signature();
+			if (it == ((ASPSolver*)this->solver)->clingo->symbolic_atoms().end())
 			{
 				cout << "ASPFactsQuery: Didn't find any suitable domain!" << endl;
 				continue;
 			}
-			for (int i = 0; i < (*it).get()->size(); i++)
+			while(it)
 			{
 //				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
 
 //				if (&(domainPred)
 //						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
 //				{
-				if (clingoModel.contains(Gringo::Symbol((*(*it))[i])) && this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+				if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol()))
 				{
-					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
+					this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
 				}
+				it++;
 //				}
 			}
 		}

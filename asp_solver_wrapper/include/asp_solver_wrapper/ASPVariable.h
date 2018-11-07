@@ -1,14 +1,6 @@
-/*
- * Variable.h
- *
- *  Created on: Jul 13, 2016
- *      Author: Stefan Jakob
- */
+#pragma once
 
-#ifndef INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
-#define INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_
-
-#include <engine/constraintmodul/SolverVariable.h>
+#include <alica_solver_interface/SolverVariable.h>
 #include <string>
 #include <memory>
 #include "ASPTerm.h"
@@ -21,15 +13,12 @@ namespace alica
 		class ASPVariable : public alica::reasoner::ASPTerm, public alica::SolverVariable
 		{
 		public:
-			ASPVariable();
+			ASPVariable(uint64_t id);
 			virtual ~ASPVariable();
 
 		private:
-			int ownId;
-			static int var_id;
+            uint64_t id;
 		};
 
 	} /* namespace reasoner */
 } /* namespace alica */
-
-#endif /* INCLUDE_ALICA_ASP_SOLVER_ASPVARIABLE_H_ */

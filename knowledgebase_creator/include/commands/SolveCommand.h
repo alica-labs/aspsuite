@@ -1,18 +1,9 @@
-/*
- * SolveCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_SOLVECOMMAND_H_
-#define SRC_COMMANDS_SOLVECOMMAND_H_
-
 #include <commands/Command.h>
-#include <memory>
-#include <clingo/clingocontrol.hh>
+
+#include <clingo.hh>
 
 #include <QJsonObject>
+#include <memory>
 
 namespace kbcr
 {
@@ -35,7 +26,7 @@ namespace kbcr
 		/**
 		 * Get models returned by solve call
 		 */
-		std::vector<Gringo::SymVec> getCurrentModels();
+		std::vector<Clingo::SymbolVector> getCurrentModels();
 		/**
 		 * Return solver result
 		 */
@@ -45,7 +36,7 @@ namespace kbcr
 
 	private:
 		bool satisfiable;
-		std::vector<Gringo::SymVec> currentModels;
+		std::vector<Clingo::SymbolVector> currentModels;
 		/**
 		 * Print models unsorted
 		 */
@@ -57,5 +48,3 @@ namespace kbcr
 	};
 
 } /* namespace kbcr */
-
-#endif /* SRC_COMMANDS_SOLVECOMMAND_H_ */

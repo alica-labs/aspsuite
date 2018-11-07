@@ -34,31 +34,33 @@ namespace kbcr
 	{
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		std::string aspString = this->program.toStdString();
+		std::cout << "aspstring: " <<  aspString << std::endl;
 		if (this->program.contains("\n") || !this->program.contains("#program"))
 		{
-			this->gui->getSolver()->add(this->programSection.toStdString(), {}, aspString);
+			this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
 			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
 		}
+		std::cout << "ps1" <<this->programSection.toStdString() << std::endl;
 		if (this->programSection.contains("(") && this->programSection.contains(")"))
 		{
 			auto indexLeft = this->programSection.indexOf("(");
 			auto indexRight = this->programSection.indexOf(")");
-			auto gringo = ((reasoner::ASPSolver*)this->gui->getSolver())->getGringoModule();
 			auto tmp = this->programSection.mid(indexLeft + 1, indexRight - indexLeft - 1);
 			this->programSection = this->programSection.left(indexLeft);
-			auto symVec = Gringo::SymVec();
+			auto symVec = Clingo::SymbolVector();
 			auto paramList = tmp.split(",", QString::SplitBehavior::SkipEmptyParts);
+			std::cout << "ps2" << this->programSection.toStdString() << std::endl;
 			for (auto it : paramList)
 			{
-				symVec.push_back(gringo->parseValue(it.toStdString().c_str(), nullptr, 20));
-			}
-			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), symVec}},
+				symVec.push_back(this->gui->getSolver()->parseValue(it.toStdString().c_str()));
+				std::cout << "param: " << it.toStdString() << std::endl;
+ 			}
+			this->gui->getSolver()->ground( { {this->programSection.toStdString().c_str(), symVec}},
 											nullptr);
-			this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->programSection).append("\n"));
 		}
 		else
 		{
-			this->gui->getSolver()->ground( { {Gringo::String(this->programSection.toStdString().c_str()), {}}},
+			this->gui->getSolver()->ground( { {this->programSection.toStdString().c_str(), {}}},
 											nullptr);
 		}
 		emit this->gui->updateExternalList();

@@ -37,7 +37,7 @@ namespace reasoner
 		auto loaded = this->solver->loadFileFromConfig(this->term->getProgramSection());
 		if (loaded)
 		{
-			this->solver->ground( { {Gringo::String(this->term->getProgramSection().c_str()), {}}}, nullptr);
+			this->solver->ground( { {this->term->getProgramSection().c_str(), {}}}, nullptr);
 		}
 		//TODO remove again is added manually to recreate eval for LNAI17 paper
 		auto loaded2 = this->solver->loadFileFromConfig("alicaBackgroundKnowledgeFile");
@@ -45,8 +45,8 @@ namespace reasoner
 		{
 			this->solver->ground( { {"alicaBackground", {}}}, nullptr);
 		}
-		this->solver->ground( { {Gringo::String(this->queryProgramSection.c_str()), {}}}, nullptr);
-		this->solver->assignExternal(*(this->external), Potassco::Value_t::True);
+		this->solver->ground( { {this->queryProgramSection.c_str(), {}}}, nullptr);
+		this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 	}
 
 	ASPVariableQuery::~ASPVariableQuery()
@@ -312,8 +312,8 @@ namespace reasoner
 #ifdef ASPVARIABLEQUERY_DEBUG
 		cout << "ASPVariableQuery: create program section: \n" << ss.str();
 #endif
-		this->solver->add(this->queryProgramSection, {}, ss.str());
-		this->external = make_shared<Gringo::Symbol>(this->solver->parseValue(this->externalName));
+		this->solver->add(this->queryProgramSection.c_str(), {}, ss.str().c_str());
+		this->external = make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
 	}
 
 	void ASPVariableQuery::removeExternal()
@@ -376,7 +376,7 @@ namespace reasoner
 			stringstream ss;
 			ss << this->queryProgramSection << "(" << value << ")";
 			auto val = this->solver->parseValue(ss.str());
-			this->headValues.emplace(val, vector<Gringo::Symbol>());
+			this->headValues.emplace(val, vector<Clingo::Symbol>());
 		}
 	}
 
@@ -385,11 +385,11 @@ namespace reasoner
 		return this->type;
 	}
 
-	void ASPVariableQuery::onModel(ClingoModel& clingoModel)
+	void ASPVariableQuery::onModel(Clingo::Model& clingoModel)
 	{
-		Gringo::SymVec vec;
-		auto tmp = clingoModel.atoms(clingo_show_type_shown);
-		for (int i = 0; i < tmp.size; i++)
+		Clingo::SymbolVector vec;
+		auto tmp = clingoModel.symbols(clingo_show_type_shown);
+		for (int i = 0; i < tmp.size(); i++)
 		{
 			vec.push_back(tmp[i]);
 		}
@@ -404,29 +404,19 @@ namespace reasoner
 #ifdef ASPQUERY_DEBUG
 			cout << "ASPVariableQuery::onModel: " << value.first << endl;
 #endif
-			auto it = ((ASPSolver*)this->solver)->clingo->out_->predDoms().find(value.first.sig());
-			if (it == ((ASPSolver*)this->solver)->clingo->out_->predDoms().end())
+			auto it = ((ASPSolver*)this->solver)->clingo->symbolic_atoms().begin(Clingo::Signature(value.first.name(), value.first.number(), value.first.is_positive())); //value.first.signature();
+			if (it == ((ASPSolver*)this->solver)->clingo->symbolic_atoms().end())
 			{
 				cout << "ASPVariableQuery: Didn't find any suitable domain!" << endl;
 				continue;
 			}
-			for (int i = 0; i < (*it).get()->size(); i++)
+			while(it)
 			{
-//				cout << "ASPFactsQuery: Inside domain-loop! " << Gringo::Symbol((*(*it))[i]) << endl;
-//				cout << clingoModel.contains(Gringo::Symbol((*(*it))[i])) << endl;
-				//				if (&(domainPred)
-				//						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))
-				//				{
-				//TODO output domain contains all predicates ... even ones with are currently false
-//				if (this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
-//				{
-//					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
-//				}
-//				}
-				if (clingoModel.contains(Gringo::Symbol((*(*it))[i])) && this->checkMatchValues(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i])))
+				if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol()))
 				{
-					this->saveHeadValuePair(Gringo::Symbol(value.first), Gringo::Symbol((*(*it))[i]));
+					this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
 				}
+				it++;
 			}
 		}
 	}

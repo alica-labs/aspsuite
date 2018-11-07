@@ -26,14 +26,14 @@ namespace reasoner
 	{
 	}
 
-	void ASPCommonsTerm::addRule(string rule)
+	void ASPCommonsTerm::addRule(std::string rule)
 	{
 		this->rules.push_back(rule);
 	}
 
-	void ASPCommonsTerm::addFact(string fact)
+	void ASPCommonsTerm::addFact(std::string fact)
 	{
-		if (fact.find(".") == string::npos)
+		if (fact.find(".") == std::string::npos)
 		{
 			this->facts.push_back(fact + ".");
 		}
@@ -43,22 +43,22 @@ namespace reasoner
 		}
 	}
 
-	vector<string> ASPCommonsTerm::getRuleHeads()
+	std::vector<std::string> ASPCommonsTerm::getRuleHeads()
 	{
 		return this->heads;
 	}
 
-	vector<string> ASPCommonsTerm::getRuleBodies()
+	std::vector<std::string> ASPCommonsTerm::getRuleBodies()
 	{
 		return this->bodies;
 	}
 
-	string ASPCommonsTerm::getProgramSection()
+	std::string ASPCommonsTerm::getProgramSection()
 	{
 		return this->programSection;
 	}
 
-	void ASPCommonsTerm::setProgramSection(string programSection)
+	void ASPCommonsTerm::setProgramSection(std::string programSection)
 	{
 		this->programSection = programSection;
 	}
@@ -74,32 +74,32 @@ namespace reasoner
 	}
 
 
-	vector<string> ASPCommonsTerm::getRules()
+	std::vector<std::string> ASPCommonsTerm::getRules()
 	{
 		return this->rules;
 	}
 
-	vector<string> ASPCommonsTerm::getFacts()
+	std::vector<std::string> ASPCommonsTerm::getFacts()
 	{
 		return this->facts;
 	}
 
-	void ASPCommonsTerm::setExternals(shared_ptr<map<string, bool>> externals)
+	void ASPCommonsTerm::setExternals(std::shared_ptr<std::map<std::string, bool>> externals)
 	{
 		this->externals = externals;
 	}
 
-	shared_ptr<map<string, bool> > ASPCommonsTerm::getExternals()
+	std::shared_ptr<std::map<std::string, bool> > ASPCommonsTerm::getExternals()
 	{
 		return this->externals;
 	}
 
-	string ASPCommonsTerm::getNumberOfModels()
+	std::string ASPCommonsTerm::getNumberOfModels()
 	{
 		return this->numberOfModels;
 	}
 
-	void ASPCommonsTerm::setNumberOfModels(string numberOfModels)
+	void ASPCommonsTerm::setNumberOfModels(std::string numberOfModels)
 	{
 		this->numberOfModels = numberOfModels;
 	}
@@ -143,12 +143,12 @@ namespace reasoner
 		this->queryId = queryId;
 	}
 
-	string ASPCommonsTerm::getQueryRule()
+	std::string ASPCommonsTerm::getQueryRule()
 	{
 		return queryRule;
 	}
 
-	void ASPCommonsTerm::setQueryRule(string queryRule)
+	void ASPCommonsTerm::setQueryRule(std::string queryRule)
 	{
 		if (queryRule.empty())
 		{
@@ -157,7 +157,7 @@ namespace reasoner
 
 		queryRule = supplementary::Configuration::trim(queryRule);
 		size_t endOfHead = queryRule.find(":-");
-		if (endOfHead != string::npos)
+		if (endOfHead != std::string::npos)
 		{
 			// for rules (including variables)
 			size_t startOfBody = endOfHead + 2;

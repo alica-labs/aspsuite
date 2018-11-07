@@ -110,6 +110,8 @@ namespace kbcr
 		 * Add Assign External element to history
 		 */
 		void addAssignExternalCommandToHistory(std::shared_ptr<Command> cmd, int pos);
+
+		void addOfferServiceCommandToHistory(std::shared_ptr<Command> cmd, int pos);
 	};
 
 } /* namespace kbcr */

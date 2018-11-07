@@ -1,10 +1,3 @@
-/*
- * NewSolverCommand.cpp
- *
- *  Created on: Jan 19, 2017
- *      Author: stefan
- */
-
 #include <commands/NewSolverCommand.h>
 
 #include "gui/SettingsDialog.h"
@@ -44,7 +37,8 @@ namespace kbcr
 		this->gui->chHandler->addToCommandHistory(shared_from_this());
 		this->gui->setSettings(this->settings);
 //		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};
-		this->gui->setSolver(new reasoner::ASPSolver(this->settings->args));
+		// vorher this->settings->args statt {}
+		this->gui->setSolver(new reasoner::ASPSolver({}));
 		this->gui->enableGui(true);
 	}
 

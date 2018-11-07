@@ -1,18 +1,11 @@
-/*
- * NewSolverCommand.h
- *
- *  Created on: Jan 19, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMANDS_NEWSOLVERCOMMAND_H_
-#define INCLUDE_COMMANDS_NEWSOLVERCOMMAND_H_
+#pragma once
 
 #include "commands/Command.h"
-#include <vector>
-#include <memory>
 
 #include <QJsonObject>
+
+#include <vector>
+#include <memory>
 
 namespace kbcr
 {
@@ -46,4 +39,3 @@ namespace kbcr
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_COMMANDS_NEWSOLVERCOMMAND_H_ */

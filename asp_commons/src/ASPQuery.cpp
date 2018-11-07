@@ -5,8 +5,11 @@
  *      Author: Stefan Jakob
  */
 
-#include <ASPCommonsTerm.h>
+
 #include "asp_commons/ASPQuery.h"
+
+#include <sstream>
+#include <ASPCommonsTerm.h>
 
 #include "asp_commons/AnnotatedValVec.h"
 #include "asp_commons/IASPSolver.h"
@@ -21,7 +24,7 @@ namespace reasoner
 		this->term = term;
 		this->programSection = term->getProgramSection();
 		this->lifeTime = term->getLifeTime();
-		this->currentModels = make_shared<vector<Gringo::SymVec>>();
+		this->currentModels = make_shared<vector<Clingo::SymbolVector>>();
 	}
 
 	ASPQuery::~ASPQuery()
@@ -36,7 +39,7 @@ namespace reasoner
 		}
 	}
 
-	void ASPQuery::saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value)
+	void ASPQuery::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
 	{
 		auto entry = this->headValues.find(key);
 		if (entry != this->headValues.end())
@@ -49,9 +52,9 @@ namespace reasoner
 		}
 	}
 
-	bool ASPQuery::checkMatchValues(Gringo::Symbol value1, Gringo::Symbol value2)
+	bool ASPQuery::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
 	{
-		if (value2.type() != Gringo::SymbolType::Fun)
+		if (value2.type() != Clingo::SymbolType::Function)
 		{
 			return false;
 		}
@@ -60,36 +63,37 @@ namespace reasoner
 		{
 			return false;
 		}
-		if (value1.args().size != value2.args().size)
+		if (value1.arguments().size() != value2.arguments().size())
 		{
 			return false;
 		}
 
-		for (uint i = 0; i < value1.args().size; ++i)
+		for (uint i = 0; i < value1.arguments().size(); ++i)
 		{
-			Gringo::Symbol arg = value1.args()[i];
-			if (arg.type() == Gringo::SymbolType::Fun && std::string(arg.name().c_str()) == IASPSolver::WILDCARD_STRING)
+			Clingo::Symbol arg = value1.arguments()[i];
+			if (arg.type() == Clingo::SymbolType::Function && std::string(arg.name()) == IASPSolver::WILDCARD_STRING)
 			{
 				continue;
 			}
 
-			if (arg.type() == Gringo::SymbolType::Fun && value2.args()[i].type() == Gringo::SymbolType::Fun)
+			if (arg.type() == Clingo::SymbolType::Function && value2.arguments()[i].type() == Clingo::SymbolType::Function)
 			{
-				if (false == checkMatchValues(arg, value2.args()[i]))
+				if (false == checkMatchValues(arg, value2.arguments()[i]))
 				{
 					return false;
 				}
 			}
-			else if (arg != value2.args()[i])
+			else if (arg != value2.arguments()[i])
 			{
 				return false;
 			}
 		}
 		return true;
 	}
+
 	string ASPQuery::toString()
 	{
-		stringstream ss;
+		std::stringstream ss;
 		ss << "Query:" << "\n";
 		ss << "\tModels: \n\t\t";
 		int counter = 0;
@@ -163,7 +167,7 @@ namespace reasoner
 		return this->solver;
 	}
 
-	shared_ptr<vector<Gringo::SymVec>> ASPQuery::getCurrentModels()
+	shared_ptr<vector<Clingo::SymbolVector>> ASPQuery::getCurrentModels()
 	{
 		return this->currentModels;
 	}
@@ -183,7 +187,7 @@ namespace reasoner
 		return this->rules;
 	}
 
-	map<Gringo::Symbol, Gringo::SymVec>& ASPQuery::getHeadValues()
+	map<Clingo::Symbol, Clingo::SymbolVector>& ASPQuery::getHeadValues()
 	{
 		return this->headValues;
 	}

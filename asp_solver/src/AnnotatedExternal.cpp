@@ -5,12 +5,12 @@
  *      Author: stefan
  */
 
-#include "../include/asp_solver/AnnotatedExternal.h"
+#include "asp_solver/AnnotatedExternal.h"
 
 namespace reasoner
 {
 
-	AnnotatedExternal::AnnotatedExternal(string aspPredicate, shared_ptr<Gringo::Symbol> gringoValue, bool value)
+	AnnotatedExternal::AnnotatedExternal(string aspPredicate, shared_ptr<Clingo::Symbol> gringoValue, bool value)
 	{
 		this->aspPredicate = aspPredicate;
 		this->gringoValue = gringoValue;
@@ -31,12 +31,12 @@ namespace reasoner
 		this->aspPredicate = aspPredicate;
 	}
 
-	shared_ptr<Gringo::Symbol> AnnotatedExternal::getGringoValue()
+	shared_ptr<Clingo::Symbol> AnnotatedExternal::getGringoValue()
 	{
 		return this->gringoValue;
 	}
 
-	void AnnotatedExternal::setGringoValue(shared_ptr<Gringo::Symbol> gringoValue)
+	void AnnotatedExternal::setGringoValue(shared_ptr<Clingo::Symbol> gringoValue)
 	{
 		this->gringoValue = gringoValue;
 	}

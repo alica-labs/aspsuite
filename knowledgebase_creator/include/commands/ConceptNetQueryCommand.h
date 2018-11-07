@@ -1,12 +1,4 @@
-/*
- * ConceptNetQueryCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_
-#define SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_
+#pragma once
 
 #include <commands/Command.h>
 
@@ -19,12 +11,17 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 
+#include <chrono>
+#include <fstream>
+
 //#define ConceptNetQueryCommandDebug
+//#define CNQC_EVALCODE
 
 namespace kbcr
 {
 
 	class ConceptNetCall;
+	class ConceptNetEdge;
 	class KnowledgebaseCreator;
 	/**
 	 * Class inheriting from Command interface used to create a ConceptNet Query
@@ -79,7 +76,7 @@ namespace kbcr
 		/**
 		 * Checks if query is one of the concept net base relations
 		 */
-		bool isConceptNetRealtion(QString query);
+		bool isConceptNetRelation(QString query);
 		/**
 		 * Informs the user that the given query is not supported by concept net
 		 */
@@ -102,21 +99,21 @@ namespace kbcr
 		 */
 		void callUrl(QUrl url);
 		/**
-		 * Prefix printed before every meta knowledge predicate
-		 */
-		QString prefix;
-		/**
-		 * Length of prefix printed before every meta knowledge predicate
-		 */
-		int prefixLength;
-		/**
 		 * Map of metaknowlege relation to asp progsm containing this relation
 		 */
 		std::map<QString, QString> extractBackgroundKnowledgePrograms(QString conceptNetProgram);
+        QString createBackgroundKnowledgeRule(QString relation, std::shared_ptr<ConceptNetEdge> edge);
 		QString conceptWithoutPrefix;
 		bool conceptContainsUTF8(QString concept);
 
 		bool minWeightPassed;
+
+		int prefixLength;
+
+#ifdef CNQC_EVALCODE
+        std::chrono::_V2::system_clock::time_point start;
+        std::ofstream outFS;
+#endif
 
 	signals:
 		/**
@@ -128,4 +125,3 @@ namespace kbcr
 
 } /* namespace kbcr */
 
-#endif /* SRC_COMMANDS_CONCEPTNETQUERYCOMMAND_H_ */

@@ -1,12 +1,4 @@
-/*
- * Variable.h
- *
- *  Created on: Jul 13, 2016
- *      Author: Stefan Jakob
- */
-
-#ifndef INCLUDE_ASP_SOLVER_ASPVARIABLE_H_
-#define INCLUDE_ASP_SOLVER_ASPVARIABLE_H_
+#pragma once
 
 #include <string>
 #include <memory>
@@ -28,5 +20,3 @@ namespace reasoner
 	};
 
 } /* namespace reasoner */
-
-#endif /* INCLUDE_ASP_SOLVER_ASPVARIABLE_H_ */

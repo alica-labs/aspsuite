@@ -1,10 +1,3 @@
-/*
- * SolveCommand.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "commands/SolveCommand.h"
 
 #include "gui/ModelSettingDialog.h"
@@ -49,10 +42,7 @@ namespace kbcr
 	{
 		if (this->gui->modelSettingsDialog->getNumberOfModels() != -1)
 		{
-			auto conf = &this->gui->getSolver()->clingo->getConf();
-			auto root = conf->getRootKey();
-			auto modelsKey = conf->getSubKey(root, "solve.models");
-			conf->setKeyValue(modelsKey, std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()).c_str());
+			this->gui->getSolver()->clingo->configuration()["solve"]["models"] = std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()).c_str();
 		}
 		this->satisfiable = this->gui->getSolver()->solve();
 		this->currentModels = this->gui->getSolver()->getCurrentModels();
@@ -73,7 +63,7 @@ namespace kbcr
 		return ret;
 	}
 
-	vector<Gringo::SymVec> SolveCommand::getCurrentModels()
+	vector<Clingo::SymbolVector> SolveCommand::getCurrentModels()
 	{
 		return this->currentModels;
 	}

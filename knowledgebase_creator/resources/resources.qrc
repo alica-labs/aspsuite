@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>conceptNetRelations.txt</file>
+        <file>drawing.svg</file>
+    </qresource>
+</RCC>

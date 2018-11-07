@@ -8,7 +8,7 @@
 #ifndef INCLUDE_ASP_WRAPPER_TERM_H_
 #define INCLUDE_ASP_WRAPPER_TERM_H_
 
-#include <engine/constraintmodul/SolverTerm.h>
+#include <alica_solver_interface/SolverTerm.h>
 #include <asp_commons/ASPQueryType.h>
 #include <string>
 #include <memory>

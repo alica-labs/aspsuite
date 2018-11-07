@@ -10,15 +10,18 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 find_package(catkin REQUIRED COMPONENTS
-  clingo
+	#  clingo
   system_config
 )
+
+set(clingo_DIR "/usr/local/lib")
+set(clingo_INCLUDE_DIRS "/usr/local/include")
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES asp_commons
-  CATKIN_DEPENDS clingo system_config
-  #DEPENDS lua python
+  CATKIN_DEPENDS system_config
+  DEPENDS clingo
 )
 
 add_definitions(-DWITH_THREADS=1) # for libclasp...
@@ -39,4 +42,4 @@ add_library(${PROJECT_NAME}
     src/AnnotatedValVec.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} clingo)

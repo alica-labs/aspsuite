@@ -9,7 +9,7 @@
 #include <iostream>
 #include <memory>
 
-#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 
 //#define GUIDEUG
 
@@ -123,6 +123,30 @@ namespace kbcr
 		 * Get list of basic cn5 relations
 		 */
 		std::vector<QString> getConceptNetBaseRealtions();
+		/**
+		 * Containts the begin of a concept net query url.
+		 */
+		static const QString CONCEPTNET_BASE_URL;
+		/**
+		 * Query part: /query?start=/c/en/
+		 */
+        static const QString CONCEPTNET_URL_QUERYSTART;
+        /**
+        * Query part: /query?end=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYEND;
+        /**
+        * Query part: /query?node=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYNODE;
+        /**
+        * Query part: /query?other=/c/en/
+        */
+        static const QString CONCEPTNET_URL_QUERYOTHER;
+		/**
+		 * Containts the cn5_ prefix.
+		 */
+		static const QString CONCEPTNET_PREFIX;
 
 	private slots:
 
@@ -154,6 +178,8 @@ namespace kbcr
 		 * Slot for ApplyExternal call
 		 */
 		void applyExternalCallBack();
+
+		void serveCallBack();
 
 	private:
 
@@ -208,11 +234,11 @@ namespace kbcr
 		/**
 		 * true if docker is installed
 		 */
-		bool isDockerInstalled;
+//		bool isDockerInstalled;
 		/**
 		 * true if concept net is available
 		 */
-		bool isConcneptNetInstalled;
+//		bool isConcneptNetInstalled;
 		/**
 		 * contains base relations
 		 */

@@ -1,21 +1,12 @@
-/*
- * ASPSolverWrapper.h
- *
- *  Created on: Jan 24, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_ASPSOLVERWRAPPER_H_
-#define INCLUDE_ASPSOLVERWRAPPER_H_
+#pragma once
 
 #include <engine/constraintmodul/ISolver.h>
 #include <engine/model/Variable.h>
+#include <asp_commons/AnnotatedValVec.h>
 
 #include <vector>
 #include <string>
 #include <memory>
-
-using namespace std;
 
 namespace reasoner
 {
@@ -35,16 +26,16 @@ namespace alica
 	{
 		class ASPAlicaPlanIntegrator;
 		class ASPGenerator;
-		class ASPSolverWrapper : public alica::ISolver
+		class ASPSolverWrapper : public alica::ISolver<ASPSolverWrapper, ::reasoner::AnnotatedValVec>
 		{
 		public:
 			ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args);
 			virtual ~ASPSolverWrapper();
 
-			bool existsSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls);
-			bool getSolution(vector<alica::Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls,
-								vector<void*>& results);
-			shared_ptr<SolverVariable> createVariable(long id);
+			bool existsSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
+			bool getSolutionImpl(SolverContext* ctx, std::vector<std::shared_ptr<ProblemDescriptor>>& calls,
+									 std::vector<::reasoner::AnnotatedValVec>& results);
+            std::shared_ptr<SolverVariable> createVariable(uint64_t id);
 			::reasoner::IASPSolver* getSolver();
 			void init(::reasoner::IASPSolver* solver);
 			int getQueryCounter();
@@ -52,22 +43,20 @@ namespace alica
 			alica::reasoner::ASPGenerator* gen;
 
 			void removeDeadQueries();
-			bool registerQuery(shared_ptr<::reasoner::ASPQuery> query);
-			bool unregisterQuery(shared_ptr<::reasoner::ASPQuery> query);
+			bool registerQuery(std::shared_ptr<::reasoner::ASPQuery> query);
+			bool unregisterQuery(std::shared_ptr<::reasoner::ASPQuery> query);
 			void printStats();
-			vector<shared_ptr<::reasoner::ASPQuery>> getRegisteredQueries();
+            std::vector<std::shared_ptr<::reasoner::ASPQuery>> getRegisteredQueries();
 
 		private:
 			AlicaEngine* ae;
 			::reasoner::IASPSolver* solver;
 			bool masterPlanLoaded;
-			shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
+            std::shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
 			void integrateRules();
-			shared_ptr<::reasoner::ASPCommonsTerm> toCommonsTerm(shared_ptr<SolverTerm> term);
-			shared_ptr<::reasoner::ASPCommonsVariable> toCommonsVariable(shared_ptr<SolverVariable> var);
+			std::shared_ptr<::reasoner::ASPCommonsTerm> toCommonsTerm(std::shared_ptr<SolverTerm> term);
+            std::shared_ptr<::reasoner::ASPCommonsVariable> toCommonsVariable(std::shared_ptr<SolverVariable> var);
 		};
 	}
 
 } /* namespace alica */
-
-#endif /* INCLUDE_ASPSOLVERWRAPPER_H_ */

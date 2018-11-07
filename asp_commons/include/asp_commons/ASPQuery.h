@@ -1,19 +1,11 @@
-/*
- * AspQuery.h
- *
- *  Created on: Jun 8, 2016
- *      Author: Stefan Jakob
- */
+#pragma once
 
-#ifndef SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_
-#define SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_
+#include <clingo.hh>
+#include <asp_commons/ASPQueryType.h>
 
 #include <string>
 #include <memory>
-#include <clingo/clingocontrol.hh>
-#include <asp_commons/ASPQueryType.h>
-
-using namespace std;
+#include <map>
 
 //#define ASPQUERY_DEBUG
 
@@ -26,31 +18,31 @@ namespace reasoner
 	class ASPQuery
 	{
 	public:
-		ASPQuery(IASPSolver* solver, shared_ptr<ASPCommonsTerm> term);
+		ASPQuery(IASPSolver* solver, std::shared_ptr<ASPCommonsTerm> term);
 		virtual ~ASPQuery();
 
-		shared_ptr<vector<Gringo::SymVec>> getCurrentModels();
+		std::shared_ptr<std::vector<Clingo::SymbolVector>> getCurrentModels();
 
 		int getLifeTime();
 		void setLifeTime(int lifeTime);
 		void reduceLifeTime();
 
-		virtual void onModel(ClingoModel& clingoModel) = 0;
+		virtual void onModel(Clingo::Model& clingoModel) = 0;
 
-		map<Gringo::Symbol, Gringo::SymVec>& getHeadValues();
+		std::map<Clingo::Symbol, Clingo::SymbolVector>& getHeadValues();
 
 		IASPSolver* getSolver();
-		vector<string> getRules();
-		shared_ptr<ASPCommonsTerm> getTerm();
+		std::vector<std::string> getRules();
+		std::shared_ptr<ASPCommonsTerm> getTerm();
 
-		string getProgrammSection();
-		void setProgrammSection(string programmSection);
+		std::string getProgrammSection();
+		void setProgrammSection(std::string programmSection);
 		virtual void removeExternal() = 0;
 
-		string toString();
+		std::string toString();
 		ASPQueryType getType();
-		void saveHeadValuePair(Gringo::Symbol key, Gringo::Symbol value);
-		bool checkMatchValues(Gringo::Symbol value1, Gringo::Symbol value2);
+		void saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value);
+		bool checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2);
 
 	protected:
 		/**
@@ -59,20 +51,18 @@ namespace reasoner
 		 * meaning that there is a rule for every predicate
 		 */
 		IASPSolver* solver;
-		shared_ptr<vector<Gringo::SymVec>> currentModels;
-		vector<string> rules;
+		std::shared_ptr<std::vector<Clingo::SymbolVector>> currentModels;
+		std::vector<std::string> rules;
 		// key := headValue , value := values which satisfies it
-		map<Gringo::Symbol, Gringo::SymVec> headValues;
+		std::map<Clingo::Symbol, Clingo::SymbolVector> headValues;
 		// lifeTime == 1 => query is used once
 		// lifeTime == x => query is used x times
 		// LifeTime == -1 => query is used until unregistered
 		int lifeTime;
-		string programSection;
-		shared_ptr<ASPCommonsTerm> term;
+		std::string programSection;
+		std::shared_ptr<ASPCommonsTerm> term;
 		ASPQueryType type;
 
 	};
 
 } /* namespace reasoner */
-
-#endif /* SYMROCK_ASP_COMMONS_INCLUDE_ASP_COMMONS_ASPQUERY_H_ */

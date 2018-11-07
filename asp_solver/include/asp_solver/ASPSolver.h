@@ -1,14 +1,4 @@
-/*
- * ASPSolver.h
- *
- *  Created on: Sep 8, 2015
- *      Author: Stephan Opfer
- */
-
-#ifndef SRC_ASPSOLVER_H_
-#define SRC_ASPSOLVER_H_
-
-#include <clingo/clingocontrol.hh>
+#include <clingo.hh>
 #include <SystemConfig.h>
 #include <mutex>
 
@@ -32,7 +22,7 @@ namespace reasoner
 	class ASPVariableQuery;
 	class ASPCommonsVariable;
 	class AnnotatedValVec;
-	class ASPSolver : public IASPSolver
+	class ASPSolver : public IASPSolver, Clingo::SolveEventHandler
 	{
 	public:
 		ASPSolver(std::vector<char const*> args);
@@ -43,16 +33,15 @@ namespace reasoner
 							vector<void*>& results);
 		shared_ptr<ASPCommonsVariable> createVariable(long id);
 
-		void disableWarnings(bool noWarns);
 		bool loadFileFromConfig(string configKey);
 		void loadFile(string filename);
 
-		void ground(Gringo::Control::GroundVec const &vec, Gringo::Context *context);
-		void assignExternal(Gringo::Symbol ext, Potassco::Value_t truthValue);
-		void releaseExternal(Gringo::Symbol ext);
+		void ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack);
+		void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue);
+		void releaseExternal(Clingo::Symbol ext);
 		bool solve();
-		void add(string const &name, Gringo::FWStringVec const &params, string const &par);
-		Gringo::Symbol parseValue(std::string const &str);
+		void add(char const *name, Clingo::StringSpan const &params, char const *par);
+		Clingo::Symbol parseValue(std::string const &str);
 
 		int getRegisteredQueriesCount();
 		/**
@@ -67,35 +56,29 @@ namespace reasoner
 		bool unregisterQuery(shared_ptr<ASPQuery> query);
 		void printStats();
 
-		const long long getSolvingTime();
-		const long long getSatTime();
-		const long long getUnsatTime();
-		const long getModelCount();
-		const long getAtomCount();
-		const long getBodiesCount();
-		const long getAuxAtomsCount();
+		const double getSolvingTime();
+		const double getSatTime();
+		const double getUnsatTime();
+		const double getModelCount();
+		const double getAtomCount();
+		const double getBodiesCount();
+		const double getAuxAtomsCount();
 
 		static const void* getWildcardPointer();
 		static const string& getWildcardString();
 		vector<shared_ptr<ASPQuery>> getRegisteredQueries();
-		vector<Gringo::SymVec> getCurrentModels();
-		DefaultGringoModule* getGringoModule();
+		vector<Clingo::SymbolVector> getCurrentModels();
 
-		shared_ptr<ClingoLib> clingo;
+		shared_ptr<Clingo::Control> clingo;
 
 	private:
-		bool onModel(Gringo::Model const &m);
-//		Gringo::Control* clingo;
-		DefaultGringoModule* gringoModule;
-		Gringo::ConfigProxy* conf;
-		unsigned int root;
-		unsigned int modelsKey;
+		bool on_model(Clingo::Model &m);
 		vector<long> currentQueryIds;
 
 		vector<string> alreadyLoaded;
 		vector<shared_ptr<AnnotatedExternal>> assignedExternals;
 		vector<shared_ptr<ASPQuery>> registeredQueries;
-		vector<Gringo::SymVec> currentModels;
+		vector<Clingo::SymbolVector> currentModels;
 
 		void reduceQueryLifeTime();
 		int prepareSolution(std::vector<shared_ptr<ASPCommonsVariable>>& vars, vector<shared_ptr<ASPCommonsTerm>>& calls);
@@ -137,5 +120,3 @@ namespace reasoner
 	}
 
 } /* namespace reasoner */
-
-#endif /* SRC_ASPSOLVER_H_ */

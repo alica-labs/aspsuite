@@ -1,271 +1,264 @@
-/*
- * ASPGenerator.cpp
- *
- *  Created on: Jan 11, 2016
- *      Author: Stephan Opfer
- */
-
 #include "asp_solver_wrapper/ASPGenerator.h"
 
 namespace alica
 {
 	namespace reasoner
 	{
-		ASPGenerator::ASPGenerator(const void* wildcard_pointer, string wildcard_string) :
-				wildcard_pointer(wildcard_pointer), wildcard_string(wildcard_string)
+		ASPGenerator::ASPGenerator(const void* wildcard_pointer, std::string wildcard_string) :
+				wildcard_pointer(wildcard_pointer), wildcard_string(std::move(wildcard_string))
 		{
 		}
 
 		// UNARY Predicates
 
-		string ASPGenerator::plan(Plan* p, bool dotTerminated)
+		std::string ASPGenerator::plan(const Plan* p, bool dotTerminated)
 		{
 			return "plan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::entryPoint(EntryPoint* ep, bool dotTerminated)
+		std::string ASPGenerator::entryPoint(const EntryPoint* ep, bool dotTerminated)
 		{
 			return "entryPoint(" + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::state(State* s, bool dotTerminated)
+		std::string ASPGenerator::state(const State* s, bool dotTerminated)
 		{
 			return "state(" + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::task(Task* t, bool dotTerminated)
+		std::string ASPGenerator::task(const Task* t, bool dotTerminated)
 		{
 			return "task(" + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::failureState(State* s, bool dotTerminated)
+		std::string ASPGenerator::failureState(const State* s, bool dotTerminated)
 		{
 			return "failureState(" + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::successState(State* s, bool dotTerminated)
+		std::string ASPGenerator::successState(const State* s, bool dotTerminated)
 		{
 			return "successState(" + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::planType(PlanType* pt, bool dotTerminated)
+		std::string ASPGenerator::planType(const PlanType* pt, bool dotTerminated)
 		{
 			return "planType(" + get(pt) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::successRequired(EntryPoint* ep, bool dotTerminated)
+		std::string ASPGenerator::successRequired(const EntryPoint* ep, bool dotTerminated)
 		{
 			return "successRequired(" + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::transition(Transition* t, bool dotTerminated)
+		std::string ASPGenerator::transition(const Transition* t, bool dotTerminated)
 		{
 			return "transition(" + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::synchronisation(SyncTransition* sync, bool dotTerminated)
+		std::string ASPGenerator::synchronisation(const SyncTransition* sync, bool dotTerminated)
 		{
 			return "synchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::preCondition(PreCondition* cond, bool dotTerminated)
+		std::string ASPGenerator::preCondition(const PreCondition* cond, bool dotTerminated)
 		{
 			return "preCondition(" + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenPlan(Plan* p, bool dotTerminated)
+		std::string ASPGenerator::brokenPlan(const Plan* p, bool dotTerminated)
 		{
 			return "brokenPlan(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::cyclic(Plan* p, bool dotTerminated)
+		std::string ASPGenerator::cyclic(const Plan* p, bool dotTerminated)
 		{
 			return "cyclic(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::cycleFree(Plan* p, bool dotTerminated)
+		std::string ASPGenerator::cycleFree(const Plan* p, bool dotTerminated)
 		{
 			return "cycleFree(" + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenState(State* s, bool dotTerminated)
+		std::string ASPGenerator::brokenState(const State* s, bool dotTerminated)
 		{
 			return "brokenState(" + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenEntryPoint(EntryPoint* ep, bool dotTerminated)
+		std::string ASPGenerator::brokenEntryPoint(const EntryPoint* ep, bool dotTerminated)
 		{
 			return "brokenEntryPoint(" + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenSynchronisation(SyncTransition* sync, bool dotTerminated)
+		std::string ASPGenerator::brokenSynchronisation(const SyncTransition* sync, bool dotTerminated)
 		{
 			return "brokenSynchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::neglocal(PreCondition* cond, bool dotTerminated)
+		std::string ASPGenerator::neglocal(const PreCondition* cond, bool dotTerminated)
 		{
 			return "nonlocal(" + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::runningPlan(uint64_t instanceElementHash, bool dotTerminated)
+		std::string ASPGenerator::runningPlan(uint64_t instanceElementHash, bool dotTerminated)
 		{
 			return "runningPlan(" + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::runtimeCondition(RuntimeCondition* cond, bool dotTerminated)
+		std::string ASPGenerator::runtimeCondition(const RuntimeCondition* cond, bool dotTerminated)
 		{
 			return "runtimeCondition(" + get("runtimeCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated)
+		std::string ASPGenerator::brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated)
 		{
 			return "brokenRunningPlan(" + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::behaviourConf(BehaviourConfiguration* behConf, bool dotTerminated)
+		std::string ASPGenerator::behaviour(const Behaviour* beh, bool dotTerminated)
 		{
-			return "behaviourConf(" + get(behConf) + (dotTerminated ? ")." : ")");
+			return "behaviourConf(" + get(beh) + (dotTerminated ? ")." : ")");
 		}
 
 		// BINARY Predicates
 
-		string ASPGenerator::hasTask(Plan* p, Task* t, bool dotTerminated)
+		std::string ASPGenerator::hasTask(const Plan* p, const Task* t, bool dotTerminated)
 		{
 			return "hasTask(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasMinCardinality(EntryPoint* ep, int minCard, bool dotTerminated)
+		std::string ASPGenerator::hasMinCardinality(const EntryPoint* ep, int minCard, bool dotTerminated)
 		{
 			return "hasMinCardinality(" + get(ep) + ", " + std::to_string(minCard) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasMaxCardinality(EntryPoint* ep, int maxCard, bool dotTerminated)
+		std::string ASPGenerator::hasMaxCardinality(const EntryPoint* ep, int maxCard, bool dotTerminated)
 		{
 			return "hasMaxCardinality(" + get(ep) + ", " + std::to_string(maxCard) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasState(Plan* p, State* s, bool dotTerminated)
+		std::string ASPGenerator::hasState(const Plan* p, const State* s, bool dotTerminated)
 		{
 			return "hasState(" + get(p) + ", " + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasInitialState(EntryPoint* ep, State* s, bool dotTerminated)
+		std::string ASPGenerator::hasInitialState(const EntryPoint* ep, const State* s, bool dotTerminated)
 		{
 			return "hasInitialState(" + get(ep) + ", " + get(s) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasPlan(State* s, Plan* p, bool dotTerminated)
+		std::string ASPGenerator::hasPlan(const State* s, const Plan* p, bool dotTerminated)
 		{
 			return "hasPlan(" + get(s) + ", " + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasPlanType(State* s, PlanType* pt, bool dotTerminated)
+		std::string ASPGenerator::hasPlanType(const State* s, const PlanType* pt, bool dotTerminated)
 		{
 			return "hasPlanType(" + get(s) + ", " + get(pt) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasRealisation(PlanType* pt, Plan* p, bool dotTerminated)
+		std::string ASPGenerator::hasRealisation(const PlanType* pt, const Plan* p, bool dotTerminated)
 		{
 			return "hasRealisation(" + get(pt) + ", " + get(p) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasPreCondition(Plan* p, PreCondition* cond, bool dotTerminated)
+		std::string ASPGenerator::hasPreCondition(const Plan* p, const PreCondition* cond, bool dotTerminated)
 		{
 			return "hasPreCondition(" + get(p) + ", " + get("preCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasInTransition(State* s, Transition* t, bool dotTerminated)
+		std::string ASPGenerator::hasInTransition(const State* s, const Transition* t, bool dotTerminated)
 		{
 			return "hasInTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasOutTransition(State* s, Transition* t, bool dotTerminated)
+		std::string ASPGenerator::hasOutTransition(const State* s, const Transition* t, bool dotTerminated)
 		{
 			return "hasOutTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasSynchedTransition(SyncTransition* sync, Transition* t, bool dotTerminated)
+		std::string ASPGenerator::hasSynchedTransition(const SyncTransition* sync, const Transition* t, bool dotTerminated)
 		{
 			return "hasSynchedTransition(" + get(sync) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::brokenPlanTaskPair(Plan* p, Task* t, bool dotTerminated)
+		std::string ASPGenerator::brokenPlanTaskPair(const Plan* p, const Task* t, bool dotTerminated)
 		{
 			return "brokenPlanTaskPair(" + get(p) + ", " + get(t) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlan(string prefix, Condition* c, string plan, bool dotTerminated)
+		std::string ASPGenerator::inRefPlan(std::string prefix, const Condition* c, std::string plan, bool dotTerminated)
 		{
-			return "inRefPlan(" + get(prefix, c) + ", " + plan + (dotTerminated ? ")." : ")");
+			return "inRefPlan(" + get(std::move(prefix), c) + ", " + plan + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasPlanInstance(Plan* p, uint64_t instanceElementHash, bool dotTerminated)
+		std::string ASPGenerator::hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated)
 		{
 			return "hasPlanInstance(" + get(p) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasRuntimeCondition(Plan* p, RuntimeCondition* cond, bool dotTerminated)
+		std::string ASPGenerator::hasRuntimeCondition(const Plan* p, const RuntimeCondition* cond, bool dotTerminated)
 		{
 			return "hasRuntimeCondition(" + get(p) + ", " + get("runtimeCond", cond) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasRunningPlan(State* s, uint64_t instanceElementHash, bool dotTerminated)
+		std::string ASPGenerator::hasRunningPlan(const State* s, uint64_t instanceElementHash, bool dotTerminated)
 		{
 			return "hasRunningPlan(" + get(s) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasRunningRealisation(PlanType* pt, uint64_t instanceElementHash, bool dotTerminated)
+		std::string ASPGenerator::hasRunningRealisation(const PlanType* pt, uint64_t instanceElementHash, bool dotTerminated)
 		{
 			return "hasRunningRealisation(" + get(pt) + ", " + get("rp", instanceElementHash) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::hasBehaviourConf(State* s, BehaviourConfiguration* behConf, bool dotTerminated)
+		std::string ASPGenerator::hasBehaviour(const State* s, const Behaviour* beh, bool dotTerminated)
 		{
-			return "hasBehaviourConf(" + get(s) + ", " + get(behConf) + (dotTerminated ? ")." : ")");
+			return "hasBehaviour(" + get(s) + ", " + get(beh) + (dotTerminated ? ")." : ")");
 		}
 
 		// TERNARY Predicates
 
-		string ASPGenerator::hasEntryPoint(Plan* p, Task* t, EntryPoint* ep, bool dotTerminated)
+		std::string ASPGenerator::hasEntryPoint(const Plan* p, const Task* t, const EntryPoint* ep, bool dotTerminated)
 		{
 			return "hasEntryPoint(" + get(p) + ", " + get(t) + ", " + get(ep) + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlanTask(string prefix, Condition* c, string plan, string task, bool dotTerminated)
+		std::string ASPGenerator::inRefPlanTask(std::string prefix, const Condition* c, std::string plan, std::string task, bool dotTerminated)
 		{
-			return "inRefPlanTask(" + get(prefix, c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
+			return "inRefPlanTask(" + get(std::move(prefix), c) + ", " + plan + ", " + task + (dotTerminated ? ")." : ")");
 		}
 
-		string ASPGenerator::inRefPlanState(string prefix, Condition* c, string plan, string state, bool dotTerminated)
+		std::string ASPGenerator::inRefPlanState(std::string prefix, const Condition* c, std::string plan, std::string state, bool dotTerminated)
 		{
-			return "inRefPlanState(" + get(prefix, c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
+			return "inRefPlanState(" + get(std::move(prefix), c) + ", " + plan + ", " + state + (dotTerminated ? ")." : ")");
 		}
 
 		// QUATERNARY Predicates
 
-		string ASPGenerator::inRefPlanTaskState(string prefix, Condition* c, string plan, string task, string state,
+		std::string ASPGenerator::inRefPlanTaskState(std::string prefix, const Condition* c, std::string plan, std::string task, std::string state,
 												bool dotTerminated)
 		{
-			return "inRefPlanTaskState(" + get(prefix, c) + ", " + plan + ", " + task + ", " + state
+			return "inRefPlanTaskState(" + get(std::move(prefix), c) + ", " + plan + ", " + task + ", " + state
 					+ (dotTerminated ? ")." : ")");
 		}
 
 		// RULES
 
-		string ASPGenerator::preConditionHolds(PreCondition* cond)
+		std::string ASPGenerator::preConditionHolds(const PreCondition* cond)
 		{
 			return "holds(" + get("preCond", cond) + ") :- " + cond->getConditionString();
 		}
 
-		string ASPGenerator::runtimeConditionHolds(RuntimeCondition* cond)
+		std::string ASPGenerator::runtimeConditionHolds(const RuntimeCondition* cond)
 		{
 			return "holds(" + get("runtimeCond", cond) + ") :- " + cond->getConditionString();
 		}
 
 		// LITERALS
 
-		string ASPGenerator::get(Plan* p)
+		std::string ASPGenerator::get(const Plan* p)
 		{
 			if (p == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -278,7 +271,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(EntryPoint* ep)
+		std::string ASPGenerator::get(const EntryPoint* ep)
 		{
 			if (ep == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -291,7 +284,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(State* s)
+		std::string ASPGenerator::get(const State* s)
 		{
 			if (s == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -304,7 +297,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(Task* t)
+		std::string ASPGenerator::get(const Task* t)
 		{
 			if (t == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -317,7 +310,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(PlanType* pt)
+		std::string ASPGenerator::get(const PlanType* pt)
 		{
 			if (pt == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -330,7 +323,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(Transition* t)
+		std::string ASPGenerator::get(const Transition* t)
 		{
 			if (t == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -342,7 +335,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(SyncTransition* sync)
+		std::string ASPGenerator::get(const SyncTransition* sync)
 		{
 			if (sync == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -355,9 +348,9 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(string prefix, uint64_t instanceElementHash)
+		std::string ASPGenerator::get(std::string prefix, uint64_t instanceElementHash)
 		{
-			if (prefix == "")
+			if (prefix.empty())
 				return this->wildcard_string;
 
 			auto&& iter = this->instanceElements.find(instanceElementHash);
@@ -368,7 +361,7 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(string prefix, Condition* cond)
+		std::string ASPGenerator::get(std::string prefix, const Condition* cond)
 		{
 			if (cond == this->wildcard_pointer)
 				return this->wildcard_string;
@@ -381,15 +374,15 @@ namespace alica
 			return iter->second;
 		}
 
-		string ASPGenerator::get(BehaviourConfiguration* behConf)
+		std::string ASPGenerator::get(const Behaviour* beh)
 		{
-			if (behConf == this->wildcard_pointer)
+			if (beh == this->wildcard_pointer)
 				return this->wildcard_string;
 
-			auto&& iter = this->elements.find(behConf->getId());
+			auto&& iter = this->elements.find(beh->getId());
 			if (iter == this->elements.end())
 			{
-				return this->elements[behConf->getId()] = "behaviourConf" + std::to_string(behConf->getId());
+				return this->elements[beh->getId()] = "behaviour" + std::to_string(beh->getId());
 			}
 			return iter->second;
 		}

@@ -16,9 +16,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
 
-# Introduce CapnProto
-#find_package(CapnProto REQUIRED)
-
 find_package(catkin QUIET)
 if(catkin_FOUND)
   catkin_package(
@@ -29,19 +26,35 @@ if(catkin_FOUND)
 endif(catkin_FOUND)
 
 include_directories(
-  include 
+  include
   ${ZeroMQ_INCLUDE_DIRS}
 )
+
+# LIBRARY
 
 add_library(${PROJECT_NAME}
   src/Publisher.cpp
   src/Subscriber.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
   ${ZeroMQ_LIBRARIES}
 )
 
 if (NOT catkin_FOUND)
  target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif (NOT catkin_FOUND)
+
+# SENDER
+
+add_executable(pub
+  src/Sender.cpp
+)
+target_link_libraries(pub
+  ${ZeroMQ_LIBRARIES}
+)
+
+if (NOT catkin_FOUND)
+    target_include_directories(pub PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif (NOT catkin_FOUND)
+

@@ -107,7 +107,7 @@ void KnowledgebaseCreator::readConceptNetBaseRelations()
     QJsonObject savedObject = loadDoc.object();
     QJsonArray relations = savedObject["relations"].toArray();
     for (auto relation : relations) {
-        this->conceptNetBaseRealtions.push_back(relation.toObject()["rel"].toString());
+        this->conceptNetBaseRelations.push_back(relation.toObject()["rel"].toString());
     }
 }
 
@@ -150,7 +150,7 @@ void KnowledgebaseCreator::queryCallBack()
     if (this->ui->aspRuleTextArea->toPlainText().isEmpty() || !rulesAreDotTerminated() || this->ui->aspRuleTextArea->toPlainText().trimmed()[0].isUpper()) {
         return;
     }
-    if (this->ui->aspRuleTextArea->toPlainText().contains(QString("wildcard"))) {
+    if (this->isFactsQuery(this->ui->aspRuleTextArea->toPlainText())) {
         std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
         cmd->execute();
     } else {
@@ -262,7 +262,7 @@ bool KnowledgebaseCreator::checkConcneptNetInstallation()
 
 std::vector<QString> KnowledgebaseCreator::getConceptNetBaseRealtions()
 {
-    return this->conceptNetBaseRealtions;
+    return this->conceptNetBaseRelations;
 }
 
 void KnowledgebaseCreator::connectGuiElements()
@@ -378,6 +378,18 @@ void KnowledgebaseCreator::configureLabels()
     this->ui->sortedModelsLabel->setWordWrap(true);
     this->ui->programLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->ui->programLabel->setWordWrap(true);
+}
+
+bool KnowledgebaseCreator::isFactsQuery(QString program) {
+    if(program.contains(QString("wildcard"))) {
+        return true;
+    }
+    QStringList list = program.split("\n");
+    if(list.size() > 1 || list.at(0).contains(":-") ) {
+        return false;
+    }
+    return true;
+
 }
 
 } // namespace kbcr

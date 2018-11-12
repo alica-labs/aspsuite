@@ -101,7 +101,10 @@ void FactsQueryCommand::execute()
         delete valVec;
     }
     for (auto term : terms) {
+        cout << "sdfsfsd" << endl;
+        cout << term->getId() << endl;
         delete term;
+        cout << "sdfsfsd" << endl;
     }
 
     for (auto var : vars) {

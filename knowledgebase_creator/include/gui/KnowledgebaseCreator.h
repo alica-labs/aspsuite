@@ -241,7 +241,11 @@ private:
     /**
      * contains base relations
      */
-    std::vector<QString> conceptNetBaseRealtions;
+    std::vector<QString> conceptNetBaseRelations;
+    /**
+     * Checks if Query is a FactsQuery
+     */
+     bool isFactsQuery(QString programm);
 
 signals:
     /**

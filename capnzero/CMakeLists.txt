@@ -2,12 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(capnzero)
 
 ## Use c++ 11x std
-set(CMAKE_CXX_FLAGS "-std=c++11  ${CMAKE_CXX_FLAGS}")
-if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
-        set(CMAKE_CXX_COMPILER_ARG1 "-std=c++11" CACHE STRING "C++ version for eclipse" FORCE)
-        set(CMAKE_ECLIPSE_VERSION "4.7" CACHE STRING "Eclipse version" FORCE)
-        add_definitions (-DCMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE)
-endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
+add_definitions(-std=c++11)
 
 # Define where to find modules for ZeroMQ and UUID
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
@@ -15,6 +10,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake CACHE INTERNAL "" FORCE)
 # this enables the draft part of the api
 add_definitions(-DZMQ_BUILD_DRAFT_API=1)
 find_package(ZeroMQ)
+
+# Introduce CapnProto
+find_package(CapnProto REQUIRED)
+
+message("CapnProto Incl: ${CAPNP_INCLUDE_DIRS}")
+message("CapnProto Lib: ${CAPNP_LIBRARIES}")
 
 find_package(catkin QUIET)
 if(catkin_FOUND)
@@ -28,9 +29,42 @@ endif(catkin_FOUND)
 include_directories(
   include
   ${ZeroMQ_INCLUDE_DIRS}
+  ${CAPNP_INCLUDE_DIRS}
 )
 
-# LIBRARY
+############# BASIC MESSAGES
+
+## Autogenerate the c++ capnproto files
+set(capnp_message_folder "${CMAKE_CURRENT_SOURCE_DIR}/msg")
+file(GLOB_RECURSE capnp_messages ${capnp_message_folder} *.capnp)
+
+set(CAPNPC_SRC_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/msg)
+set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+capnp_generate_cpp(CAPNP_SRCS CAPNP_HDRS ${capnp_messages})
+
+message("CAPNP_SRCS: ${CAPNP_SRCS}")
+message("CAPNP_HDRS: ${CAPNP_HDRS}")
+
+## Move header files into include folder
+set(position "")
+set(length "")
+set(sub "")
+string(LENGTH ${CAPNP_HDRS} length)
+string(FIND ${CAPNP_HDRS} "/" position REVERSE)
+string(SUBSTRING ${CAPNP_HDRS} ${position}+1 ${length}-1  sub)
+add_custom_target(move-base-msgs-header-to-include ALL
+  COMMAND ${CMAKE_COMMAND} -E copy ${CAPNP_HDRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/capnzero-base-msgs${sub}
+  DEPENDS ${CAPNP_HDRS}
+)
+
+## Declare the C++ capnproto message library
+add_library(capnzero-base-msgs
+  ${CAPNP_SRCS}
+)
+
+#add_dependencies(capnzero-base-msgs move-base-msgs-header-to-include)
+
+############ PUBLISH-SUBSCRIBE-LIBRARY
 
 add_library(${PROJECT_NAME}
   src/Publisher.cpp
@@ -39,19 +73,24 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   ${ZeroMQ_LIBRARIES}
+  ${CAPNP_LIBRARIES}
 )
 
 if (NOT catkin_FOUND)
  target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif (NOT catkin_FOUND)
 
-# SENDER
+############# SENDER-CONSOLE-APP
 
 add_executable(pub
   src/Sender.cpp
 )
+
 target_link_libraries(pub
+  ${PROJECT_NAME}
   ${ZeroMQ_LIBRARIES}
+  ${CAPNP_LIBRARIES}
+  capnzero-base-msgs
 )
 
 if (NOT catkin_FOUND)

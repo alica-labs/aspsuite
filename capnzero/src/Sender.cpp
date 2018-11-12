@@ -1,6 +1,11 @@
 #include <capnzero/Publisher.h>
+
+//#include <capnzero/string.capnp.h>
+
+#include <capnp/common.h>
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
+#include <kj/array.h>
 
 int main (int argc, char ** argv) {
 
@@ -19,17 +24,15 @@ int main (int argc, char ** argv) {
     // Cap'n Proto: create proto message
 
     // init builder
-//    ::capnp::MallocMessageBuilder msgBuilder;
-//    capnp::Text::Builder beaconMsgBuilder = msgBuilder.initRoot<capnp::Text>();
+    ::capnp::MallocMessageBuilder msgBuilder;
+//    capnp::String::Builder beaconMsgBuilder = msgBuilder.initRoot<capnp::Text>();
 
     // set content
 //    beaconMsgBuilder.
 
 #ifdef DEBUG_AGENT
-    std::cout << "Agent:send(): Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
+    std::cout << "pub: Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
-
-
 
     //void* context, std::string connection, std::string multicastGroupName
 //    capnzero::Publisher pub = capnzero::Publisher(ctx);

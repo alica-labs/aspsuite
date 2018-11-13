@@ -35,7 +35,7 @@ void ExternalTableHandler::fillExternalTable()
             int pos = this->gui->getUi()->externalTable->rowCount();
             this->gui->getUi()->externalTable->insertRow(pos);
             std::stringstream ss;
-            ss << atom.symbol().name();
+            ss << atom.symbol();
             auto leftItem = new QTableWidgetItem(QString(ss.str().c_str()));
             leftItem->setFlags(leftItem->flags() ^ Qt::ItemIsEditable);
             this->gui->getUi()->externalTable->setItem(pos, 0, leftItem);

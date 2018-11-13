@@ -43,10 +43,8 @@ void GroundCommand::execute()
         this->programSection = this->programSection.left(indexLeft);
         auto symVec = Clingo::SymbolVector();
         auto paramList = tmp.split(",", QString::SplitBehavior::SkipEmptyParts);
-        std::cout << "ps2" << this->programSection.toStdString() << std::endl;
         for (auto it : paramList) {
             symVec.push_back(this->gui->getSolver()->parseValue(it.toStdString().c_str()));
-            std::cout << "param: " << it.toStdString() << std::endl;
         }
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), symVec}}, nullptr);
     } else {

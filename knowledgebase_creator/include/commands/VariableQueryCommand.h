@@ -1,12 +1,4 @@
-/*
- * VariableQueryCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMANDS_VARIABLEQUERYCOMMAND_H_
-#define INCLUDE_COMMANDS_VARIABLEQUERYCOMMAND_H_
+#pragma once
 
 #include <commands/Command.h>
 #include <memory>
@@ -40,4 +32,3 @@ public:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_COMMANDS_VARIABLEQUERYCOMMAND_H_ */

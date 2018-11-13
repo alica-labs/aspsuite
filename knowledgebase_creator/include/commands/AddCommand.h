@@ -1,12 +1,4 @@
-/*
- * AddCommand.h
- *
- *  Created on: Mar 9, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_ADDCOMMAND_H_
-#define SRC_COMMANDS_ADDCOMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <commands/Command.h>
@@ -41,5 +33,3 @@ private:
 };
 
 } /* namespace kbcr */
-
-#endif /* SRC_COMMANDS_ADDCOMMAND_H_ */

@@ -1,12 +1,4 @@
-/*
- * FactsQueryCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_FACTSQUERYCOMMAND_H_
-#define SRC_COMMANDS_FACTSQUERYCOMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <commands/Command.h>
@@ -36,4 +28,3 @@ public:
 
 } /* namespace kbcr */
 
-#endif /* SRC_COMMANDS_FACTSQUERYCOMMAND_H_ */

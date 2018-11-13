@@ -1,12 +1,4 @@
-/*
- * Command.h
- *
- *  Created on: Jan 18, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMAND_H_
-#define INCLUDE_COMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <QObject>
@@ -48,4 +40,3 @@ protected:
 };
 } // namespace kbcr
 
-#endif /* INCLUDE_COMMAND_H_ */

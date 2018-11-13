@@ -23,6 +23,8 @@ namespace kbcr
 ExternalTableHandler::ExternalTableHandler(KnowledgebaseCreator* gui)
 {
     this->gui = gui;
+    connect(this->gui->getUi()->externalTable, SIGNAL(itemPressed(QTableWidgetItem *)),
+            this, SLOT(updateExternalLabel(QTableWidgetItem *)));
 }
 
 ExternalTableHandler::~ExternalTableHandler() {}
@@ -68,6 +70,13 @@ void ExternalTableHandler::drawExternalTable()
     this->gui->getUi()->externalTable->setColumnWidth(0, 350);
     this->gui->getUi()->externalTable->horizontalHeader()->stretchLastSection();
     this->gui->getUi()->externalTable->setRowCount(0);
+}
+
+void ExternalTableHandler::updateExternalLabel(QTableWidgetItem* item) {
+	if(item->column() == 0)
+	{
+		this->gui->getUi()->externalTextEdit->setText(item->text());
+	}
 }
 
 } /* namespace kbcr */

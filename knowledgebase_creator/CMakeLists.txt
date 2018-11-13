@@ -58,7 +58,6 @@ set(knowledgebaseCreator_HDRS
         include/gui/ModelSettingDialog.h
         include/containers/SolverSettings.h
         include/containers/ConceptNetCall.h
-        include/containers/ConceptNetEdge.h
         include/containers/ConceptNetConcept.h
         include/commands/Command.h
         include/commands/NewSolverCommand.h

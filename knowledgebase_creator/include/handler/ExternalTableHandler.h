@@ -1,14 +1,7 @@
-/*
- * ExternalTableHandler.h
- *
- *  Created on: Mar 12, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_HANDLER_EXTERNALTABLEHANDLER_H_
-#define INCLUDE_HANDLER_EXTERNALTABLEHANDLER_H_
+#pragma once
 
 #include <QObject>
+#include <QTableWidget>
 #include <memory>
 
 namespace kbcr
@@ -40,7 +33,10 @@ public slots:
      * Slot to redraw the command history
      */
     void drawExternalTable();
-
+    /**
+     * Slot for filling the external label
+     */
+    void updateExternalLabel(QTableWidgetItem * item);
 private:
     /**
      * Pointer to main Gui handler
@@ -50,4 +46,3 @@ private:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_HANDLER_EXTERNALTABLEHANDLER_H_ */

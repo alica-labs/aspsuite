@@ -1,12 +1,4 @@
-/*
- * LoadLogicProgramCommand.h
- *
- *  Created on: Jan 21, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMANDS_LOADBACKGROUNDKNOWLEDGECOMMAND_H_
-#define INCLUDE_COMMANDS_LOADBACKGROUNDKNOWLEDGECOMMAND_H_
+#pragma once
 
 #include <QByteArray>
 #include <QJsonObject>
@@ -40,4 +32,3 @@ public:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_COMMANDS_LOADBACKGROUNDKNOWLEDGECOMMAND_H_ */

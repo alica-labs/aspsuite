@@ -97,7 +97,8 @@ void KnowledgebaseCreator::readConceptNetBaseRelations()
     // File placed in project etc folder
     QFile file(":/conceptNetRelations.txt");
 
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly))
+    {
         qWarning("Couldn't open file conceptNetRelations.txt.");
         return;
     }
@@ -106,7 +107,8 @@ void KnowledgebaseCreator::readConceptNetBaseRelations()
     QJsonDocument loadDoc(QJsonDocument::fromJson(loadedData));
     QJsonObject savedObject = loadDoc.object();
     QJsonArray relations = savedObject["relations"].toArray();
-    for (auto relation : relations) {
+    for (auto relation : relations)
+    {
         this->conceptNetBaseRelations.push_back(relation.toObject()["rel"].toString());
     }
 }
@@ -120,7 +122,8 @@ void KnowledgebaseCreator::newSolver()
         this->msgBox->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         this->msgBox->setDefaultButton(QMessageBox::Cancel);
         int btn = this->msgBox->exec();
-        if (btn == QMessageBox::Ok) {
+        if (btn == QMessageBox::Ok)
+        {
             std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
             cmd->execute();
         }

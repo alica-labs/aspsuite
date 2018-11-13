@@ -1,13 +1,4 @@
-/*
- * CommandHistoryHandler.h
- *
- *  Created on: Jan 23, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_HANDLER_COMMANDHISTORYHANDLER_H_
-#define INCLUDE_HANDLER_COMMANDHISTORYHANDLER_H_
-
+#pragma once
 #include <QObject>
 #include <memory>
 
@@ -116,4 +107,3 @@ private:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_HANDLER_COMMANDHISTORYHANDLER_H_ */

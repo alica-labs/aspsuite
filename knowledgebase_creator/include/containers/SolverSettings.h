@@ -1,12 +1,4 @@
-/*
- * SolverSettings.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_CONTAINERS_SOLVERSETTINGS_H_
-#define INCLUDE_CONTAINERS_SOLVERSETTINGS_H_
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -55,5 +47,3 @@ private:
 };
 
 } /* namespace kbcr */
-
-#endif /* INCLUDE_CONTAINERS_SOLVERSETTINGS_H_ */

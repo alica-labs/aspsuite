@@ -1,12 +1,4 @@
-/*
- * ChangeSolverSettingsCommand.h
- *
- *  Created on: Jan 19, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMANDS_CHANGESOLVERSETTINGSCOMMAND_H_
-#define INCLUDE_COMMANDS_CHANGESOLVERSETTINGSCOMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <commands/Command.h>
@@ -42,4 +34,3 @@ public:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_COMMANDS_CHANGESOLVERSETTINGSCOMMAND_H_ */

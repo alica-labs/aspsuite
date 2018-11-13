@@ -1,12 +1,4 @@
-/*
- * SettingsDialog.h
- *
- *  Created on: Jan 17, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_SETTINGSDIALOG_H_
-#define INCLUDE_SETTINGSDIALOG_H_
+#pragma once
 
 #include <QDialog>
 #include <QListWidget>
@@ -113,4 +105,4 @@ private:
     std::map<std::string, std::shared_ptr<SolverSettings>> parameterMap;
 };
 } // namespace kbcr
-#endif /* INCLUDE_SETTINGSDIALOG_H_ */
+

@@ -1,5 +1,4 @@
-#ifndef KnowledgebaseCreator_H
-#define KnowledgebaseCreator_H
+#pragma once
 
 #include <QMainWindow>
 #include <QMessageBox>
@@ -258,4 +257,4 @@ signals:
     void updateExternalList();
 };
 } // namespace kbcr
-#endif // KnowledgebaseCreator_H
+

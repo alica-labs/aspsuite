@@ -1,12 +1,4 @@
-/*
- * ConceptNetEdge.h
- *
- *  Created on: Feb 23, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_CONTAINERS_CONCEPTNETEDGE_H_
-#define SRC_CONTAINERS_CONCEPTNETEDGE_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -41,4 +33,3 @@ public:
 
 } /* namespace kbcr */
 
-#endif /* SRC_CONTAINERS_CONCEPTNETEDGE_H_ */

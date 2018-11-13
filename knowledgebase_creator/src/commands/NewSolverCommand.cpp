@@ -33,7 +33,6 @@ void NewSolverCommand::execute()
     this->gui->clear();
     this->gui->chHandler->addToCommandHistory(shared_from_this());
     this->gui->setSettings(this->settings);
-    //		std::vector<char const *> args {"clingo", "-W", "no-atom-undefined", "--number=1", nullptr};
     // vorher this->settings->args statt {}
     this->gui->setSolver(new reasoner::ASPSolver({}));
     this->gui->enableGui(true);

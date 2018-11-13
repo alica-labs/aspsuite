@@ -1,12 +1,4 @@
-/*
- * ConceptNetCall.h
- *
- *  Created on: Feb 23, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_CONTAINERS_CONCEPTNETCALL_H_
-#define SRC_CONTAINERS_CONCEPTNETCALL_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -93,4 +85,3 @@ signals:
 
 } /* namespace kbcr */
 
-#endif /* SRC_CONTAINERS_CONCEPTNETCALL_H_ */

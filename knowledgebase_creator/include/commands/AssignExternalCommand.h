@@ -1,12 +1,4 @@
-/*
- * AssignExternalCommand.h
- *
- *  Created on: Mar 11, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_COMMANDS_ASSIGNEXTERNALCOMMAND_H_
-#define INCLUDE_COMMANDS_ASSIGNEXTERNALCOMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <commands/Command.h>
@@ -42,4 +34,3 @@ private:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_COMMANDS_ASSIGNEXTERNALCOMMAND_H_ */

@@ -1,12 +1,4 @@
-/*
- * ModelSettingDialog.h
- *
- *  Created on: Mar 12, 2017
- *      Author: stefan
- */
-
-#ifndef INCLUDE_GUI_MODELSETTINGDIALOG_H_
-#define INCLUDE_GUI_MODELSETTINGDIALOG_H_
+#pragma once
 
 #include <QDialog>
 
@@ -71,4 +63,3 @@ private slots:
 
 } /* namespace kbcr */
 
-#endif /* INCLUDE_GUI_MODELSETTINGDIALOG_H_ */

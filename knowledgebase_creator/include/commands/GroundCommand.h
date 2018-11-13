@@ -1,12 +1,4 @@
-/*
- * GroundCommand.h
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
-#ifndef SRC_COMMANDS_GROUNDCOMMAND_H_
-#define SRC_COMMANDS_GROUNDCOMMAND_H_
+#pragma once
 
 #include <QJsonObject>
 #include <QString>
@@ -46,4 +38,3 @@ private:
 
 } /* namespace kbcr */
 
-#endif /* SRC_COMMANDS_GROUNDCOMMAND_H_ */

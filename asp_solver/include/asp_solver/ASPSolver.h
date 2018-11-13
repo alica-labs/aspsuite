@@ -8,6 +8,8 @@
 
 #include <asp_commons/IASPSolver.h>
 
+#include "asp_solver/GrdProgramObserver.h"
+
 //#define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
 //#define SOLVER_OPTIONS
@@ -72,6 +74,8 @@ public:
 
     shared_ptr<Clingo::Control> clingo;
 
+    const std::string getGroundProgram() const;
+
 private:
     bool on_model(Clingo::Model& m);
     vector<long> currentQueryIds;
@@ -85,6 +89,7 @@ private:
     int prepareSolution(std::vector<ASPCommonsVariable*>& vars, vector<ASPCommonsTerm*>& calls);
     int queryCounter;
     supplementary::SystemConfig* sc;
+    GrdProgramObserver observer;
 
 protected:
     static mutex queryCounterMutex;

@@ -4,9 +4,11 @@
 #include <asp_commons/ASPCommonsVariable.h>
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/AnnotatedValVec.h>
-#include <asp_solver/ASPFactsQuery.h>
-#include <asp_solver/ASPVariableQuery.h>
-#include <asp_solver/AnnotatedExternal.h>
+
+#include "asp_solver/ASPFactsQuery.h"
+#include "asp_solver/ASPVariableQuery.h"
+#include "asp_solver/AnnotatedExternal.h"
+
 
 namespace reasoner
 {
@@ -31,6 +33,7 @@ ASPSolver::ASPSolver(vector<char const*> args)
         }
     };
     this->clingo = make_shared<Clingo::Control>(args, logger, 20);
+    this->clingo->register_observer(this->observer);
     this->sc = supplementary::SystemConfig::getInstance();
     this->queryCounter = 0;
 #ifdef ASPSolver_DEBUG
@@ -77,6 +80,7 @@ void ASPSolver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 #ifdef ASPSOLVER_DEBUG
     cout << "ASPSolver_ground: " << vec.at(0).first << endl;
 #endif
+    this->observer.clear();
     this->clingo->ground(vec, callBack);
 }
 
@@ -369,4 +373,10 @@ vector<shared_ptr<ASPQuery>> ASPSolver::getRegisteredQueries()
     return registeredQueries;
 }
 
+const std::string ASPSolver::getGroundProgram() const {
+	return this->observer.getGroundProgram();
+}
+
 } /* namespace reasoner */
+
+

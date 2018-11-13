@@ -26,10 +26,7 @@ ASPQuery::ASPQuery(IASPSolver* solver, reasoner::ASPCommonsTerm* term)
     this->currentModels = make_shared<vector<Clingo::SymbolVector>>();
 }
 
-ASPQuery::~ASPQuery()
-{
-    delete term;
-}
+ASPQuery::~ASPQuery() {}
 
 void ASPQuery::reduceLifeTime()
 {

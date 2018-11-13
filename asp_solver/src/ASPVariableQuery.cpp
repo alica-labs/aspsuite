@@ -359,7 +359,7 @@ void ASPVariableQuery::onModel(Clingo::Model& clingoModel)
 #endif
         auto it = ((ASPSolver*) this->solver)
                           ->clingo->symbolic_atoms()
-                          .begin(Clingo::Signature(value.first.name(), value.first.number(), value.first.is_positive())); // value.first.signature();
+                          .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
             cout << "ASPVariableQuery: Didn't find any suitable domain!" << endl;
             continue;

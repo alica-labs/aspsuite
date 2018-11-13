@@ -32,12 +32,10 @@ void GroundCommand::execute()
 {
     this->gui->chHandler->addToCommandHistory(shared_from_this());
     std::string aspString = this->program.toStdString();
-    std::cout << "aspstring: " << aspString << std::endl;
     if (this->program.contains("\n") || !this->program.contains("#program")) {
         this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
         this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
     }
-    std::cout << "ps1" << this->programSection.toStdString() << std::endl;
     if (this->programSection.contains("(") && this->programSection.contains(")")) {
         auto indexLeft = this->programSection.indexOf("(");
         auto indexRight = this->programSection.indexOf(")");

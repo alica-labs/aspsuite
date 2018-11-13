@@ -159,15 +159,14 @@ void ASPFactsQuery::onModel(Clingo::Model& clingoModel)
 #ifdef ASPQUERY_DEBUG
         cout << "ASPFactsQuery::onModel: " << value.first << endl;
 #endif
-        auto it = ((ASPSolver*) this->solver)
-                          ->clingo->symbolic_atoms()
-                          .begin(Clingo::Signature(value.first.name(), value.first.number(), value.first.is_positive())); // value.first.signature();
+        auto it = ((ASPSolver*) this->solver)->clingo->symbolic_atoms().begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
             cout << "ASPFactsQuery: Didn't find any suitable domain!" << endl;
             continue;
         }
+
         while (it) {
-            //				cout << "ASPFactsQuery: Inside domain-loop! " << *(*it) << endl;
+            //cout << "ASPFactsQuery: Inside domain-loop! " << (*it).symbol().to_string() << endl;
 
             //				if (&(domainPred)
             //						&& (clingoModel)>isTrue(clingoModel.lp.getLiteral(domainPair.second.uid())))

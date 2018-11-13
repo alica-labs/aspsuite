@@ -102,7 +102,7 @@ bool ASPSolver::solve()
 bool ASPSolver::on_model(Clingo::Model& m)
 {
 #ifdef ASPSolver_DEBUG
-    cout << "ASPSolver: Found the following model which is number " << endl;
+    cout << "ASPSolver: Found the following model :" << endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         cout << atom << " ";
     }
@@ -128,7 +128,6 @@ void ASPSolver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue
 
 void ASPSolver::releaseExternal(Clingo::Symbol ext)
 {
-    //		this->clingo->assignExternal(ext, Potassco::Value_t::False);
     this->clingo->release_external(ext);
 }
 
@@ -165,8 +164,6 @@ bool ASPSolver::unregisterQuery(shared_ptr<ASPQuery> query)
 
 bool ASPSolver::existsSolution(vector<ASPCommonsVariable*>& vars, vector<ASPCommonsTerm*>& calls)
 {
-
-    // this->conf->setKeyValue(this->modelsKey, "1");
     this->clingo->configuration()["solve"]["models"] = "1";
     int dim = prepareSolution(vars, calls);
     if (dim == -1) {
@@ -218,43 +215,26 @@ int ASPSolver::prepareSolution(vector<ASPCommonsVariable*>& vars, vector<ASPComm
     for (int i = 0; i < vars.size(); ++i) {
         cVars.at(i) = vars.at(i);
     }
-    vector<reasoner::ASPCommonsTerm*> constraint;
-    for (auto& c : calls) {
-        constraint.push_back(c);
-    }
-    for (auto term : constraint) {
+    for (auto term : calls) {
         this->currentQueryIds.push_back(term->getId());
         if (!term->getNumberOfModels().empty()) {
             this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
         }
-        if (term->getType() == ASPQueryType::Variable) {
-            if (this->registeredQueries.size() == 0) {
+        bool found = false;
+        for (auto query : this->registeredQueries) {
+            if (term->getId() == query->getTerm()->getId()) {
+                found = true;
+            }
+        }
+        if (!found) {
+            if (term->getType() == ASPQueryType::Variable) {
                 this->registerQuery(make_shared<ASPVariableQuery>(this, term));
-            } else {
-                bool found = false;
-                for (auto query : this->registeredQueries) {
-                    if (term->getId() == query->getTerm()->getId()) {
-                        found = true;
-                    }
-                }
-                if (!found) {
-                    this->registerQuery(make_shared<ASPVariableQuery>(this, term));
-                }
-            }
-        } else if (term->getType() == ASPQueryType::Facts) {
-            bool found = true;
-            for (auto query : this->registeredQueries) {
-                if (term->getId() != query->getTerm()->getId()) {
-                    found = false;
-                    break;
-                }
-            }
-            if (!found) {
+            }  else if (term->getType() == ASPQueryType::Facts) {
                 this->registerQuery(make_shared<ASPFactsQuery>(this, term));
+            } else {
+                cout << "ASPSolver: Query of unknown type registered!" << endl;
+                return -1;
             }
-        } else {
-            cout << "ASPSolver: Query of unknown type registered!" << endl;
-            return -1;
         }
         if (term->getExternals() != nullptr) {
             for (auto p : *term->getExternals()) {
@@ -283,15 +263,10 @@ shared_ptr<ASPCommonsVariable> ASPSolver::createVariable(long id)
 
 void ASPSolver::removeDeadQueries()
 {
-    // TODO: Optimize
-    vector<shared_ptr<ASPQuery>> toRemove;
-    for (auto query : this->registeredQueries) {
-        if (query->getLifeTime() == 0) {
-            toRemove.push_back(query);
+    for (int i = this->registeredQueries.size() - 1; i >= 0; i--) {
+        if (this->registeredQueries.at(i)->getLifeTime() == 0) {
+            this->unregisterQuery(this->registeredQueries.at(i));
         }
-    }
-    for (auto query : toRemove) {
-        this->unregisterQuery(query);
     }
 }
 

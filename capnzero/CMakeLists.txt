@@ -54,6 +54,7 @@ string(FIND ${CAPNP_HDRS} "/" position REVERSE)
 string(SUBSTRING ${CAPNP_HDRS} ${position}+1 ${length}-1  sub)
 add_custom_target(move-base-msgs-header-to-include ALL
   COMMAND ${CMAKE_COMMAND} -E copy ${CAPNP_HDRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/capnzero-base-msgs${sub}
+  COMMAND ${CMAKE_COMMAND} -E remove ${CAPNP_HDRS}
   DEPENDS ${CAPNP_HDRS}
 )
 

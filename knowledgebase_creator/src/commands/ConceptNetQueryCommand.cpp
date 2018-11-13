@@ -106,7 +106,7 @@ void ConceptNetQueryCommand::handleQuery()
     auto commaPos = this->query.indexOf(",");
     // cn5_Wildcard(concept, concept)
     if (this->query.contains("cn5_Wildcard")) {
-        this->queryConcept = QString("wildcard");
+        this->queryConcept = KnowledgebaseCreator::WILDCARD;
         auto conceptRight = this->query.mid(commaPos + 1, this->query.size() - commaPos);
         auto conceptLeft = this->query.mid(pos + 1, commaPos - pos).trimmed();
         conceptRight = conceptRight.left(conceptRight.size() - 1).trimmed();
@@ -116,8 +116,8 @@ void ConceptNetQueryCommand::handleQuery()
         QUrl url(KnowledgebaseCreator::CONCEPTNET_BASE_URL + KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE + conceptLeft + "&other=/c/en/" + conceptRight +
                  "&limit=1000");
         callUrl(url);
-    } else if (this->query.contains("wildcard") && !this->query.contains("cn5_Wildcard")) {
-        auto wildcardPos = this->query.indexOf("wildcard");
+    } else if (this->query.contains(KnowledgebaseCreator::WILDCARD) && !this->query.contains("cn5_Wildcard")) {
+        auto wildcardPos = this->query.indexOf(KnowledgebaseCreator::WILDCARD);
         // relation(wildcard, concept)
         if (wildcardPos < commaPos) {
             auto concept = this->query.mid(commaPos + 1, this->query.size() - commaPos);
@@ -141,7 +141,7 @@ void ConceptNetQueryCommand::handleQuery()
     } else {
         if (this->query.contains(",")) {
             // relation(concept, concept)
-            this->queryConcept = QString("wildcard");
+            this->queryConcept = KnowledgebaseCreator::WILDCARD;
             auto conceptRight = this->query.mid(commaPos + 1, this->query.size() - commaPos);
             auto conceptLeft = this->query.mid(pos + 1, commaPos - pos).trimmed();
             conceptRight = conceptRight.left(conceptRight.size() - 1).trimmed();
@@ -334,7 +334,7 @@ void ConceptNetQueryCommand::extractASPPredicates()
     auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
     for (auto pair : pgmMap) {
         this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
-        this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
+        //this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
     }
     this->gui->enableGui(true);
 #ifdef CNQC_EVALCODE

@@ -21,7 +21,7 @@ NewSolverCommand::NewSolverCommand(KnowledgebaseCreator* gui, std::shared_ptr<So
     this->settings = settings;
     this->gui = gui;
     if (settings == nullptr) {
-        cout << "Using default params" << endl;
+        std::cout << "Using default params" << std::endl;
         getDefaultArguments();
     }
 }

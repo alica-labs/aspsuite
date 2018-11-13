@@ -55,7 +55,7 @@ std::string ConceptNetCall::toString()
 
 void ConceptNetCall::findServices()
 {
-    if (this->queryConcept.compare("wildcard") == 0) {
+    if (this->queryConcept.compare(KnowledgebaseCreator::WILDCARD) == 0) {
         return;
     }
 
@@ -154,7 +154,7 @@ void ConceptNetCall::mapServices(QNetworkReply* reply)
 
 void ConceptNetCall::findInconsistencies()
 {
-    if (this->queryConcept.compare("wildcard") == 0) {
+    if (this->queryConcept.compare(KnowledgebaseCreator::WILDCARD) == 0) {
         return;
     }
     for (auto edge : this->edges) {

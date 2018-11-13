@@ -198,7 +198,7 @@ void OfferServicesCommand::extractASPPredicates()
     auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
     for (auto pair : pgmMap) {
         this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
-        this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
+        //this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
     }
     this->gui->enableGui(true);
     if (this->gui->slHandler->currentLoadCmd != nullptr) {

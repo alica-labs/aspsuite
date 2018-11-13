@@ -35,14 +35,6 @@ AssignExternalCommand::~AssignExternalCommand() {}
 void AssignExternalCommand::execute()
 {
     auto external = this->gui->getSolver()->parseValue(this->externalName.toStdString());
-    // Maybe not necessary anymore!?
-    //		auto symbolPos = this->gui->getSolver()->clingo->lookup(external);
-    //		if (!this->gui->getSolver()->clingo->valid(symbolPos) || !this->gui->getSolver()->clingo->external(symbolPos))
-    //		{
-    //			this->gui->getUi()->externalTextEdit->setText(QString("Invalid or Released External!"));
-    //			this->undo();
-    //			return;
-    //		}
     if (external.is_positive()) {
         this->previousTruthValue = true;
     }

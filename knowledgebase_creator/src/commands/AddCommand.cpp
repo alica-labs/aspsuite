@@ -33,7 +33,7 @@ void AddCommand::execute()
     // call add program on solver
     this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
     // show program string
-    this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
+    //this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
     this->gui->chHandler->addToCommandHistory(shared_from_this());
 }
 

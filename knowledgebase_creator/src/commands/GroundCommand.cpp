@@ -34,7 +34,6 @@ void GroundCommand::execute()
     std::string aspString = this->program.toStdString();
     if (this->program.contains("\n") || !this->program.contains("#program")) {
         this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
-        this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
     }
     if (this->programSection.contains("(") && this->programSection.contains(")")) {
         auto indexLeft = this->programSection.indexOf("(");
@@ -48,6 +47,7 @@ void GroundCommand::execute()
         }
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), symVec}}, nullptr);
     } else {
+    	this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), {}}}, nullptr);
     }
     emit this->gui->updateExternalList();

@@ -34,6 +34,7 @@ const QString KnowledgebaseCreator::CONCEPTNET_URL_QUERYEND = "/query?end=/c/en/
 const QString KnowledgebaseCreator::CONCEPTNET_URL_QUERYNODE = "/query?node=/c/en/";
 const QString KnowledgebaseCreator::CONCEPTNET_URL_QUERYOTHER = "/query?other=/c/en/";
 const QString KnowledgebaseCreator::CONCEPTNET_PREFIX = "cn5_";
+const QString KnowledgebaseCreator::WILDCARD = "wildcard";
 
 KnowledgebaseCreator::KnowledgebaseCreator(QWidget* parent)
         : QMainWindow(parent)
@@ -116,17 +117,17 @@ void KnowledgebaseCreator::readConceptNetBaseRelations()
 void KnowledgebaseCreator::newSolver()
 {
     if (this->settings == nullptr) {
-        this->msgBox->setWindowTitle("New Solver");
+       /* this->msgBox->setWindowTitle("New Solver");
         this->msgBox->setText("No Solver Settings given!");
         this->msgBox->setInformativeText("Create Solver with default Settings?");
         this->msgBox->setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         this->msgBox->setDefaultButton(QMessageBox::Cancel);
         int btn = this->msgBox->exec();
         if (btn == QMessageBox::Ok)
-        {
+        {*/
             std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
             cmd->execute();
-        }
+        //}
     } else {
         std::shared_ptr<NewSolverCommand> cmd = std::make_shared<NewSolverCommand>(this, this->settings);
         cmd->execute();
@@ -289,6 +290,7 @@ void KnowledgebaseCreator::connectGuiElements()
     this->connect(this->ui->addBtn, SIGNAL(released()), this, SLOT(addCallBack()));
     this->connect(this->ui->applyBtn, SIGNAL(released()), this, SLOT(applyExternalCallBack()));
     this->connect(this->ui->serveBtn, SIGNAL(released()), this, SLOT(serveCallBack()));
+//    this->connect(this->ui->getGrdProgramBtn, SIGNAL(released()), this, SLOT(serveCallBack()));
 
     // Command History
     this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));
@@ -384,7 +386,7 @@ void KnowledgebaseCreator::configureLabels()
 }
 
 bool KnowledgebaseCreator::isFactsQuery(QString program) {
-    if(program.contains(QString("wildcard"))) {
+    if(program.contains(KnowledgebaseCreator::WILDCARD)) {
         return true;
     }
     QStringList list = program.split("\n");

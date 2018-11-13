@@ -146,6 +146,10 @@ public:
      * Containts the cn5_ prefix.
      */
     static const QString CONCEPTNET_PREFIX;
+    /**
+     * Wildcard string
+     */
+    static const QString WILDCARD;
 
 private slots:
 

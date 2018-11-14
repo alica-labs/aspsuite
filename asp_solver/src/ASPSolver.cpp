@@ -32,7 +32,8 @@ ASPSolver::ASPSolver(vector<char const*> args)
             std::cerr << message << std::endl;
         }
     };
-    this->clingo = make_shared<Clingo::Control>(args, logger, 20);
+    this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    this->observer.setClingo(this->clingo);
     this->clingo->register_observer(this->observer);
     this->sc = supplementary::SystemConfig::getInstance();
     this->queryCounter = 0;

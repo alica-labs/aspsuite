@@ -77,7 +77,7 @@ public:
     const std::string getGroundProgram() const;
 
 private:
-    bool on_model(Clingo::Model& m);
+    bool on_model(Clingo::Model& m) override;
     vector<long> currentQueryIds;
 
     vector<string> alreadyLoaded;

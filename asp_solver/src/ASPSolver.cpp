@@ -33,7 +33,6 @@ ASPSolver::ASPSolver(vector<char const*> args)
         }
     };
     this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
-    this->observer.setClingo(this->clingo);
     this->clingo->register_observer(this->observer);
     this->sc = supplementary::SystemConfig::getInstance();
     this->queryCounter = 0;
@@ -97,14 +96,14 @@ bool ASPSolver::solve()
 #endif
     // bind(&ASPSolver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
-    auto result = this->clingo->solve(span, this);
+    auto result = this->clingo->solve(span, this, false, false);
     return result.get().is_satisfiable();
 }
 
 /**
  * Callback for created models during solving.
  */
-bool ASPSolver::on_model(Clingo::Model& m)
+bool ASPSolver::on_model(Clingo::Model &m)
 {
 #ifdef ASPSolver_DEBUG
     cout << "ASPSolver: Found the following model :" << endl;
@@ -113,15 +112,14 @@ bool ASPSolver::on_model(Clingo::Model& m)
     }
     cout << endl;
 #endif
-    Clingo::Model& clingoModel = (Clingo::Model&) m;
     Clingo::SymbolVector vec;
-    auto tmp = clingoModel.symbols(clingo_show_type_shown);
+    auto tmp = m.symbols(Clingo::ShowType::Shown);
     for (int i = 0; i < tmp.size(); i++) {
         vec.push_back(tmp[i]);
     }
     this->currentModels.push_back(vec);
     for (auto& query : this->registeredQueries) {
-        query->onModel(clingoModel);
+        query->onModel(m);
     }
     return true;
 }

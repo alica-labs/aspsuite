@@ -181,8 +181,14 @@ private slots:
      * Slot for ApplyExternal call
      */
     void applyExternalCallBack();
-
+    /**
+     * Slot for get Service call
+     */
     void serveCallBack();
+    /**
+     * Slot for getGroundProgram call
+     */
+    void getGroundProgrammCallBack();
 
 private:
     /**

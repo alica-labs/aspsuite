@@ -59,8 +59,6 @@ public:
 
     void subscribe(void (*callbackFunction)(::capnp::FlatArrayMessageReader&));
 
-    void receive();
-
     static const int wordSize;
 
     // ObjType *callbackObject_;
@@ -74,6 +72,8 @@ protected:
     std::string multicastGroupName;
     std::thread* runThread;
     bool running;
+
+    void receive();
 };
 
 const int Subscriber::wordSize = sizeof(capnp::word);
@@ -105,21 +105,20 @@ void Subscriber::receive()
     while (this->running) {
         zmq_msg_t msg;
         check(zmq_msg_init(&msg), "zmq_msg_init");
-        std::cout << "Subscriber::received() waiting ..." << std::endl;
+//        std::cout << "Subscriber::received() waiting ..." << std::endl;
         int nbytes = zmq_msg_recv(&msg, this->socket, 0);
 
-        std::cout << "Subscriber::receive(): nBytes: " << nbytes << " errno: " << errno << "(EAGAIN: " << EAGAIN << ")" << std::endl;
+//        std::cout << "Subscriber::receive(): nBytes: " << nbytes << " errno: " << errno << "(EAGAIN: " << EAGAIN << ")" << std::endl;
 
         // handling for unsuccessful call to zmq_msg_recv
         if (nbytes == -1) {
-
-            if (errno == EAGAIN) // no message available
-            {
-                std::cout << "Subscriber::receive(): continue because of EAGAIN!" << std::endl;
-                usleep(1);
-            } else // receiving a message was unsuccessful
+            if (errno != EAGAIN) // receiving a message was unsuccessful
             {
                 std::cerr << "Subscriber::receive(): zmq_msg_recv returned: -1 - " << zmq_strerror(errno) << std::endl;
+            } else // no message available
+            {
+//                std::cout << "Subscriber::receive(): continue because of EAGAIN!" << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
 
             check(zmq_msg_close(&msg), "zmq_msg_close");
@@ -128,6 +127,7 @@ void Subscriber::receive()
 
         // Received message must contain an integral number of words.
         if (zmq_msg_size(&msg) % Subscriber::wordSize != 0) {
+            std::cout << "Non-Integral number of words!" << std::endl;
             check(zmq_msg_close(&msg), "zmq_msg_close");
             continue;
         }
@@ -141,10 +141,6 @@ void Subscriber::receive()
         ::capnp::FlatArrayMessageReader msgReader = ::capnp::FlatArrayMessageReader(wordArray);
 
         (this->callbackFunction_)(msgReader);
-
-        //    auto beacon = msgReader.getRoot<discovery_msgs::Beacon>();
-        //
-        //    std::cout << "Subscriber::receive(): " << beacon.toString().flatten().cStr() << std::endl;
 
         check(zmq_msg_close(&msg), "zmq_msg_close");
     }

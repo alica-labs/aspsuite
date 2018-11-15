@@ -1,16 +1,18 @@
-#include <capnzero/Publisher.h>
+#include "capnzero-base-msgs/string.capnp.h"
 
-//#include <capnzero/string.capnp.h>
+#include <capnzero/Publisher.h>
 
 #include <capnp/common.h>
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
 #include <kj/array.h>
 
-int main (int argc, char ** argv) {
+#define DEBUG_SENDER
 
-    if (argc <= 1)
-    {
+int main(int argc, char** argv)
+{
+
+    if (argc <= 1) {
         std::cerr << "Synopsis: rosrun capnzero pub \"String that should be published!\"" << std::endl;
         return -1;
     }
@@ -19,26 +21,25 @@ int main (int argc, char ** argv) {
         std::cout << "Param " << i << ": '" << argv[i] << "'" << std::endl;
     }
 
-    void* ctx = zmq_ctx_new();
-
     // Cap'n Proto: create proto message
 
     // init builder
     ::capnp::MallocMessageBuilder msgBuilder;
-//    capnp::String::Builder beaconMsgBuilder = msgBuilder.initRoot<capnp::Text>();
+    capnzero::String::Builder beaconMsgBuilder = msgBuilder.initRoot<capnzero::String>();
 
     // set content
-//    beaconMsgBuilder.
+    beaconMsgBuilder.setString(argv[2]);
 
-#ifdef DEBUG_AGENT
+#ifdef DEBUG_SENDER
     std::cout << "pub: Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-    //void* context, std::string connection, std::string multicastGroupName
-//    capnzero::Publisher pub = capnzero::Publisher(ctx);
-//    int numBytesSent = pub->send(msgBuilder);
+    // void* context, std::string connection, std::string multicastGroupName
+    void* ctx = zmq_ctx_new();
+    capnzero::Publisher pub = capnzero::Publisher(ctx, "udp://224.0.0.1:5555", argv[1]);
+    int numBytesSent = pub.send(msgBuilder);
 
-#ifdef DEBUG_AGENT
+#ifdef DEBUG_SENDER
     std::cout << "pub: " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
 }

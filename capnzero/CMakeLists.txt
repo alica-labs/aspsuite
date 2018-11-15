@@ -39,31 +39,16 @@ set(capnp_message_folder "${CMAKE_CURRENT_SOURCE_DIR}/msg")
 file(GLOB_RECURSE capnp_messages ${capnp_message_folder} *.capnp)
 
 set(CAPNPC_SRC_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/msg)
-set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(CAPNPC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/capnzero-base-msgs")
 capnp_generate_cpp(CAPNP_SRCS CAPNP_HDRS ${capnp_messages})
 
 message("CAPNP_SRCS: ${CAPNP_SRCS}")
 message("CAPNP_HDRS: ${CAPNP_HDRS}")
 
-## Move header files into include folder
-set(position "")
-set(length "")
-set(sub "")
-string(LENGTH ${CAPNP_HDRS} length)
-string(FIND ${CAPNP_HDRS} "/" position REVERSE)
-string(SUBSTRING ${CAPNP_HDRS} ${position}+1 ${length}-1  sub)
-add_custom_target(move-base-msgs-header-to-include ALL
-  COMMAND ${CMAKE_COMMAND} -E copy ${CAPNP_HDRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/capnzero-base-msgs${sub}
-  COMMAND ${CMAKE_COMMAND} -E remove ${CAPNP_HDRS}
-  DEPENDS ${CAPNP_HDRS}
-)
-
 ## Declare the C++ capnproto message library
 add_library(capnzero-base-msgs
   ${CAPNP_SRCS}
 )
-
-#add_dependencies(capnzero-base-msgs move-base-msgs-header-to-include)
 
 ############ PUBLISH-SUBSCRIBE-LIBRARY
 
@@ -84,7 +69,7 @@ endif (NOT catkin_FOUND)
 ############# SENDER-CONSOLE-APP
 
 add_executable(pub
-  src/Sender.cpp
+        src/pub.cpp
 )
 
 target_link_libraries(pub
@@ -95,6 +80,24 @@ target_link_libraries(pub
 )
 
 if (NOT catkin_FOUND)
-    target_include_directories(pub PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  target_include_directories(pub PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif (NOT catkin_FOUND)
+
+############# RECEIVER-CONSOLE-APP
+
+add_executable(echo
+        src/echo.cpp
+)
+
+target_link_libraries(echo
+  ${PROJECT_NAME}
+  ${ZeroMQ_LIBRARIES}
+  ${CAPNP_LIBRARIES}
+  capnzero-base-msgs
+  pthread
+)
+
+if (NOT catkin_FOUND)
+  target_include_directories(echo PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 endif (NOT catkin_FOUND)
 

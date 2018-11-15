@@ -67,15 +67,13 @@ void Agent::run()
     // this->checkZMQVersion();
     // this->testUUIDStuff();
 
-    if (!this->getWirelessAddress()) {
-        std::cerr << "Agent: No WLAN-Address available! " << std::endl;
-        return;
-    }
+//    if (!this->getWirelessAddress()) {
+//        std::cerr << "Agent: No WLAN-Address available! " << std::endl;
+//        return;
+//    }
 
     if (this->sender) {
         send();
-    } else {
-        this->sub->receive();
     }
 }
 

@@ -3,26 +3,22 @@
 #include <clingo.hh>
 #include <iostream>
 
+namespace reasoner
+{
 class GrdProgramObserver : public Clingo::GroundProgramObserver{
 public:
-	virtual void output_atom(Clingo::Symbol symbol, Clingo::atom_t atom) override {
-		groundProgram.append(symbol.to_string()).append(" ");
-	}
 
-	const std::string getGroundProgram() const {
-		return groundProgram;
-	}
+	GrdProgramObserver();
+	virtual ~GrdProgramObserver();
 
-	void clear() {
-		this->groundProgram.clear();
-	}
+	virtual void output_atom(Clingo::Symbol symbol, Clingo::atom_t atom) override;
 
+	virtual void external(Clingo::atom_t atom, Clingo::ExternalType type) override;
+
+	const std::string getGroundProgram() const;
+
+	void clear();
 private:
-	std::string groundProgram = "";
+	std::string groundAtoms;
 };
-
-
-/*
-bla(X) :- test(X).
-test(1).
-*/
+}

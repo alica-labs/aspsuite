@@ -39,6 +39,7 @@ add_library(${PROJECT_NAME}
     src/AnnotatedExternal.cpp
     src/ASPFactsQuery.cpp
     src/ASPVariableQuery.cpp
+    src/GrdProgramObserver.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

@@ -47,7 +47,7 @@ void GroundCommand::execute()
         }
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), symVec}}, nullptr);
     } else {
-    	this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
+//    	this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), {}}}, nullptr);
     }
     emit this->gui->updateExternalList();

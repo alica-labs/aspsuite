@@ -290,7 +290,7 @@ void KnowledgebaseCreator::connectGuiElements()
     this->connect(this->ui->addBtn, SIGNAL(released()), this, SLOT(addCallBack()));
     this->connect(this->ui->applyBtn, SIGNAL(released()), this, SLOT(applyExternalCallBack()));
     this->connect(this->ui->serveBtn, SIGNAL(released()), this, SLOT(serveCallBack()));
-//    this->connect(this->ui->getGrdProgramBtn, SIGNAL(released()), this, SLOT(serveCallBack()));
+    this->connect(this->ui->getGrdProgramBtn, SIGNAL(released()), this, SLOT(getGroundProgrammCallBack()));
 
     // Command History
     this->connect(this, SIGNAL(updateCommandList()), this->chHandler, SLOT(fillCommandHistory()));
@@ -383,6 +383,10 @@ void KnowledgebaseCreator::configureLabels()
     this->ui->sortedModelsLabel->setWordWrap(true);
     this->ui->programLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->ui->programLabel->setWordWrap(true);
+}
+
+void KnowledgebaseCreator::getGroundProgrammCallBack() {
+	this->ui->programLabel->setText(QString(this->solver->getGroundProgram().c_str()));
 }
 
 bool KnowledgebaseCreator::isFactsQuery(QString program) {

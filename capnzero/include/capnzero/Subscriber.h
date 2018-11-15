@@ -38,18 +38,26 @@ public:
     //        check(zmq_join(this->socket, this->multicastGroupName.c_str()), "zmq_join");
     //    }
 
-    Subscriber(void* context, std::string connection, std::string multicastGroupName)
+    Subscriber(void* context, CommType commType, std::string address, std::string multicastGroupName = "")
             : socket(nullptr)
             , multicastGroupName(multicastGroupName)
             , callbackFunction_(nullptr)
             , running(true)
             , runThread(nullptr)
-            , rcvTimeout(15)
-    {
-        this->socket = zmq_socket(context, ZMQ_DISH);
-        check(zmq_setsockopt(this->socket, ZMQ_RCVTIMEO, &rcvTimeout, sizeof(rcvTimeout)), "zmq_setsockopt");
-        check(zmq_bind(this->socket, connection.c_str()), "zmq_connect");
-        check(zmq_join(this->socket, this->multicastGroupName.c_str()), "zmq_join");
+            , rcvTimeout(15) {
+        if (commType == CommType::UDP_MULTICAST) {
+            this->socket = zmq_socket(context, ZMQ_DISH);
+            check(zmq_setsockopt(this->socket, ZMQ_RCVTIMEO, &rcvTimeout, sizeof(rcvTimeout)), "zmq_setsockopt");
+            std::string connection = "udp://" + address;
+            check(zmq_bind(this->socket, connection.c_str()), "zmq_connect");
+            check(zmq_join(this->socket, this->multicastGroupName.c_str()), "zmq_join");
+        } else if (commType == CommType::TCP_P2P) {
+            this->socket = zmq_socket(context, ZMQ_STREAM);
+            std::string connection = "tcp://" + address;
+            check(zmq_bind(this->socket, connection.c_str()), "zmq_connect");
+        } else {
+            std::cerr << "Subscriber: Got unknown CommType! " << std::endl;
+        }
     }
 
     virtual ~Subscriber();

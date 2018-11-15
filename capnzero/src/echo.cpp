@@ -1,6 +1,7 @@
 #include "capnzero-base-msgs/string.capnp.h"
 
 #include <capnzero/Subscriber.h>
+#include <capnzero/Common.h>
 
 #include <capnp/common.h>
 #include <capnp/message.h>
@@ -41,7 +42,7 @@ int main(int argc, char** argv)
     signal(SIGINT, sigIntHandler);
 
     void* ctx = zmq_ctx_new();
-    capnzero::Subscriber sub = capnzero::Subscriber(ctx, "udp://224.0.0.1:5555", argv[1]);
+    capnzero::Subscriber sub = capnzero::Subscriber(ctx, capnzero::CommType::TCP_P2P, "141.51.122.134:5555", argv[1]);
     sub.subscribe(&callback);
 
     while (running) {

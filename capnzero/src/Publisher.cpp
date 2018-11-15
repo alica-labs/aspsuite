@@ -6,12 +6,21 @@
 namespace capnzero
 {
 
-Publisher::Publisher(void* context, std::string connection, std::string multicastGroupName)
+Publisher::Publisher(void* context, CommType commType, std::string address, std::string multicastGroupName)
         : socket(nullptr)
         , multicastGroupName(multicastGroupName)
+        , commType(commType)
 {
-    this->socket = zmq_socket(context, ZMQ_RADIO);
-    check(zmq_connect(socket, connection.c_str()), "zmq_connect");
+    std::string connection;
+    if (this->commType == CommType::UDP_MULTICAST) {
+        this->socket = zmq_socket(context, ZMQ_RADIO);
+        connection = "udp://" + address;
+        check(zmq_connect(socket, connection.c_str()), "zmq_connect");
+    } else if (this->commType == CommType::TCP_P2P) {
+        this->socket = zmq_socket(context, ZMQ_STREAM);
+        connection = "tcp://" + address;
+        check(zmq_connect(socket, connection.c_str()), "zmq_connect");
+    }
 }
 
 Publisher::~Publisher()
@@ -33,9 +42,10 @@ int Publisher::send(::capnp::MallocMessageBuilder& msgBuilder)
     kj::Array<capnp::word>* wordArrayPtr = new kj::Array<capnp::word>(kj::mv(wordArray)); // will be delete by zero-mq
     check(zmq_msg_init_data(&msg, wordArrayPtr->begin(), wordArrayPtr->size() * sizeof(capnp::word), &cleanUpMsgData, wordArrayPtr), "zmq_msg_init_data");
 
-    // set group
-    check(zmq_msg_set_group(&msg, this->multicastGroupName.c_str()), "zmq_msg_set_group");
-
+    if (this->commType == CommType::UDP_MULTICAST) {
+        // set group
+        check(zmq_msg_set_group(&msg, this->multicastGroupName.c_str()), "zmq_msg_set_group");
+    }
     // send
     int numBytesSend = zmq_msg_send(&msg, this->socket, 0);
     if (numBytesSend == -1) {

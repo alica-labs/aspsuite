@@ -7,6 +7,10 @@
 
 namespace capnzero
 {
+    enum CommType {
+        UDP_MULTICAST,
+        TCP_P2P
+    };
 
 /**
  * Checks the return code and reports an error if present.

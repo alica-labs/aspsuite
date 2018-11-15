@@ -16,7 +16,7 @@ namespace capnzero
 class Publisher
 {
 public:
-    Publisher(void* context, std::string connection, std::string multicastGroupName);
+    Publisher(void* context, CommType commType, std::string address, std::string multicastGroupName);
     virtual ~Publisher();
 
     int send(capnp::MallocMessageBuilder& msgBuilder);
@@ -24,6 +24,7 @@ public:
 protected:
     void* socket;
     std::string multicastGroupName;
+    CommType commType;
 };
 
 static void cleanUpMsgData(void* data, void* hint);

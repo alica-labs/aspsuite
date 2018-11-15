@@ -1,6 +1,7 @@
 #include "capnzero-base-msgs/string.capnp.h"
 
 #include <capnzero/Publisher.h>
+#include <capnzero/Common.h>
 
 #include <capnp/common.h>
 #include <capnp/message.h>
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
 
     // void* context, std::string connection, std::string multicastGroupName
     void* ctx = zmq_ctx_new();
-    capnzero::Publisher pub = capnzero::Publisher(ctx, "udp://224.0.0.1:5555", argv[1]);
+    capnzero::Publisher pub = capnzero::Publisher(ctx, capnzero::CommType::TCP_P2P, "141.51.122.134:5555", argv[1]);
     int numBytesSent = pub.send(msgBuilder);
 
 #ifdef DEBUG_SENDER

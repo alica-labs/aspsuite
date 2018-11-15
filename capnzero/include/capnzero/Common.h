@@ -9,7 +9,7 @@ namespace capnzero
 {
     enum CommType {
         UDP_MULTICAST,
-        TCP_P2P
+        TCP_UNICAST
     };
 
 /**

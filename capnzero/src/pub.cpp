@@ -7,11 +7,31 @@
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
 #include <kj/array.h>
+#include <chrono>
+#include <thread>
+#include <signal.h>
 
-#define DEBUG_SENDER
+#define DEBUG_PUB
+
+static bool interrupted = false;
+static void s_signal_handler(int signal_value)
+{
+    interrupted = true;
+}
+
+static void s_catch_signals(void)
+{
+    struct sigaction action;
+    action.sa_handler = s_signal_handler;
+    action.sa_flags = 0;
+    sigemptyset(&action.sa_mask);
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+}
 
 int main(int argc, char** argv)
 {
+    s_catch_signals();
 
     if (argc <= 1) {
         std::cerr << "Synopsis: rosrun capnzero pub \"String that should be published!\"" << std::endl;
@@ -31,16 +51,19 @@ int main(int argc, char** argv)
     // set content
     beaconMsgBuilder.setString(argv[2]);
 
-#ifdef DEBUG_SENDER
+#ifdef DEBUG_PUB
     std::cout << "pub: Message to send: " << beaconMsgBuilder.toString().flatten().cStr() << std::endl;
 #endif
 
-    // void* context, std::string connection, std::string multicastGroupName
     void* ctx = zmq_ctx_new();
-    capnzero::Publisher pub = capnzero::Publisher(ctx, capnzero::CommType::TCP_P2P, "141.51.122.134:5555", argv[1]);
+    capnzero::Publisher pub = capnzero::Publisher(ctx, argv[1]);
+    pub.connect(capnzero::CommType::UDP_MULTICAST, "141.51.122.62:5555");
     int numBytesSent = pub.send(msgBuilder);
 
-#ifdef DEBUG_SENDER
+#ifdef DEBUG_PUB
     std::cout << "pub: " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
+
+    // wait until everything is send
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }

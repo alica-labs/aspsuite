@@ -1,7 +1,7 @@
 #include "capnzero-base-msgs/string.capnp.h"
 
-#include <capnzero/Subscriber.h>
 #include <capnzero/Common.h>
+#include <capnzero/Subscriber.h>
 
 #include <capnp/common.h>
 #include <capnp/message.h>
@@ -13,22 +13,31 @@
 
 #define DEBUG_SENDER
 
-static bool running;
-
 void callback(::capnp::FlatArrayMessageReader& reader)
 {
     std::cout << "Called callback..." << std::endl;
     std::cout << reader.getRoot<capnzero::String>().toString().flatten().cStr() << std::endl;
 }
 
-void sigIntHandler(int sig)
+static bool interrupted = false;
+static void s_signal_handler(int signal_value)
 {
-    running = false;
+    interrupted = true;
+}
+
+static void s_catch_signals(void)
+{
+    struct sigaction action;
+    action.sa_handler = s_signal_handler;
+    action.sa_flags = 0;
+    sigemptyset(&action.sa_mask);
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
 }
 
 int main(int argc, char** argv)
 {
-    running = true;
+    s_catch_signals();
 
     if (argc <= 1) {
         std::cerr << "Synopsis: rosrun capnzero echo \"Topic that should be listened to!\"" << std::endl;
@@ -39,13 +48,12 @@ int main(int argc, char** argv)
         std::cout << "Param " << i << ": '" << argv[i] << "'" << std::endl;
     }
 
-    signal(SIGINT, sigIntHandler);
-
     void* ctx = zmq_ctx_new();
-    capnzero::Subscriber sub = capnzero::Subscriber(ctx, capnzero::CommType::TCP_P2P, "141.51.122.134:5555", argv[1]);
+    capnzero::Subscriber sub = capnzero::Subscriber(ctx, argv[1]);
+    sub.bind(capnzero::CommType::UDP_MULTICAST, "141.51.122.62:5555");
     sub.subscribe(&callback);
 
-    while (running) {
+    while (!interrupted) {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 

@@ -55,7 +55,7 @@ add_library(capnzero-base-msgs
 add_library(${PROJECT_NAME}
   src/Publisher.cpp
   src/Subscriber.cpp
-)
+        include/capnzero/CapnZero.h)
 
 target_link_libraries(${PROJECT_NAME}
   ${ZeroMQ_LIBRARIES}

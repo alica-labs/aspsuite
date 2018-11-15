@@ -1,6 +1,6 @@
 #include "discovery/Agent.h"
 
-#include <capnzero/Publisher.h>
+#include <capnzero/CapnZero.h>
 
 #include <zmq.h>
 
@@ -39,9 +39,11 @@ Agent::Agent(std::string name, bool sender)
     uuid_generate(this->uuid);
 
     if (this->sender) {
-        this->pub = new capnzero::Publisher(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
+        this->pub = new capnzero::Publisher(this->ctx, "MCGroup");
+        this->pub->connect(capnzero::CommType::UDP_MULTICAST, "udp://224.0.0.1:5555");
     } else {
-        this->sub = new capnzero::Subscriber(this->ctx, "udp://224.0.0.1:5555", "MCGroup");
+        this->sub = new capnzero::Subscriber(this->ctx, "MCGroup");
+        this->sub->bind(capnzero::CommType::UDP_MULTICAST, "udp://224.0.0.1:5555");
         this->sub->subscribe<discovery::Agent>(&Agent::callback, (discovery::Agent*) this);
     }
 }

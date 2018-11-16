@@ -1,4 +1,5 @@
 #include "containers/SolverSettings.h"
+
 #include <QString>
 
 namespace kbcr

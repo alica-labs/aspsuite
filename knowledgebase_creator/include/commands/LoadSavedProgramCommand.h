@@ -1,13 +1,15 @@
 #pragma once
 
-#include <commands/Command.h>
-#include <memory>
+#include "commands/Command.h"
+
 
 #include <QByteArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+
 #include <chrono>
 #include <fstream>
+#include <memory>
 
 //#define LSPC_EVALCODE
 

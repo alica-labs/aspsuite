@@ -1,7 +1,9 @@
+#include "gui/KnowledgebaseCreator.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtGui>
-#include <gui/KnowledgebaseCreator.h>
+
 #include <signal.h>
 #include <unistd.h>
 

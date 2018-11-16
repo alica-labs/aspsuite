@@ -1,10 +1,10 @@
 #pragma once
+
 #include <QObject>
 #include <memory>
 
 namespace kbcr
 {
-
 class Command;
 class KnowledgebaseCreator;
 /**

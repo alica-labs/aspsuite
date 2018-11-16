@@ -1,21 +1,15 @@
-/*
- * ExternalTableHandler.cpp
- *
- *  Created on: Mar 12, 2017
- *      Author: stefan
- */
+#include "handler/ExternalTableHandler.h"
 
-#include <sstream>
-
-#include <handler/ExternalTableHandler.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include <ui_knowledgebasecreator.h>
 
 #include <asp_solver/ASPSolver.h>
 
-#include <QtWidgets/QTableWidgetItem>
 #include <clingo.hh>
-#include <gui/KnowledgebaseCreator.h>
+
+#include <QtWidgets/QTableWidgetItem>
+#include <sstream>
 
 namespace kbcr
 {

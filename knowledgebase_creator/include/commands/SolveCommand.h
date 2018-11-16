@@ -1,8 +1,11 @@
-#include <commands/Command.h>
+#pragma once
+
+#include "commands/Command.h"
 
 #include <clingo.hh>
 
 #include <QJsonObject>
+
 #include <memory>
 
 namespace kbcr

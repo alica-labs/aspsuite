@@ -1,5 +1,5 @@
 #include "gui/ModelSettingDialog.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "containers/ConceptNetCall.h"
 #include "containers/ConceptNetConcept.h"
@@ -25,11 +25,7 @@ ConceptNetCall::ConceptNetCall(KnowledgebaseCreator* gui, QString id, QString qu
     this->newConceptFound = false;
 }
 
-ConceptNetCall::~ConceptNetCall()
-{
-    //        delete this->collectAntonymConceptsNAM;
-    //        delete this->collectSynonymConceptsNAM;
-}
+ConceptNetCall::~ConceptNetCall() {}
 
 std::string ConceptNetCall::toString()
 {
@@ -124,7 +120,6 @@ void ConceptNetCall::mapServices(QNetworkReply* reply)
         QString endTerm = end["term"].toString();
         endTerm = trimTerm(endTerm);
         if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm)) {
-            //				std::cout << "ConceptNetCall: Skipping Antonym:" << endTerm.toStdString() << std::endl;
             continue;
         }
         // start of edge
@@ -137,7 +132,6 @@ void ConceptNetCall::mapServices(QNetworkReply* reply)
         QString startTerm = start["term"].toString();
         startTerm = trimTerm(startTerm);
         if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm)) {
-            //				std::cout << "ConceptNetCall: Skipping Antonym:" << startTerm.toStdString() << std::endl;
             continue;
         }
 
@@ -169,20 +163,23 @@ void ConceptNetCall::findInconsistencies()
             }
         }
     }
-    //		std::cout << "ConceptNetCall: Adjectives size: " << this->connectedConcepts.size() << std::endl;
+#ifdef CN5CALL_DEBUG
+    std::cout << "ConceptNetCall: Adjectives size: " << this->connectedConcepts.size() << std::endl;
+#endif
     collectAntonyms();
-    //		std::cout << "ConceptNetCall: Finished collecting Antonyms." << std::endl;
+#ifdef CN5CALL_DEBUG
+	std::cout << "ConceptNetCall: Finished collecting Antonyms." << std::endl;
+#endif
     checkAdjectives();
-    //		std::cout << "ConceptNetCall: Finished checking Antonyms among the connectedConcepts of the queried concept."
-    //				<< std::endl;
+#ifdef CN5CALL_DEBUG
+    		std::cout << "ConceptNetCall: Finished checking Antonyms among the connectedConcepts of the queried concept." << std::endl;
+#endif
     for (auto adj : this->connectedConcepts) {
         auto tmp = std::make_shared<std::vector<QString>>();
         tmp->push_back(adj.first);
         this->gatherMap.emplace(adj.first, tmp);
     }
     gatherConcepts(this->connectedConcepts);
-    //		std::cout << "ConceptNetCall: Finished gathering related concepts. Number of found concepts: "
-    //				<< gatheredConcepts.size() << std::endl;
     for (auto adj : this->connectedConcepts) {
         if (this->gatherMap.at(adj.first)->size() == 1) {
             this->gatherMap.erase(adj.first);
@@ -194,15 +191,17 @@ void ConceptNetCall::findInconsistencies()
 
 void ConceptNetCall::checkGatheredConcepts()
 {
-    //		for (auto i : this->gatherMap)
-    //		{
-    //			std::cout << i.first.toStdString() << ": ";
-    //			for (auto j : *i.second)
-    //			{
-    //				std::cout << j.toStdString() << " ";
-    //			}
-    //			std::cout << std::endl;
-    //		}
+#ifdef CN5CALL_DEBUG
+    for (auto i : this->gatherMap)
+    {
+        std::cout << i.first.toStdString() << ": ";
+        for (auto j : *i.second)
+    	{
+    		std::cout << j.toStdString() << " ";
+    	}
+        std::cout << std::endl;
+    }
+#endif
     std::map<QString, std::vector<QString>>::iterator it;
     bool conceptDeleted = false;
     for (it = this->adjectiveAntonymMap.begin(); it != this->adjectiveAntonymMap.end();) {
@@ -219,10 +218,6 @@ void ConceptNetCall::checkGatheredConcepts()
                     if (this->connectedConcepts.at(it->first)->weight < this->connectedConcepts.at(gathered.first)->weight) {
                         auto iterator = this->connectedConcepts.find(it->first);
                         if (iterator != this->connectedConcepts.end()) {
-                            //								std::cout << "ConceptNetCall: Antonym found: removing: " <<
-                            //it->first.toStdString()
-                            //										<< " keeping: " << gathered.first.toStdString() <<
-                            //std::endl;
                             this->connectedConcepts.erase(it->first);
                             this->adjectiveAntonymMap.erase(it->first);
                             conceptDeleted = true;
@@ -230,9 +225,6 @@ void ConceptNetCall::checkGatheredConcepts()
                     } else {
                         auto iterator = this->connectedConcepts.find(gathered.first);
                         if (iterator != this->connectedConcepts.end()) {
-                            //								std::cout << "ConceptNetCall: Antonym found: removing: " <<
-                            //gathered.first.toStdString()
-                            //										<< " keeping: " << it->first.toStdString() << std::endl;
                             this->connectedConcepts.erase(gathered.first);
                             this->adjectiveAntonymMap.erase(gathered.first);
                             conceptDeleted = true;
@@ -265,8 +257,6 @@ void ConceptNetCall::checkAdjectives(/*std::map<QString, std::shared_ptr<Concept
             if (this->connectedConcepts.at(it->first)->weight < this->connectedConcepts.at(antonym)->weight) {
                 auto iterator = this->connectedConcepts.find(it->first);
                 if (iterator != this->connectedConcepts.end()) {
-                    //						std::cout << "ConceptNetCall: Antonym found: removing: " << it->first.toStdString()
-                    //								<< " keeping: " << antonym.toStdString() << std::endl;
                     this->connectedConcepts.erase(it->first);
                     this->adjectiveAntonymMap.erase(it->first);
                     conceptDeleted = true;
@@ -274,8 +264,6 @@ void ConceptNetCall::checkAdjectives(/*std::map<QString, std::shared_ptr<Concept
             } else {
                 auto iterator = this->connectedConcepts.find(antonym);
                 if (iterator != this->connectedConcepts.end()) {
-                    //						std::cout << "ConceptNetCall: Antonym found: removing: " << antonym.toStdString()
-                    //								<< " keeping: " << it->first.toStdString() << std::endl;
                     this->connectedConcepts.erase(antonym);
                     this->adjectiveAntonymMap.erase(antonym);
                     conceptDeleted = true;
@@ -400,7 +388,6 @@ std::shared_ptr<ConceptNetEdge> ConceptNetCall::extractCNEdge(QJsonObject edge)
     QString endTerm = end["term"].toString();
     endTerm = trimTerm(endTerm);
     if (endTerm.at(0).isDigit() || this->conceptContainsUTF8(endTerm)) {
-        //			std::cout << "ConceptNetCall: Skipping concept:" << endTerm.toStdString() << std::endl;
         return nullptr;
     }
     QString endSenseLabel = end["sense_label"].toString();
@@ -415,7 +402,6 @@ std::shared_ptr<ConceptNetEdge> ConceptNetCall::extractCNEdge(QJsonObject edge)
     QString startTerm = start["term"].toString();
     startTerm = trimTerm(startTerm);
     if (startTerm.at(0).isDigit() || this->conceptContainsUTF8(startTerm)) {
-        //			std::cout << "ConceptNetCall: Skipping Antonym:" << startTerm.toStdString() << std::endl;
         return nullptr;
     }
     QString startSenseLabel = start["sense_label"].toString();
@@ -503,16 +489,18 @@ void ConceptNetCall::collectAntonyms()
         loop.exec();
     }
     this->collectAntonymConceptsNAM->deleteLater();
-    //		for (auto pair : this->adjectiveAntonymMap)
-    //		{
-    //			std::cout << "Adjective: " << pair.first.toStdString() << std::endl;
-    //			std::cout << "\t Antonyms: ";
-    //			for (auto antonym : pair.second)
-    //			{
-    //				std::cout << antonym.toStdString() << " ";
-    //			}
-    //			std::cout << std::endl;
-    //		}
+#ifdef CN5CALL_DEBUG
+    for (auto pair : this->adjectiveAntonymMap)
+    {
+        std::cout << "Adjective: " << pair.first.toStdString() << std::endl;
+    	std::cout << "\t Antonyms: ";
+    	for (auto antonym : pair.second)
+    	{
+    		std::cout << antonym.toStdString() << " ";
+    	}
+    	std::cout << std::endl;
+    }
+#endif
 }
 
 } /* namespace kbcr */

@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QTableWidget>
+
 #include <memory>
 
 namespace kbcr

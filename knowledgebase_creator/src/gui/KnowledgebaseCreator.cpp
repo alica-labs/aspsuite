@@ -1,3 +1,4 @@
+#include "gui/KnowledgebaseCreator.h"
 #include "gui/ModelSettingDialog.h"
 #include "gui/SettingsDialog.h"
 
@@ -23,7 +24,6 @@
 #include <ui_knowledgebasecreator.h>
 
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 namespace kbcr
 {

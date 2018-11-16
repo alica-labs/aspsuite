@@ -1,16 +1,10 @@
-/*
- * VariableQueryCommand.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "commands/VariableQueryCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 
 #include "gui/ModelSettingDialog.h"
 #include "gui/SettingsDialog.h"
+#include "gui/KnowledgebaseCreator.h"
 
 #include <ui_knowledgebasecreator.h>
 
@@ -20,7 +14,6 @@
 #include <asp_commons/AnnotatedValVec.h>
 
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 #include <SystemConfig.h>
 
@@ -136,6 +129,9 @@ void VariableQueryCommand::execute()
     this->gui->getUi()->aspRuleTextArea->setText(this->program);
 
     // clean up memory
+    for (auto valVec : result) {
+        delete valVec;
+    }
     for (auto var : vars) {
         delete var;
     }

@@ -2,7 +2,7 @@
 #include "commands/GroundCommand.h"
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/SolveCommand.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "containers/ConceptNetCall.h"
 #include "containers/ConceptNetConcept.h"
@@ -78,7 +78,7 @@ void ConceptNetQueryCommand::handleWrongInput()
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     // show message box
-    int ret = msgBox.exec();
+    msgBox.exec();
     // remove from command history
     this->undo();
 }
@@ -173,7 +173,7 @@ void ConceptNetQueryCommand::execute()
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         // show message box
-        int ret = msgBox.exec();
+        msgBox.exec();
         this->undo();
         return;
     }
@@ -334,7 +334,6 @@ void ConceptNetQueryCommand::extractASPPredicates()
     auto pgmMap = extractBackgroundKnowledgePrograms(tmp);
     for (auto pair : pgmMap) {
         this->gui->getSolver()->add(programSection.toStdString().c_str(), {}, pair.second.toStdString().c_str());
-        //this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(pair.second).append("\n"));
     }
     this->gui->enableGui(true);
 #ifdef CNQC_EVALCODE

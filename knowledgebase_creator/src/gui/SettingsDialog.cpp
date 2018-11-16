@@ -1,14 +1,7 @@
-/*
- * SettingsDialog.cpp
- *
- *  Created on: Jan 17, 2017
- *      Author: stefan
- */
-
 #include "gui/SettingsDialog.h"
 #include "commands/ChangeSolverSettingsCommand.h"
 #include "containers/SolverSettings.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include <ui_knowledgebasecreator.h>
 #include <ui_settingsdialog.h>

@@ -1,12 +1,5 @@
-/*
- * ChangeSolverSettingsCommand.cpp
- *
- *  Created on: Jan 19, 2017
- *      Author: stefan
- */
-
 #include "commands/ChangeSolverSettingsCommand.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "containers/SolverSettings.h"
 

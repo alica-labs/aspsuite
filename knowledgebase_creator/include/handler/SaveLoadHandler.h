@@ -1,11 +1,11 @@
 #pragma once
 
 #include <QObject>
+
 #include <memory>
 
 namespace kbcr
 {
-
 class LoadSavedProgramCommand;
 class KnowledgebaseCreator;
 /**

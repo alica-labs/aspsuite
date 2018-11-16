@@ -1,12 +1,6 @@
-/*
- * ModelSettingDialog.cpp
- *
- *  Created on: Mar 12, 2017
- *      Author: stefan
- */
+#include "gui/KnowledgebaseCreator.h"
+#include "gui/ModelSettingDialog.h"
 
-#include <gui/KnowledgebaseCreator.h>
-#include <gui/ModelSettingDialog.h>
 #include <ui_modelsettings.h>
 namespace kbcr
 {

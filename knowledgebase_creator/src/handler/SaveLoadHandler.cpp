@@ -1,12 +1,5 @@
-/*
- * SaveLoadHandler.cpp
- *
- *  Created on: Jan 23, 2017
- *      Author: stefan
- */
-
 #include "handler/SaveLoadHandler.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "gui/ModelSettingDialog.h"
 #include "gui/SettingsDialog.h"

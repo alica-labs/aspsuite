@@ -10,6 +10,7 @@ Publisher::Publisher(void* context, std::string groupName)
         , groupName(groupName)
         , commType(commType)
 {
+//    this->socket = zmq_socket(context, ZMQ_PUB);
     this->socket = zmq_socket(context, ZMQ_RADIO);
 }
 
@@ -18,18 +19,21 @@ Publisher::~Publisher()
     check(zmq_close(this->socket), "zmq_close");
 }
 
-void Publisher::connect(CommType commType, std::string address)
+void Publisher::bind(CommType commType, std::string address)
 {
     switch (commType) {
-    case CommType::UDP_MULTICAST:
-        check(zmq_connect(socket, ("udp://" + address).c_str()), "zmq_connect");
-        break;
-    case CommType::TCP_UNICAST:
-        check(zmq_connect(socket, ("tcp://" + address).c_str()), "zmq_connect");
-        break;
-    default:
-        //Unknown communication type!
-        assert(false);
+        case CommType::UDP:
+            check(zmq_bind(this->socket, ("udp://" + address).c_str()), "zmq_bind");
+            break;
+        case CommType::TCP:
+            check(zmq_bind(this->socket, ("tcp://" + address).c_str()), "zmq_bind");
+            break;
+        case CommType::IPC:
+            check(zmq_bind(this->socket, ("ipc://" + address).c_str()), "zmq_bind");
+            break;
+        default:
+            // Unknown communication type!
+            assert(false);
     }
 }
 
@@ -48,7 +52,7 @@ int Publisher::send(::capnp::MallocMessageBuilder& msgBuilder)
     check(zmq_msg_init_data(&msg, wordArrayPtr->begin(), wordArrayPtr->size() * sizeof(capnp::word), &cleanUpMsgData, wordArrayPtr), "zmq_msg_init_data");
 
     // set group
-    check(zmq_msg_set_group(&msg, this->groupName.c_str()), "zmq_msg_set_group");
+//    check(zmq_msg_set_group(&msg, this->groupName.c_str()), "zmq_msg_set_group");
 
     // send
     int numBytesSend = zmq_msg_send(&msg, this->socket, 0);

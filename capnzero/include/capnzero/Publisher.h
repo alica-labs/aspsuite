@@ -19,7 +19,7 @@ public:
     Publisher(void* context, std::string groupName);
     virtual ~Publisher();
 
-    void connect(CommType commType, std::string address);
+    void bind(CommType commType, std::string address);
 
     int send(capnp::MallocMessageBuilder& msgBuilder);
 

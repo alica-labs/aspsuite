@@ -57,12 +57,16 @@ int main(int argc, char** argv)
 
     void* ctx = zmq_ctx_new();
     capnzero::Publisher pub = capnzero::Publisher(ctx, argv[1]);
-    pub.connect(capnzero::CommType::UDP_MULTICAST, "141.51.122.62:5555");
-    int numBytesSent = pub.send(msgBuilder);
-
+    pub.bind(capnzero::CommType::IPC, "@capnzero.ipc");
+    while (!interrupted) {
+        int numBytesSent = pub.send(msgBuilder);
 #ifdef DEBUG_PUB
-    std::cout << "pub: " << numBytesSent << " Bytes sent!" << std::endl;
+        std::cout << "pub: " << numBytesSent << " Bytes sent!" << std::endl;
 #endif
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
+
 
     // wait until everything is send
     std::this_thread::sleep_for(std::chrono::seconds(1));

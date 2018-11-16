@@ -50,11 +50,11 @@ int main(int argc, char** argv)
 
     void* ctx = zmq_ctx_new();
     capnzero::Subscriber sub = capnzero::Subscriber(ctx, argv[1]);
-    sub.bind(capnzero::CommType::UDP_MULTICAST, "141.51.122.62:5555");
+    sub.connect(capnzero::CommType::IPC, "@capnzero.ipc");
     sub.subscribe(&callback);
 
     while (!interrupted) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     return 0;

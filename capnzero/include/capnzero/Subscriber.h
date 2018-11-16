@@ -31,13 +31,16 @@ public:
             , runThread(nullptr)
             , rcvTimeout(500)
     {
+        //        this->socket = zmq_socket(context, ZMQ_SUB);
         this->socket = zmq_socket(context, ZMQ_DISH);
         check(zmq_setsockopt(this->socket, ZMQ_RCVTIMEO, &rcvTimeout, sizeof(rcvTimeout)), "zmq_setsockopt");
+//        check(zmq_setsockopt(this->socket, ZMQ_SUBSCRIBE, "", 0), "zmq_setsockopt");
+        //        check(zmq_join(this->socket, this->groupName.c_str()), "zmq_join");
     }
 
     virtual ~Subscriber();
 
-    void bind(CommType commType, std::string address);
+    void connect(CommType commType, std::string address);
 
     template <class CallbackObjType>
     void subscribe(void (CallbackObjType::*callbackFunction)(::capnp::FlatArrayMessageReader&), CallbackObjType* callbackObject);
@@ -68,16 +71,17 @@ Subscriber::~Subscriber()
     check(zmq_close(this->socket), "zmq_close");
 }
 
-void Subscriber::bind(CommType commType, std::string address)
+void Subscriber::connect(CommType commType, std::string address)
 {
     switch (commType) {
-    case CommType::UDP_MULTICAST:
-        check(zmq_bind(this->socket, ("udp://" + address).c_str()), "zmq_connect");
-        check(zmq_join(this->socket, this->groupName.c_str()), "zmq_join");
+    case CommType::UDP:
+        check(zmq_connect(this->socket, ("udp://" + address).c_str()), "zmq_bind");
         break;
-    case CommType::TCP_UNICAST:
-        check(zmq_bind(this->socket, ("tcp://" + address).c_str()), "zmq_connect");
-        check(zmq_join(this->socket, this->groupName.c_str()), "zmq_join");
+    case CommType::TCP:
+        check(zmq_connect(this->socket, ("tcp://" + address).c_str()), "zmq_bind");
+        break;
+    case CommType::IPC:
+        check(zmq_connect(this->socket, ("ipc://" + address).c_str()), "zmq_bind");
         break;
     default:
         // Unknown communication type!
@@ -104,9 +108,9 @@ void Subscriber::receive()
     while (this->running) {
         zmq_msg_t msg;
         check(zmq_msg_init(&msg), "zmq_msg_init");
-        #ifdef DEBUG_SUBSCRIBER
-            std::cout << "Subscriber::received() waiting ..." << std::endl;
-        #endif
+#ifdef DEBUG_SUBSCRIBER
+        std::cout << "Subscriber::received() waiting ..." << std::endl;
+#endif
 
         int nbytes = zmq_msg_recv(&msg, this->socket, 0);
 
@@ -118,15 +122,16 @@ void Subscriber::receive()
             {
                 std::cerr << "Subscriber::receive(): zmq_msg_recv returned: -1 - " << zmq_strerror(errno) << std::endl;
             }
-            #ifdef DEBUG_SUBSCRIBER
+#ifdef DEBUG_SUBSCRIBER
             else // no message available
             {
                 //                std::cout << "Subscriber::receive(): continue because of EAGAIN!" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
-            #endif
+#endif
 
             std::cout << ".";
+            std::cout.flush();
             check(zmq_msg_close(&msg), "zmq_msg_close");
             continue;
         } else {

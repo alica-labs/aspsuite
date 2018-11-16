@@ -8,8 +8,9 @@
 namespace capnzero
 {
     enum CommType {
-        UDP_MULTICAST,
-        TCP_UNICAST
+        UDP,
+        TCP,
+        IPC
     };
 
 /**

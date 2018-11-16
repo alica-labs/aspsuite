@@ -1,15 +1,9 @@
-/*
- * GroundCommand.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "commands/GroundCommand.h"
 #include "handler/CommandHistoryHandler.h"
 
+#include "gui/KnowledgebaseCreator.h"
+
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 #include <QString>
 
@@ -47,7 +41,6 @@ void GroundCommand::execute()
         }
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), symVec}}, nullptr);
     } else {
-//    	this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program).append("\n"));
         this->gui->getSolver()->ground({{this->programSection.toStdString().c_str(), {}}}, nullptr);
     }
     emit this->gui->updateExternalList();

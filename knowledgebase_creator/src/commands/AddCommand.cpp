@@ -1,16 +1,9 @@
-/*
- * AddCommand.cpp
- *
- *  Created on: Mar 9, 2017
- *      Author: stefan
- */
-
 #include "commands/AddCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
+#include "gui/KnowledgebaseCreator.h"
 
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 #include <ui_knowledgebasecreator.h>
 
@@ -32,8 +25,6 @@ void AddCommand::execute()
     std::string aspString = this->program.toStdString();
     // call add program on solver
     this->gui->getSolver()->add(this->programSection.toStdString().c_str(), {}, aspString.c_str());
-    // show program string
-    //this->gui->getUi()->programLabel->setText(this->gui->getUi()->programLabel->text().append("\n").append(this->program));
     this->gui->chHandler->addToCommandHistory(shared_from_this());
 }
 

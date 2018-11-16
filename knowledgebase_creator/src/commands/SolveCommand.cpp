@@ -1,13 +1,13 @@
 #include "commands/SolveCommand.h"
 
 #include "gui/ModelSettingDialog.h"
+#include "gui/KnowledgebaseCreator.h"
 
 #include <ui_knowledgebasecreator.h>
 
 #include "handler/CommandHistoryHandler.h"
 
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 namespace kbcr
 {

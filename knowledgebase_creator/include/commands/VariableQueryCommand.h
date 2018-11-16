@@ -1,10 +1,11 @@
 #pragma once
 
-#include <commands/Command.h>
-#include <memory>
-#include <string>
+#include "commands/Command.h"
 
 #include <QJsonObject>
+
+#include <memory>
+#include <string>
 
 namespace kbcr
 {

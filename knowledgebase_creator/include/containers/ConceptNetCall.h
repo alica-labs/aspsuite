@@ -14,6 +14,8 @@
 
 namespace kbcr
 {
+
+//#define CN5CALL_DEBUG
 class KnowledgebaseCreator;
 class ConceptNetEdge;
 class ConceptNetConcept;

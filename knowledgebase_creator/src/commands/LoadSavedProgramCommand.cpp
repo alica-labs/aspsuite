@@ -1,5 +1,5 @@
 #include "gui/SettingsDialog.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "handler/CommandHistoryHandler.h"
 #include "handler/SaveLoadHandler.h"
@@ -53,8 +53,7 @@ void LoadSavedProgramCommand::execute()
         for (int i = 0; i < cmds.size(); i++) {
             QJsonObject cmd = cmds[i].toObject();
             // Show progress to user
-            //			std::cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/"
-            //					<< cmds.size() << std::endl;
+            std::cout << "LoadSavedProgramCommand: " << cmd["type"].toString().toStdString() << " " << i + 1 << "/" << cmds.size() << std::endl;
 
             // Handle new Solver command
             if (cmd["type"].toString().toStdString().compare("New Solver") == 0) {
@@ -142,7 +141,7 @@ void LoadSavedProgramCommand::execute()
             }
             // Handle unknown command
             else {
-                //				std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;
+                std::cout << "LoadSavedProgramCommand: Command with unknown type found!" << std::endl;
             }
         }
 #ifdef LSPC_EVALCODE

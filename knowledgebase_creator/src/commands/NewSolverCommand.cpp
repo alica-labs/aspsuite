@@ -1,4 +1,4 @@
-#include <commands/NewSolverCommand.h>
+#include "commands/NewSolverCommand.h"
 
 #include "gui/SettingsDialog.h"
 
@@ -6,11 +6,12 @@
 
 #include "handler/CommandHistoryHandler.h"
 
+#include "gui/KnowledgebaseCreator.h"
+
 #include <iostream>
 
 #include <asp_commons/IASPSolver.h>
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 namespace kbcr
 {

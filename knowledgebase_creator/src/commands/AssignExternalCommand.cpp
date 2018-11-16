@@ -1,17 +1,11 @@
-/*
- * AssignExternalCommand.cpp
- *
- *  Created on: Mar 11, 2017
- *      Author: stefan
- */
-
-#include <commands/AssignExternalCommand.h>
-#include <commands/SolveCommand.h>
+#include "commands/AssignExternalCommand.h"
+#include "commands/SolveCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 
+#include "gui/KnowledgebaseCreator.h"
+
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 #include <QString>
 

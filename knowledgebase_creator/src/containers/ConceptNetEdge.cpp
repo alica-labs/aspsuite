@@ -1,10 +1,3 @@
-/*
- * ConceptNetEdge.cpp
- *
- *  Created on: Feb 23, 2017
- *      Author: stefan
- */
-
 #include "containers/ConceptNetEdge.h"
 #include "containers/ConceptNetConcept.h"
 

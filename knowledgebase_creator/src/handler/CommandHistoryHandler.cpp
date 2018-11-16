@@ -1,12 +1,5 @@
-/*
- * CommandHistoryHandler.cpp
- *
- *  Created on: Jan 23, 2017
- *      Author: stefan
- */
-
 #include "handler/CommandHistoryHandler.h"
-#include <gui/KnowledgebaseCreator.h>
+#include "gui/KnowledgebaseCreator.h"
 
 #include "containers/SolverSettings.h"
 

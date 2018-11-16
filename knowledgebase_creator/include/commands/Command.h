@@ -2,6 +2,7 @@
 
 #include <QJsonObject>
 #include <QObject>
+
 #include <string>
 
 namespace kbcr

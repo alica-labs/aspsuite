@@ -1,10 +1,3 @@
-/*
- * FactsQueryCommand.cpp
- *
- *  Created on: Jan 20, 2017
- *      Author: stefan
- */
-
 #include "commands/FactsQueryCommand.h"
 
 #include <ui_knowledgebasecreator.h>
@@ -12,6 +5,8 @@
 #include "gui/ModelSettingDialog.h"
 
 #include "handler/CommandHistoryHandler.h"
+#include "gui/KnowledgebaseCreator.h"
+
 
 #include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPCommonsVariable.h>
@@ -19,7 +14,6 @@
 #include <asp_commons/AnnotatedValVec.h>
 #include <asp_solver/ASPFactsQuery.h>
 #include <asp_solver/ASPSolver.h>
-#include <gui/KnowledgebaseCreator.h>
 
 namespace kbcr
 {

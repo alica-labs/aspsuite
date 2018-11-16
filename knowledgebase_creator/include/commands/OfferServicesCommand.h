@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Command.h"
+#include "commands/Command.h"
+
+#include "containers/ConceptNetCall.h"
+
 #include <chrono>
-#include <containers/ConceptNetCall.h>
 #include <fstream>
 #include <memory>
 

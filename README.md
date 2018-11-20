@@ -1,1 +1,1 @@
-# SymROCK - Symbolic Representation Of dynamiC Knowledge
+# Answer Set Programming Suite

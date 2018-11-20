@@ -85,9 +85,9 @@ int main(int argc, char** argv)
     assert(ctx);
 
     pub = new capnzero::Publisher(ctx, "MCGroup");
-    pub->connect(capnzero::CommType::UDP_MULTICAST, "udp://224.0.0.1:5555");
+    pub->bind(capnzero::CommType::UDP, "udp://224.0.0.1:5555");
     sub = new capnzero::Subscriber(ctx, "MCGroup");
-    sub->bind(capnzero::CommType::UDP_MULTICAST, "udp://224.0.0.1:5555");
+    sub->connect(capnzero::CommType::UDP, "udp://224.0.0.1:5555");
     sub->subscribe(&receive);
 
     msgNumber = 0;

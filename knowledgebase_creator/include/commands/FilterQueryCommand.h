@@ -10,14 +10,14 @@ namespace kbcr
 {
 class KnowledgebaseCreator;
 /**
- * Class inheriting from Command interface used to create a FactsQuery
+ * Class inheriting from Command interface used to create a FilterQuery
  */
-class FactsQueryCommand : public Command, public std::enable_shared_from_this<FactsQueryCommand>
+class FilterQueryCommand : public Command, public std::enable_shared_from_this<FilterQueryCommand>
 {
     Q_OBJECT
 public:
-    FactsQueryCommand(KnowledgebaseCreator* gui, QString factsString);
-    virtual ~FactsQueryCommand();
+    FilterQueryCommand(KnowledgebaseCreator* gui, QString factsString);
+    virtual ~FilterQueryCommand();
 
     void execute();
     void undo();

@@ -1,4 +1,4 @@
-#include "asp_solver/ASPVariableQuery.h"
+#include "asp_solver/ASPExtensionQuery.h"
 
 #include "asp_solver/ASPSolver.h"
 
@@ -10,21 +10,21 @@
 namespace reasoner
 {
 
-ASPVariableQuery::ASPVariableQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term)
+ASPExtensionQuery::ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term)
         : ASPQuery(solver, term)
 {
-    this->type = ASPQueryType::Variable;
+    this->type = ASPQueryType::Extension;
     std::stringstream ss;
     if (term->getQueryId() == -1) {
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPVariableQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
+        cout << "ASPExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
 #endif
         return;
     }
     ss << "query" << term->getQueryId();
     this->queryProgramSection = ss.str();
 #ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ASPVariableQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
+    cout << "ASPExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
 #endif
     this->createProgramSection();
     this->createHeadQueryValues(this->term->getRuleHeads());
@@ -38,14 +38,14 @@ ASPVariableQuery::ASPVariableQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* 
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 }
 
-ASPVariableQuery::~ASPVariableQuery() {}
+ASPExtensionQuery::~ASPExtensionQuery() {}
 
-std::vector<std::string> ASPVariableQuery::getRules()
+std::vector<std::string> ASPExtensionQuery::getRules()
 {
     return this->rules;
 }
 
-std::string ASPVariableQuery::expandQueryRuleModuleProperty(std::string rule)
+std::string ASPExtensionQuery::expandQueryRuleModuleProperty(std::string rule)
 {
     if (rule.find(":-") == 0) {
         return rule;
@@ -68,23 +68,23 @@ std::string ASPVariableQuery::expandQueryRuleModuleProperty(std::string rule)
             head = (supplementary::Configuration::trim(r.substr(0, endOfRuleHead)));
             auto headPredicates = createHeadPredicates(head);
 #ifdef ASPVARIABLEQUERY_DEBUG
-            cout << "ASPVariableQuery: Head: " << head << endl;
+            cout << "ASPExtensionQuery: Head: " << head << endl;
 #endif
             for (auto pred : headPredicates) {
                 replaceFittingPredicate(queryRuleBody, pred);
 #ifdef ASPVARIABLEQUERY_DEBUG
-                cout << "ASPVariableQuery: Replaced body: " << queryRuleBody << endl;
+                cout << "ASPExtensionQuery: Replaced body: " << queryRuleBody << endl;
 #endif
             }
             for (auto fact : this->term->getFacts()) {
                 replaceFittingPredicate(queryRuleBody, fact);
 #ifdef ASPVARIABLEQUERY_DEBUG
-                cout << "ASPVariableQuery: Replaced body: " << body << endl;
+                cout << "ASPExtensionQuery: Replaced body: " << body << endl;
 #endif
             }
         }
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPVariableQuery: queryRule: " << ss.str() << endl;
+        cout << "ASPExtensionQuery: queryRule: " << ss.str() << endl;
 #endif
         queryRuleBody = queryRuleBody.substr(0, queryRuleBody.size() - 1);
         ss << queryRuleHead << " :- " << queryRuleBody << ", " << this->externalName << ".";
@@ -92,19 +92,19 @@ std::string ASPVariableQuery::expandQueryRuleModuleProperty(std::string rule)
     return ss.str();
 }
 
-std::string ASPVariableQuery::expandFactModuleProperty(std::string fact)
+std::string ASPExtensionQuery::expandFactModuleProperty(std::string fact)
 {
     fact = supplementary::Configuration::trim(fact);
     fact = fact.substr(0, fact.size() - 1);
     std::stringstream ss;
     ss << this->queryProgramSection << "(" << fact << ") :- " << this->externalName << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ASPVariableQuery: fact: " << ss.str() << endl;
+    cout << "ASPExtensionQuery: fact: " << ss.str() << endl;
 #endif
     return ss.str();
 }
 
-void ASPVariableQuery::replaceFittingPredicate(std::string& ruleBody, std::string predicate)
+void ASPExtensionQuery::replaceFittingPredicate(std::string& ruleBody, std::string predicate)
 {
     auto tmp = predicate.substr(0, predicate.find("("));
     auto pos = ruleBody.find(tmp);
@@ -115,7 +115,7 @@ void ASPVariableQuery::replaceFittingPredicate(std::string& ruleBody, std::strin
     }
 }
 
-std::string ASPVariableQuery::expandRuleModuleProperty(std::string rule)
+std::string ASPExtensionQuery::expandRuleModuleProperty(std::string rule)
 {
     rule = supplementary::Configuration::trim(rule);
     if (rule.find(":-") == 0) {
@@ -130,30 +130,30 @@ std::string ASPVariableQuery::expandRuleModuleProperty(std::string rule)
         head = (supplementary::Configuration::trim(rule.substr(0, endOfHead)));
         body = (supplementary::Configuration::trim(rule.substr(startOfBody, rule.size() - startOfBody - 1)));
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPVariableQuery: Head: " << head << endl;
-        cout << "ASPVariableQuery: Body: " << body << endl;
+        cout << "ASPExtensionQuery: Head: " << head << endl;
+        cout << "ASPExtensionQuery: Body: " << body << endl;
 #endif
         for (auto fact : this->term->getFacts()) {
             replaceFittingPredicate(body, fact);
 #ifdef ASPVARIABLEQUERY_DEBUG
-            cout << "ASPVariableQuery: Replaced body: " << body << endl;
+            cout << "ASPExtensionQuery: Replaced body: " << body << endl;
 #endif
         }
         head = replaceHeadPredicates(head);
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPVariableQuery: Replaced head: " << head << endl;
+        cout << "ASPExtensionQuery: Replaced head: " << head << endl;
 #endif
         rule = rule.substr(0, rule.size() - 1);
         std::stringstream ss;
         ss << head << " :- " << body << ", " << this->externalName << ".";
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPVariableQuery: rule: " << ss.str() << endl;
+        cout << "ASPExtensionQuery: rule: " << ss.str() << endl;
 #endif
         return ss.str();
     }
 }
 
-std::string ASPVariableQuery::replaceHeadPredicates(std::string head)
+std::string ASPExtensionQuery::replaceHeadPredicates(std::string head)
 {
     std::stringstream ss;
     if (head.find(",") != std::string::npos && head.find(";") == std::string::npos) {
@@ -198,7 +198,7 @@ std::string ASPVariableQuery::replaceHeadPredicates(std::string head)
     return ss.str();
 }
 
-void ASPVariableQuery::createProgramSection()
+void ASPExtensionQuery::createProgramSection()
 {
     this->externalName = "external" + this->queryProgramSection;
 
@@ -216,18 +216,18 @@ void ASPVariableQuery::createProgramSection()
         ss << expandFactModuleProperty(fact) << std::endl;
     }
 #ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ASPVariableQuery: create program section: \n" << ss.str();
+    cout << "ASPExtensionQuery: create program section: \n" << ss.str();
 #endif
     this->solver->add(this->queryProgramSection.c_str(), {}, ss.str().c_str());
     this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
 }
 
-void ASPVariableQuery::removeExternal()
+void ASPExtensionQuery::removeExternal()
 {
     this->solver->releaseExternal(*(this->external));
 }
 
-void ASPVariableQuery::createHeadQueryValues(std::vector<std::string> queryVec)
+void ASPExtensionQuery::createHeadQueryValues(std::vector<std::string> queryVec)
 {
     std::vector<std::string> valuesToParse;
     for (auto queryString : queryVec) {
@@ -256,7 +256,7 @@ void ASPVariableQuery::createHeadQueryValues(std::vector<std::string> queryVec)
     }
 }
 
-std::vector<std::string> ASPVariableQuery::createHeadPredicates(std::string head)
+std::vector<std::string> ASPExtensionQuery::createHeadPredicates(std::string head)
 {
     std::vector<std::string> ret;
     if (head.find(",") != std::string::npos && head.find(";") == std::string::npos) {
@@ -299,12 +299,12 @@ std::vector<std::string> ASPVariableQuery::createHeadPredicates(std::string head
     return ret;
 }
 
-ASPQueryType ASPVariableQuery::getType()
+ASPQueryType ASPExtensionQuery::getType()
 {
     return this->type;
 }
 
-void ASPVariableQuery::onModel(Clingo::Model& clingoModel)
+void ASPExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
     Clingo::SymbolVector vec;
     auto tmp = clingoModel.symbols(clingo_show_type_shown);
@@ -319,13 +319,13 @@ void ASPVariableQuery::onModel(Clingo::Model& clingoModel)
 
         value.second.clear();
 #ifdef ASPQUERY_DEBUG
-        cout << "ASPVariableQuery::onModel: " << value.first << endl;
+        cout << "ASPExtensionQuery::onModel: " << value.first << endl;
 #endif
         auto it = ((ASPSolver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
-            std::cout << "ASPVariableQuery: Didn't find any suitable domain!" << std::endl;
+            std::cout << "ASPExtensionQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }
         while (it) {

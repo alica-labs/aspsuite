@@ -12,14 +12,14 @@ namespace kbcr
 
 class KnowledgebaseCreator;
 /**
- * Class inheriting from Command interface used to create a VariableQuery
+ * Class inheriting from Command interface used to create a ExtensionQuery
  */
-class VariableQueryCommand : public Command, public std::enable_shared_from_this<VariableQueryCommand>
+class ExtensionQueryCommand : public Command, public std::enable_shared_from_this<ExtensionQueryCommand>
 {
     Q_OBJECT
 public:
-    VariableQueryCommand(KnowledgebaseCreator* gui, QString program);
-    virtual ~VariableQueryCommand();
+    ExtensionQueryCommand(KnowledgebaseCreator* gui, QString program);
+    virtual ~ExtensionQueryCommand();
 
     void execute();
     void undo();

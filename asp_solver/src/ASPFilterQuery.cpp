@@ -1,4 +1,4 @@
-#include "asp_solver/ASPFactsQuery.h"
+#include "asp_solver/ASPFilterQuery.h"
 
 #include "asp_solver/ASPSolver.h"
 
@@ -7,10 +7,10 @@
 namespace reasoner
 {
 
-ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, ASPCommonsTerm* term)
+ASPFilterQuery::ASPFilterQuery(ASPSolver* solver, ASPCommonsTerm* term)
         : ASPQuery(solver, term)
 {
-    this->type = ASPQueryType::Facts;
+    this->type = ASPQueryType::Filter;
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
@@ -26,9 +26,9 @@ ASPFactsQuery::ASPFactsQuery(ASPSolver* solver, ASPCommonsTerm* term)
 #endif
 }
 
-ASPFactsQuery::~ASPFactsQuery() {}
+ASPFilterQuery::~ASPFilterQuery() {}
 
-void ASPFactsQuery::addQueryValues(std::vector<std::string> queryVec)
+void ASPFilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
     for (auto queryString : queryVec) {
         if (queryString.compare("") == 0) {
@@ -58,7 +58,7 @@ void ASPFactsQuery::addQueryValues(std::vector<std::string> queryVec)
     }
 }
 
-bool ASPFactsQuery::factsExistForAtLeastOneModel()
+bool ASPFilterQuery::factsExistForAtLeastOneModel()
 {
     for (auto queryValue : this->headValues) {
         if (queryValue.second.size() > 0) {
@@ -68,7 +68,7 @@ bool ASPFactsQuery::factsExistForAtLeastOneModel()
     return false;
 }
 
-bool ASPFactsQuery::factsExistForAllModels()
+bool ASPFilterQuery::factsExistForAllModels()
 {
     for (auto queryValue : this->headValues) {
         if (queryValue.second.size() == 0) {
@@ -78,11 +78,11 @@ bool ASPFactsQuery::factsExistForAllModels()
     return true;
 }
 
-void ASPFactsQuery::removeExternal()
-{ // NOOP in case of ASPFactsQuery
+void ASPFilterQuery::removeExternal()
+{ // NOOP in case of ASPFilterQuery
 }
 
-std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ASPFactsQuery::getASPTruthValues()
+std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ASPFilterQuery::getASPTruthValues()
 {
     std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ret;
     for (auto iter : this->getHeadValues()) {
@@ -99,7 +99,7 @@ std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ASPFactsQuery::getASPTruth
     return ret;
 }
 
-void ASPFactsQuery::onModel(Clingo::Model& clingoModel)
+void ASPFilterQuery::onModel(Clingo::Model& clingoModel)
 {
     // Remember model
     Clingo::SymbolVector vec;
@@ -112,13 +112,13 @@ void ASPFactsQuery::onModel(Clingo::Model& clingoModel)
     // Fill mapping from query fact towards model fact
     for (auto value : this->getHeadValues()) {
 #ifdef ASPQUERY_DEBUG
-        cout << "ASPFactsQuery::onModel: " << value.first << endl;
+        cout << "ASPFilterQuery::onModel: " << value.first << endl;
 #endif
         auto it = ((ASPSolver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
-            std::cout << "ASPFactsQuery: Didn't find any suitable domain!" << std::endl;
+            std::cout << "ASPFilterQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }
 

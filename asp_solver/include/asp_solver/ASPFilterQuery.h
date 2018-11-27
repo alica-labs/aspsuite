@@ -11,16 +11,16 @@ namespace reasoner
 {
 
 class ASPSolver;
-class ASPFactsQuery : public ASPQuery
+class ASPFilterQuery : public ASPQuery
 {
 public:
-    ASPFactsQuery(ASPSolver* solver, ASPCommonsTerm* term);
-    virtual ~ASPFactsQuery();
+    ASPFilterQuery(ASPSolver* solver, ASPCommonsTerm* term);
+    virtual ~ASPFilterQuery();
 
     bool factsExistForAllModels();
     bool factsExistForAtLeastOneModel();
 
-    // NOOP in case of ASPFactsQuery
+    // NOOP in case of ASPFilterQuery
     void removeExternal();
 
     std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> getASPTruthValues();

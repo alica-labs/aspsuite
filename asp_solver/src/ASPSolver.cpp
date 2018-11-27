@@ -1,7 +1,7 @@
 #include "asp_solver/ASPSolver.h"
 
-#include "asp_solver/ASPFactsQuery.h"
-#include "asp_solver/ASPVariableQuery.h"
+#include "asp_solver/ASPFilterQuery.h"
+#include "asp_solver/ASPExtensionQuery.h"
 #include "asp_solver/AnnotatedExternal.h"
 
 #include <asp_commons/ASPCommonsTerm.h>
@@ -226,10 +226,10 @@ int ASPSolver::prepareSolution(std::vector<ASPCommonsVariable*>& vars, std::vect
             }
         }
         if (!found) {
-            if (term->getType() == ASPQueryType::Variable) {
-                this->registerQuery(std::make_shared<ASPVariableQuery>(this, term));
-            } else if (term->getType() == ASPQueryType::Facts) {
-                this->registerQuery(std::make_shared<ASPFactsQuery>(this, term));
+            if (term->getType() == ASPQueryType::Extension) {
+                this->registerQuery(std::make_shared<ASPExtensionQuery>(this, term));
+            } else if (term->getType() == ASPQueryType::Filter) {
+                this->registerQuery(std::make_shared<ASPFilterQuery>(this, term));
             } else {
                 std::cout << "ASPSolver: Query of unknown type registered!" << std::endl;
                 return -1;

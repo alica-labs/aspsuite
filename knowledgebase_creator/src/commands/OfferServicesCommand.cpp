@@ -160,8 +160,8 @@ void OfferServicesCommand::conceptNetCallFinished(QNetworkReply* reply)
         relation = relation.right(relation.size() - relation.lastIndexOf('/') - 1);
         // sources
         QJsonArray sources = edge["sources"].toArray();
-        auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
-                make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
+        auto tmp = std::make_shared<ConceptNetEdge>(edgeId, startLanguage, std::make_shared<ConceptNetConcept>(startTerm, startSenseLabel, startID),
+                                                    std::make_shared<ConceptNetConcept>(endTerm, endSenseLabel, endID), relation, weight);
         for (int j = 0; j < sources.size(); j++) {
             tmp->sources.push_back(sources[j].toObject()["contributor"].toString());
         }

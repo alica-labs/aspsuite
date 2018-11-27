@@ -13,11 +13,11 @@
 namespace reasoner
 {
 class ASPSolver;
-class ASPVariableQuery : public ASPQuery
+class ASPExtensionQuery : public ASPQuery
 {
 public:
-    ASPVariableQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term);
-    virtual ~ASPVariableQuery();
+    ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term);
+    virtual ~ASPExtensionQuery();
     std::vector<std::string> getRules();
     ASPQueryType getType();
     void removeExternal();

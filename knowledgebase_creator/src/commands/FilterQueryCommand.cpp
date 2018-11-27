@@ -1,4 +1,4 @@
-#include "commands/FactsQueryCommand.h"
+#include "commands/FilterQueryCommand.h"
 
 #include <ui_knowledgebasecreator.h>
 
@@ -12,38 +12,38 @@
 #include <asp_commons/ASPCommonsVariable.h>
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/AnnotatedValVec.h>
-#include <asp_solver/ASPFactsQuery.h>
+#include <asp_solver/ASPFilterQuery.h>
 #include <asp_solver/ASPSolver.h>
 
 namespace kbcr
 {
 
-FactsQueryCommand::FactsQueryCommand(KnowledgebaseCreator* gui, QString factsString)
+FilterQueryCommand::FilterQueryCommand(KnowledgebaseCreator* gui, QString factsString)
 {
-    this->type = "Facts Query";
+    this->type = "Filter Query";
     this->gui = gui;
     this->factsString = factsString;
 }
 
-FactsQueryCommand::~FactsQueryCommand() {}
+FilterQueryCommand::~FilterQueryCommand() {}
 
-void FactsQueryCommand::execute()
+void FilterQueryCommand::execute()
 {
     auto prgm = this->factsString.trimmed();
     // handle Wrong input
     if (prgm.contains("\n")) {
-        std::cout << "FactsQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
+        std::cout << "FilterQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
         return;
     }
     // create ASP term
     auto term = new reasoner::ASPCommonsTerm();
-    term->setType(reasoner::ASPQueryType::Facts);
+    term->setType(reasoner::ASPQueryType::Filter);
     int queryId = this->gui->getSolver()->getQueryCounter();
     term->setId(queryId);
     term->setQueryId(queryId);
     // get number of models from gui
     if (this->gui->modelSettingsDialog->getNumberOfModels() != -1) {
-        term->setNumberOfModels(to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
+        term->setNumberOfModels(std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
     }
     prgm = prgm.left(prgm.size() - 1);
     term->setQueryRule(prgm.toStdString());
@@ -103,17 +103,17 @@ void FactsQueryCommand::execute()
     }
 }
 
-void FactsQueryCommand::undo()
+void FilterQueryCommand::undo()
 {
     this->gui->chHandler->removeFromCommandHistory(shared_from_this());
     this->gui->getUi()->queryResultsLabel->clear();
     this->gui->getUi()->aspRuleTextArea->clear();
 }
 
-QJsonObject FactsQueryCommand::toJSON()
+QJsonObject FilterQueryCommand::toJSON()
 {
     QJsonObject ret;
-    ret["type"] = "Facts Query";
+    ret["type"] = QString(this->type.c_str());
     ret["factsString"] = this->factsString;
     return ret;
 }

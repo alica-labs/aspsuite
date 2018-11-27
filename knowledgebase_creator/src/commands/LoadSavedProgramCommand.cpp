@@ -10,13 +10,14 @@
 #include "commands/AssignExternalCommand.h"
 #include "commands/ChangeSolverSettingsCommand.h"
 #include "commands/ConceptNetQueryCommand.h"
-#include "commands/FactsQueryCommand.h"
+#include "commands/FilterQueryCommand.h"
 #include "commands/GroundCommand.h"
 #include "commands/LoadBackgroundKnowledgeCommand.h"
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/NewSolverCommand.h"
 #include "commands/SolveCommand.h"
-#include "commands/VariableQueryCommand.h"
+#include "commands/ExtensionQueryCommand.h"
+#include "commands/OfferServicesCommand.h"
 
 namespace kbcr
 {
@@ -81,9 +82,19 @@ void LoadSavedProgramCommand::execute()
                 emit this->gui->updateCommandList();
                 continue;
             }
+            // Handle Offer Services command
+            else if (cmd["type"].toString().toStdString().compare("Offer Services") == 0) {
+                std::shared_ptr<OfferServicesCommand> c = std::make_shared<OfferServicesCommand>(this->gui, cmd["queryString"].toString());
+                c->execute();
+                QEventLoop loop;
+                this->connect(this, SIGNAL(cn5CallFinished()), &loop, SLOT(quit()));
+                loop.exec();
+                emit this->gui->updateCommandList();
+                continue;
+            }
             // Handle facts query command
-            else if (cmd["type"].toString().toStdString().compare("Facts Query") == 0) {
-                std::shared_ptr<FactsQueryCommand> c = std::make_shared<FactsQueryCommand>(this->gui, cmd["factsString"].toString());
+            else if (cmd["type"].toString().toStdString().compare("Filter Query") == 0) {
+                std::shared_ptr<FilterQueryCommand> c = std::make_shared<FilterQueryCommand>(this->gui, cmd["factsString"].toString());
                 c->execute();
                 emit this->gui->updateCommandList();
                 continue;
@@ -111,8 +122,8 @@ void LoadSavedProgramCommand::execute()
                 continue;
             }
             // Handle Variable query command
-            else if (cmd["type"].toString().toStdString().compare("Variable Query") == 0) {
-                std::shared_ptr<VariableQueryCommand> c = std::make_shared<VariableQueryCommand>(this->gui, cmd["program"].toString());
+            else if (cmd["type"].toString().toStdString().compare("Extension Query") == 0) {
+                std::shared_ptr<ExtensionQueryCommand> c = std::make_shared<ExtensionQueryCommand>(this->gui, cmd["program"].toString());
                 c->execute();
                 emit this->gui->updateCommandList();
                 continue;

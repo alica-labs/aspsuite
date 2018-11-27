@@ -1,4 +1,4 @@
-#include "commands/VariableQueryCommand.h"
+#include "commands/ExtensionQueryCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 
@@ -20,17 +20,17 @@
 namespace kbcr
 {
 
-VariableQueryCommand::VariableQueryCommand(KnowledgebaseCreator* gui, QString program)
+ExtensionQueryCommand::ExtensionQueryCommand(KnowledgebaseCreator* gui, QString program)
 {
-    this->type = "Variable Query";
+    this->type = "Extension Query";
     this->gui = gui;
     this->program = program;
     this->toShow = QString("");
 }
 
-VariableQueryCommand::~VariableQueryCommand() {}
+ExtensionQueryCommand::~ExtensionQueryCommand() {}
 
-void VariableQueryCommand::execute()
+void ExtensionQueryCommand::execute()
 {
     // Separate program into lines by given delimiter
     auto prgm = this->program.toStdString();
@@ -44,13 +44,13 @@ void VariableQueryCommand::execute()
     lines.push_back(prgm);
     // Define asp term
     auto term = new reasoner::ASPCommonsTerm();
-    term->setType(reasoner::ASPQueryType::Variable);
+    term->setType(reasoner::ASPQueryType::Extension);
     int queryId = this->gui->getSolver()->getQueryCounter();
     term->setId(queryId);
     term->setQueryId(queryId);
     // Set number of shown models according to the gui
     if (this->gui->modelSettingsDialog->getNumberOfModels() != -1) {
-        term->setNumberOfModels(to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
+        term->setNumberOfModels(std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
     }
     for (int i = 0; i < lines.size(); i++) {
         // empty lines would result in a constraint for the query external statement
@@ -64,7 +64,7 @@ void VariableQueryCommand::execute()
         // query rule
         if (i == 0) {
             if (lines.at(i).find(":-") == std::string::npos) {
-                cout << "VariableQueryCommand: malformed query rule! Aborting!" << endl;
+                std::cout << "ExtensionQueryCommand: malformed query rule! Aborting!" << std::endl;
                 return;
             }
             term->setQueryRule(lines.at(i));
@@ -81,7 +81,7 @@ void VariableQueryCommand::execute()
             term->addFact(lines.at(i));
             continue;
         } else {
-            cout << "VariableQueryCommand: string not recognized!" << endl;
+            std::cout << "ExtensionQueryCommand: string not recognized!" << std::endl;
         }
     }
     // Prepare getSolution
@@ -140,17 +140,17 @@ void VariableQueryCommand::execute()
     }
 }
 
-void VariableQueryCommand::undo()
+void ExtensionQueryCommand::undo()
 {
     this->gui->chHandler->removeFromCommandHistory(shared_from_this());
     this->gui->getUi()->queryResultsLabel->clear();
     this->gui->getUi()->aspRuleTextArea->clear();
 }
 
-QJsonObject VariableQueryCommand::toJSON()
+QJsonObject ExtensionQueryCommand::toJSON()
 {
     QJsonObject ret;
-    ret["type"] = "Variable Query";
+    ret["type"] = QString(this->type.c_str());
     ret["program"] = this->program;
     return ret;
 }

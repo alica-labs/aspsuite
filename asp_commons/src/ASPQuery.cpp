@@ -98,8 +98,8 @@ std::string ASPQuery::toString()
     }
     ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
 
-    if (this->getType() == ASPQueryType::Facts) {
-        ss << "\tQuery is of type Facts.\n";
+    if (this->getType() == ASPQueryType::Filter) {
+        ss << "\tQuery is of type Filter.\n";
         ss << "\tFacts:"
            << "\n";
         for (auto value : this->headValues) {
@@ -115,8 +115,8 @@ std::string ASPQuery::toString()
             }
             ss << "\n";
         }
-    } else {
-        ss << "\tQuery is of type Variable.\n";
+    } else if (this->getType() == ASPQueryType::Extension) {
+        ss << "\tQuery is of type Extension.\n";
         ss << "\tRuleHeadValues:"
            << "\n";
         for (auto value : this->headValues) {
@@ -132,7 +132,10 @@ std::string ASPQuery::toString()
             }
             ss << "\n";
         }
+    } else {
+        ss << "\tQuery type is undefined!.\n";
     }
+
     return ss.str();
 }
 

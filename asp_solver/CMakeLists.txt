@@ -37,8 +37,8 @@ include_directories(
 add_library(${PROJECT_NAME}
     src/ASPSolver.cpp
     src/AnnotatedExternal.cpp
-    src/ASPFactsQuery.cpp
-    src/ASPVariableQuery.cpp
+        src/ASPFilterQuery.cpp
+		src/ASPExtensionQuery.cpp
     src/GrdProgramObserver.cpp
 )
 

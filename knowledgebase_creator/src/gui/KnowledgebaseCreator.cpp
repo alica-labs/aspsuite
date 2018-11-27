@@ -8,14 +8,14 @@
 #include "commands/AssignExternalCommand.h"
 #include "commands/ChangeSolverSettingsCommand.h"
 #include "commands/ConceptNetQueryCommand.h"
-#include "commands/FactsQueryCommand.h"
+#include "commands/FilterQueryCommand.h"
 #include "commands/GroundCommand.h"
 #include "commands/LoadBackgroundKnowledgeCommand.h"
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/NewSolverCommand.h"
 #include "commands/OfferServicesCommand.h"
 #include "commands/SolveCommand.h"
-#include "commands/VariableQueryCommand.h"
+#include "commands/ExtensionQueryCommand.h"
 
 #include "handler/CommandHistoryHandler.h"
 #include "handler/ExternalTableHandler.h"
@@ -155,10 +155,10 @@ void KnowledgebaseCreator::queryCallBack()
         return;
     }
     if (this->isFactsQuery(this->ui->aspRuleTextArea->toPlainText())) {
-        std::shared_ptr<FactsQueryCommand> cmd = std::make_shared<FactsQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
+        std::shared_ptr<FilterQueryCommand> cmd = std::make_shared<FilterQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
         cmd->execute();
     } else {
-        std::shared_ptr<VariableQueryCommand> cmd = std::make_shared<VariableQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
+        std::shared_ptr<ExtensionQueryCommand> cmd = std::make_shared<ExtensionQueryCommand>(this, this->ui->aspRuleTextArea->toPlainText());
         cmd->execute();
     }
 }
@@ -240,7 +240,7 @@ bool KnowledgebaseCreator::checkDockerInstallation()
 #ifdef GUIDEUG
     cout << "KnowledgebaseCreator: " << result << endl;
 #endif
-    return (result.find("Docker version ") != string::npos);
+    return (result.find("Docker version ") != std::string::npos);
 }
 
 bool KnowledgebaseCreator::checkConcneptNetInstallation()
@@ -257,11 +257,11 @@ bool KnowledgebaseCreator::checkConcneptNetInstallation()
         }
     }
 #ifdef GUIDEUG
-    cout << "KnowledgebaseCreator: " << result << endl;
+    std::cout << "KnowledgebaseCreator: " << result << std::endl;
 #endif
 
     // conceptnet5_conceptnet-web_1
-    return (result.find("conceptnet5_api_1") != string::npos);
+    return (result.find("conceptnet5_api_1") != std::string::npos);
 }
 
 std::vector<QString> KnowledgebaseCreator::getConceptNetBaseRealtions()
@@ -315,7 +315,7 @@ void KnowledgebaseCreator::clear()
     this->solver = nullptr;
 }
 
-void KnowledgebaseCreator::setSettings(shared_ptr<SolverSettings> settings)
+void KnowledgebaseCreator::setSettings(std::shared_ptr<SolverSettings> settings)
 {
     this->settings = settings;
 }

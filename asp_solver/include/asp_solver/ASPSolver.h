@@ -17,9 +17,9 @@ namespace reasoner
 {
 
 class AnnotatedExternal;
-class ASPFactsQuery;
+class ASPFilterQuery;
 class ASPQuery;
-class ASPVariableQuery;
+class ASPExtensionQuery;
 class ASPCommonsVariable;
 class AnnotatedValVec;
 class ASPSolver : public IASPSolver, Clingo::SolveEventHandler

@@ -9,13 +9,13 @@
 #include "commands/ChangeSolverSettingsCommand.h"
 #include "commands/Command.h"
 #include "commands/ConceptNetQueryCommand.h"
-#include "commands/FactsQueryCommand.h"
+#include "commands/FilterQueryCommand.h"
 #include "commands/GroundCommand.h"
 #include "commands/LoadBackgroundKnowledgeCommand.h"
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/NewSolverCommand.h"
 #include "commands/SolveCommand.h"
-#include "commands/VariableQueryCommand.h"
+#include "commands/ExtensionQueryCommand.h"
 
 #include <ui_knowledgebasecreator.h>
 #include <ui_settingsdialog.h>

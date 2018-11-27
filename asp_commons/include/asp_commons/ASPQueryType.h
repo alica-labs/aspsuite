@@ -4,8 +4,8 @@ namespace reasoner
 {
 enum ASPQueryType
 {
-    Facts,
-    Variable,
+    Filter,
+    Extension,
     Undefined
 };
 } /* namespace reasoner */

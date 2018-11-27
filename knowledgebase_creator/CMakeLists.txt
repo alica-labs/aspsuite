@@ -38,11 +38,11 @@ set(knowledgebaseCreator_SRCS
         src/commands/NewSolverCommand.cpp
         src/commands/ChangeSolverSettingsCommand.cpp
         src/commands/ConceptNetQueryCommand.cpp
-        src/commands/FactsQueryCommand.cpp
+        src/commands/FilterQueryCommand.cpp
         src/commands/GroundCommand.cpp
         src/commands/LoadSavedProgramCommand.cpp
         src/commands/SolveCommand.cpp
-        src/commands/VariableQueryCommand.cpp
+        src/commands/ExtensionQueryCommand.cpp
         src/commands/LoadBackgroundKnowledgeCommand.cpp
         src/commands/AddCommand.cpp
         src/commands/AssignExternalCommand.cpp
@@ -63,11 +63,11 @@ set(knowledgebaseCreator_HDRS
         include/commands/NewSolverCommand.h
         include/commands/ChangeSolverSettingsCommand.h
         include/commands/ConceptNetQueryCommand.h
-        include/commands/FactsQueryCommand.h
+        include/commands/FilterQueryCommand.h
         include/commands/GroundCommand.h
         include/commands/LoadSavedProgramCommand.h
         include/commands/SolveCommand.h
-        include/commands/VariableQueryCommand.h
+        include/commands/ExtensionQueryCommand.h
         include/commands/LoadBackgroundKnowledgeCommand.h
         include/commands/AddCommand.h
         include/commands/AssignExternalCommand.h

@@ -8,14 +8,14 @@
 #include "commands/ChangeSolverSettingsCommand.h"
 #include "commands/Command.h"
 #include "commands/ConceptNetQueryCommand.h"
-#include "commands/FactsQueryCommand.h"
+#include "commands/FilterQueryCommand.h"
 #include "commands/GroundCommand.h"
 #include "commands/LoadBackgroundKnowledgeCommand.h"
 #include "commands/LoadSavedProgramCommand.h"
 #include "commands/NewSolverCommand.h"
 #include "commands/OfferServicesCommand.h"
 #include "commands/SolveCommand.h"
-#include "commands/VariableQueryCommand.h"
+#include "commands/ExtensionQueryCommand.h"
 
 #include <ui_knowledgebasecreator.h>
 
@@ -160,7 +160,7 @@ void CommandHistoryHandler::addSolveCommandToHistory(std::shared_ptr<Command> cm
 
 void CommandHistoryHandler::addVariableQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 {
-    auto item = new QTableWidgetItem(std::dynamic_pointer_cast<VariableQueryCommand>(cmd)->toShow);
+    auto item = new QTableWidgetItem(std::dynamic_pointer_cast<ExtensionQueryCommand>(cmd)->toShow);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 }
@@ -174,7 +174,7 @@ void CommandHistoryHandler::addLoadBackgroundKnowledgeCommandToHistory(std::shar
 
 void CommandHistoryHandler::addFactsQueryCommandToHistory(std::shared_ptr<Command> cmd, int pos)
 {
-    auto item = new QTableWidgetItem(std::dynamic_pointer_cast<FactsQueryCommand>(cmd)->factsString);
+    auto item = new QTableWidgetItem(std::dynamic_pointer_cast<FilterQueryCommand>(cmd)->factsString);
     item->setFlags(item->flags() ^ Qt::ItemIsEditable);
     this->gui->getUi()->commandHistoryTable->setItem(pos, 1, item);
 }

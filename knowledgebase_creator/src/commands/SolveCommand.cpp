@@ -23,7 +23,7 @@ SolveCommand::~SolveCommand() {}
 
 void SolveCommand::printModels()
 {
-    stringstream ss;
+    std::stringstream ss;
     for (int i = 0; i < this->currentModels.size(); i++) {
         ss << "Model number " << i + 1 << ":" << endl;
         for (auto atom : this->currentModels.at(i)) {
@@ -58,7 +58,7 @@ QJsonObject SolveCommand::toJSON()
     return ret;
 }
 
-vector<Clingo::SymbolVector> SolveCommand::getCurrentModels()
+std::vector<Clingo::SymbolVector> SolveCommand::getCurrentModels()
 {
     return this->currentModels;
 }
@@ -71,7 +71,7 @@ bool SolveCommand::isSatisfiable()
 void SolveCommand::printSortedModels()
 {
     std::stringstream ss;
-    vector<vector<string>> sorted = std::vector<std::vector<std::string>>(this->currentModels.size());
+    std::vector<std::vector<std::string>> sorted = std::vector<std::vector<std::string>>(this->currentModels.size());
     for (int i = 0; i < this->currentModels.size(); i++) {
         for (auto atom : this->currentModels.at(i)) {
             ss << atom;

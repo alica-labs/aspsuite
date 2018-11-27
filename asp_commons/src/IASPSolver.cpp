@@ -1,6 +1,6 @@
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPCommonsVariable.h>
-#include <asp_commons/IASPSolver.h>
+#include "asp_commons/ASPCommonsTerm.h"
+#include "asp_commons/ASPCommonsVariable.h"
+#include "asp_commons/IASPSolver.h"
 
 namespace reasoner
 {

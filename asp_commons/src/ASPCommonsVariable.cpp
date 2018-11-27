@@ -1,10 +1,3 @@
-/*
- * Variable.cpp
- *
- *  Created on: Jul 13, 2016
- *      Author: Stefan Jakob
- */
-
 #include <ASPCommonsVariable.h>
 
 namespace reasoner

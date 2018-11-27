@@ -1,10 +1,3 @@
-/*
- * AnnotatedValVec.cpp
- *
- *  Created on: Nov 5, 2016
- *      Author: stefan
- */
-
 #include "asp_commons/AnnotatedValVec.h"
 #include "asp_commons/ASPQuery.h"
 #include <Configuration.h>
@@ -12,7 +5,7 @@
 namespace reasoner
 {
 
-AnnotatedValVec::AnnotatedValVec(long id, vector<Clingo::SymbolVector> values, shared_ptr<ASPQuery> query)
+AnnotatedValVec::AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<ASPQuery> query)
 {
     this->id = id;
     this->values = values;
@@ -25,12 +18,12 @@ AnnotatedValVec::~AnnotatedValVec() {}
 void AnnotatedValVec::extractResponse()
 {
     for (int i = 0; i < values.size(); i++) {
-        this->variableQueryValues.push_back(vector<string>());
-        this->factQueryValues.push_back(vector<string>());
+        this->variableQueryValues.push_back(std::vector<std::string>());
+        this->factQueryValues.push_back(std::vector<std::string>());
         for (auto val : values.at(i)) {
-            stringstream ss;
+            std::stringstream ss;
             ss << val;
-            string tmp = ss.str();
+            std::string tmp = ss.str();
             tmp = supplementary::Configuration::trim(tmp);
             this->factQueryValues.at(i).push_back(tmp);
             tmp = tmp.substr(0, tmp.size() - 1);

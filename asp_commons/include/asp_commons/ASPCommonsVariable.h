@@ -1,9 +1,9 @@
 #pragma once
 
+#include "asp_commons/ASPCommonsTerm.h"
+
 #include <memory>
 #include <string>
-
-#include "asp_commons/ASPCommonsTerm.h"
 
 namespace reasoner
 {

@@ -1,18 +1,7 @@
-/*
- * AnnotatedValVec.h
- *
- *  Created on: Nov 5, 2016
- *      Author: stefan
- */
+#pragma once
 
-#ifndef SRC_COMMONS_ANNOTATEDVALVEC_H_
-#define SRC_COMMONS_ANNOTATEDVALVEC_H_
-
-#include <memory>
-//#include <clingo/clingocontrol.hh>
 #include <clingo.hh>
-
-using namespace std;
+#include <memory>
 
 namespace reasoner
 {
@@ -20,19 +9,16 @@ class ASPQuery;
 class AnnotatedValVec
 {
 public:
-    //			AnnotatedValVec();
-    AnnotatedValVec(long id, vector<Clingo::SymbolVector> values, shared_ptr<ASPQuery> query);
+    AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<ASPQuery> query);
     virtual ~AnnotatedValVec();
     long id;
-    vector<vector<string>> variableQueryValues;
-    vector<vector<string>> factQueryValues;
-    shared_ptr<ASPQuery> query;
+    std::vector<std::vector<std::string>> variableQueryValues;
+    std::vector<std::vector<std::string>> factQueryValues;
+    std::shared_ptr<ASPQuery> query;
 
 private:
-    vector<Clingo::SymbolVector> values;
+    std::vector<Clingo::SymbolVector> values;
     void extractResponse();
 };
 
 } /* namespace reasoner */
-
-#endif /* SRC_COMMONS_ANNOTATEDVALVEC_H_ */

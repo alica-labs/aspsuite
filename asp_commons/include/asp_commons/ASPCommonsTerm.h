@@ -19,6 +19,8 @@ public:
     std::vector<std::string> getRuleBodies();
     std::string getProgramSection();
     void setProgramSection(std::string programSection);
+    std::vector<std::string> getProgramSectionParameters();
+    void addProgramSectionParameter(std::string param);
     int getLifeTime();
     void setLifeTime(int lifeTime);
     std::vector<std::string> getRules();
@@ -53,6 +55,7 @@ private:
     int queryId;
     int lifeTime;
     std::vector<std::string> facts;
+    std::vector<std::string> programSectionParameters;
     std::shared_ptr<std::map<std::string, bool>> externals;
     ASPQueryType type;
 };

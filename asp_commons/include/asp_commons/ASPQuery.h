@@ -1,6 +1,6 @@
 #pragma once
 
-#include <asp_commons/ASPQueryType.h>
+#include "asp_commons/ASPQueryType.h"
 #include <clingo.hh>
 
 #include <map>
@@ -35,8 +35,8 @@ public:
     std::vector<std::string> getRules();
     ASPCommonsTerm* getTerm();
 
-    std::string getProgrammSection();
-    void setProgrammSection(std::string programmSection);
+    std::string getProgramSection();
+    void setProgramSection(std::string programSection);
     virtual void removeExternal() = 0;
 
     std::string toString();
@@ -62,6 +62,7 @@ protected:
     std::string programSection;
     ASPCommonsTerm* term;
     ASPQueryType type;
+    std::string backgroundKnowledgeFilename;
 };
 
 } /* namespace reasoner */

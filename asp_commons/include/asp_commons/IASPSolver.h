@@ -29,7 +29,6 @@ public:
     virtual bool loadFileFromConfig(std::string configKey) = 0;
     virtual void loadFile(std::string filename) = 0;
 
-    // virtual void ground(Clingo::GroundVec const &vec, Clingo::Context *context) = 0;
     virtual void ground(Clingo::PartSpan parts, Clingo::GroundCallback = nullptr) = 0;
     virtual void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue) = 0;
     virtual void releaseExternal(Clingo::Symbol ext) = 0;

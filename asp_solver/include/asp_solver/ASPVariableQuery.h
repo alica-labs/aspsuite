@@ -1,9 +1,11 @@
 #pragma once
-#include <clingo.hh>
 
 #include <asp_commons/ASPCommonsTerm.h>
 #include <asp_commons/ASPQuery.h>
 #include <asp_commons/ASPQueryType.h>
+
+#include <clingo.hh>
+
 #include <memory>
 
 //#define ASPVARIABLEQUERY_DEBUG
@@ -32,6 +34,14 @@ private:
     std::shared_ptr<Clingo::Symbol> external;
     std::string queryProgramSection;
     std::string externalName;
+
+    /**
+     * Encapsulates the query in an extra program section including an external (the query external, e.g., query1).
+     * The query external is added to every rule in the query, in order to guard it: bla bla :- blub blub, query1.
+     * Furthermore, it encapsulates queried rules/ ruleheads with a query1(...) in order to guarantee the module property.
+     *
+     * Therefore, it utilises the methods above... expandBlaBla()
+     */
     void createProgramSection();
 };
 

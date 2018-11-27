@@ -1,17 +1,10 @@
-/*
- * AspQuery.cpp
- *
- *  Created on: Jun 8, 2016
- *      Author: Stefan Jakob
- */
-
 #include "asp_commons/ASPQuery.h"
 
-#include <ASPCommonsTerm.h>
-#include <sstream>
-
+#include "asp_commons/ASPCommonsTerm.h"
 #include "asp_commons/AnnotatedValVec.h"
 #include "asp_commons/IASPSolver.h"
+
+#include <sstream>
 
 namespace reasoner
 {
@@ -23,7 +16,20 @@ ASPQuery::ASPQuery(IASPSolver* solver, reasoner::ASPCommonsTerm* term)
     this->term = term;
     this->programSection = term->getProgramSection();
     this->lifeTime = term->getLifeTime();
-    this->currentModels = make_shared<vector<Clingo::SymbolVector>>();
+    this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
+
+    // load background knowledge file only once (it does not ground anything)
+    this->solver->loadFileFromConfig(this->backgroundKnowledgeFilename);
+
+    // ground term program section with given params
+    if (!term->getProgramSection().empty()) {
+        Clingo::SymbolVector paramsVec;
+        auto params = this->term->getProgramSectionParameters();
+        for (auto param : params) {
+            paramsVec.push_back(this->solver->parseValue(param));
+        }
+        this->solver->ground({{term->getProgramSection().c_str(), paramsVec}}, nullptr);
+    }
 }
 
 ASPQuery::~ASPQuery() {}
@@ -39,7 +45,6 @@ void ASPQuery::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
 {
     auto entry = this->headValues.find(key);
     if (entry != this->headValues.end()) {
-        // TODO remove
         if (find(entry->second.begin(), entry->second.end(), value) == entry->second.end()) {
             entry->second.push_back(value);
         }
@@ -76,7 +81,7 @@ bool ASPQuery::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
     return true;
 }
 
-string ASPQuery::toString()
+std::string ASPQuery::toString()
 {
     std::stringstream ss;
     ss << "Query:"
@@ -131,12 +136,12 @@ string ASPQuery::toString()
     return ss.str();
 }
 
-string ASPQuery::getProgrammSection()
+std::string ASPQuery::getProgramSection()
 {
     return this->programSection;
 }
 
-void ASPQuery::setProgrammSection(string programSection)
+void ASPQuery::setProgramSection(std::string programSection)
 {
     this->programSection = programSection;
 }
@@ -146,7 +151,7 @@ IASPSolver* ASPQuery::getSolver()
     return this->solver;
 }
 
-shared_ptr<vector<Clingo::SymbolVector>> ASPQuery::getCurrentModels()
+std::shared_ptr<std::vector<Clingo::SymbolVector>> ASPQuery::getCurrentModels()
 {
     return this->currentModels;
 }
@@ -161,12 +166,12 @@ void ASPQuery::setLifeTime(int lifeTime)
     this->lifeTime = lifeTime;
 }
 
-vector<string> ASPQuery::getRules()
+std::vector<std::string> ASPQuery::getRules()
 {
     return this->rules;
 }
 
-map<Clingo::Symbol, Clingo::SymbolVector>& ASPQuery::getHeadValues()
+std::map<Clingo::Symbol, Clingo::SymbolVector>& ASPQuery::getHeadValues()
 {
     return this->headValues;
 }

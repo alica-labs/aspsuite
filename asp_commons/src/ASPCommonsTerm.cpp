@@ -1,10 +1,3 @@
-/*
- * Term.cpp
- *
- *  Created on: Jul 13, 2016
- *      Author: Stefan Jakob
- */
-
 #include <ASPCommonsTerm.h>
 #include <SystemConfig.h>
 
@@ -56,6 +49,16 @@ std::string ASPCommonsTerm::getProgramSection()
 void ASPCommonsTerm::setProgramSection(std::string programSection)
 {
     this->programSection = programSection;
+}
+
+std::vector<std::string> ASPCommonsTerm::getProgramSectionParameters()
+{
+    return this->programSectionParameters;
+}
+
+void ASPCommonsTerm::addProgramSectionParameter(std::string param)
+{
+    this->programSectionParameters.push_back(param);
 }
 
 int ASPCommonsTerm::getLifeTime()

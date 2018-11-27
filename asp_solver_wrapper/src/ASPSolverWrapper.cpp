@@ -130,7 +130,7 @@ void ASPSolverWrapper::init(::reasoner::IASPSolver* solver)
 {
     this->solver = solver;
     this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
-    this->planIntegrator = make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
+    this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
 }
 
 void ASPSolverWrapper::integrateRules()
@@ -167,12 +167,12 @@ void alica::reasoner::ASPSolverWrapper::removeDeadQueries()
     this->solver->removeDeadQueries();
 }
 
-bool alica::reasoner::ASPSolverWrapper::registerQuery(shared_ptr<::reasoner::ASPQuery> query)
+bool alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner::ASPQuery> query)
 {
     return this->solver->registerQuery(query);
 }
 
-bool alica::reasoner::ASPSolverWrapper::unregisterQuery(shared_ptr<::reasoner::ASPQuery> query)
+bool alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::ASPQuery> query)
 {
     return this->solver->unregisterQuery(query);
 }
@@ -182,7 +182,7 @@ void alica::reasoner::ASPSolverWrapper::printStats()
     this->solver->printStats();
 }
 
-vector<shared_ptr<::reasoner::ASPQuery>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries()
+    std::vector<std::shared_ptr<::reasoner::ASPQuery>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries()
 {
     return this->solver->getRegisteredQueries();
 }

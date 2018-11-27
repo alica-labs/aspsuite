@@ -1,12 +1,4 @@
-/*
- * QueryType.h
- *
- *  Created on: Nov 1, 2016
- *      Author: stefan
- */
-
-#ifndef INCLUDE_QUERYTYPE_H_
-#define INCLUDE_QUERYTYPE_H_
+#pragma once
 
 namespace reasoner
 {
@@ -18,4 +10,3 @@ enum ASPQueryType
 };
 } /* namespace reasoner */
 
-#endif /* INCLUDE_QUERYTYPE_H_ */

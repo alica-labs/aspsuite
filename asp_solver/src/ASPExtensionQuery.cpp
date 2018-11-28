@@ -40,11 +40,6 @@ ASPExtensionQuery::ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm
 
 ASPExtensionQuery::~ASPExtensionQuery() {}
 
-std::vector<std::string> ASPExtensionQuery::getRules()
-{
-    return this->rules;
-}
-
 std::string ASPExtensionQuery::expandQueryRuleModuleProperty(std::string rule)
 {
     if (rule.find(":-") == 0) {

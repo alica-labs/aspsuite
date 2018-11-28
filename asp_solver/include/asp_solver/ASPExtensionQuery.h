@@ -18,7 +18,6 @@ class ASPExtensionQuery : public ASPQuery
 public:
     ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term);
     virtual ~ASPExtensionQuery();
-    std::vector<std::string> getRules();
     ASPQueryType getType();
     void removeExternal();
     void onModel(Clingo::Model& clingoModel);

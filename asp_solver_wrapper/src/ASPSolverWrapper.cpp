@@ -133,16 +133,6 @@ void ASPSolverWrapper::init(::reasoner::IASPSolver* solver)
     this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
 }
 
-void ASPSolverWrapper::integrateRules()
-{
-    for (auto query : this->getRegisteredQueries()) {
-        for (auto rule : query->getRules()) {
-            this->solver->add("planBase", {}, rule.c_str());
-        }
-    }
-    this->solver->ground({{"planBase", {}}}, nullptr);
-}
-
 /**
  * Validates the well-formedness of a given plan.
  *
@@ -152,14 +142,7 @@ bool ASPSolverWrapper::validatePlan(Plan* plan)
 {
     // adds all facts about the given plan tree in to clingo
     this->planIntegrator->loadPlanTree(plan);
-
-    this->integrateRules();
-    for (auto query : this->getRegisteredQueries()) {
-        query->reduceLifeTime();
-    }
-    auto result = this->solver->solve();
-    this->removeDeadQueries();
-    return result;
+    return this->solver->solve();
 }
 
 void alica::reasoner::ASPSolverWrapper::removeDeadQueries()

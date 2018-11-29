@@ -32,7 +32,6 @@ public:
     std::map<Clingo::Symbol, Clingo::SymbolVector>& getHeadValues();
 
     IASPSolver* getSolver();
-    std::vector<std::string> getRules();
     ASPCommonsTerm* getTerm();
 
     std::string getProgramSection();
@@ -52,7 +51,6 @@ protected:
      */
     IASPSolver* solver;
     std::shared_ptr<std::vector<Clingo::SymbolVector>> currentModels;
-    std::vector<std::string> rules;
     // key := headValue , value := values which satisfies it
     std::map<Clingo::Symbol, Clingo::SymbolVector> headValues;
     // lifeTime == 1 => query is used once

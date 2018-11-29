@@ -55,7 +55,6 @@ private:
     ::reasoner::IASPSolver* solver;
     bool masterPlanLoaded;
     std::shared_ptr<ASPAlicaPlanIntegrator> planIntegrator;
-    void integrateRules();
     ::reasoner::ASPCommonsTerm* toCommonsTerm(SolverTerm* term);
 };
 } // namespace reasoner

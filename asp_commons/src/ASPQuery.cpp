@@ -169,11 +169,6 @@ void ASPQuery::setLifeTime(int lifeTime)
     this->lifeTime = lifeTime;
 }
 
-std::vector<std::string> ASPQuery::getRules()
-{
-    return this->rules;
-}
-
 std::map<Clingo::Symbol, Clingo::SymbolVector>& ASPQuery::getHeadValues()
 {
     return this->headValues;

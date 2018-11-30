@@ -61,16 +61,6 @@ bool areParanthesisBalanced(std::string expr)
     return (stack.empty());
 }
 
-std::string expandFactModuleProperty(std::string fact)
-{
-    fact = trim(fact);
-    fact = fact.substr(0, fact.size() - 1);
-    std::stringstream ss;
-    ss << queryProgramSection << "(" << fact << ") :- " << externalName << ".\n";
-    std::cout << "fact: " << ss.str();
-    return ss.str();
-}
-
 int findFirstOpeningBrace(std::string predicate, int start = 0)
 {
     return predicate.find_first_of('(', start);
@@ -112,7 +102,13 @@ std::string replaceAtomsByVariables(std::string fact)
     size_t openingBraceIdx = findFirstOpeningBrace(fact);
     if (openingBraceIdx == std::string::npos) {
         // constant
-        return fact;
+        if (fact.find_last_of('.') == fact.size()-1) {
+            // cut of . from fact, if present
+            return fact.substr(0, fact.size() - 1);
+        } else {
+            // no . at the end of fact is present
+            return fact;
+        }
     }
     std::string factParametersString = fact.substr(openingBraceIdx + 1, findMatchingClosingBrace(fact, openingBraceIdx) - openingBraceIdx - 1);
 
@@ -143,12 +139,32 @@ std::string replaceAtomsByVariables(std::string fact)
     std::stringstream replacedFact;
     replacedFact << fact.substr(0, openingBraceIdx);
     replacedFact << "(";
-    for (int i = 0; i < arity-1; i++ ) {
-        replacedFact << "X" << i+1 << ",";
+    for (int i = 0; i < arity - 1; i++) {
+        replacedFact << "X" << i + 1 << ",";
     }
     replacedFact << "X" << arity << ")";
 
     return replacedFact.str();
+}
+
+std::string createKBCaptueringFactRule(std::string fact)
+{
+    std::stringstream additonalFactRule;
+    std::string variableFact = replaceAtomsByVariables(fact);
+    std::stringstream ss;
+    ss << queryProgramSection << "(" << variableFact << ") :- " << variableFact << ", " << externalName << ".\n";
+    std::cout << "KnowledgeBase capturing fact rule: " << ss.str();
+    return ss.str();
+}
+
+std::string expandFactModuleProperty(std::string fact)
+{
+    fact = trim(fact);
+    fact = fact.substr(0, fact.size() - 1);
+    std::stringstream ss;
+    ss << queryProgramSection << "(" << fact << ") :- " << externalName << ".\n";
+    std::cout << "MP Fact: " << ss.str();
+    return ss.str();
 }
 
 int main()
@@ -184,7 +200,7 @@ int main()
      */
     for (auto fact : facts) {
         queryProgram << expandFactModuleProperty(fact);
-        std::cout << "Replaced Constants by Variables: " << replaceAtomsByVariables(fact) << std::endl;
+        queryProgram << createKBCaptueringFactRule(fact);
     }
 
     std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;

@@ -1,7 +1,12 @@
 #include <bits/stdc++.h>
 
+#include <string>
+#include <vector>
+#include <map>
+
 static std::string queryProgramSection = "query1";
 static std::string externalName = "externalQuery1";
+static std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
 
 std::string trim(const std::string& str)
 {
@@ -16,54 +21,14 @@ std::string trim(const std::string& str)
     return str.substr(strBegin, strRange);
 }
 
-bool areParanthesisBalanced(std::string expr)
-{
-    std::stack<char> stack;
-    char top;
-
-    int begin = 0;
-    for (int i = 0; i < expr.length(); i++) {
-        if (expr[i] == '(' || expr[i] == '[' || expr[i] == '{') {
-            stack.push(expr[i]);
-            continue;
-        }
-        if (stack.empty()) {
-            continue;
-        }
-        switch (expr[i]) {
-        case ')':
-            top = stack.top();
-            stack.pop();
-            if (top == '{' || top == '[') {
-                return false;
-            }
-            break;
-        case '}':
-            top = stack.top();
-            stack.pop();
-            if (top == '(' || top == '[') {
-                return false;
-            }
-            break;
-        case ']':
-            top = stack.top();
-            stack.pop();
-            if (top == '(' || top == '{') {
-                return false;
-            }
-            break;
-        }
-        if (stack.empty()) {
-            std::cout << expr.substr(begin, i + 1) << std::endl;
-            begin = i + 1;
-        }
-    }
-    return (stack.empty());
-}
-
-int findFirstOpeningBrace(std::string predicate, int start = 0)
+size_t findFirstOpeningBrace(std::string predicate, int start = 0)
 {
     return predicate.find_first_of('(', start);
+}
+
+size_t findImplication (std::string rule)
+{
+    return std::max(rule.find_first_of(":-"), rule.find_first_of(":~"));
 }
 
 size_t findMatchingClosingBrace(std::string predicate, int openingBraceIdx)
@@ -138,16 +103,24 @@ std::string replaceAtomsByVariables(std::string fact)
     // build replaced fact
     std::stringstream replacedFact;
     replacedFact << fact.substr(0, openingBraceIdx);
+    std::string predicateName = replacedFact.str();
     replacedFact << "(";
     for (int i = 0; i < arity - 1; i++) {
         replacedFact << "X" << i + 1 << ",";
     }
     replacedFact << "X" << arity << ")";
 
+    // remember predicates to encapsulate later
+    if (predicatesToAritiesMap.find(predicateName) != predicatesToAritiesMap.end()) {
+        predicatesToAritiesMap.emplace(predicateName, std::unordered_set<int>({arity}));
+    } else {
+        predicatesToAritiesMap[predicateName].insert(arity);
+    }
+
     return replacedFact.str();
 }
 
-std::string createKBCaptueringFactRule(std::string fact)
+std::string createKBCapturingFactRule(std::string fact)
 {
     std::stringstream additonalFactRule;
     std::string variableFact = replaceAtomsByVariables(fact);
@@ -167,17 +140,35 @@ std::string expandFactModuleProperty(std::string fact)
     return ss.str();
 }
 
+void extractHeadPredicates (std::string rule) {
+    size_t implicationIdx = findImplication(rule);
+    if (implicationIdx == 0) {
+        return;
+    }
+
+    size_t openingBraceIdx = findFirstOpeningBrace(rule);
+//    size_t colonIdx = findFirstColon(rule);
+//    size_t semicolonIdx = findFirstSemicolon(rule);
+
+
+
+
+
+
+
+
+    size_t matchingBraceIdx = findMatchingClosingBrace(rule, openingBraceIdx);
+}
+
 int main()
 {
-    std::stringstream queryProgram;
-    queryProgram << "#program " << queryProgramSection << ".\n";
-    queryProgram << "#external " << externalName << ".\n";
-
+    // query rule
     std::string queryRule = "factA(X):-factB(X).";
 
+    // additional rules
     std::vector<std::string> rules;
 
-    // test facts.
+    // facts
     std::vector<std::string> facts;
     facts.push_back("factA.");
     facts.push_back("factA(1).");
@@ -189,26 +180,21 @@ int main()
     facts.push_back("factAB(wtf, you, dick, head).");
     facts.push_back("factAB(factB(wtf, you, factZ(1), head)).");
 
-    /**
-     * factAB(3).
-     * factAB(factB(4, your, d, head)).
-     * factAB(factB(wtf, you, factZ(2), head)).
-     *
-     * factAB(X). // X = factB(....)
-     * factAB(factB(X, Y, Z, E)).
-     *
-     */
-    for (auto fact : facts) {
+    std::stringstream queryProgram;
+    queryProgram << "#program " << queryProgramSection << ".\n";
+    queryProgram << "#external " << externalName << ".\n";
+
+    for (auto& fact : facts) {
         queryProgram << expandFactModuleProperty(fact);
-        queryProgram << createKBCaptueringFactRule(fact);
+        queryProgram << createKBCapturingFactRule(fact);
+    }
+
+    extractHeadPredicates(queryRule);
+    for (auto& rule : rules) {
+        extractHeadPredicates(rule);
     }
 
     std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
 
-    if (areParanthesisBalanced(queryRule)) {
-        std::cout << "Balanced";
-    } else {
-        std::cout << "Not Balanced";
-    }
     return 0;
 }

@@ -21,32 +21,44 @@ std::string trim(const std::string& str)
     return str.substr(strBegin, strRange);
 }
 
-size_t findNextChar(std::string predicate, char c, int length, int start = 0)
+size_t findNextChar(std::string predicate, std::string chars, int length, int start = 0)
 {
-    size_t idx = predicate.find_first_of(c, start);
-    return length <= idx ? std::string::npos : idx;
+    size_t idx = predicate.find_first_of(chars, start);
+    return length <= (idx - start) + 1 ? std::string::npos : idx;
 }
 
 size_t findNextCharNotOf(std::string predicate, std::string chars, int length, int start = 0)
 {
     size_t idx = predicate.find_first_not_of(chars, start);
-    return length <= idx ? std::string::npos : idx;
+    return length <= (idx - start) + 1 ? std::string::npos : idx;
 }
 
+/**
+ * Finds the implication of a given rule. Also handles #minimize and #maximize, as they are converted to
+ * a weak constraint like ":~ not goalReachable(id) : goal(id,_,_). [1@2]"
+ * @param rule
+ * @return Idx of the implication ":-"
+ */
 size_t findImplication(std::string rule)
 {
-    return std::max(rule.find_first_of(":-"), rule.find_first_of(":~"));
+    size_t idxs[] = {rule.find(":-"), rule.find(":~"), rule.find("#minimize"), rule.find("#maximize")};
+    return *std::min_element(idxs, idxs+4);
 }
 
 void rememberPredicate(std::string predicateName, int arity)
 {
-    if (predicatesToAritiesMap.find(predicateName) == predicatesToAritiesMap.end()) {
-        predicatesToAritiesMap.emplace(predicateName, std::unordered_set<int>({arity}));
-    } else {
-        predicatesToAritiesMap[predicateName].insert(arity);
+    // cut off starting choice stuff and whitespaces...
+    size_t start = predicateName.find_first_not_of(" ,:;{[");
+    std::string trimmedPredicateName = predicateName;
+    if (start != std::string::npos) {
+        trimmedPredicateName = predicateName.substr(start);
     }
 
-    std::cout << "Remember: " << predicateName << " arity " << arity << std::endl;
+    if (predicatesToAritiesMap.find(trimmedPredicateName) == predicatesToAritiesMap.end()) {
+        predicatesToAritiesMap.emplace(trimmedPredicateName, std::unordered_set<int>({arity}));
+    } else {
+        predicatesToAritiesMap[trimmedPredicateName].insert(arity);
+    }
 }
 
 size_t findMatchingClosingBrace(std::string predicate, int openingBraceIdx)
@@ -113,7 +125,7 @@ int determineArity(std::string predicate, size_t posOpeningBrace, size_t& outClo
 
 std::string replaceAtomsByVariables(std::string fact)
 {
-    size_t openingBraceIdx = findNextChar(fact, '(', fact.size());
+    size_t openingBraceIdx = findNextChar(fact, "(", fact.size());
     if (openingBraceIdx == std::string::npos) {
         // constant
         if (fact.find_last_of('.') == fact.size() - 1) {
@@ -207,15 +219,17 @@ void extractHeadPredicates(std::string rule)
     std::pair<Separator, size_t> commaPair;
     std::pair<Separator, size_t> result;
     size_t openingBraceIdx = std::string::npos;
-    size_t closingBraceIdx = std::string::npos;
+    size_t skipToIdx = std::string::npos;
     size_t currentIdx = 0;
 
-    while (currentIdx != std::string::npos) {
-        colonPair = std::pair<Separator, size_t>(Separator::Colon, findNextChar(rule, ':', implicationIdx, currentIdx));
-        semicolonPair = std::pair<Separator, size_t>(Separator::Semicolon, findNextChar(rule, ';', implicationIdx, currentIdx));
-        commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ',', implicationIdx, currentIdx));
+    bool done = false;
+
+    while (!done) {
+        colonPair = std::pair<Separator, size_t>(Separator::Colon, findNextChar(rule, ":", implicationIdx, currentIdx));
+        semicolonPair = std::pair<Separator, size_t>(Separator::Semicolon, findNextChar(rule, ";", implicationIdx, currentIdx));
+        commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ",", implicationIdx, currentIdx));
         result = determineFirst(determineFirst(colonPair, semicolonPair), commaPair);
-        openingBraceIdx = findNextChar(rule, '(', result.second, currentIdx);
+        openingBraceIdx = findNextChar(rule, "(", result.second, currentIdx);
 
         // handle next predicate
         switch (result.first) {
@@ -224,13 +238,24 @@ void extractHeadPredicates(std::string rule)
                 // constant
                 rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
             } else {
-                int arity = determineArity(rule, openingBraceIdx, closingBraceIdx);
+                // writes into skipToIdx as out-parameter
+                int arity = determineArity(rule, openingBraceIdx, skipToIdx);
                 rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), arity);
             }
             break;
         case Semicolon:
             break;
         case Colon:
+            // skip behind conditional: ';' or '}' will end conditional
+            skipToIdx = findNextChar(rule, "}", implicationIdx - (result.second + 1), result.second + 1);
+            if (skipToIdx == std::string::npos) {
+                skipToIdx = findNextChar(rule, ";", implicationIdx - (result.second + 1), result.second + 1);
+            } else {
+                skipToIdx = findNextChar(rule, ",;", implicationIdx - (skipToIdx + 1), skipToIdx + 1);
+                if (skipToIdx == std::string::npos) {
+                    done = true;
+                }
+            }
             break;
         case None:
             if (openingBraceIdx == std::string::npos) {
@@ -247,17 +272,19 @@ void extractHeadPredicates(std::string rule)
         }
 
         // update currentIdx
-        if (closingBraceIdx != std::string::npos) {
-            currentIdx = findNextCharNotOf(rule, " ,;:", implicationIdx - closingBraceIdx, closingBraceIdx);
+        if (skipToIdx != std::string::npos) {
+            // skipping conditional part of conditionals
+            currentIdx = findNextCharNotOf(rule, " ,;", implicationIdx - (skipToIdx + 1), skipToIdx + 1);
             if (currentIdx == std::string::npos) {
-                break;
+                done = true;
             }
+        } else {
+            currentIdx = result.second + 1;
         }
-        currentIdx = result.second;
 
         // reset brace idx
         openingBraceIdx = std::string::npos;
-        closingBraceIdx = std::string::npos;
+        skipToIdx = std::string::npos;
     }
 }
 
@@ -268,6 +295,12 @@ int main()
 
     // additional rules
     std::vector<std::string> rules;
+    rules.push_back("timestep(0..X,id) :- maxTimestep(id,X).");
+    rules.push_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
+    rules.push_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
+    rules.push_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
+    rules.push_back("#minimize {T@1,id : maxTimestep(id,T)}.");
+    rules.push_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
 
     // facts
     std::vector<std::string> facts;
@@ -295,7 +328,15 @@ int main()
         extractHeadPredicates(rule);
     }
 
-    std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
+    std::cout << "INPUT PROGRAM: " << std::endl;
+    std::cout << queryRule << std::endl;
+    for (auto& rule : rules) {
+        std::cout << rule << std::endl;
+    }
+    for (auto& fact : facts) {
+        std::cout << fact << std::endl;
+    }
+    std::cout << std::endl;
 
     std::cout << "HEAD VALUES: " << std::endl;
     for (auto& predicateArityPair : predicatesToAritiesMap) {
@@ -305,6 +346,9 @@ int main()
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
+
+    std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
 
     return 0;
 }

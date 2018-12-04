@@ -244,6 +244,7 @@ void extractHeadPredicates(std::string rule)
             }
             break;
         case Semicolon:
+            std::cerr << "MP: Semicolon in head not implemented, yet! If you read this, please create ticket on github with an example rule. THX" << std::endl;
             break;
         case Colon:
             // skip behind conditional: ';' or '}' will end conditional

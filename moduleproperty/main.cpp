@@ -103,24 +103,41 @@ size_t findMatchingClosingBrace(std::string predicate, int openingBraceIdx)
     return currentIdx;
 }
 
-// size_t rfind_first_of(std::string rule, size_t start, const char* chars, int charCount)
-//{
-//    size_t idx = 0;
-//    for (int i = 0; i < charCount; i++) {
-//        size_t foundIdx = rule.rfind(chars[i], start);
-//        if (foundIdx != std::string::npos && foundIdx > idx) {
-//            idx = foundIdx + 1;
-//        }
-//    }
-//    return idx;
-//}
+Predicate extractConstant(std::string rule, size_t constantEndIdxPlusOne)
+{
+    Predicate predicate;
+    size_t leftDelimiterIdx = rule.find_last_of(" ,;:", constantEndIdxPlusOne - 1);
+    size_t predicateStartIdx = 0;
+    if (leftDelimiterIdx != std::string::npos) {
+        if (rule[leftDelimiterIdx + 1] == '-') {
+            leftDelimiterIdx = leftDelimiterIdx + 2;
+        }
+        predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
+    }
+
+    predicate.name = rule.substr(predicateStartIdx, constantEndIdxPlusOne - predicateStartIdx);
+    // cut off starting choice stuff and whitespaces...
+    size_t start = predicate.name.find_first_not_of(" ,:;{[");
+    if (start != std::string::npos) {
+        predicate.name = predicate.name.substr(start);
+    }
+
+    predicate.parameterStartIdx = constantEndIdxPlusOne;
+    predicate.parameterEndIdx = constantEndIdxPlusOne;
+    predicate.parameters = "";
+    predicate.arity = 0;
+    return predicate;
+}
 
 Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
 {
     Predicate predicate;
-    size_t leftDelimiterIdx = rule.find_last_of(" ,;:", 0, parameterStartIdx);
+    size_t leftDelimiterIdx = rule.find_last_of(" ,;:", parameterStartIdx);
     size_t predicateStartIdx = 0;
     if (leftDelimiterIdx != std::string::npos) {
+        if (rule[leftDelimiterIdx + 1] == '-') {
+            leftDelimiterIdx = leftDelimiterIdx + 2;
+        }
         predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
     }
 
@@ -131,12 +148,7 @@ Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
         predicate.name = predicate.name.substr(start);
     }
     if (rule[parameterStartIdx] != '(') {
-        // constant
-        predicate.parameterStartIdx = parameterStartIdx;
-        predicate.parameterEndIdx = parameterStartIdx;
-        predicate.parameters = "";
-        predicate.arity = 0;
-        return predicate;
+        std::cerr << "extractPredicate: WTF Constants are everywhere!" << std::endl;
     }
 
     // normal predicate
@@ -354,7 +366,6 @@ std::string expandRuleModuleProperty(std::string rule)
     std::pair<Separator, size_t> commaPair;
     std::pair<Separator, size_t> result;
     size_t openingBraceIdx = std::string::npos;
-    size_t skipToIdx = std::string::npos;
     size_t currentIdx = 0;
     size_t endLastPredicateIdx = 0;
 
@@ -372,7 +383,13 @@ std::string expandRuleModuleProperty(std::string rule)
         Predicate predicate;
         switch (result.first) {
         case Comma:
-            predicate = extractPredicate(rule, openingBraceIdx);
+            if (openingBraceIdx != std::string::npos) {
+                predicate = extractPredicate(rule, openingBraceIdx);
+            } else {
+                predicate.name = "";
+                predicate.parameterStartIdx = result.second + 1;
+                predicate.parameterEndIdx = result.second + 1;
+            }
             break;
         case Semicolon:
 
@@ -380,7 +397,7 @@ std::string expandRuleModuleProperty(std::string rule)
         case Colon:
             if (result.second != currentIdx) {
                 // constant before : or :-
-                predicate = extractPredicate(rule, rule.find_last_not_of(" ", currentIdx, result.second - currentIdx));
+                predicate = extractConstant(rule, rule.find_last_not_of(" ", result.second - 1) + 1);
             } else {
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
@@ -388,41 +405,60 @@ std::string expandRuleModuleProperty(std::string rule)
             }
             break;
         case None:
-            // constant found
-            predicate = extractPredicate(rule, rule.size());
+            if (openingBraceIdx == std::string::npos) {
+                if (currentIdx != std::string::npos && currentIdx > rule.find_last_of(".")) {
+                    predicate.name = "";
+                    predicate.parameterStartIdx = result.second + 1;
+                    predicate.parameterEndIdx = result.second + 1;
+                } else {
+                    // constant found (-1 because of . at the end of rules)
+                    predicate = extractConstant(rule, rule.size() - 1);
+                }
+            } else {
+                // normal predicate found
+                predicate = extractPredicate(rule, openingBraceIdx);
+            }
             done = true;
             break;
         default:
             std::cerr << "MP: Separator Char not known!" << std::endl;
         }
 
-        // add middle stuff like commas, 1=, { etc.
+        // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx
         if (predicate.name != "") {
-            mpRule << rule.substr(endLastPredicateIdx, predicate.parameterStartIdx - predicate.name.length());
-        }
-
-        if (predicate.name != "") {
+            currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx + 1);
+            mpRule << rule.substr(endLastPredicateIdx, (predicate.parameterStartIdx - predicate.name.length()) - endLastPredicateIdx);
+            endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
                 // add mp nested predicate
                 mpRule << queryProgramSection << "(" << predicate.name << "(" << predicate.parameters << "))";
             } else {
-                mpRule << predicate.name << "(" << predicate.parameters << ")";
+                mpRule << predicate.name;
+                if (predicate.arity != 0) {
+                    mpRule << "(" << predicate.parameters << ")";
+                }
+            }
+            if (currentIdx == std::string::npos) {
+                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of(".") - endLastPredicateIdx) << ".";
+            }
+        } else {
+            currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
+            if (currentIdx != std::string::npos) {
+                mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
+                endLastPredicateIdx = currentIdx;
+            } else {
+                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of(".") - endLastPredicateIdx) << ".";
             }
         }
 
-        // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx
-        currentIdx = findNextCharNotOf(rule, " ,;", rule.size(), predicate.parameterEndIdx + 1);
         if (currentIdx == std::string::npos) {
             done = true;
         }
-        if (predicate.name != "") {
-            endLastPredicateIdx = predicate.parameterEndIdx + 1;
-        }
-
         // reset brace idx
+        std::string tmpString = mpRule.str();
         openingBraceIdx = std::string::npos;
     }
-    mpRule << ".\n";
+    mpRule << "\n";
     std::string tmpString = mpRule.str();
     return tmpString;
 }
@@ -430,15 +466,15 @@ std::string expandRuleModuleProperty(std::string rule)
 int main()
 {
     // query rule
-    std::string queryRule = "factA(X, Y):-factB(X).";
+    std::string queryRule = ":~ not goalReachable(id) : goal(id,_,_). [1@2]";
 
     // additional rules
     std::vector<std::string> rules;
     rules.push_back("timestep(0..X,id) :- maxTimestep(id,X).");
-    rules.push_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
+    rules.push_back("factA(X, Y):-factB(X).");
     rules.push_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
-    rules.push_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
     rules.push_back("#minimize {T@1,id : maxTimestep(id,T)}.");
+    rules.push_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
     rules.push_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
 
     // facts

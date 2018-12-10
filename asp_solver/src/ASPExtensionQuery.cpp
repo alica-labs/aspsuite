@@ -50,8 +50,9 @@ void ASPExtensionQuery::createProgramSection()
         queryProgram << expandFactModuleProperty(fact);
         extractHeadPredicates(fact);
     }
-
-    extractHeadPredicates(term->getQueryRule());
+    if (!term->getQueryRule().empty()) {
+        extractHeadPredicates(term->getQueryRule());
+    }
     for (auto& rule : term->getRules()) {
         extractHeadPredicates(rule);
     }

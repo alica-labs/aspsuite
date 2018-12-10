@@ -19,11 +19,16 @@ ASPCommonsTerm::~ASPCommonsTerm() {}
 
 void ASPCommonsTerm::addRule(std::string rule)
 {
-    this->rules.push_back(rule);
+    if(!rule.empty()) {
+        this->rules.push_back(rule);
+    }
 }
 
 void ASPCommonsTerm::addFact(std::string fact)
 {
+    if(fact.empty()) {
+        return;
+    }
     if (fact.find(".") == std::string::npos) {
         this->facts.push_back(fact + ".");
     } else {

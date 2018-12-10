@@ -65,6 +65,9 @@ size_t findImplication(const std::string& rule)
 
 void rememberPredicate(std::string predicateName, int arity)
 {
+    if (predicateName.empty()) {
+        return;
+    }
     predicateName = trim(predicateName);
     size_t dotIndex = predicateName.find_last_of('.');
     if (dotIndex == predicateName.size() - 1) {
@@ -288,6 +291,15 @@ void extractHeadPredicates(const std::string& rule)
             }
             break;
         case Colon:
+            if (openingBraceIdx == std::string::npos) {
+                // constant
+                rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+            } else {
+                Predicate predicate = extractPredicate(rule, openingBraceIdx);
+                // writes into skipToIdx
+                skipToIdx = predicate.parameterEndIdx;
+                rememberPredicate(predicate.name, predicate.arity);
+            }
             // skip behind conditional: ';' or '}' will end conditional
             skipToIdx = findNextChar(rule, "}", implicationIdx, result.second + 1);
             if (skipToIdx == std::string::npos) {
@@ -304,8 +316,13 @@ void extractHeadPredicates(const std::string& rule)
                 // constant
                 rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
             } else {
-                // unary predicate
-                rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
+                if (openingBraceIdx > implicationIdx) {
+                    // constant
+                    rememberPredicate(rule.substr(currentIdx, implicationIdx - currentIdx), 0);
+                } else {
+                    // unary predicate
+                    rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
+                }
             }
             break;
         default:
@@ -376,8 +393,12 @@ std::string expandRuleModuleProperty(const std::string& rule)
             break;
         case Colon:
             if (result.second != currentIdx) {
-                // constant before : or :-
-                predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
+                if (openingBraceIdx != std::string::npos) {
+                    predicate = extractPredicate(rule, openingBraceIdx);
+                } else {
+                    // constant before : or :-
+                    predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
+                }
             } else {
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
@@ -411,7 +432,12 @@ std::string expandRuleModuleProperty(const std::string& rule)
             endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
                 // add mp nested predicate
-                mpRule << queryProgramSection << "(" << predicate.name << "(" << predicate.parameters << "))";
+                mpRule << queryProgramSection << "(" << predicate.name;
+                if (predicate.arity != 0) {
+                    mpRule << "(" << predicate.parameters << "))";
+                } else {
+                    mpRule << ")";
+                }
             } else {
                 mpRule << predicate.name;
                 if (predicate.arity != 0) {
@@ -426,10 +452,11 @@ std::string expandRuleModuleProperty(const std::string& rule)
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
-                    mpRule << ", " << externalName;
+                    mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                } else {
+                    mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
+                    endLastPredicateIdx = currentIdx;
                 }
-                mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
-                endLastPredicateIdx = currentIdx;
             } else {
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
             }
@@ -448,17 +475,40 @@ std::string expandRuleModuleProperty(const std::string& rule)
 int main()
 {
     // query rule
-    std::string queryRule = "1{occurs(A,T) : action(A)}1 :- timestep(T).";
+    std::string queryRule = ":~ not goalReachable(id) : goal(id,_,_). [1@2]";
 
     // additional rules
     std::vector<std::string> rules;
+
+    rules.emplace_back("{goal(X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
+    rules.emplace_back("goalReachable :- safe(X,Y) : holds(on(X,Y),T).");
+    rules.emplace_back("{occurs(A,T) : action(A)} = 1 :- timestep(T).");
+    rules.emplace_back("occurs(pickup,0) :- on(X,Y), glitter(X,Y).");
+    rules.emplace_back("occurs(leave,0) :- on(X,Y), initial(X,Y), haveGold.");
+    rules.emplace_back("goal(X,Y) :- initial(X,Y), haveGold.");
+    rules.emplace_back("#minimize {2*T@1 : maxTimestep(T)}.");
+    rules.emplace_back("1{occurs(A,T) : action(A)}1 :- timestep(T).");
+    rules.emplace_back("success :- #count{1,X,Y : holds(on(X,Y),T) , goal(X,Y)} = 1.");
+    rules.emplace_back("holds(on(X,Y),0) :- on(X,Y).");
+    rules.emplace_back("holds(heading(X),0) :- heading(X).");
+    rules.emplace_back("timestep(0..X) :- maxTimestep(X).");
+    rules.emplace_back("holds(on(X,Y),T+1) :- occurs(move,T), fieldAhead(X,Y,T), timestep(T). ");
+    rules.emplace_back("fieldAhead(X-1,Y,T) :- field(X,Y), field(X-1,Y), holds(heading(0),T), holds(on(X,Y),T), timestep(T).");
+    rules.emplace_back("fieldAhead(X+1,Y,T) :- field(X,Y), field(X+1,Y), holds(heading(2),T), holds(on(X,Y),T), timestep(T).");
+    rules.emplace_back("fieldAhead(X,Y+1,T) :- field(X,Y), field(X,Y+1), holds(heading(3),T), holds(on(X,Y),T), timestep(T).");
+    rules.emplace_back("fieldAhead(X,Y-1,T) :- field(X,Y), field(X,Y-1), holds(heading(1),T), holds(on(X,Y),T), timestep(T).");
+    rules.emplace_back("holds(heading((X+1)\\4),T+1) :- holds(heading(X),T), occurs(turnLeft,T).");
+    rules.emplace_back("holds(heading((X+3)\\4),T+1) :- holds(heading(X),T), occurs(turnRight,T).");
+    rules.emplace_back("holds(on(X,Y),T+1) :- holds(on(X,Y),T), not occurs(move,T), timestep(T+1).");
+    rules.emplace_back("holds(heading(X),T+1) :- holds(heading(X),T), not occurs(turnLeft,T), not occurs(turnRight,T), timestep(T+1).");
+    rules.emplace_back(":- not success.");
+
     rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
     rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
     rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
-
     rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
     rules.emplace_back("factA(X, Y):-factB(X).");
-    rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
+    rules.emplace_back("{maxTimestep(0..(N*N)) : fieldSize(N)} = 1.");
     rules.emplace_back("#minimize {T@1,id : maxTimestep(id,T)}.");
     rules.emplace_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
     rules.emplace_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
@@ -468,9 +518,9 @@ int main()
     std::vector<std::string> facts;
     facts.emplace_back("factA.");
     facts.emplace_back("factA(1).");
-    facts.emplace_back("factB(1)");
+    facts.emplace_back("factB(1).");
     facts.emplace_back("factC(2).");
-    facts.emplace_back("factZ(1)");
+    facts.emplace_back("factZ(1).");
     facts.emplace_back("factZ(1251).");
     facts.emplace_back("factZ(asc, 1251).");
     facts.emplace_back("factAB(wtf, you, dick, head).");
@@ -480,12 +530,12 @@ int main()
     queryProgram << "#program " << queryProgramSection << ".\n";
     queryProgram << "#external " << externalName << ".\n";
 
+    extractHeadPredicates(queryRule);
     for (auto& fact : facts) {
         queryProgram << expandFactModuleProperty(fact);
         extractHeadPredicates(fact);
     }
 
-    extractHeadPredicates(queryRule);
     for (auto& rule : rules) {
         extractHeadPredicates(rule);
     }

@@ -144,6 +144,8 @@ Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
             leftDelimiterIdx = leftDelimiterIdx + 2;
         }
         predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
+    } else {
+        predicateStartIdx = rule.find_first_not_of(" ,;:{=0123456789");
     }
 
     predicate.name = rule.substr(predicateStartIdx, parameterStartIdx - predicateStartIdx);
@@ -446,10 +448,14 @@ std::string expandRuleModuleProperty(const std::string& rule)
 int main()
 {
     // query rule
-    std::string queryRule = "{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.";
+    std::string queryRule = "1{occurs(A,T) : action(A)}1 :- timestep(T).";
 
     // additional rules
     std::vector<std::string> rules;
+    rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
+    rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
+    rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
+
     rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
     rules.emplace_back("factA(X, Y):-factB(X).");
     rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");

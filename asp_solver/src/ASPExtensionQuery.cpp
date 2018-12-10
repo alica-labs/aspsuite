@@ -258,6 +258,8 @@ ASPExtensionQuery::Predicate ASPExtensionQuery::extractPredicate(std::string rul
             leftDelimiterIdx = leftDelimiterIdx + 2;
         }
         predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
+    } else {
+        predicateStartIdx = rule.find_first_not_of(" ,;:{=0123456789");
     }
 
     predicate.name = rule.substr(predicateStartIdx, parameterStartIdx - predicateStartIdx);

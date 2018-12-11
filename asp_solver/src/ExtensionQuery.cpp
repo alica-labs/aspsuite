@@ -519,8 +519,8 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                     predicate.parameterStartIdx = result.second + 1;
                     predicate.parameterEndIdx = currentIdx;
                 } else {
-                    // constant found (-1 because of . at the end of rules)
-                    predicate = extractConstant(rule, rule.size() - 1);
+                    // constant found
+                    predicate = extractConstant(rule, rule.find_last_of('.'));
                 }
             } else {
                 // normal predicate found
@@ -554,6 +554,10 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             if (currentIdx == std::string::npos) {
                 mpRule << ", " << externalName;
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+            }
+            size_t bracketIdx = rule.find_last_of('[');
+            if (done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
+                mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);

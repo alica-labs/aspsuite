@@ -412,8 +412,8 @@ std::string expandRuleModuleProperty(const std::string& rule)
                     predicate.parameterStartIdx = result.second + 1;
                     predicate.parameterEndIdx = currentIdx;
                 } else {
-                    // constant found (-1 because of . at the end of rules)
-                    predicate = extractConstant(rule, rule.size() - 1);
+                    // constant found
+                    predicate = extractConstant(rule, rule.find_last_of('.'));
                 }
             } else {
                 // normal predicate found
@@ -448,6 +448,10 @@ std::string expandRuleModuleProperty(const std::string& rule)
                 mpRule << ", " << externalName;
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
             }
+            size_t bracketIdx = rule.find_last_of('[');
+            if(done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
+                mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+            }
         } else {
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
@@ -475,7 +479,7 @@ std::string expandRuleModuleProperty(const std::string& rule)
 int main()
 {
     // query rule
-    std::string queryRule = ":~ not goalReachable(id) : goal(id,_,_). [1@2]";
+    std::string queryRule = ":~ not goalReachable. [1@2]";
 
     // additional rules
     std::vector<std::string> rules;
@@ -513,6 +517,7 @@ int main()
     rules.emplace_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
     rules.emplace_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
     rules.emplace_back("factD(X); factE(Y,Z) :- factA(X), factZ(Y,Z).");
+    rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
 
     // facts
     std::vector<std::string> facts;

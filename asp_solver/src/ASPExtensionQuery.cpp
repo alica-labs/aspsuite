@@ -179,6 +179,9 @@ size_t ASPExtensionQuery::findImplication(const std::string& rule)
 
 void ASPExtensionQuery::rememberPredicate(std::string predicateName, int arity)
 {
+    if (predicateName.empty()) {
+        return;
+    }
     predicateName = trim(predicateName);
     size_t dotIndex = predicateName.find_last_of('.');
     if (dotIndex == predicateName.size() - 1) {
@@ -395,6 +398,15 @@ void ASPExtensionQuery::extractHeadPredicates(const std::string& rule)
             }
             break;
         case Colon:
+            if (openingBraceIdx == std::string::npos) {
+                // constant
+                rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+            } else {
+                Predicate predicate = extractPredicate(rule, openingBraceIdx);
+                // writes into skipToIdx
+                skipToIdx = predicate.parameterEndIdx;
+                rememberPredicate(predicate.name, predicate.arity);
+            }
             // skip behind conditional: ';' or '}' will end conditional
             skipToIdx = findNextChar(rule, "}", implicationIdx, result.second + 1);
             if (skipToIdx == std::string::npos) {
@@ -411,8 +423,13 @@ void ASPExtensionQuery::extractHeadPredicates(const std::string& rule)
                 // constant
                 rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
             } else {
-                // unary predicate
-                rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
+                if (openingBraceIdx > implicationIdx) {
+                    // constant
+                    rememberPredicate(rule.substr(currentIdx, implicationIdx - currentIdx), 0);
+                } else {
+                    // unary predicate
+                    rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
+                }
             }
             break;
         default:
@@ -483,8 +500,12 @@ std::string ASPExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             break;
         case Colon:
             if (result.second != currentIdx) {
-                // constant before : or :-
-                predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
+                if (openingBraceIdx != std::string::npos) {
+                    predicate = extractPredicate(rule, openingBraceIdx);
+                } else {
+                    // constant before : or :-
+                    predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
+                }
             } else {
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
@@ -518,7 +539,12 @@ std::string ASPExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
                 // add mp nested predicate
-                mpRule << queryProgramSection << "(" << predicate.name << "(" << predicate.parameters << "))";
+                mpRule << queryProgramSection << "(" << predicate.name;
+                if (predicate.arity != 0) {
+                    mpRule << "(" << predicate.parameters << "))";
+                } else {
+                    mpRule << ")";
+                }
             } else {
                 mpRule << predicate.name;
                 if (predicate.arity != 0) {
@@ -533,10 +559,11 @@ std::string ASPExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
-                    mpRule << ", " << externalName;
+                    mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                } else {
+                    mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
+                    endLastPredicateIdx = currentIdx;
                 }
-                mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
-                endLastPredicateIdx = currentIdx;
             } else {
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
             }

@@ -3,7 +3,7 @@
 #include "handler/CommandHistoryHandler.h"
 #include "gui/KnowledgebaseCreator.h"
 
-#include <asp_solver/ASPSolver.h>
+#include <reasoner/asp/Solver.h>
 
 #include <ui_knowledgebasecreator.h>
 

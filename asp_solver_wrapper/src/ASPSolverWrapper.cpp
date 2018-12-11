@@ -6,11 +6,11 @@
 #include <engine/PlanBase.h>
 #include <engine/constraintmodul/ProblemDescriptor.h>
 
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPCommonsVariable.h>
-#include <asp_commons/ASPQuery.h>
-#include <asp_commons/AnnotatedValVec.h>
-#include <asp_commons/IASPSolver.h>
+#include <reasoner/asp/Term.h>
+#include <reasoner/asp/Variable.h>
+#include <reasoner/asp/Query.h>
+#include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/Solver.h>
 #include <asp_solver_wrapper/ASPAlicaPlanIntegrator.h>
 #include <asp_solver_wrapper/ASPGenerator.h>
 #include <asp_solver_wrapper/ASPSolverContext.h>
@@ -20,7 +20,7 @@ namespace alica
 namespace reasoner
 {
 ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args)
-        : alica::ISolver<ASPSolverWrapper, ::reasoner::AnnotatedValVec*>(ae)
+        : alica::ISolver<ASPSolverWrapper, ::reasoner::asp::AnnotatedValVec*>(ae)
 {
     this->ae = ae;
     this->solver = nullptr;
@@ -49,11 +49,11 @@ bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, const std::vector<
         masterPlanLoaded = true;
     }
 
-    auto cVars = std::vector<::reasoner::ASPCommonsVariable*>(solverCtx->getVariables().size());
+    auto cVars = std::vector<::reasoner::asp::Variable*>(solverCtx->getVariables().size());
     for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i) {
-        cVars.at(i) = (::reasoner::ASPCommonsVariable*) solverCtx->getVariables().at(i).get();
+        cVars.at(i) = (::reasoner::asp::Variable*) solverCtx->getVariables().at(i).get();
     }
-    std::vector<::reasoner::ASPCommonsTerm*> constraint;
+    std::vector<::reasoner::asp::Term*> constraint;
     for (auto& c : calls) {
         constraint.push_back(toCommonsTerm(c->getConstraint()));
     }
@@ -62,7 +62,7 @@ bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, const std::vector<
 }
 
 bool ASPSolverWrapper::getSolutionImpl(
-        SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<::reasoner::AnnotatedValVec*>& results)
+        SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<::reasoner::asp::AnnotatedValVec*>& results)
 {
     ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
@@ -71,12 +71,12 @@ bool ASPSolverWrapper::getSolutionImpl(
         masterPlanLoaded = true;
     }
 
-    auto cVars = std::vector<::reasoner::ASPCommonsVariable*>(solverCtx->getVariables().size());
+    auto cVars = std::vector<::reasoner::asp::Variable*>(solverCtx->getVariables().size());
     for (unsigned int i = 0; i < solverCtx->getVariables().size(); ++i) {
-        cVars.at(i) = (::reasoner::ASPCommonsVariable*) solverCtx->getVariables().at(i).get();
+        cVars.at(i) = (::reasoner::asp::Variable*) solverCtx->getVariables().at(i).get();
     }
 
-    std::vector<::reasoner::ASPCommonsTerm*> constraint;
+    std::vector<::reasoner::asp::Term*> constraint;
     for (auto& c : calls) {
         constraint.push_back(toCommonsTerm(c->getConstraint()));
     }
@@ -99,11 +99,11 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
  * @param term
  * @return
  */
-::reasoner::ASPCommonsTerm* ASPSolverWrapper::toCommonsTerm(SolverTerm* term)
+::reasoner::asp::Term* ASPSolverWrapper::toCommonsTerm(SolverTerm* term)
 {
-    auto tmp = (::reasoner::ASPCommonsTerm*) term;
+    auto tmp = (::reasoner::asp::Term*) term;
 
-    ::reasoner::ASPCommonsTerm* ret = new ::reasoner::ASPCommonsTerm();
+    ::reasoner::asp::Term* ret = new ::reasoner::asp::Term();
     ret->setLifeTime(tmp->getLifeTime());
     ret->setQueryRule(tmp->getQueryRule());
     for (auto it : tmp->getRules()) {
@@ -121,12 +121,12 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
     return ret;
 }
 
-::reasoner::IASPSolver* ASPSolverWrapper::getSolver()
+::reasoner::asp::Solver* ASPSolverWrapper::getSolver()
 {
     return solver;
 }
 
-void ASPSolverWrapper::init(::reasoner::IASPSolver* solver)
+void ASPSolverWrapper::init(::reasoner::asp::Solver* solver)
 {
     this->solver = solver;
     this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
@@ -150,12 +150,12 @@ void alica::reasoner::ASPSolverWrapper::removeDeadQueries()
     this->solver->removeDeadQueries();
 }
 
-bool alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner::ASPQuery> query)
+bool alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner::asp::Query> query)
 {
     return this->solver->registerQuery(query);
 }
 
-bool alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::ASPQuery> query)
+bool alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query)
 {
     return this->solver->unregisterQuery(query);
 }
@@ -165,7 +165,7 @@ void alica::reasoner::ASPSolverWrapper::printStats()
     this->solver->printStats();
 }
 
-    std::vector<std::shared_ptr<::reasoner::ASPQuery>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries()
+    std::vector<std::shared_ptr<::reasoner::asp::Query>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries()
 {
     return this->solver->getRegisteredQueries();
 }

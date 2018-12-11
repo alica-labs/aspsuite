@@ -1,6 +1,8 @@
-#include "asp_solver/AnnotatedExternal.h"
+#include "reasoner/asp/AnnotatedExternal.h"
 
 namespace reasoner
+{
+namespace asp
 {
 
 AnnotatedExternal::AnnotatedExternal(std::string aspPredicate, std::shared_ptr<Clingo::Symbol> gringoValue, bool value)
@@ -41,5 +43,5 @@ void AnnotatedExternal::setValue(bool value)
 {
     this->value = value;
 }
-
+} /* namespace asp */
 } /* namespace reasoner */

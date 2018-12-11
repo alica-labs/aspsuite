@@ -1,6 +1,7 @@
 #pragma once
 
-#include "asp_commons/ASPQueryType.h"
+#include "Enums.h"
+
 #include <clingo.hh>
 
 #include <map>
@@ -12,14 +13,16 @@
 namespace reasoner
 {
 
-class ASPCommonsTerm;
+namespace asp
+{
+class Term;
 class AnnotatedValVec;
-class IASPSolver;
-class ASPQuery
+class Solver;
+class Query
 {
 public:
-    ASPQuery(IASPSolver* solver, ASPCommonsTerm* term);
-    virtual ~ASPQuery();
+    Query(Solver* solver, Term* term);
+    virtual ~Query();
 
     std::shared_ptr<std::vector<Clingo::SymbolVector>> getCurrentModels();
 
@@ -31,15 +34,15 @@ public:
 
     std::map<Clingo::Symbol, Clingo::SymbolVector>& getHeadValues();
 
-    IASPSolver* getSolver();
-    ASPCommonsTerm* getTerm();
+    Solver* getSolver();
+    Term* getTerm();
 
     std::string getProgramSection();
     void setProgramSection(std::string programSection);
     virtual void removeExternal() = 0;
 
     std::string toString();
-    ASPQueryType getType();
+    QueryType getType();
     void saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value);
     bool checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2);
 
@@ -49,7 +52,7 @@ protected:
      * predicates are separated by "," meaning all of them will be in the same rule and ";"
      * meaning that there is a rule for every predicate
      */
-    IASPSolver* solver;
+    Solver* solver;
     std::shared_ptr<std::vector<Clingo::SymbolVector>> currentModels;
     // key := headValue , value := values which satisfies it
     std::map<Clingo::Symbol, Clingo::SymbolVector> headValues;
@@ -58,9 +61,9 @@ protected:
     // LifeTime == -1 => query is used until unregistered
     int lifeTime;
     std::string programSection;
-    ASPCommonsTerm* term;
-    ASPQueryType type;
+    Term* term;
+    QueryType type;
     std::string backgroundKnowledgeFilename;
 };
-
+} /* namespace asp */
 } /* namespace reasoner */

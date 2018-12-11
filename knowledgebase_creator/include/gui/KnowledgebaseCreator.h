@@ -14,7 +14,9 @@
 
 namespace reasoner
 {
-class ASPSolver;
+    namespace asp {
+        class Solver;
+    }
 }
 
 namespace Ui
@@ -113,11 +115,11 @@ public:
     /**
      * Get Solver pointer
      */
-    reasoner::ASPSolver* getSolver();
+    reasoner::asp::Solver* getSolver();
     /**
      * Set solver Pointer
      */
-    void setSolver(reasoner::ASPSolver* solver);
+    void setSolver(reasoner::asp::Solver* solver);
     /**
      * Get list of basic cn5 relations
      */
@@ -210,7 +212,7 @@ private:
     /**
      * Solver pointer
      */
-    reasoner::ASPSolver* solver;
+    reasoner::asp::Solver* solver;
     /**
      * Current Settings
      */

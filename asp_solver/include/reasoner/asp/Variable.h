@@ -1,22 +1,25 @@
 #pragma once
 
-#include "asp_commons/ASPCommonsTerm.h"
+#include "reasoner/asp/Term.h"
 
 #include <memory>
 #include <string>
 
 namespace reasoner
 {
+    namespace asp
+    {
 
-class ASPCommonsVariable : public reasoner::ASPCommonsTerm
+class Variable : public Term
 {
 public:
-    ASPCommonsVariable();
-    virtual ~ASPCommonsVariable();
+    Variable();
+    virtual ~Variable();
 
 private:
     int ownId;
     static int var_id;
 };
 
+    } /* namespace asp */
 } /* namespace reasoner */

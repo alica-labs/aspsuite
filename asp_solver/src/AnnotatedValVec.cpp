@@ -1,11 +1,12 @@
-#include "asp_commons/AnnotatedValVec.h"
-#include "asp_commons/ASPQuery.h"
+#include "reasoner/asp/AnnotatedValVec.h"
+#include "reasoner/asp/Query.h"
 #include <Configuration.h>
 
 namespace reasoner
 {
+    namespace asp{
 
-AnnotatedValVec::AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<ASPQuery> query)
+AnnotatedValVec::AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<Query> query)
 {
     this->id = id;
     this->values = values;
@@ -32,5 +33,5 @@ void AnnotatedValVec::extractResponse()
         }
     }
 }
-
+    } /* namespace asp */
 } /* namespace reasoner */

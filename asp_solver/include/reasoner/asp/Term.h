@@ -1,6 +1,7 @@
 #pragma once
 
-#include "asp_commons/ASPQueryType.h"
+#include "reasoner/asp/Enums.h"
+
 #include <map>
 #include <memory>
 #include <string>
@@ -8,35 +9,62 @@
 
 namespace reasoner
 {
+namespace asp
+{
 
-class ASPCommonsTerm : public std::enable_shared_from_this<ASPCommonsTerm>
+class Term : public std::enable_shared_from_this<Term>
 {
 public:
-    ASPCommonsTerm(int lifeTime = 1);
-    virtual ~ASPCommonsTerm();
+    Term(int lifeTime = 1);
+
+    virtual ~Term();
+
     void addRule(std::string rule);
+
     std::vector<std::string> getRuleHeads();
+
     std::vector<std::string> getRuleBodies();
+
     std::string getProgramSection();
+
     void setProgramSection(std::string programSection);
+
     std::vector<std::string> getProgramSectionParameters();
+
     void addProgramSectionParameter(std::string param);
+
     int getLifeTime();
+
     void setLifeTime(int lifeTime);
+
     std::vector<std::string> getRules();
+
     void addFact(std::string fact);
+
     std::vector<std::string> getFacts();
+
     void setExternals(std::shared_ptr<std::map<std::string, bool>> externals);
+
     std::shared_ptr<std::map<std::string, bool>> getExternals();
+
     std::string getNumberOfModels();
+
     void setNumberOfModels(std::string numberOfModels);
-    ASPQueryType getType();
-    void setType(ASPQueryType type);
+
+    QueryType getType();
+
+    void setType(QueryType type);
+
     long getId();
+
     void setId(long id);
+
     int getQueryId();
+
     void setQueryId(int queryId);
+
     std::string getQueryRule();
+
     void setQueryRule(std::string queryRule);
 
 private:
@@ -57,7 +85,8 @@ private:
     std::vector<std::string> facts;
     std::vector<std::string> programSectionParameters;
     std::shared_ptr<std::map<std::string, bool>> externals;
-    ASPQueryType type;
+    QueryType type;
 };
 
+} /* namespace asp */
 } /* namespace reasoner */

@@ -10,8 +10,7 @@
 
 #include <iostream>
 
-#include <asp_commons/IASPSolver.h>
-#include <asp_solver/ASPSolver.h>
+#include <reasoner/asp/Solver.h>
 
 namespace kbcr
 {
@@ -35,7 +34,7 @@ void NewSolverCommand::execute()
     this->gui->chHandler->addToCommandHistory(shared_from_this());
     this->gui->setSettings(this->settings);
     // vorher this->settings->args statt {}
-    this->gui->setSolver(new reasoner::ASPSolver({}));
+    this->gui->setSolver(new reasoner::asp::Solver({}));
     this->gui->enableGui(true);
 }
 

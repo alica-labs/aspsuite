@@ -5,20 +5,23 @@
 
 namespace reasoner
 {
-class ASPQuery;
+namespace asp
+{
+class Query;
 class AnnotatedValVec
 {
 public:
-    AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<ASPQuery> query);
+    AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<Query> query);
     virtual ~AnnotatedValVec();
     long id;
     std::vector<std::vector<std::string>> variableQueryValues;
     std::vector<std::vector<std::string>> factQueryValues;
-    std::shared_ptr<ASPQuery> query;
+    std::shared_ptr<Query> query;
 
 private:
     std::vector<Clingo::SymbolVector> values;
     void extractResponse();
 };
 
+} /* namespace asp */
 } /* namespace reasoner */

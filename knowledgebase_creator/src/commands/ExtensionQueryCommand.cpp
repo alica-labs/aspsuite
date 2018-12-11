@@ -8,12 +8,12 @@
 
 #include <ui_knowledgebasecreator.h>
 
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPCommonsVariable.h>
-#include <asp_commons/ASPQuery.h>
-#include <asp_commons/AnnotatedValVec.h>
+#include <reasoner/asp/Term.h>
+#include <reasoner/asp/Variable.h>
+#include <reasoner/asp/Query.h>
+#include <reasoner/asp/AnnotatedValVec.h>
 
-#include <asp_solver/ASPSolver.h>
+#include <reasoner/asp/Solver.h>
 
 #include <SystemConfig.h>
 
@@ -43,8 +43,8 @@ void ExtensionQueryCommand::execute()
     }
     lines.push_back(prgm);
     // Define asp term
-    auto term = new reasoner::ASPCommonsTerm();
-    term->setType(reasoner::ASPQueryType::Extension);
+    auto term = new reasoner::asp::Term();
+    term->setType(reasoner::asp::QueryType::Extension);
     int queryId = this->gui->getSolver()->getQueryCounter();
     term->setId(queryId);
     term->setQueryId(queryId);
@@ -85,11 +85,11 @@ void ExtensionQueryCommand::execute()
         }
     }
     // Prepare getSolution
-    std::vector<reasoner::ASPCommonsVariable*> vars;
-    vars.push_back(new reasoner::ASPCommonsVariable());
-    std::vector<reasoner::ASPCommonsTerm*> terms;
+    std::vector<reasoner::asp::Variable*> vars;
+    vars.push_back(new reasoner::asp::Variable());
+    std::vector<reasoner::asp::Term*> terms;
     terms.push_back(term);
-    std::vector<reasoner::AnnotatedValVec*> result;
+    std::vector<reasoner::asp::AnnotatedValVec*> result;
     // Call getSolution on solver
     this->gui->getSolver()->getSolution(vars, terms, result);
     // handle result if there is one

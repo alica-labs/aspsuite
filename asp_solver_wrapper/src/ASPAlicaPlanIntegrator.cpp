@@ -22,7 +22,7 @@ namespace alica
 namespace reasoner
 {
 
-ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(::reasoner::IASPSolver* solver, ASPGenerator* gen)
+ASPAlicaPlanIntegrator::ASPAlicaPlanIntegrator(::reasoner::asp::Solver* solver, ASPGenerator* gen)
 {
     this->solver = solver;
     this->gen = gen;

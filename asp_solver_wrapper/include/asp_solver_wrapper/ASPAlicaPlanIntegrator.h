@@ -1,6 +1,6 @@
 #pragma once
 
-#include <asp_commons/IASPSolver.h>
+#include <reasoner/asp/Solver.h>
 #include <memory>
 
 //#define ASPAlicaPlanIntegratorDebug
@@ -26,7 +26,7 @@ class ASPGenerator;
 class ASPAlicaPlanIntegrator
 {
 public:
-    ASPAlicaPlanIntegrator(::reasoner::IASPSolver* solver, ASPGenerator* gen);
+    ASPAlicaPlanIntegrator(::reasoner::asp::Solver* solver, ASPGenerator* gen);
     virtual ~ASPAlicaPlanIntegrator();
     void loadPlanTree(const Plan* p);
 
@@ -40,7 +40,7 @@ private:
     void handleCondString(const std::string& condString, std::string prefix, const Condition* cond);
 
     ASPGenerator* gen;
-    ::reasoner::IASPSolver* solver;
+    ::reasoner::asp::Solver* solver;
 
     std::vector<long> processedPlanIds;
 };

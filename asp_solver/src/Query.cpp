@@ -1,17 +1,19 @@
-#include "asp_commons/ASPQuery.h"
+#include "reasoner/asp/Query.h"
 
-#include "asp_commons/ASPCommonsTerm.h"
-#include "asp_commons/AnnotatedValVec.h"
-#include "asp_commons/IASPSolver.h"
+#include "reasoner/asp/AnnotatedValVec.h"
+#include "reasoner/asp/Solver.h"
+#include "reasoner/asp/Term.h"
 
 #include <sstream>
 
 namespace reasoner
 {
-
-ASPQuery::ASPQuery(IASPSolver* solver, reasoner::ASPCommonsTerm* term)
+namespace asp
 {
-    this->type = ASPQueryType::Undefined;
+
+Query::Query(Solver* solver, Term* term)
+{
+    this->type = QueryType::Undefined;
     this->solver = solver;
     this->term = term;
     this->programSection = term->getProgramSection();
@@ -32,16 +34,16 @@ ASPQuery::ASPQuery(IASPSolver* solver, reasoner::ASPCommonsTerm* term)
     }
 }
 
-ASPQuery::~ASPQuery() {}
+Query::~Query() {}
 
-void ASPQuery::reduceLifeTime()
+void Query::reduceLifeTime()
 {
     if (this->lifeTime > 0) {
         this->lifeTime--;
     }
 }
 
-void ASPQuery::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
+void Query::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
 {
     auto entry = this->headValues.find(key);
     if (entry != this->headValues.end()) {
@@ -51,7 +53,7 @@ void ASPQuery::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
     }
 }
 
-bool ASPQuery::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
+bool Query::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
 {
     if (value2.type() != Clingo::SymbolType::Function) {
         return false;
@@ -66,7 +68,7 @@ bool ASPQuery::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
 
     for (uint i = 0; i < value1.arguments().size(); ++i) {
         Clingo::Symbol arg = value1.arguments()[i];
-        if (arg.type() == Clingo::SymbolType::Function && std::string(arg.name()) == IASPSolver::WILDCARD_STRING) {
+        if (arg.type() == Clingo::SymbolType::Function && std::string(arg.name()) == Solver::WILDCARD_STRING) {
             continue;
         }
 
@@ -81,7 +83,7 @@ bool ASPQuery::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
     return true;
 }
 
-std::string ASPQuery::toString()
+std::string Query::toString()
 {
     std::stringstream ss;
     ss << "Query:"
@@ -98,7 +100,7 @@ std::string ASPQuery::toString()
     }
     ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
 
-    if (this->getType() == ASPQueryType::Filter) {
+    if (this->getType() == QueryType ::Filter) {
         ss << "\tQuery is of type Filter.\n";
         ss << "\tFacts:"
            << "\n";
@@ -115,7 +117,7 @@ std::string ASPQuery::toString()
             }
             ss << "\n";
         }
-    } else if (this->getType() == ASPQueryType::Extension) {
+    } else if (this->getType() == QueryType::Extension) {
         ss << "\tQuery is of type Extension.\n";
         ss << "\tRuleHeadValues:"
            << "\n";
@@ -139,49 +141,50 @@ std::string ASPQuery::toString()
     return ss.str();
 }
 
-std::string ASPQuery::getProgramSection()
+std::string Query::getProgramSection()
 {
     return this->programSection;
 }
 
-void ASPQuery::setProgramSection(std::string programSection)
+void Query::setProgramSection(std::string programSection)
 {
     this->programSection = programSection;
 }
 
-IASPSolver* ASPQuery::getSolver()
+Solver* Query::getSolver()
 {
     return this->solver;
 }
 
-std::shared_ptr<std::vector<Clingo::SymbolVector>> ASPQuery::getCurrentModels()
+std::shared_ptr<std::vector<Clingo::SymbolVector>> Query::getCurrentModels()
 {
     return this->currentModels;
 }
 
-int ASPQuery::getLifeTime()
+int Query::getLifeTime()
 {
     return this->lifeTime;
 }
 
-void ASPQuery::setLifeTime(int lifeTime)
+void Query::setLifeTime(int lifeTime)
 {
     this->lifeTime = lifeTime;
 }
 
-std::map<Clingo::Symbol, Clingo::SymbolVector>& ASPQuery::getHeadValues()
+std::map<Clingo::Symbol, Clingo::SymbolVector>& Query::getHeadValues()
 {
     return this->headValues;
 }
 
-reasoner::ASPCommonsTerm* ASPQuery::getTerm()
+Term* Query::getTerm()
 {
     return term;
 }
 
-ASPQueryType ASPQuery::getType()
+QueryType Query::getType()
 {
     return type;
 }
 
+} /* namespace asp */
 } /* namespace reasoner */

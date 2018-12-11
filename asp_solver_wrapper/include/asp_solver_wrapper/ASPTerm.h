@@ -1,7 +1,7 @@
 #pragma once
 
 #include <alica_solver_interface/SolverTerm.h>
-#include <asp_commons/ASPQueryType.h>
+#include <reasoner/asp/Enums.h>
 
 #include <map>
 #include <memory>
@@ -31,8 +31,8 @@ public:
     std::shared_ptr<std::map<std::string, bool>> getExternals();
     std::string getNumberOfModels();
     void setNumberOfModels(std::string numberOfModels);
-    ::reasoner::ASPQueryType getType();
-    void setType(::reasoner::ASPQueryType type);
+    ::reasoner::asp::QueryType getType();
+    void setType(::reasoner::asp::QueryType type);
     long getId();
     void setId(long id);
     int getQueryId();
@@ -57,7 +57,7 @@ private:
     int lifeTime;
     std::vector<std::string> facts;
     std::shared_ptr<std::map<std::string, bool>> externals;
-    ::reasoner::ASPQueryType type;
+    ::reasoner::asp::QueryType type;
 };
 
 } /* namespace reasoner */

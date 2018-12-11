@@ -20,7 +20,7 @@ ASPTerm::ASPTerm(int lifeTime)
     this->lifeTime = lifeTime;
     this->externals = nullptr;
     this->numberOfModels = "";
-    this->type = ::reasoner::ASPQueryType::Undefined;
+    this->type = ::reasoner::asp::QueryType::Undefined;
     this->queryId = -1;
 }
 
@@ -95,12 +95,12 @@ void ASPTerm::setNumberOfModels(std::string numberOfModels)
     this->numberOfModels = numberOfModels;
 }
 
-::reasoner::ASPQueryType ASPTerm::getType()
+::reasoner::asp::QueryType ASPTerm::getType()
 {
     return this->type;
 }
 
-void ASPTerm::setType(::reasoner::ASPQueryType type)
+void ASPTerm::setType(::reasoner::asp::QueryType type)
 {
     this->type = type;
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPQuery.h>
-#include <asp_commons/ASPQueryType.h>
+#include "reasoner/asp/Enums.h"
+#include "reasoner/asp/Query.h"
+#include "reasoner/asp/Term.h"
 
 #include <clingo.hh>
 
@@ -13,13 +13,15 @@
 
 namespace reasoner
 {
-class ASPSolver;
-class ASPExtensionQuery : public ASPQuery
+namespace asp
+{
+class Solver;
+class ExtensionQuery : public Query
 {
 public:
-    ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term);
-    virtual ~ASPExtensionQuery();
-    ASPQueryType getType();
+    ExtensionQuery(Solver* solver, Term* term);
+    virtual ~ExtensionQuery();
+    QueryType getType();
     void removeExternal();
     void onModel(Clingo::Model& clingoModel);
 
@@ -84,4 +86,5 @@ private:
     void createProgramSection();
 };
 
+} /* namespace asp */
 } /* namespace reasoner */

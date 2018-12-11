@@ -9,20 +9,21 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 	add_definitions (-DCMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE)
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
+## CLINGO
+set(clingo_DIR "/usr/local/lib")
+set(clingo_INCLUDE_DIRS "/usr/local/include")
+
 find_package(catkin REQUIRED COMPONENTS
-	#clingo
   system_config
   system_util
   fsystem
-  asp_commons
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES asp_solver
-  CATKIN_DEPENDS system_config fsystem asp_commons system_util
-  #clingo
-  #DEPENDS lua python
+  CATKIN_DEPENDS system_config fsystem system_util
+  DEPENDS clingo
 )
 
 add_definitions(-DWITH_THREADS=1) # for libclasp...
@@ -35,12 +36,15 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-    src/ASPSolver.cpp
+	src/Solver.cpp
     src/AnnotatedExternal.cpp
-        src/ASPFilterQuery.cpp
-		src/ASPExtensionQuery.cpp
+	src/FilterQuery.cpp
+	src/ExtensionQuery.cpp
     src/GrdProgramObserver.cpp
+	src/Term.cpp
+	src/Variable.cpp
+	src/AnnotatedValVec.cpp
+	src/Query.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} clingo)

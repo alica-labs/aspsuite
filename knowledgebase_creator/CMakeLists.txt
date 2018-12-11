@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(knowledgebase_creator)
 
-find_package(catkin REQUIRED qt_gui asp_commons asp_solver)
+find_package(catkin REQUIRED qt_gui asp_solver)
 
 find_package(Qt5Core REQUIRED)
 get_target_property(Qt5Core_location Qt5::Core LOCATION)
@@ -102,7 +102,7 @@ include_directories(${knowledgebaseCreator_INCLUDE_DIRECTORIES} ${catkin_INCLUDE
 catkin_package(
         INCLUDE_DIRS ${knowledgebaseCreator_INCLUDE_DIRECTORIES}
         LIBRARIES ${PROJECT_NAME}
-        CATKIN_DEPENDS qt_gui asp_commons asp_solver
+        CATKIN_DEPENDS qt_gui asp_solver
 
 )
 

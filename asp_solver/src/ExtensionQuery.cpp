@@ -1,30 +1,30 @@
-#include "asp_solver/ASPExtensionQuery.h"
+#include "reasoner/asp/ExtensionQuery.h"
 
-#include "asp_solver/ASPSolver.h"
-
-#include <asp_commons/IASPSolver.h>
+#include "reasoner/asp/Solver.h"
 
 #include <algorithm>
 #include <regex>
 
 namespace reasoner
 {
-
-ASPExtensionQuery::ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm* term)
-        : ASPQuery(solver, term)
+namespace asp
 {
-    this->type = ASPQueryType::Extension;
+
+ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
+        : Query(solver, term)
+{
+    this->type = QueryType::Extension;
     std::stringstream ss;
     if (term->getQueryId() == -1) {
 #ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ASPExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
+        cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
 #endif
         return;
     }
     ss << "query" << term->getQueryId();
     this->queryProgramSection = ss.str();
 #ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ASPExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
+    cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
 #endif
     this->createProgramSection();
     //    // is added manually to recreate eval for LNAI17 paper
@@ -36,9 +36,9 @@ ASPExtensionQuery::ASPExtensionQuery(ASPSolver* solver, reasoner::ASPCommonsTerm
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 }
 
-ASPExtensionQuery::~ASPExtensionQuery() = default;
+ExtensionQuery::~ExtensionQuery() = default;
 
-void ASPExtensionQuery::createProgramSection()
+void ExtensionQuery::createProgramSection()
 {
     this->externalName = "external" + this->queryProgramSection;
 
@@ -97,17 +97,17 @@ void ASPExtensionQuery::createProgramSection()
     this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
 }
 
-void ASPExtensionQuery::removeExternal()
+void ExtensionQuery::removeExternal()
 {
     this->solver->releaseExternal(*(this->external));
 }
 
-ASPQueryType ASPExtensionQuery::getType()
+QueryType ExtensionQuery::getType()
 {
     return this->type;
 }
 
-void ASPExtensionQuery::onModel(Clingo::Model& clingoModel)
+void ExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
     Clingo::SymbolVector vec;
     auto tmp = clingoModel.symbols(clingo_show_type_shown);
@@ -115,20 +115,20 @@ void ASPExtensionQuery::onModel(Clingo::Model& clingoModel)
         vec.push_back(tmp[i]);
     }
     this->getCurrentModels()->push_back(vec);
-    //	cout << "ASPQuery: processing query '" << queryMapPair.first << "'" << endl;
+    //	cout << "Query: processing query '" << queryMapPair.first << "'" << endl;
 
     // determine the domain of the query predicate
     for (auto& value : this->headValues) {
 
         value.second.clear();
 #ifdef ASPQUERY_DEBUG
-        cout << "ASPExtensionQuery::onModel: " << value.first << endl;
+        cout << "ExtensionQuery::onModel: " << value.first << endl;
 #endif
-        auto it = ((ASPSolver*) this->solver)
+        auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
-        if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
-            std::cout << "ASPExtensionQuery: Didn't find any suitable domain!" << std::endl;
+        if (it == ((Solver*) this->solver)->clingo->symbolic_atoms().end()) {
+            std::cout << "ExtensionQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }
         while (it) {
@@ -140,7 +140,7 @@ void ASPExtensionQuery::onModel(Clingo::Model& clingoModel)
     }
 }
 
-std::string ASPExtensionQuery::trim(const std::string& str)
+std::string ExtensionQuery::trim(const std::string& str)
 {
     const std::string& whitespace = " \t";
     const auto strBegin = str.find_first_not_of(whitespace);
@@ -153,13 +153,13 @@ std::string ASPExtensionQuery::trim(const std::string& str)
     return str.substr(strBegin, strRange);
 }
 
-size_t ASPExtensionQuery::findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start)
+size_t ExtensionQuery::findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start)
 {
     size_t idx = predicate.find_first_of(chars, start);
     return end <= idx ? std::string::npos : idx;
 }
 
-size_t ASPExtensionQuery::findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start)
+size_t ExtensionQuery::findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start)
 {
     size_t idx = predicate.find_first_not_of(chars, start);
     return end <= idx ? std::string::npos : idx;
@@ -171,13 +171,13 @@ size_t ASPExtensionQuery::findNextCharNotOf(const std::string& predicate, const 
  * @param rule
  * @return Idx of the implication ":-"
  */
-size_t ASPExtensionQuery::findImplication(const std::string& rule)
+size_t ExtensionQuery::findImplication(const std::string& rule)
 {
     size_t idxs[] = {rule.find(":-"), rule.find(":~"), rule.find("#minimize"), rule.find("#maximize")};
     return *std::min_element(idxs, idxs + 4);
 }
 
-void ASPExtensionQuery::rememberPredicate(std::string predicateName, int arity)
+void ExtensionQuery::rememberPredicate(std::string predicateName, int arity)
 {
     if (predicateName.empty()) {
         return;
@@ -194,7 +194,7 @@ void ASPExtensionQuery::rememberPredicate(std::string predicateName, int arity)
     }
 }
 
-size_t ASPExtensionQuery::findMatchingClosingBrace(const std::string& predicate, size_t openingBraceIdx)
+size_t ExtensionQuery::findMatchingClosingBrace(const std::string& predicate, size_t openingBraceIdx)
 {
     int numOpenBraces = 1;
 
@@ -225,7 +225,7 @@ size_t ASPExtensionQuery::findMatchingClosingBrace(const std::string& predicate,
     return currentIdx;
 }
 
-ASPExtensionQuery::Predicate ASPExtensionQuery::extractConstant(std::string rule, size_t constantEndIdxPlusOne)
+ExtensionQuery::Predicate ExtensionQuery::extractConstant(std::string rule, size_t constantEndIdxPlusOne)
 {
     Predicate predicate;
     size_t leftDelimiterIdx = rule.find_last_of(" ,;:", constantEndIdxPlusOne - 1);
@@ -251,7 +251,7 @@ ASPExtensionQuery::Predicate ASPExtensionQuery::extractConstant(std::string rule
     return predicate;
 }
 
-ASPExtensionQuery::Predicate ASPExtensionQuery::extractPredicate(std::string rule, size_t parameterStartIdx)
+ExtensionQuery::Predicate ExtensionQuery::extractPredicate(std::string rule, size_t parameterStartIdx)
 {
     Predicate predicate;
     size_t leftDelimiterIdx = rule.find_last_of(" ,;:", parameterStartIdx);
@@ -306,7 +306,7 @@ ASPExtensionQuery::Predicate ASPExtensionQuery::extractPredicate(std::string rul
     return predicate;
 }
 
-std::string ASPExtensionQuery::createVariableParameters(int arity)
+std::string ExtensionQuery::createVariableParameters(int arity)
 {
     std::stringstream variableParams;
     if (arity != 0) {
@@ -321,7 +321,7 @@ std::string ASPExtensionQuery::createVariableParameters(int arity)
     }
 }
 
-std::string ASPExtensionQuery::createKBCapturingRule(const std::string& headPredicateName, int arity)
+std::string ExtensionQuery::createKBCapturingRule(const std::string& headPredicateName, int arity)
 {
     // build replaced fact
     std::stringstream rule;
@@ -331,7 +331,7 @@ std::string ASPExtensionQuery::createKBCapturingRule(const std::string& headPred
     return rule.str();
 }
 
-std::string ASPExtensionQuery::expandFactModuleProperty(std::string fact)
+std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
 {
     fact = trim(fact);
     fact = fact.substr(0, fact.size() - 1);
@@ -341,8 +341,8 @@ std::string ASPExtensionQuery::expandFactModuleProperty(std::string fact)
     return ss.str();
 }
 
-std::pair<ASPExtensionQuery::Separator, size_t> ASPExtensionQuery::determineFirstSeparator(
-        std::pair<ASPExtensionQuery::Separator, size_t> a, std::pair<ASPExtensionQuery::Separator, size_t> b)
+std::pair<ExtensionQuery::Separator, size_t> ExtensionQuery::determineFirstSeparator(
+        std::pair<ExtensionQuery::Separator, size_t> a, std::pair<ExtensionQuery::Separator, size_t> b)
 {
     if (a.second == std::string::npos) {
         if (b.second == std::string::npos) {
@@ -359,7 +359,7 @@ std::pair<ASPExtensionQuery::Separator, size_t> ASPExtensionQuery::determineFirs
     }
 };
 
-void ASPExtensionQuery::extractHeadPredicates(const std::string& rule)
+void ExtensionQuery::extractHeadPredicates(const std::string& rule)
 {
     size_t implicationIdx = findImplication(rule);
     if (implicationIdx == 0) {
@@ -455,7 +455,7 @@ void ASPExtensionQuery::extractHeadPredicates(const std::string& rule)
     }
 }
 
-bool ASPExtensionQuery::lookUpPredicate(const std::string& predicateName, int arity)
+bool ExtensionQuery::lookUpPredicate(const std::string& predicateName, int arity)
 {
     if (predicatesToAritiesMap.find(predicateName) != predicatesToAritiesMap.end()) {
         // name matched
@@ -465,7 +465,7 @@ bool ASPExtensionQuery::lookUpPredicate(const std::string& predicateName, int ar
     return false;
 }
 
-std::string ASPExtensionQuery::expandRuleModuleProperty(const std::string& rule)
+std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
 {
     std::pair<Separator, size_t> colonPair;
     std::pair<Separator, size_t> semicolonPair;
@@ -578,5 +578,5 @@ std::string ASPExtensionQuery::expandRuleModuleProperty(const std::string& rule)
     mpRule << "\n";
     return mpRule.str();
 }
-
+} /* namespace asp */
 } /* namespace reasoner */

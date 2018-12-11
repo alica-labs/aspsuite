@@ -23,7 +23,7 @@
 
 #include <ui_knowledgebasecreator.h>
 
-#include <asp_solver/ASPSolver.h>
+#include <reasoner/asp/Solver.h>
 
 namespace kbcr
 {
@@ -330,12 +330,12 @@ std::shared_ptr<SolverSettings> KnowledgebaseCreator::getSettings()
     return this->settings;
 }
 
-reasoner::ASPSolver* KnowledgebaseCreator::getSolver()
+reasoner::asp::Solver* KnowledgebaseCreator::getSolver()
 {
     return this->solver;
 }
 
-void KnowledgebaseCreator::setSolver(reasoner::ASPSolver* solver)
+void KnowledgebaseCreator::setSolver(reasoner::asp::Solver* solver)
 {
     this->solver = solver;
 }

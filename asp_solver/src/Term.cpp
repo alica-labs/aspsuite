@@ -1,32 +1,35 @@
-#include <ASPCommonsTerm.h>
+#include "reasoner/asp/Term.h"
+
 #include <SystemConfig.h>
 
 namespace reasoner
 {
+namespace asp
+{
 
-ASPCommonsTerm::ASPCommonsTerm(int lifeTime)
+Term::Term(int lifeTime)
 {
     this->programSection = "";
     this->id = -1;
     this->lifeTime = lifeTime;
     this->externals = nullptr;
     this->numberOfModels = "";
-    this->type = ASPQueryType::Undefined;
+    this->type = QueryType::Undefined;
     this->queryId = -1;
 }
 
-ASPCommonsTerm::~ASPCommonsTerm() {}
+Term::~Term() {}
 
-void ASPCommonsTerm::addRule(std::string rule)
+void Term::addRule(std::string rule)
 {
-    if(!rule.empty()) {
+    if (!rule.empty()) {
         this->rules.push_back(rule);
     }
 }
 
-void ASPCommonsTerm::addFact(std::string fact)
+void Term::addFact(std::string fact)
 {
-    if(fact.empty()) {
+    if (fact.empty()) {
         return;
     }
     if (fact.find(".") == std::string::npos) {
@@ -36,101 +39,102 @@ void ASPCommonsTerm::addFact(std::string fact)
     }
 }
 
-std::vector<std::string> ASPCommonsTerm::getRuleHeads()
+std::vector<std::string> Term::getRuleHeads()
 {
     return this->heads;
 }
 
-std::vector<std::string> ASPCommonsTerm::getRuleBodies()
+std::vector<std::string> Term::getRuleBodies()
 {
     return this->bodies;
 }
 
-std::string ASPCommonsTerm::getProgramSection()
+std::string Term::getProgramSection()
 {
     return this->programSection;
 }
 
-void ASPCommonsTerm::setProgramSection(std::string programSection)
+void Term::setProgramSection(std::string programSection)
 {
     this->programSection = programSection;
 }
 
-std::vector<std::string> ASPCommonsTerm::getProgramSectionParameters()
+std::vector<std::string> Term::getProgramSectionParameters()
 {
     return this->programSectionParameters;
 }
 
-void ASPCommonsTerm::addProgramSectionParameter(std::string param)
+void Term::addProgramSectionParameter(std::string param)
 {
     this->programSectionParameters.push_back(param);
 }
 
-int ASPCommonsTerm::getLifeTime()
+int Term::getLifeTime()
 {
     return this->lifeTime;
 }
 
-void ASPCommonsTerm::setLifeTime(int lifeTime)
+void Term::setLifeTime(int lifeTime)
 {
     this->lifeTime = lifeTime;
 }
 
-std::vector<std::string> ASPCommonsTerm::getRules()
+std::vector<std::string> Term::getRules()
 {
     return this->rules;
 }
 
-std::vector<std::string> ASPCommonsTerm::getFacts()
+std::vector<std::string> Term::getFacts()
 {
     return this->facts;
 }
 
-void ASPCommonsTerm::setExternals(std::shared_ptr<std::map<std::string, bool>> externals)
+void Term::setExternals(std::shared_ptr<std::map<std::string, bool>> externals)
 {
     this->externals = externals;
 }
 
-std::shared_ptr<std::map<std::string, bool>> ASPCommonsTerm::getExternals()
+std::shared_ptr<std::map<std::string, bool>> Term::getExternals()
 {
     return this->externals;
 }
 
-std::string ASPCommonsTerm::getNumberOfModels()
+std::string Term::getNumberOfModels()
 {
     return this->numberOfModels;
 }
 
-void ASPCommonsTerm::setNumberOfModels(std::string numberOfModels)
+void Term::setNumberOfModels(std::string numberOfModels)
 {
     this->numberOfModels = numberOfModels;
 }
 
-ASPQueryType ASPCommonsTerm::getType()
+QueryType Term::getType()
 {
     return this->type;
 }
 
-void ASPCommonsTerm::setType(ASPQueryType type)
+void Term::setType(QueryType type)
 {
     this->type = type;
 }
 
-long ASPCommonsTerm::getId()
+long Term::getId()
 {
     return id;
 }
 
-void ASPCommonsTerm::setId(long id)
+void Term::setId(long id)
 {
     this->id = id;
 }
+
 /**
  * The query id has to be added to any predicate which is added to the program, naming rule
  * heads and facts!
- * An unique id is given by the ASPSolver!
+ * An unique id is given by the Solver!
  */
-int ASPCommonsTerm::getQueryId()
+int Term::getQueryId()
 {
     return queryId;
 }
@@ -138,19 +142,19 @@ int ASPCommonsTerm::getQueryId()
 /**
  * The query id has to be added to any predicate which is added to the program, naming rule
  * heads and facts!
- * An unique id is given by the ASPSolver!
+ * An unique id is given by the Solver!
  */
-void ASPCommonsTerm::setQueryId(int queryId)
+void Term::setQueryId(int queryId)
 {
     this->queryId = queryId;
 }
 
-std::string ASPCommonsTerm::getQueryRule()
+std::string Term::getQueryRule()
 {
     return queryRule;
 }
 
-void ASPCommonsTerm::setQueryRule(std::string queryRule)
+void Term::setQueryRule(std::string queryRule)
 {
     if (queryRule.empty()) {
         return;
@@ -169,5 +173,5 @@ void ASPCommonsTerm::setQueryRule(std::string queryRule)
     }
     this->queryRule = queryRule;
 }
-
+} /* namespace asp */
 } /* namespace reasoner */

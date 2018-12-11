@@ -1,9 +1,12 @@
 #pragma once
 
 #include <clingo.hh>
+
 #include <memory>
 
 namespace reasoner
+{
+namespace asp
 {
 
 class AnnotatedExternal
@@ -23,5 +26,5 @@ private:
     std::shared_ptr<Clingo::Symbol> gringoValue;
     bool value;
 };
-
+} /* namespace asp */
 } /* namespace reasoner */

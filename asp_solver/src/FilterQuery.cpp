@@ -1,34 +1,35 @@
-#include "asp_solver/ASPFilterQuery.h"
+#include "reasoner/asp/FilterQuery.h"
 
-#include "asp_solver/ASPSolver.h"
-
-#include <asp_commons/IASPSolver.h>
+#include "reasoner/asp/Solver.h"
+#include "reasoner/asp/Enums.h"
 
 namespace reasoner
 {
-
-ASPFilterQuery::ASPFilterQuery(ASPSolver* solver, ASPCommonsTerm* term)
-        : ASPQuery(solver, term)
+namespace asp
 {
-    this->type = ASPQueryType::Filter;
+
+FilterQuery::FilterQuery(Solver* solver, Term* term)
+        : Query(solver, term)
+{
+    this->type = QueryType ::Filter;
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
-#ifdef ASPSolver_DEBUG
-    std::cout << "ASPSolver: Query contains rule: " << std::endl;
+#ifdef Solver_DEBUG
+    std::cout << "Solver: Query contains rule: " << std::endl;
     for (auto rule : this->term->getRules()) {
         std::cout << rule << std::endl;
     }
 
     for (auto fact : this->term->getFacts()) {
-        std::cout << "ASPSolver: Query contains fact: " << fact << std::endl;
+        std::cout << "Solver: Query contains fact: " << fact << std::endl;
     }
 #endif
 }
 
-ASPFilterQuery::~ASPFilterQuery() {}
+FilterQuery::~FilterQuery() {}
 
-void ASPFilterQuery::addQueryValues(std::vector<std::string> queryVec)
+void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
     for (auto queryString : queryVec) {
         if (queryString.compare("") == 0) {
@@ -58,7 +59,7 @@ void ASPFilterQuery::addQueryValues(std::vector<std::string> queryVec)
     }
 }
 
-bool ASPFilterQuery::factsExistForAtLeastOneModel()
+bool FilterQuery::factsExistForAtLeastOneModel()
 {
     for (auto queryValue : this->headValues) {
         if (queryValue.second.size() > 0) {
@@ -68,7 +69,7 @@ bool ASPFilterQuery::factsExistForAtLeastOneModel()
     return false;
 }
 
-bool ASPFilterQuery::factsExistForAllModels()
+bool FilterQuery::factsExistForAllModels()
 {
     for (auto queryValue : this->headValues) {
         if (queryValue.second.size() == 0) {
@@ -78,28 +79,28 @@ bool ASPFilterQuery::factsExistForAllModels()
     return true;
 }
 
-void ASPFilterQuery::removeExternal()
-{ // NOOP in case of ASPFilterQuery
+void FilterQuery::removeExternal()
+{ // NOOP in case of FilterQuery
 }
 
-std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ASPFilterQuery::getASPTruthValues()
+std::vector<std::pair<Clingo::Symbol, TruthValue>> FilterQuery::getTruthValues()
 {
-    std::vector<std::pair<Clingo::Symbol, ASPTruthValue>> ret;
+    std::vector<std::pair<Clingo::Symbol, TruthValue>> ret;
     for (auto iter : this->getHeadValues()) {
         if (iter.second.size() == 0) {
-            ret.push_back(std::pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::Unknown));
+            ret.push_back(std::pair<Clingo::Symbol, TruthValue>(iter.first, TruthValue::Unknown));
         } else {
             if (iter.second.at(0).is_positive()) {
-                ret.push_back(std::pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::True));
+                ret.push_back(std::pair<Clingo::Symbol, TruthValue>(iter.first, TruthValue::True));
             } else {
-                ret.push_back(std::pair<Clingo::Symbol, ASPTruthValue>(iter.first, ASPTruthValue::False));
+                ret.push_back(std::pair<Clingo::Symbol, TruthValue>(iter.first, TruthValue::False));
             }
         }
     }
     return ret;
 }
 
-void ASPFilterQuery::onModel(Clingo::Model& clingoModel)
+void FilterQuery::onModel(Clingo::Model& clingoModel)
 {
     // Remember model
     Clingo::SymbolVector vec;
@@ -111,14 +112,14 @@ void ASPFilterQuery::onModel(Clingo::Model& clingoModel)
 
     // Fill mapping from query fact towards model fact
     for (auto value : this->getHeadValues()) {
-#ifdef ASPQUERY_DEBUG
-        cout << "ASPFilterQuery::onModel: " << value.first << endl;
+#ifdef QUERY_DEBUG
+        cout << "FilterQuery::onModel: " << value.first << endl;
 #endif
-        auto it = ((ASPSolver*) this->solver)
+        auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
-        if (it == ((ASPSolver*) this->solver)->clingo->symbolic_atoms().end()) {
-            std::cout << "ASPFilterQuery: Didn't find any suitable domain!" << std::endl;
+        if (it == ((Solver*) this->solver)->clingo->symbolic_atoms().end()) {
+            std::cout << "FilterQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }
 
@@ -130,5 +131,5 @@ void ASPFilterQuery::onModel(Clingo::Model& clingoModel)
         }
     }
 }
-
+} /* namespace asp */
 } /* namespace reasoner */

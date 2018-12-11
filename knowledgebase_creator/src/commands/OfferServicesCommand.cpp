@@ -16,7 +16,7 @@
 
 #include "ui_knowledgebasecreator.h"
 
-#include <asp_solver/ASPSolver.h>
+#include <reasoner/asp/Solver.h>
 
 namespace kbcr
 {

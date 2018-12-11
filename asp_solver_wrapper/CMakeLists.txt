@@ -12,19 +12,18 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 find_package(catkin REQUIRED COMPONENTS
     alica_engine 
     system_util
-    asp_commons
+	asp_solver
 )
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES asp_solver_wrapper
-  CATKIN_DEPENDS alica_engine asp_commons
-  #DEPENDS lua python
+	INCLUDE_DIRS include
+	LIBRARIES asp_solver_wrapper
+	CATKIN_DEPENDS alica_engine asp_solver system_util
 )
 
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+	include
+	${catkin_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -34,5 +33,7 @@ add_library(${PROJECT_NAME}
     src/ASPSolverWrapper.cpp
     src/ASPGenerator.cpp
     src/ASPAlicaPlanIntegrator.cpp
-        src/ASPSolverContext.cpp include/asp_solver_wrapper/ASPSolverContext.h)
+    src/ASPSolverContext.cpp
+)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

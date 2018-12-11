@@ -1,21 +1,25 @@
-#include "asp_solver/ASPSolver.h"
+#include "reasoner/asp/Solver.h"
 
-#include "asp_solver/ASPFilterQuery.h"
-#include "asp_solver/ASPExtensionQuery.h"
-#include "asp_solver/AnnotatedExternal.h"
+#include "reasoner/asp/ExtensionQuery.h"
+#include "reasoner/asp/FilterQuery.h"
+#include "reasoner/asp/AnnotatedExternal.h"
 
-#include <asp_commons/ASPCommonsTerm.h>
-#include <asp_commons/ASPCommonsVariable.h>
-#include <asp_commons/ASPQuery.h>
-#include <asp_commons/AnnotatedValVec.h>
+#include <reasoner/asp/Variable.h>
+#include <reasoner/asp/Query.h>
+#include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/Term.h>
 
 namespace reasoner
 {
+namespace asp
+{
 
-std::mutex ASPSolver::queryCounterMutex;
+const void* const Solver::WILDCARD_POINTER = new int(0);
+const std::string Solver::WILDCARD_STRING = "wildcard";
 
-ASPSolver::ASPSolver(std::vector<char const*> args)
-        : IASPSolver()
+std::mutex Solver::queryCounterMutex;
+
+Solver::Solver(std::vector<char const*> args)
 {
     Clingo::Logger logger = [](Clingo::WarningCode warningCode, char const* message) {
         switch (warningCode) {
@@ -35,21 +39,21 @@ ASPSolver::ASPSolver(std::vector<char const*> args)
     this->clingo->register_observer(this->observer);
     this->sc = supplementary::SystemConfig::getInstance();
     this->queryCounter = 0;
-#ifdef ASPSolver_DEBUG
+#ifdef Solver_DEBUG
     this->modelCount = 0;
 #endif
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
 }
 
-ASPSolver::~ASPSolver() {}
+Solver::~Solver() {}
 
-void ASPSolver::loadFile(std::string absolutFilename)
+void Solver::loadFile(std::string absolutFilename)
 {
     this->clingo->load(absolutFilename.c_str());
 }
 
-bool ASPSolver::loadFileFromConfig(std::string configKey)
+bool Solver::loadFileFromConfig(std::string configKey)
 {
     if (configKey.empty()) {
         return true;
@@ -61,7 +65,7 @@ bool ASPSolver::loadFileFromConfig(std::string configKey)
         }
     }
 
-    std::string backGroundKnowledgeFile = (*this->sc)["ASPSolver"]->get<std::string>(configKey.c_str(), NULL);
+    std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
     backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
     this->clingo->load(backGroundKnowledgeFile.c_str());
@@ -71,10 +75,10 @@ bool ASPSolver::loadFileFromConfig(std::string configKey)
 /**
  * Let the internal solver ground a given program part (context).
  */
-void ASPSolver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
+void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 {
 #ifdef ASPSOLVER_DEBUG
-    cout << "ASPSolver_ground: " << vec.at(0).first << endl;
+    cout << "Solver_ground: " << vec.at(0).first << endl;
 #endif
     this->observer.clear();
     this->clingo->ground(vec, callBack);
@@ -83,14 +87,14 @@ void ASPSolver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 /**
  * Let the internal solver solve one time.
  */
-bool ASPSolver::solve()
+bool Solver::solve()
 {
     this->currentModels.clear();
     this->reduceQueryLifeTime();
-#ifdef ASPSolver_DEBUG
+#ifdef Solver_DEBUG
     this->modelCount = 0;
 #endif
-    // bind(&ASPSolver::onModel, this, placeholders::_1)
+    // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
     auto result = this->clingo->solve(span, this, false, false);
     return result.get().is_satisfiable();
@@ -99,10 +103,10 @@ bool ASPSolver::solve()
 /**
  * Callback for created models during solving.
  */
-bool ASPSolver::on_model(Clingo::Model& m)
+bool Solver::on_model(Clingo::Model& m)
 {
-#ifdef ASPSolver_DEBUG
-    cout << "ASPSolver: Found the following model :" << endl;
+#ifdef Solver_DEBUG
+    cout << "Solver: Found the following model :" << endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         cout << atom << " ";
     }
@@ -120,27 +124,27 @@ bool ASPSolver::on_model(Clingo::Model& m)
     return true;
 }
 
-void ASPSolver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
+void Solver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
 {
     this->clingo->assign_external(ext, truthValue);
 }
 
-void ASPSolver::releaseExternal(Clingo::Symbol ext)
+void Solver::releaseExternal(Clingo::Symbol ext)
 {
     this->clingo->release_external(ext);
 }
 
-void ASPSolver::add(char const* name, const Clingo::StringSpan& params, char const* par)
+void Solver::add(char const* name, const Clingo::StringSpan& params, char const* par)
 {
     this->clingo->add(name, params, par);
 }
 
-Clingo::Symbol ASPSolver::parseValue(const std::string& str)
+Clingo::Symbol Solver::parseValue(const std::string& str)
 {
     return Clingo::parse_term(str.c_str(), nullptr, 20);
 }
 
-bool ASPSolver::registerQuery(std::shared_ptr<ASPQuery> query)
+bool Solver::registerQuery(std::shared_ptr<Query> query)
 {
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry == this->registeredQueries.end()) {
@@ -150,7 +154,7 @@ bool ASPSolver::registerQuery(std::shared_ptr<ASPQuery> query)
     return false;
 }
 
-bool ASPSolver::unregisterQuery(std::shared_ptr<ASPQuery> query)
+bool Solver::unregisterQuery(std::shared_ptr<Query> query)
 {
     query->removeExternal();
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
@@ -161,7 +165,7 @@ bool ASPSolver::unregisterQuery(std::shared_ptr<ASPQuery> query)
     return false;
 }
 
-bool ASPSolver::existsSolution(std::vector<ASPCommonsVariable*>& vars, std::vector<ASPCommonsTerm*>& calls)
+bool Solver::existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
 {
     this->clingo->configuration()["solve"]["models"] = "1";
     int dim = prepareSolution(vars, calls);
@@ -173,7 +177,7 @@ bool ASPSolver::existsSolution(std::vector<ASPCommonsVariable*>& vars, std::vect
     return satisfied;
 }
 
-bool ASPSolver::getSolution(std::vector<ASPCommonsVariable*>& vars, std::vector<ASPCommonsTerm*>& calls, std::vector<AnnotatedValVec*>& results)
+bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls, std::vector<AnnotatedValVec*>& results)
 {
     this->clingo->configuration()["solve"]["models"] = "0";
     int dim = prepareSolution(vars, calls);
@@ -207,10 +211,10 @@ bool ASPSolver::getSolution(std::vector<ASPCommonsVariable*>& vars, std::vector<
     }
 }
 
-int ASPSolver::prepareSolution(std::vector<ASPCommonsVariable*>& vars, std::vector<ASPCommonsTerm*>& calls)
+int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
 {
 
-    auto cVars = std::vector<reasoner::ASPCommonsVariable*>(vars.size());
+    auto cVars = std::vector<Variable*>(vars.size());
     for (int i = 0; i < vars.size(); ++i) {
         cVars.at(i) = vars.at(i);
     }
@@ -226,12 +230,12 @@ int ASPSolver::prepareSolution(std::vector<ASPCommonsVariable*>& vars, std::vect
             }
         }
         if (!found) {
-            if (term->getType() == ASPQueryType::Extension) {
-                this->registerQuery(std::make_shared<ASPExtensionQuery>(this, term));
-            } else if (term->getType() == ASPQueryType::Filter) {
-                this->registerQuery(std::make_shared<ASPFilterQuery>(this, term));
+            if (term->getType() == QueryType::Extension) {
+                this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
+            } else if (term->getType() == QueryType::Filter) {
+                this->registerQuery(std::make_shared<FilterQuery>(this, term));
             } else {
-                std::cout << "ASPSolver: Query of unknown type registered!" << std::endl;
+                std::cout << "Solver: Query of unknown type registered!" << std::endl;
                 return -1;
             }
         }
@@ -247,7 +251,7 @@ int ASPSolver::prepareSolution(std::vector<ASPCommonsVariable*>& vars, std::vect
     return vars.size();
 }
 
-void ASPSolver::handleExternals(std::shared_ptr<std::map<std::string, bool>> externals)
+void Solver::handleExternals(std::shared_ptr<std::map<std::string, bool>> externals)
 {
     for (auto p : *externals) {
         auto it = find_if(this->assignedExternals.begin(), this->assignedExternals.end(),
@@ -265,12 +269,12 @@ void ASPSolver::handleExternals(std::shared_ptr<std::map<std::string, bool>> ext
     }
 }
 
-std::shared_ptr<ASPCommonsVariable> ASPSolver::createVariable(long id)
+std::shared_ptr<Variable> Solver::createVariable(long id)
 {
-    return std::make_shared<reasoner::ASPCommonsVariable>();
+    return std::make_shared<Variable>();
 }
 
-void ASPSolver::removeDeadQueries()
+void Solver::removeDeadQueries()
 {
     for (int i = this->registeredQueries.size() - 1; i >= 0; i--) {
         if (this->registeredQueries.at(i)->getLifeTime() == 0) {
@@ -279,29 +283,29 @@ void ASPSolver::removeDeadQueries()
     }
 }
 
-const void* ASPSolver::getWildcardPointer()
+const void* Solver::getWildcardPointer()
 {
     return WILDCARD_POINTER;
 }
 
-const std::string& ASPSolver::getWildcardString()
+const std::string& Solver::getWildcardString()
 {
     return WILDCARD_STRING;
 }
 
-int ASPSolver::getRegisteredQueriesCount()
+int Solver::getRegisteredQueriesCount()
 {
     return this->registeredQueries.size();
 }
 
-void ASPSolver::reduceQueryLifeTime()
+void Solver::reduceQueryLifeTime()
 {
     for (auto query : this->registeredQueries) {
         query->reduceLifeTime();
     }
 }
 
-const double ASPSolver::getSolvingTime()
+const double Solver::getSolvingTime()
 {
     auto statistics = this->clingo->statistics();
 
@@ -309,7 +313,7 @@ const double ASPSolver::getSolvingTime()
     return statistics["sumary"]["times"]["solve"] * 1000;
 }
 
-const double ASPSolver::getSatTime()
+const double Solver::getSatTime()
 {
     auto statistics = this->clingo->statistics();
 
@@ -317,7 +321,7 @@ const double ASPSolver::getSatTime()
     return statistics["sumary"]["times"]["sat"] * 1000;
 }
 
-const double ASPSolver::getUnsatTime()
+const double Solver::getUnsatTime()
 {
     auto statistics = this->clingo->statistics();
 
@@ -325,12 +329,12 @@ const double ASPSolver::getUnsatTime()
     return statistics["sumary"]["times"]["unsat"] * 1000;
 }
 
-const double ASPSolver::getModelCount()
+const double Solver::getModelCount()
 {
     return this->clingo->statistics()["summary"]["models"]["enumerated"];
 }
 
-int ASPSolver::getQueryCounter()
+int Solver::getQueryCounter()
 {
     std::lock_guard<std::mutex> lock(queryCounterMutex);
 
@@ -338,27 +342,27 @@ int ASPSolver::getQueryCounter()
     return this->queryCounter;
 }
 
-const double ASPSolver::getAtomCount()
+const double Solver::getAtomCount()
 {
     return this->clingo->statistics()["problem"]["lp"]["atoms"];
 }
 
-const double ASPSolver::getBodiesCount()
+const double Solver::getBodiesCount()
 {
     return this->clingo->statistics()["problem"]["lp"]["bodies"];
 }
 
-const double ASPSolver::getAuxAtomsCount()
+const double Solver::getAuxAtomsCount()
 {
     return this->clingo->statistics()["problem"]["lp"]["atoms_aux"];
 }
 
-std::vector<Clingo::SymbolVector> ASPSolver::getCurrentModels()
+std::vector<Clingo::SymbolVector> Solver::getCurrentModels()
 {
     return this->currentModels;
 }
 
-void ASPSolver::printStats()
+void Solver::printStats()
 {
     auto statistics = this->clingo->statistics();
 
@@ -373,14 +377,15 @@ void ASPSolver::printStats()
     std::cout << ss.str() << std::flush;
 }
 
-std::vector<std::shared_ptr<ASPQuery>> ASPSolver::getRegisteredQueries()
+std::vector<std::shared_ptr<Query>> Solver::getRegisteredQueries()
 {
     return registeredQueries;
 }
 
-const std::string ASPSolver::getGroundProgram() const
+const std::string Solver::getGroundProgram() const
 {
     return this->observer.getGroundProgram();
 }
 
+} /* namespace asp */
 } /* namespace reasoner */

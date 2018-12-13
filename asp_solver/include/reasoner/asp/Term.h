@@ -25,6 +25,10 @@ public:
 
     std::vector<std::string> getRuleBodies();
 
+    std::string getBackgroundKnowledgeFilename();
+
+    void setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilename);
+
     std::string getProgramSection();
 
     void setProgramSection(std::string programSection);
@@ -74,6 +78,8 @@ private:
     std::vector<std::string> heads;
     std::vector<std::string> bodies;
     std::string programSection;
+    std::string backgroundKnowledgeFilename;
+
     long id;
     /**
      * The query id has to be added to any predicate which is added to the program, naming rule

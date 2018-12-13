@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 
-//#define ASPQUERY_DEBUG
 
 namespace reasoner
 {
@@ -63,7 +62,6 @@ protected:
     std::string programSection;
     Term* term;
     QueryType type;
-    std::string backgroundKnowledgeFilename;
 };
 } /* namespace asp */
 } /* namespace reasoner */

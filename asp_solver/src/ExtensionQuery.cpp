@@ -16,15 +16,15 @@ ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
     this->type = QueryType::Extension;
     std::stringstream ss;
     if (term->getQueryId() == -1) {
-#ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
+#ifdef QUERY_DEBUG
+        std::cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << std::endl;
 #endif
         return;
     }
     ss << "query" << term->getQueryId();
     this->queryProgramSection = ss.str();
-#ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
+#ifdef QUERY_DEBUG
+    std::cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << std::endl;
 #endif
     this->createProgramSection();
     //    // is added manually to recreate eval for LNAI17 paper
@@ -62,7 +62,7 @@ void ExtensionQuery::createProgramSection()
             queryProgram << createKBCapturingRule(headPredicate.first, arity);
         }
     }
-#ifdef ASPVARIABLEQUERY_DEBUG
+#ifdef QUERY_DEBUG
     std::cout << "INPUT PROGRAM: " << std::endl;
     std::cout << term->getQueryRule() << std::endl;
     for (auto& rule : term->getRules()) {
@@ -84,12 +84,14 @@ void ExtensionQuery::createProgramSection()
     std::cout << std::endl;
 #endif
 
-    queryProgram << expandRuleModuleProperty(term->getQueryRule());
+    if(!term->getQueryRule().empty()) {
+        queryProgram << expandRuleModuleProperty(term->getQueryRule());
+    }
     for (auto& rule : term->getRules()) {
         queryProgram << expandRuleModuleProperty(rule);
     }
 
-#ifdef ASPVARIABLEQUERY_DEBUG
+#ifdef QUERY_DEBUG
     std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
 #endif
 
@@ -121,8 +123,8 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
     for (auto& value : this->headValues) {
 
         value.second.clear();
-#ifdef ASPQUERY_DEBUG
-        cout << "ExtensionQuery::onModel: " << value.first << endl;
+#ifdef QUERY_DEBUG
+        std::cout << "ExtensionQuery::onModel: " << value.first << std::endl;
 #endif
         auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()

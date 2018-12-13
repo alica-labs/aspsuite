@@ -1,7 +1,7 @@
 #include "reasoner/asp/FilterQuery.h"
 
-#include "reasoner/asp/Solver.h"
 #include "reasoner/asp/Enums.h"
+#include "reasoner/asp/Solver.h"
 
 namespace reasoner
 {
@@ -11,11 +11,11 @@ namespace asp
 FilterQuery::FilterQuery(Solver* solver, Term* term)
         : Query(solver, term)
 {
-    this->type = QueryType ::Filter;
+    this->type = QueryType::Filter;
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
-#ifdef Solver_DEBUG
+#ifdef SOLVER_DEBUG
     std::cout << "Solver: Query contains rule: " << std::endl;
     for (auto rule : this->term->getRules()) {
         std::cout << rule << std::endl;
@@ -27,7 +27,9 @@ FilterQuery::FilterQuery(Solver* solver, Term* term)
 #endif
 }
 
-FilterQuery::~FilterQuery() {}
+FilterQuery::~FilterQuery()
+{
+}
 
 void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
@@ -35,6 +37,7 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
         if (queryString.compare("") == 0) {
             return;
         }
+
         // TODO: Fix nested braces and move funtionality to central accessable helper class
         if (queryString.find(",") != std::string::npos) {
             size_t start = 0;
@@ -46,14 +49,19 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
                     break;
                 }
                 currentQuery = queryString.substr(start, end - start + 1);
+
                 currentQuery = supplementary::Configuration::trim(currentQuery);
+
                 this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
+
                 start = queryString.find(",", end);
+
                 if (start != std::string::npos) {
                     start += 1;
                 }
             }
         } else {
+
             this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
         }
     }
@@ -113,7 +121,7 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
     // Fill mapping from query fact towards model fact
     for (auto value : this->getHeadValues()) {
 #ifdef QUERY_DEBUG
-        cout << "FilterQuery::onModel: " << value.first << endl;
+        std::cout << "FilterQuery::onModel: " << value.first << std::endl;
 #endif
         auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()

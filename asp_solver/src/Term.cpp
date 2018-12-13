@@ -18,7 +18,9 @@ Term::Term(int lifeTime)
     this->queryId = -1;
 }
 
-Term::~Term() {}
+Term::~Term()
+{
+}
 
 void Term::addRule(std::string rule)
 {
@@ -57,6 +59,16 @@ std::string Term::getProgramSection()
 void Term::setProgramSection(std::string programSection)
 {
     this->programSection = programSection;
+}
+
+std::string Term::getBackgroundKnowledgeFilename()
+{
+    return this->backgroundKnowledgeFilename;
+}
+
+void Term::setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilename)
+{
+    this->backgroundKnowledgeFilename = backgroundKnowledgeFilename;
 }
 
 std::vector<std::string> Term::getProgramSectionParameters()

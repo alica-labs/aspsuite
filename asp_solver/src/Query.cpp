@@ -21,7 +21,9 @@ Query::Query(Solver* solver, Term* term)
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
     // load background knowledge file only once (it does not ground anything)
-    this->solver->loadFileFromConfig(this->backgroundKnowledgeFilename);
+    if (!this->term->getBackgroundKnowledgeFilename().empty()) {
+        this->solver->loadFileFromConfig(this->term->getBackgroundKnowledgeFilename());
+    }
 
     // ground term program section with given params
     if (!term->getProgramSection().empty()) {
@@ -34,7 +36,9 @@ Query::Query(Solver* solver, Term* term)
     }
 }
 
-Query::~Query() {}
+Query::~Query()
+{
+}
 
 void Query::reduceLifeTime()
 {
@@ -100,7 +104,7 @@ std::string Query::toString()
     }
     ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
 
-    if (this->getType() == QueryType ::Filter) {
+    if (this->getType() == QueryType::Filter) {
         ss << "\tQuery is of type Filter.\n";
         ss << "\tFacts:"
            << "\n";

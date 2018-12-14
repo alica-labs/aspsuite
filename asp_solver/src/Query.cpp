@@ -190,5 +190,7 @@ QueryType Query::getType()
     return type;
 }
 
+
+
 } /* namespace asp */
 } /* namespace reasoner */

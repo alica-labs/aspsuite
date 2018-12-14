@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Enums.h"
+#include "PredicateContainer.h"
 
 #include <clingo.hh>
 
@@ -17,7 +18,7 @@ namespace asp
 class Term;
 class AnnotatedValVec;
 class Solver;
-class Query
+class Query : public PredicateContainer
 {
 public:
     Query(Solver* solver, Term* term);
@@ -46,6 +47,7 @@ public:
     bool checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2);
 
 protected:
+
     /**
      * queryString is used to ask the solver if specific predicates are true.
      * predicates are separated by "," meaning all of them will be in the same rule and ";"
@@ -62,6 +64,7 @@ protected:
     std::string programSection;
     Term* term;
     QueryType type;
+
 };
 } /* namespace asp */
 } /* namespace reasoner */

@@ -15,14 +15,14 @@ FilterQuery::FilterQuery(Solver* solver, Term* term)
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
-#ifdef SOLVER_DEBUG
-    std::cout << "Solver: Query contains rule: " << std::endl;
+#ifdef QUERY_DEBUG
+    std::cout << "FilterQuery: Query contains rule: " << std::endl;
     for (auto rule : this->term->getRules()) {
         std::cout << rule << std::endl;
     }
 
     for (auto fact : this->term->getFacts()) {
-        std::cout << "Solver: Query contains fact: " << fact << std::endl;
+        std::cout << "FilterQuery: Query contains fact: " << fact << std::endl;
     }
 #endif
 }
@@ -31,40 +31,51 @@ FilterQuery::~FilterQuery()
 {
 }
 
+/**
+ *
+ * @param queryVec
+ */
 void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
-    for (auto queryString : queryVec) {
-        if (queryString.compare("") == 0) {
-            return;
-        }
+    // TODO: Fix nested braces and move funtionality to central accessable helper class
+    /*
+  size_t parameterStartIdx = 0;
+  for (auto queryString : queryVec) {
+      if (queryString.compare("") == 0) {
+          return;
+      }
 
-        // TODO: Fix nested braces and move funtionality to central accessable helper class
-        if (queryString.find(",") != std::string::npos) {
-            size_t start = 0;
-            size_t end = std::string::npos;
-            std::string currentQuery = "";
-            while (start != std::string::npos) {
-                end = queryString.find(")", start);
-                if (end == std::string::npos || end == queryString.size()) {
-                    break;
-                }
-                currentQuery = queryString.substr(start, end - start + 1);
+      // this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
 
-                currentQuery = supplementary::Configuration::trim(currentQuery);
 
-                this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
 
-                start = queryString.find(",", end);
+      if (queryString.find(",") != std::string::npos) {
+          size_t start = 0;
+          size_t end = std::string::npos;
+          std::string currentQuery = "";
+          while (start != std::string::npos) {
+              end = queryString.find(")", start);
+              if (end == std::string::npos || end == queryString.size()) {
+                  break;
+              }
+              currentQuery = queryString.substr(start, end - start + 1);
 
-                if (start != std::string::npos) {
-                    start += 1;
-                }
-            }
-        } else {
+              currentQuery = supplementary::Configuration::trim(currentQuery);
 
-            this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
-        }
-    }
+              this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
+
+              start = queryString.find(",", end);
+
+              if (start != std::string::npos) {
+                  start += 1;
+              }
+          }
+      } else {
+
+          this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
+      }
+  }
+    }*/
 }
 
 bool FilterQuery::factsExistForAtLeastOneModel()
@@ -123,10 +134,9 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
 #ifdef QUERY_DEBUG
         std::cout << "FilterQuery::onModel: " << value.first << std::endl;
 #endif
-        auto it = ((Solver*) this->solver)
-                          ->clingo->symbolic_atoms()
-                          .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
-        if (it == ((Solver*) this->solver)->clingo->symbolic_atoms().end()) {
+        auto it = this->solver->clingo->symbolic_atoms().begin(
+                Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
+        if (it == this->solver->clingo->symbolic_atoms().end()) {
             std::cout << "FilterQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }

@@ -104,11 +104,6 @@ void ExtensionQuery::removeExternal()
     this->solver->releaseExternal(*(this->external));
 }
 
-QueryType ExtensionQuery::getType()
-{
-    return this->type;
-}
-
 void ExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
     Clingo::SymbolVector vec;
@@ -120,6 +115,7 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
     //	cout << "Query: processing query '" << queryMapPair.first << "'" << endl;
 
     // determine the domain of the query predicate
+    //Lisa: bug/deprecated? nothing seems to get emplaced into headValues in ExtQuery anymore
     for (auto& value : this->headValues) {
 
         value.second.clear();
@@ -142,200 +138,19 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
     }
 }
 
-std::string ExtensionQuery::trim(const std::string& str)
-{
-    const std::string& whitespace = " \t";
-    const auto strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos) {
-        return ""; // no content
-    }
-    const auto strEnd = str.find_last_not_of(whitespace);
-    const auto strRange = strEnd - strBegin + 1;
-
-    return str.substr(strBegin, strRange);
-}
-
-size_t ExtensionQuery::findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start)
-{
-    size_t idx = predicate.find_first_of(chars, start);
-    return end <= idx ? std::string::npos : idx;
-}
-
-size_t ExtensionQuery::findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start)
-{
-    size_t idx = predicate.find_first_not_of(chars, start);
-    return end <= idx ? std::string::npos : idx;
-}
-
-/**
- * Finds the implication of a given rule. Also handles #minimize and #maximize, as they are converted to
- * a weak constraint like ":~ not goalReachable(id) : goal(id,_,_). [1@2]"
- * @param rule
- * @return Idx of the implication ":-"
- */
-size_t ExtensionQuery::findImplication(const std::string& rule)
-{
-    size_t idxs[] = {rule.find(":-"), rule.find(":~"), rule.find("#minimize"), rule.find("#maximize")};
-    return *std::min_element(idxs, idxs + 4);
-}
-
-void ExtensionQuery::rememberPredicate(std::string predicateName, int arity)
-{
-    if (predicateName.empty()) {
-        return;
-    }
-    predicateName = trim(predicateName);
-    size_t dotIndex = predicateName.find_last_of('.');
-    if (dotIndex == predicateName.size() - 1) {
-        predicateName = predicateName.substr(0, dotIndex);
-    }
-    if (predicatesToAritiesMap.find(predicateName) == predicatesToAritiesMap.end()) {
-        predicatesToAritiesMap.emplace(predicateName, std::unordered_set<int>({arity}));
-    } else {
-        predicatesToAritiesMap[predicateName].insert(arity);
-    }
-}
-
-size_t ExtensionQuery::findMatchingClosingBrace(const std::string& predicate, size_t openingBraceIdx)
-{
-    int numOpenBraces = 1;
-
-    size_t currentIdx = openingBraceIdx + 1;
-
-    while (numOpenBraces != 0 && currentIdx < predicate.size()) {
-        size_t nextOpeningBrace = predicate.find_first_of('(', currentIdx + 1);
-        size_t nextClosingBrace = predicate.find_first_of(')', currentIdx + 1);
-
-        if (nextClosingBrace == std::string::npos) {
-            return std::string::npos;
-        }
-
-        if (nextOpeningBrace < nextClosingBrace && nextOpeningBrace != std::string::npos) {
-            numOpenBraces++;
-            currentIdx = nextOpeningBrace;
-        } else {
-            numOpenBraces--;
-            currentIdx = nextClosingBrace;
-        }
-    }
-
-    // we did go over the length of the predicate, that sucks
-    if (currentIdx >= predicate.size()) {
-        currentIdx = std::string::npos;
-    }
-
-    return currentIdx;
-}
-
-ExtensionQuery::Predicate ExtensionQuery::extractConstant(std::string rule, size_t constantEndIdxPlusOne)
-{
-    Predicate predicate;
-    size_t leftDelimiterIdx = rule.find_last_of(" ,;:", constantEndIdxPlusOne - 1);
-    size_t predicateStartIdx = 0;
-    if (leftDelimiterIdx != std::string::npos) {
-        if (rule[leftDelimiterIdx + 1] == '-') {
-            leftDelimiterIdx = leftDelimiterIdx + 2;
-        }
-        predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
-    }
-
-    predicate.name = rule.substr(predicateStartIdx, constantEndIdxPlusOne - predicateStartIdx);
-    // cut off starting choice stuff and whitespaces...
-    size_t start = predicate.name.find_first_not_of(" ,:;{[");
-    if (start != std::string::npos) {
-        predicate.name = predicate.name.substr(start);
-    }
-
-    predicate.parameterStartIdx = constantEndIdxPlusOne;
-    predicate.parameterEndIdx = constantEndIdxPlusOne;
-    predicate.parameters = "";
-    predicate.arity = 0;
-    return predicate;
-}
-
-ExtensionQuery::Predicate ExtensionQuery::extractPredicate(std::string rule, size_t parameterStartIdx)
-{
-    Predicate predicate;
-    size_t leftDelimiterIdx = rule.find_last_of(" ,;:", parameterStartIdx);
-    size_t predicateStartIdx = 0;
-    if (leftDelimiterIdx != std::string::npos) {
-        if (rule[leftDelimiterIdx + 1] == '-') {
-            leftDelimiterIdx = leftDelimiterIdx + 2;
-        }
-        predicateStartIdx = rule.find_first_not_of(" ,;:", leftDelimiterIdx);
-    } else {
-        predicateStartIdx = rule.find_first_not_of(" ,;:{=0123456789");
-    }
-
-    predicate.name = rule.substr(predicateStartIdx, parameterStartIdx - predicateStartIdx);
-    // cut off starting choice stuff and whitespaces...
-    size_t start = predicate.name.find_first_not_of(" ,:;{[");
-    if (start != std::string::npos) {
-        predicate.name = predicate.name.substr(start);
-    }
-    if (rule[parameterStartIdx] != '(') {
-        std::cerr << "extractPredicate: WTF Constants are everywhere!" << std::endl;
-    }
-
-    // normal predicate
-    predicate.parameterStartIdx = parameterStartIdx;
-    predicate.parameterEndIdx = findMatchingClosingBrace(rule, predicate.parameterStartIdx);
-    predicate.parameters = rule.substr(predicate.parameterStartIdx + 1, predicate.parameterEndIdx - predicate.parameterStartIdx - 1);
-
-    int arity = 0;
-    size_t currentIdx = 0;
-    while (currentIdx < predicate.parameters.size()) {
-        // next parameter found
-        arity++;
-
-        size_t nextComma = predicate.parameters.find_first_of(',', currentIdx + 1);
-        size_t nextOpeningBrace = predicate.parameters.find_first_of('(', currentIdx + 1);
-
-        if (nextOpeningBrace != std::string::npos && nextOpeningBrace < nextComma) {
-            // jump over nested fact
-            nextComma = predicate.parameters.find_first_of(',', findMatchingClosingBrace(predicate.parameters, nextOpeningBrace) + 1);
-        }
-
-        if (nextComma == std::string::npos) {
-            break;
-        }
-
-        // update currentIdx
-        currentIdx = nextComma + 1;
-    }
-    predicate.arity = arity;
-
-    return predicate;
-}
-
-std::string ExtensionQuery::createVariableParameters(int arity)
-{
-    std::stringstream variableParams;
-    if (arity != 0) {
-        variableParams << "(";
-        for (int i = 0; i < arity - 1; i++) {
-            variableParams << "X" << i + 1 << ",";
-        }
-        variableParams << "X" << arity << ")";
-        return variableParams.str();
-    } else {
-        return "";
-    }
-}
-
 std::string ExtensionQuery::createKBCapturingRule(const std::string& headPredicateName, int arity)
 {
     // build replaced fact
     std::stringstream rule;
-    rule << queryProgramSection << "(" << headPredicateName << createVariableParameters(arity) << ") :- " << headPredicateName
-         << createVariableParameters(arity) << ", " << externalName << ".\n";
+    rule << queryProgramSection << "(" << headPredicateName << SyntaxUtils::createVariableParameters(arity) << ") :- " << headPredicateName
+         << SyntaxUtils::createVariableParameters(arity) << ", " << externalName << ".\n";
     //    std::cout << "KB Fact Rule: " << rule.str();
     return rule.str();
 }
 
 std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
 {
-    fact = trim(fact);
+    fact = SyntaxUtils::trim(fact);
     fact = fact.substr(0, fact.size() - 1);
     std::stringstream ss;
     ss << queryProgramSection << "(" << fact << ") :- " << externalName << ".\n";
@@ -343,136 +158,12 @@ std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
     return ss.str();
 }
 
-std::pair<ExtensionQuery::Separator, size_t> ExtensionQuery::determineFirstSeparator(
-        std::pair<ExtensionQuery::Separator, size_t> a, std::pair<ExtensionQuery::Separator, size_t> b)
-{
-    if (a.second == std::string::npos) {
-        if (b.second == std::string::npos) {
-            return {Separator::None, std::string::npos};
-        } else {
-            return b;
-        }
-    } else {
-        if (b.second == std::string::npos) {
-            return a;
-        } else {
-            return a.second < b.second ? a : b;
-        }
-    }
-};
-
-void ExtensionQuery::extractHeadPredicates(const std::string& rule)
-{
-    size_t implicationIdx = findImplication(rule);
-    if (implicationIdx == 0) {
-        return;
-    }
-
-    std::pair<Separator, size_t> colonPair;
-    std::pair<Separator, size_t> semicolonPair;
-    std::pair<Separator, size_t> commaPair;
-    std::pair<Separator, size_t> result;
-    size_t openingBraceIdx = std::string::npos;
-    size_t skipToIdx = std::string::npos;
-    size_t currentIdx = 0;
-
-    bool done = false;
-
-    while (!done) {
-        colonPair = std::pair<Separator, size_t>(Separator::Colon, findNextChar(rule, ":", implicationIdx, currentIdx));
-        semicolonPair = std::pair<Separator, size_t>(Separator::Semicolon, findNextChar(rule, ";", implicationIdx, currentIdx));
-        commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ",", implicationIdx, currentIdx));
-        result = determineFirstSeparator(determineFirstSeparator(colonPair, semicolonPair), commaPair);
-        openingBraceIdx = findNextChar(rule, "(", result.second, currentIdx);
-
-        // handle next predicate
-        switch (result.first) {
-        case Semicolon:
-        case Comma:
-            if (openingBraceIdx == std::string::npos) {
-                // constant
-                rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
-            } else {
-                Predicate predicate = extractPredicate(rule, openingBraceIdx);
-                // writes into skipToIdx
-                skipToIdx = predicate.parameterEndIdx;
-                rememberPredicate(predicate.name, predicate.arity);
-            }
-            break;
-        case Colon:
-            if (openingBraceIdx == std::string::npos) {
-                // constant
-                rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
-            } else {
-                Predicate predicate = extractPredicate(rule, openingBraceIdx);
-                // writes into skipToIdx
-                skipToIdx = predicate.parameterEndIdx;
-                rememberPredicate(predicate.name, predicate.arity);
-            }
-            // skip behind conditional: ';' or '}' will end conditional
-            skipToIdx = findNextChar(rule, "}", implicationIdx, result.second + 1);
-            if (skipToIdx == std::string::npos) {
-                skipToIdx = findNextChar(rule, ";", implicationIdx, result.second + 1);
-            } else {
-                skipToIdx = findNextChar(rule, ",;", implicationIdx, skipToIdx + 1);
-                if (skipToIdx == std::string::npos) {
-                    done = true;
-                }
-            }
-            break;
-        case None:
-            if (openingBraceIdx == std::string::npos) {
-                // constant
-                rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
-            } else {
-                if (openingBraceIdx > implicationIdx) {
-                    // constant
-                    rememberPredicate(rule.substr(currentIdx, implicationIdx - currentIdx), 0);
-                } else {
-                    // unary predicate
-                    rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
-                }
-            }
-            break;
-        default:
-            std::cerr << "MP: Separator Char not known!" << std::endl;
-        }
-
-        // update currentIdx
-        if (skipToIdx != std::string::npos) {
-            currentIdx = findNextCharNotOf(rule, " ,;.", implicationIdx, skipToIdx + 1);
-            if (currentIdx == std::string::npos) {
-                done = true;
-            }
-        } else {
-            if (result.second == std::string::npos) {
-                done = true;
-            }
-            currentIdx = result.second + 1;
-        }
-
-        // reset brace idx
-        openingBraceIdx = std::string::npos;
-        skipToIdx = std::string::npos;
-    }
-}
-
-bool ExtensionQuery::lookUpPredicate(const std::string& predicateName, int arity)
-{
-    if (predicatesToAritiesMap.find(predicateName) != predicatesToAritiesMap.end()) {
-        // name matched
-        auto& aritiesSet = predicatesToAritiesMap[predicateName];
-        return aritiesSet.find(arity) != aritiesSet.end();
-    }
-    return false;
-}
-
 std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
 {
-    std::pair<Separator, size_t> colonPair;
-    std::pair<Separator, size_t> semicolonPair;
-    std::pair<Separator, size_t> commaPair;
-    std::pair<Separator, size_t> result;
+    std::pair<SyntaxUtils::Separator, size_t> colonPair;
+    std::pair<SyntaxUtils::Separator, size_t> semicolonPair;
+    std::pair<SyntaxUtils::Separator, size_t> commaPair;
+    std::pair<SyntaxUtils::Separator, size_t> result;
     size_t openingBraceIdx = std::string::npos;
     size_t currentIdx = 0;
     size_t endLastPredicateIdx = 0;
@@ -481,32 +172,32 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
     std::stringstream mpRule;
 
     while (!done) {
-        colonPair = std::pair<Separator, size_t>(Separator::Colon, findNextChar(rule, ":", rule.size(), currentIdx));
-        semicolonPair = std::pair<Separator, size_t>(Separator::Semicolon, findNextChar(rule, ";", rule.size(), currentIdx));
-        commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ",", rule.size(), currentIdx));
-        result = determineFirstSeparator(determineFirstSeparator(colonPair, semicolonPair), commaPair);
-        openingBraceIdx = findNextChar(rule, "(", result.second, currentIdx);
+        colonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Colon, SyntaxUtils::findNextChar(rule, ":", rule.size(), currentIdx));
+        semicolonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Semicolon, SyntaxUtils::findNextChar(rule, ";", rule.size(), currentIdx));
+        commaPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Comma, SyntaxUtils::findNextChar(rule, ",", rule.size(), currentIdx));
+        result = SyntaxUtils::determineFirstSeparator(SyntaxUtils::determineFirstSeparator(colonPair, semicolonPair), commaPair);
+        openingBraceIdx = SyntaxUtils::findNextChar(rule, "(", result.second, currentIdx);
 
         // handle next predicate
-        Predicate predicate;
+        SyntaxUtils::Predicate predicate;
         switch (result.first) {
-        case Semicolon:
-        case Comma:
+        case SyntaxUtils::Semicolon:
+        case SyntaxUtils::Comma:
             if (openingBraceIdx != std::string::npos) {
-                predicate = extractPredicate(rule, openingBraceIdx);
+                predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
             } else {
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
                 predicate.parameterEndIdx = result.second + 1;
             }
             break;
-        case Colon:
+        case SyntaxUtils::Colon:
             if (result.second != currentIdx) {
                 if (openingBraceIdx != std::string::npos) {
-                    predicate = extractPredicate(rule, openingBraceIdx);
+                    predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
                 } else {
                     // constant before : or :-
-                    predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
+                    predicate = SyntaxUtils::extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
                 }
             } else {
                 predicate.name = "";
@@ -514,7 +205,7 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                 predicate.parameterEndIdx = result.second + 1;
             }
             break;
-        case None:
+        case SyntaxUtils::None:
             if (openingBraceIdx == std::string::npos) {
                 if (currentIdx != std::string::npos && currentIdx > rule.find_last_of('.')) {
                     predicate.name = "";
@@ -522,11 +213,11 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                     predicate.parameterEndIdx = currentIdx;
                 } else {
                     // constant found
-                    predicate = extractConstant(rule, rule.find_last_of('.'));
+                    predicate = SyntaxUtils::extractConstant(rule, rule.find_last_of('.'));
                 }
             } else {
                 // normal predicate found
-                predicate = extractPredicate(rule, openingBraceIdx);
+                predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
             }
             done = true;
             break;
@@ -536,7 +227,7 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
 
         // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx
         if (!predicate.name.empty()) {
-            currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx + 1);
+            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx + 1);
             mpRule << rule.substr(endLastPredicateIdx, (predicate.parameterStartIdx - predicate.name.length()) - endLastPredicateIdx);
             endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
@@ -562,7 +253,7 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                 mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
-            currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
+            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
                     mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);

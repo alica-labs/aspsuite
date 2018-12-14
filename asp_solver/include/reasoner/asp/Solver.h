@@ -19,8 +19,8 @@ namespace asp
 {
 
 class AnnotatedExternal;
-class FilterQuery;
 class Query;
+class FilterQuery;
 class ExtensionQuery;
 class Variable;
 class AnnotatedValVec;

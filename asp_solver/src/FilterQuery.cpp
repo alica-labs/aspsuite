@@ -38,44 +38,39 @@ FilterQuery::~FilterQuery()
 void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
     // TODO: Fix nested braces and move funtionality to central accessable helper class
-    /*
-  size_t parameterStartIdx = 0;
-  for (auto queryString : queryVec) {
-      if (queryString.compare("") == 0) {
-          return;
-      }
 
-      // this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
+    for (auto queryString : queryVec) {
+        if (queryString.compare("") == 0) {
+            return;
+        }
+
+        // this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
+
+        if (queryString.find(",") != std::string::npos) {
+
+            auto preds = this->determineHeadPredicates(queryString);
+            for (auto pred : preds) {
+                std::stringstream currentQuery;
+                currentQuery << pred.name;
+                if(pred.arity > 0) {
+                    currentQuery << "(";
+                }
+                currentQuery << pred.parameters;
+                if(pred.arity > 0) {
+                    currentQuery << ")";
+                }
+                auto res = currentQuery.str();
+                //TODO remove
+                std::cout << "emplacing entry for " << res << std::endl;
+                this->headValues.emplace(this->solver->parseValue(res), std::vector<Clingo::Symbol>());
+            }
+        } else {
+            this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
+        }
+
+    }
 
 
-
-      if (queryString.find(",") != std::string::npos) {
-          size_t start = 0;
-          size_t end = std::string::npos;
-          std::string currentQuery = "";
-          while (start != std::string::npos) {
-              end = queryString.find(")", start);
-              if (end == std::string::npos || end == queryString.size()) {
-                  break;
-              }
-              currentQuery = queryString.substr(start, end - start + 1);
-
-              currentQuery = supplementary::Configuration::trim(currentQuery);
-
-              this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
-
-              start = queryString.find(",", end);
-
-              if (start != std::string::npos) {
-                  start += 1;
-              }
-          }
-      } else {
-
-          this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
-      }
-  }
-    }*/
 }
 
 bool FilterQuery::factsExistForAtLeastOneModel()

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "SyntaxUtils.h"
-#include <unordered_set>
 #include <map>
+#include <unordered_set>
 
 namespace reasoner
 {
@@ -12,7 +12,6 @@ class PredicateContainer
 {
 
 protected:
-
     std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
 
     void rememberPredicate(std::string predicateName, int arity)
@@ -44,11 +43,20 @@ protected:
 
     void extractHeadPredicates(const std::string& rule)
     {
+        auto headPredicates = this->determineHeadPredicates(rule);
+        for (auto hp : headPredicates) {
+            rememberPredicate(hp.name, hp.arity);
+        }
+    }
+
+    std::vector<SyntaxUtils::Predicate> determineHeadPredicates(const std::string& rule)
+    {
+
         size_t implicationIdx = SyntaxUtils::findImplication(rule);
         if (implicationIdx == 0) {
-            return;
+            return std::vector<SyntaxUtils::Predicate>();
         }
-
+        std::vector<SyntaxUtils::Predicate> ret;
         std::pair<SyntaxUtils::Separator, size_t> colonPair;
         std::pair<SyntaxUtils::Separator, size_t> semicolonPair;
         std::pair<SyntaxUtils::Separator, size_t> commaPair;
@@ -60,63 +68,86 @@ protected:
         bool done = false;
 
         while (!done) {
-            colonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Colon, SyntaxUtils::findNextChar(rule, ":", implicationIdx, currentIdx));
-            semicolonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Semicolon, SyntaxUtils::findNextChar(rule, ";", implicationIdx, currentIdx));
-            commaPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Comma, SyntaxUtils::findNextChar(rule, ",", implicationIdx, currentIdx));
+            colonPair =
+                    std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Colon, SyntaxUtils::findNextChar(rule, ":", implicationIdx, currentIdx));
+            semicolonPair = std::pair<SyntaxUtils::Separator, size_t>(
+                    SyntaxUtils::Separator::Semicolon, SyntaxUtils::findNextChar(rule, ";", implicationIdx, currentIdx));
+            commaPair =
+                    std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Comma, SyntaxUtils::findNextChar(rule, ",", implicationIdx, currentIdx));
             result = SyntaxUtils::determineFirstSeparator(SyntaxUtils::determineFirstSeparator(colonPair, semicolonPair), commaPair);
             openingBraceIdx = SyntaxUtils::findNextChar(rule, "(", result.second, currentIdx);
+            SyntaxUtils::Predicate predicate;
 
             // handle next predicate
             switch (result.first) {
-                case SyntaxUtils::Semicolon:
-                case SyntaxUtils::Comma:
-                    if (openingBraceIdx == std::string::npos) {
-                        // constant
-                        rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
-                    } else {
-                        SyntaxUtils::Predicate predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
-                        // writes into skipToIdx
-                        skipToIdx = predicate.parameterEndIdx;
-                        rememberPredicate(predicate.name, predicate.arity);
-                    }
-                    break;
-                case SyntaxUtils::Colon:
-                    if (openingBraceIdx == std::string::npos) {
-                        // constant
-                        rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
-                    } else {
-                        SyntaxUtils::Predicate predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
-                        // writes into skipToIdx
-                        skipToIdx = predicate.parameterEndIdx;
-                        rememberPredicate(predicate.name, predicate.arity);
-                    }
-                    // skip behind conditional: ';' or '}' will end conditional
-                    skipToIdx = SyntaxUtils::findNextChar(rule, "}", implicationIdx, result.second + 1);
+            case SyntaxUtils::Semicolon:
+            case SyntaxUtils::Comma:
+                if (openingBraceIdx == std::string::npos) {
+                    // constant
+                    predicate.name = rule.substr(currentIdx, result.second - currentIdx);
+                    predicate.arity = 0;
+                    ret.push_back(predicate);
+                    // rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+                } else {
+                    // SyntaxUtils::Predicate predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
+                    predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
+                    // writes into skipToIdx
+                    skipToIdx = predicate.parameterEndIdx;
+                    // rememberPredicate(predicate.name, predicate.arity);
+                    ret.push_back(predicate);
+                }
+                break;
+            case SyntaxUtils::Colon:
+                if (openingBraceIdx == std::string::npos) {
+                    // constant
+                    // rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+                    predicate.name = rule.substr(currentIdx, result.second - currentIdx);
+                    predicate.arity = 0;
+                    ret.push_back(predicate);
+                } else {
+                    // SyntaxUtils::Predicate predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
+                    predicate = SyntaxUtils::extractPredicate(rule, openingBraceIdx);
+                    // writes into skipToIdx
+                    skipToIdx = predicate.parameterEndIdx;
+                    // rememberPredicate(predicate.name, predicate.arity);
+                    ret.push_back(predicate);
+                }
+                // skip behind conditional: ';' or '}' will end conditional
+                skipToIdx = SyntaxUtils::findNextChar(rule, "}", implicationIdx, result.second + 1);
+                if (skipToIdx == std::string::npos) {
+                    skipToIdx = SyntaxUtils::findNextChar(rule, ";", implicationIdx, result.second + 1);
+                } else {
+                    skipToIdx = SyntaxUtils::findNextChar(rule, ",;", implicationIdx, skipToIdx + 1);
                     if (skipToIdx == std::string::npos) {
-                        skipToIdx = SyntaxUtils::findNextChar(rule, ";", implicationIdx, result.second + 1);
-                    } else {
-                        skipToIdx = SyntaxUtils::findNextChar(rule, ",;", implicationIdx, skipToIdx + 1);
-                        if (skipToIdx == std::string::npos) {
-                            done = true;
-                        }
+                        done = true;
                     }
-                    break;
-                case SyntaxUtils::None:
-                    if (openingBraceIdx == std::string::npos) {
+                }
+                break;
+            case SyntaxUtils::None:
+                if (openingBraceIdx == std::string::npos) {
+                    // constant
+                    // rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+                    predicate.name = rule.substr(currentIdx, result.second - currentIdx);
+                    predicate.arity = 0;
+                    ret.push_back(predicate);
+                } else {
+                    if (openingBraceIdx > implicationIdx) {
                         // constant
-                        rememberPredicate(rule.substr(currentIdx, result.second - currentIdx), 0);
+                        // rememberPredicate(rule.substr(currentIdx, implicationIdx - currentIdx), 0);
+                        predicate.name = rule.substr(currentIdx, implicationIdx - currentIdx);
+                        predicate.arity = 0;
+                        ret.push_back(predicate);
                     } else {
-                        if (openingBraceIdx > implicationIdx) {
-                            // constant
-                            rememberPredicate(rule.substr(currentIdx, implicationIdx - currentIdx), 0);
-                        } else {
-                            // unary predicate
-                            rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
-                        }
+                        // unary predicate
+                        predicate.name = rule.substr(currentIdx, openingBraceIdx - currentIdx);
+                        predicate.arity = 1;
+                        ret.push_back(predicate);
+                        // rememberPredicate(rule.substr(currentIdx, openingBraceIdx - currentIdx), 1);
                     }
-                    break;
-                default:
-                    std::cerr << "MP: Separator Char not known!" << std::endl;
+                }
+                break;
+            default:
+                std::cerr << "MP: Separator Char not known!" << std::endl;
             }
 
             // update currentIdx
@@ -136,9 +167,8 @@ protected:
             openingBraceIdx = std::string::npos;
             skipToIdx = std::string::npos;
         }
+        return ret;
     }
-
-
 };
 } /* namespace asp*/
 } /* namespace reasoner*/

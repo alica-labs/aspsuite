@@ -25,11 +25,12 @@ void SolveCommand::printModels()
 {
     std::stringstream ss;
     for (int i = 0; i < this->currentModels.size(); i++) {
-        ss << "Model number " << i + 1 << ":" << endl;
+        ss << "Model number " << i + 1 << ":\n" << std::endl;
         for (auto atom : this->currentModels.at(i)) {
             ss << atom << " ";
         }
-        ss << endl;
+        ss << std::endl;
+        this->gui->getUi()->sortedModelsLabel->setText(QString(ss.str().c_str()));
     }
     this->gui->getUi()->currentModelsLabel->setText(QString(ss.str().c_str()));
 }
@@ -82,7 +83,7 @@ void SolveCommand::printSortedModels()
     }
     ss.str("");
     for (int i = 0; i < sorted.size(); i++) {
-        ss << "Model number " << i + 1 << ":" << std::endl;
+        ss << "Model number " << i + 1 << ":\n" << std::endl;
         for (auto atom : sorted.at(i)) {
             ss << atom << " ";
         }

@@ -117,7 +117,7 @@ private:
     std::vector<Clingo::SymbolVector> currentModels;
 
     int queryCounter;
-    supplementary::SystemConfig* sc;
+    essentials::SystemConfig* sc;
     GrdProgramObserver observer;
 
 protected:

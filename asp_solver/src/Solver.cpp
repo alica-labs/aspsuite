@@ -37,7 +37,7 @@ Solver::Solver(std::vector<char const*> args)
     };
     this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
     this->clingo->register_observer(this->observer);
-    this->sc = supplementary::SystemConfig::getInstance();
+    this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
 #ifdef Solver_DEBUG
     this->modelCount = 0;
@@ -67,7 +67,7 @@ bool Solver::loadFileFromConfig(std::string configKey)
 
     std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
-    backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
+    backGroundKnowledgeFile = essentials::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
     this->clingo->load(backGroundKnowledgeFile.c_str());
     return true;
 }

@@ -221,7 +221,7 @@ void ASPAlicaPlanIntegrator::processRuntimeCondition(const RuntimeCondition* con
 
 uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* rootPlan)
 {
-    uint64_t instanceElementHash = supplementary::CustomHashes::FNV_OFFSET ^ rootPlan->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+    uint64_t instanceElementHash = essentials::CustomHashes::FNV_OFFSET ^ rootPlan->getId() * essentials::CustomHashes::FNV_MAGIC_PRIME;
     this->solver->add("planBase", {}, gen->hasPlanInstance(rootPlan, instanceElementHash).c_str());
     this->solver->add("planBase", {}, gen->runningPlan(instanceElementHash).c_str());
     return instanceElementHash;
@@ -229,7 +229,7 @@ uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* rootPlan)
 
 uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* plan, const State* state, uint64_t instanceElementHash)
 {
-    instanceElementHash = instanceElementHash ^ state->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+    instanceElementHash = instanceElementHash ^ state->getId() * essentials::CustomHashes::FNV_MAGIC_PRIME;
     this->solver->add("planBase", {}, gen->hasRunningPlan(state, instanceElementHash).c_str());
     this->solver->add("planBase", {}, gen->hasPlanInstance(plan, instanceElementHash).c_str());
     this->solver->add("planBase", {}, gen->runningPlan(instanceElementHash).c_str());
@@ -238,7 +238,7 @@ uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* plan, const State
 
 uint64_t ASPAlicaPlanIntegrator::handleRunningPlan(const Plan* plan, const State* state, const PlanType* planType, uint64_t instanceElementHash)
 {
-    instanceElementHash = instanceElementHash ^ planType->getId() * supplementary::CustomHashes::FNV_MAGIC_PRIME;
+    instanceElementHash = instanceElementHash ^ planType->getId() * essentials::CustomHashes::FNV_MAGIC_PRIME;
     instanceElementHash = handleRunningPlan(plan, state, instanceElementHash);
     this->solver->add("planBase", {}, gen->hasRunningRealisation(planType, instanceElementHash).c_str());
     return instanceElementHash;
@@ -280,7 +280,7 @@ void ASPAlicaPlanIntegrator::handleCondString(const std::string& condString, std
             end = inPredicateString.find(',', start);
             if (end != std::string::npos) {
                 task = inPredicateString.substr(start, end - start);
-                task = supplementary::Configuration::trim(task);
+                task = essentials::Configuration::trim(task);
                 //						std::cout << "ASPAlicaPlanInegrator: TASK MATCH>>>>>>" << task
                 //<<
                 //"<<<<<<" << std::endl;
@@ -297,7 +297,7 @@ void ASPAlicaPlanIntegrator::handleCondString(const std::string& condString, std
             end = inPredicateString.find(')', start);
             if (end != std::string::npos) {
                 state = inPredicateString.substr(start, end - start);
-                state = supplementary::Configuration::trim(state);
+                state = essentials::Configuration::trim(state);
                 //						std::cout << "ASPAlicaPlanInegrator: STATE MATCH>>>>>>" <<
                 // state
                 //<< "<<<<<<" << std::endl;

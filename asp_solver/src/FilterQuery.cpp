@@ -46,7 +46,7 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
                     break;
                 }
                 currentQuery = queryString.substr(start, end - start + 1);
-                currentQuery = supplementary::Configuration::trim(currentQuery);
+                currentQuery = essentials::Configuration::trim(currentQuery);
                 this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
                 start = queryString.find(",", end);
                 if (start != std::string::npos) {

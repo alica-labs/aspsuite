@@ -25,7 +25,7 @@ void AnnotatedValVec::extractResponse()
             std::stringstream ss;
             ss << val;
             std::string tmp = ss.str();
-            tmp = supplementary::Configuration::trim(tmp);
+            tmp = essentials::Configuration::trim(tmp);
             this->factQueryValues.at(i).push_back(tmp);
             tmp = tmp.substr(0, tmp.size() - 1);
             tmp = tmp.erase(0, tmp.find("(") + 1);

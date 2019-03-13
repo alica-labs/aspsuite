@@ -136,12 +136,25 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
             continue;
         }
 
+        bool isNewModel = true;
         while (it) {
             if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol())) {
+
+                //TODO hack for accumulating too many models in optimization
+                if(isNewModel) {
+                    isNewModel = false;
+                    auto entry = this->headValues.find(Clingo::Symbol(value.first));
+                    if (entry != this->headValues.end()) {
+                        std::cout << "CLEARING VECTOR FOR " << value.first.to_string() << std::endl;
+                        entry->second.clear();
+                    }
+
+                }
                 this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
             }
             it++;
         }
+
     }
 }
 } /* namespace asp */

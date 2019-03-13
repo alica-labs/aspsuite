@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <regex>
 
+#define QUERY_DEBUG
+
 namespace reasoner
 {
 namespace asp
@@ -84,7 +86,7 @@ void ExtensionQuery::createProgramSection()
     std::cout << std::endl;
 #endif
 
-    if(!term->getQueryRule().empty()) {
+    if (!term->getQueryRule().empty()) {
         queryProgram << expandRuleModuleProperty(term->getQueryRule());
     }
     for (auto& rule : term->getRules()) {
@@ -115,7 +117,7 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
     //	cout << "Query: processing query '" << queryMapPair.first << "'" << endl;
 
     // determine the domain of the query predicate
-    //Lisa: bug/deprecated? nothing seems to get emplaced into headValues in ExtQuery anymore
+    // Lisa: bug/deprecated? nothing seems to get emplaced into headValues in ExtQuery anymore
     for (auto& value : this->headValues) {
 
         value.second.clear();
@@ -154,7 +156,6 @@ std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
     fact = fact.substr(0, fact.size() - 1);
     std::stringstream ss;
     ss << queryProgramSection << "(" << fact << ") :- " << externalName << ".\n";
-    //    std::cout << "MP Fact Rule: " << ss.str();
     return ss.str();
 }
 
@@ -173,7 +174,8 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
 
     while (!done) {
         colonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Colon, SyntaxUtils::findNextChar(rule, ":", rule.size(), currentIdx));
-        semicolonPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Semicolon, SyntaxUtils::findNextChar(rule, ";", rule.size(), currentIdx));
+        semicolonPair =
+                std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Semicolon, SyntaxUtils::findNextChar(rule, ";", rule.size(), currentIdx));
         commaPair = std::pair<SyntaxUtils::Separator, size_t>(SyntaxUtils::Separator::Comma, SyntaxUtils::findNextChar(rule, ",", rule.size(), currentIdx));
         result = SyntaxUtils::determineFirstSeparator(SyntaxUtils::determineFirstSeparator(colonPair, semicolonPair), commaPair);
         openingBraceIdx = SyntaxUtils::findNextChar(rule, "(", result.second, currentIdx);
@@ -225,6 +227,12 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             std::cerr << "MP: Separator Char not known!" << std::endl;
         }
 
+        // quick fix for condition rules (only works if the rule contains at most one condition as the last literal)
+        std::string externalSeparator = ", ";
+        if (rule.find(':') != std::string::npos && rule.find_last_of(':') != SyntaxUtils::findImplication(rule) && rule.find(';') == std::string::npos &&
+                rule.find('{') == std::string::npos) {
+            externalSeparator = "; ";
+        }
         // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx
         if (!predicate.name.empty()) {
             currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx + 1);
@@ -244,25 +252,26 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                     mpRule << "(" << predicate.parameters << ")";
                 }
             }
+
             if (currentIdx == std::string::npos) {
-                mpRule << ", " << externalName;
+                mpRule << externalSeparator << externalName;
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
             }
             size_t bracketIdx = rule.find_last_of('[');
             if (done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
-                mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                mpRule << externalSeparator << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
             currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
-                    mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                    mpRule << externalSeparator << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
                 } else {
                     mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
                     endLastPredicateIdx = currentIdx;
                 }
             } else {
-                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
+                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << externalSeparator << externalName << ".";
             }
         }
 
@@ -273,6 +282,7 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
         openingBraceIdx = std::string::npos;
     }
     mpRule << "\n";
+
     return mpRule.str();
 }
 } /* namespace asp */

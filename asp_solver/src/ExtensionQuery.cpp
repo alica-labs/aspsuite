@@ -465,6 +465,21 @@ bool ExtensionQuery::lookUpPredicate(const std::string& predicateName, int arity
     return false;
 }
 
+bool ExtensionQuery::isMinOrMax(std::string rule, size_t openingCurlyBracesIdx)
+{
+    size_t hashIdx = rule.find_last_of('#', openingCurlyBracesIdx);
+    if (hashIdx == std::string::npos) {
+        return false;
+    }
+    std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx - hashIdx);
+    potentialMinMax = trim(potentialMinMax);
+    if (potentialMinMax.compare("minimize") || potentialMinMax.compare("maximize")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
 {
     std::pair<Separator, size_t> colonPair;
@@ -474,6 +489,12 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
     size_t openingBraceIdx = std::string::npos;
     size_t currentIdx = 0;
     size_t endLastPredicateIdx = 0;
+    size_t conditionColonIdx = std::string::npos;
+    size_t implicationIdx = findImplication(rule);
+    size_t openingCurlyBracesIdx = findNextChar(rule, "{", rule.size(), 0);
+    if (isMinOrMax(rule, openingCurlyBracesIdx)) {
+        openingCurlyBracesIdx = std::string::npos;
+    }
 
     bool done = false;
     std::stringstream mpRule;
@@ -484,6 +505,9 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
         commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ",", rule.size(), currentIdx));
         result = determineFirstSeparator(determineFirstSeparator(colonPair, semicolonPair), commaPair);
         openingBraceIdx = findNextChar(rule, "(", result.second, currentIdx);
+        if (findNextChar(rule, "}", currentIdx, (openingCurlyBracesIdx == std::string::npos ? 0 : openingCurlyBracesIdx)) != std::string::npos) {
+            openingCurlyBracesIdx = findNextChar(rule, "{", result.second, currentIdx);
+        }
 
         // handle next predicate
         Predicate predicate;
@@ -507,6 +531,10 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                     predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
                 }
             } else {
+                if (implicationIdx == std::string::npos || result.second > implicationIdx && openingCurlyBracesIdx == std::string::npos) {
+                    conditionColonIdx = result.second;
+                }
+
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
                 predicate.parameterEndIdx = result.second + 1;
@@ -552,24 +580,41 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                 }
             }
             if (currentIdx == std::string::npos) {
-                mpRule << ", " << externalName;
-                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                if (implicationIdx == 0) {
+                    if (openingCurlyBracesIdx != std::string::npos) {
+                        mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
+                    } else {
+                        mpRule << ", " << externalName << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                    }
+                } else if (implicationIdx == std::string::npos) {
+                    mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << " :- " << externalName << ".";
+                } else {
+                    if (openingCurlyBracesIdx != std::string::npos) {
+                        mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx)
+                               << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
+                    } else {
+                        mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName
+                               << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                    }
+                }
             }
             size_t bracketIdx = rule.find_last_of('[');
             if (done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
-                mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
-                    mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                    mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "."
+                           << rule.substr(rule.find_last_of('.') + 1); // Stuff after .
                 } else {
                     mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
                     endLastPredicateIdx = currentIdx;
                 }
             } else {
-                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
+                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx);
+                mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
             }
         }
 

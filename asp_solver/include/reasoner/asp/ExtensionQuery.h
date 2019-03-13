@@ -56,6 +56,7 @@ private:
     std::string queryProgramSection;
     std::string externalName;
     std::string trim(const std::string& str);
+    bool isMinOrMax(std::string rule, size_t openingCurlyBracesIdx);
     size_t findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start = 0);
     size_t findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start = 0);
     size_t findImplication(const std::string& rule);

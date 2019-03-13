@@ -358,6 +358,20 @@ bool lookUpPredicate(const std::string& predicateName, int arity)
     return false;
 }
 
+bool isMinOrMax(std::string rule, size_t  openingCurlyBracesIdx) {
+    size_t hashIdx = rule.find_last_of('#', openingCurlyBracesIdx);
+    if (hashIdx == std::string::npos) {
+        return false;
+    }
+    std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx-hashIdx);
+    potentialMinMax = trim(potentialMinMax);
+    if (potentialMinMax.compare("minimize") || potentialMinMax.compare("maximize")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 std::string expandRuleModuleProperty(const std::string& rule)
 {
     std::pair<Separator, size_t> colonPair;
@@ -367,6 +381,12 @@ std::string expandRuleModuleProperty(const std::string& rule)
     size_t openingBraceIdx = std::string::npos;
     size_t currentIdx = 0;
     size_t endLastPredicateIdx = 0;
+    size_t conditionColonIdx = std::string::npos;
+    size_t implicationIdx = findImplication(rule);
+    size_t openingCurlyBracesIdx = findNextChar(rule, "{", rule.size(), 0);
+    if (isMinOrMax(rule, openingCurlyBracesIdx)) {
+        openingCurlyBracesIdx = std::string::npos;
+    }
 
     bool done = false;
     std::stringstream mpRule;
@@ -377,6 +397,9 @@ std::string expandRuleModuleProperty(const std::string& rule)
         commaPair = std::pair<Separator, size_t>(Separator::Comma, findNextChar(rule, ",", rule.size(), currentIdx));
         result = determineFirstSeparator(determineFirstSeparator(colonPair, semicolonPair), commaPair);
         openingBraceIdx = findNextChar(rule, "(", result.second, currentIdx);
+        if (findNextChar(rule, "}", currentIdx, (openingCurlyBracesIdx == std::string::npos ? 0 : openingCurlyBracesIdx)) != std::string::npos) {
+            openingCurlyBracesIdx = findNextChar(rule, "{", result.second, currentIdx);
+        }
 
         // handle next predicate
         Predicate predicate;
@@ -400,6 +423,10 @@ std::string expandRuleModuleProperty(const std::string& rule)
                     predicate = extractConstant(rule, rule.find_last_not_of(' ', result.second - 1) + 1);
                 }
             } else {
+                if (implicationIdx == std::string::npos || result.second > implicationIdx && openingCurlyBracesIdx == std::string::npos) {
+                    conditionColonIdx = result.second;
+                }
+
                 predicate.name = "";
                 predicate.parameterStartIdx = result.second + 1;
                 predicate.parameterEndIdx = result.second + 1;
@@ -445,24 +472,41 @@ std::string expandRuleModuleProperty(const std::string& rule)
                 }
             }
             if (currentIdx == std::string::npos) {
-                mpRule << ", " << externalName;
-                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                if (implicationIdx == 0) {
+                    if (openingCurlyBracesIdx != std::string::npos) {
+                        mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
+                    } else {
+                        mpRule << ", " << externalName << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                    }
+                } else if (implicationIdx == std::string::npos) {
+                    mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << " :- " << externalName << ".";
+                } else {
+                    if (openingCurlyBracesIdx != std::string::npos) {
+                        mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx)
+                               << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
+                    } else {
+                        mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName
+                               << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                    }
+                }
             }
             size_t bracketIdx = rule.find_last_of('[');
-            if(done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
-                mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+            if (done && bracketIdx != std::string::npos && bracketIdx > rule.find_last_of('.')) {
+                mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
             currentIdx = findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
-                    mpRule << ", " << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
+                    mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "."
+                           << rule.substr(rule.find_last_of('.') + 1); // Stuff after .
                 } else {
                     mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
                     endLastPredicateIdx = currentIdx;
                 }
             } else {
-                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
+                mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx);
+                mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
             }
         }
 
@@ -479,7 +523,8 @@ std::string expandRuleModuleProperty(const std::string& rule)
 int main()
 {
     // query rule
-    std::string queryRule = ":~ not goalReachable. [1@2]";
+    // std::string queryRule = ":~ not goalReachable. [1@2]";
+    std::string queryRule = "{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.";
 
     // additional rules
     std::vector<std::string> rules;
@@ -509,7 +554,7 @@ int main()
 
     rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
     rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
-    rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
+    // rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
     rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
     rules.emplace_back("factA(X, Y):-factB(X).");
     rules.emplace_back("{maxTimestep(0..(N*N)) : fieldSize(N)} = 1.");
@@ -518,6 +563,7 @@ int main()
     rules.emplace_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
     rules.emplace_back("factD(X); factE(Y,Z) :- factA(X), factZ(Y,Z).");
     rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
+    rules.emplace_back(":- 1{occurs(A,T) : action(A)}1");
 
     // facts
     std::vector<std::string> facts;

@@ -145,13 +145,13 @@ void ASPTerm::setQueryRule(std::string queryRule)
         return;
     }
 
-    queryRule = supplementary::Configuration::trim(queryRule);
+    queryRule = essentials::Configuration::trim(queryRule);
     size_t endOfHead = queryRule.find(":-");
     if (endOfHead != std::string::npos) {
         // for rules (including variables)
         size_t startOfBody = endOfHead + 2;
-        this->heads.push_back(supplementary::Configuration::trim(queryRule.substr(0, endOfHead)));
-        this->bodies.push_back(supplementary::Configuration::trim(queryRule.substr(startOfBody, queryRule.size() - startOfBody - 1)));
+        this->heads.push_back(essentials::Configuration::trim(queryRule.substr(0, endOfHead)));
+        this->bodies.push_back(essentials::Configuration::trim(queryRule.substr(startOfBody, queryRule.size() - startOfBody - 1)));
     } else {
         // for ground literals
         this->heads.push_back(queryRule);

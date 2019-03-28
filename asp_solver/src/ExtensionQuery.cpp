@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <regex>
 
-#define QUERY_DEBUG
+//#define QUERY_DEBUG
 
 namespace reasoner
 {

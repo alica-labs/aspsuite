@@ -31,6 +31,7 @@ Query::Query(Solver* solver, Term* term)
         auto params = this->term->getProgramSectionParameters();
         for (auto param : params) {
             paramsVec.push_back(this->solver->parseValue(param));
+
         }
         this->solver->ground({{term->getProgramSection().c_str(), paramsVec}}, nullptr);
     }

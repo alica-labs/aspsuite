@@ -145,7 +145,6 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
                     isNewModel = false;
                     auto entry = this->headValues.find(Clingo::Symbol(value.first));
                     if (entry != this->headValues.end()) {
-                        std::cout << "CLEARING VECTOR FOR " << value.first.to_string() << std::endl;
                         entry->second.clear();
                     }
 

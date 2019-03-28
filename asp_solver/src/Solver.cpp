@@ -1,13 +1,15 @@
 #include "reasoner/asp/Solver.h"
 
+#include "reasoner/asp/AnnotatedExternal.h"
 #include "reasoner/asp/ExtensionQuery.h"
 #include "reasoner/asp/FilterQuery.h"
-#include "reasoner/asp/AnnotatedExternal.h"
 
-#include <reasoner/asp/Variable.h>
-#include <reasoner/asp/Query.h>
 #include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/Query.h>
 #include <reasoner/asp/Term.h>
+#include <reasoner/asp/Variable.h>
+
+#define Solver_DEBUG
 
 namespace reasoner
 {
@@ -37,16 +39,15 @@ Solver::Solver(std::vector<char const*> args)
     };
     this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
     this->clingo->register_observer(this->observer);
-    this->sc = supplementary::SystemConfig::getInstance();
+    this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
-#ifdef Solver_DEBUG
-    this->modelCount = 0;
-#endif
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
 }
 
-Solver::~Solver() {}
+Solver::~Solver()
+{
+}
 
 void Solver::loadFile(std::string absolutFilename)
 {
@@ -67,7 +68,7 @@ bool Solver::loadFileFromConfig(std::string configKey)
 
     std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
-    backGroundKnowledgeFile = supplementary::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
+    backGroundKnowledgeFile = essentials::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
     this->clingo->load(backGroundKnowledgeFile.c_str());
     return true;
 }
@@ -91,9 +92,6 @@ bool Solver::solve()
 {
     this->currentModels.clear();
     this->reduceQueryLifeTime();
-#ifdef Solver_DEBUG
-    this->modelCount = 0;
-#endif
     // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
     auto result = this->clingo->solve(span, this, false, false);
@@ -106,11 +104,11 @@ bool Solver::solve()
 bool Solver::on_model(Clingo::Model& m)
 {
 #ifdef Solver_DEBUG
-    cout << "Solver: Found the following model :" << endl;
+    std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
-        cout << atom << " ";
+        std::cout << atom << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
 #endif
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
@@ -213,7 +211,6 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
 
 int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
 {
-
     auto cVars = std::vector<Variable*>(vars.size());
     for (int i = 0; i < vars.size(); ++i) {
         cVars.at(i) = vars.at(i);
@@ -373,7 +370,6 @@ void Solver::printStats()
     ss << "SAT Time: " << (statistics["sumary"]["times"]["sat"] * 1000.0) << "ms" << std::endl;
     ss << "UNSAT Time: " << (statistics["sumary"]["times"]["unsat"] * 1000.0) << "ms" << std::endl;
     ss << "SOLVE Time: " << (statistics["sumary"]["times"]["solve"] * 1000.0) << "ms" << std::endl;
-
     std::cout << ss.str() << std::flush;
 }
 

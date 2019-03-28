@@ -32,7 +32,7 @@ class ASPRCC8 : public ::testing::Test
 {
 
 protected:
-    supplementary::SystemConfig* sc;
+    essentials::SystemConfig* sc;
     alica::AlicaEngine* ae;
     alica::BehaviourCreator* bc;
     alica::ConditionCreator* cc;
@@ -43,13 +43,13 @@ protected:
     virtual void SetUp()
     {
         // determine the path to the test config
-        string path = supplementary::FileSystem::getSelfPath();
+        string path = essentials::FileSystem::getSelfPath();
         int place = path.rfind("devel");
         path = path.substr(0, place);
         path = path + "src/symrock/alica_asp_test/src";
 
         // bring up the SystemConfig with the corresponding path
-        sc = supplementary::SystemConfig::getInstance();
+        sc = essentials::SystemConfig::getInstance();
         sc->setRootPath(path);
         sc->setConfigPath(path + "/etc");
         sc->setHostname("nase");

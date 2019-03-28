@@ -365,7 +365,7 @@ bool isMinOrMax(std::string rule, size_t  openingCurlyBracesIdx) {
     }
     std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx-hashIdx);
     potentialMinMax = trim(potentialMinMax);
-    if (potentialMinMax.compare("minimize") || potentialMinMax.compare("maximize")) {
+    if (potentialMinMax.compare("minimize") == 0 || potentialMinMax.compare("maximize") == 0) {
         return true;
     } else {
         return false;
@@ -384,6 +384,9 @@ std::string expandRuleModuleProperty(const std::string& rule)
     size_t conditionColonIdx = std::string::npos;
     size_t implicationIdx = findImplication(rule);
     size_t openingCurlyBracesIdx = findNextChar(rule, "{", rule.size(), 0);
+    if(openingCurlyBracesIdx == std::string::npos) {
+        std::cout << std::endl;
+    }
     if (isMinOrMax(rule, openingCurlyBracesIdx)) {
         openingCurlyBracesIdx = std::string::npos;
     }
@@ -524,7 +527,8 @@ int main()
 {
     // query rule
     // std::string queryRule = ":~ not goalReachable. [1@2]";
-    std::string queryRule = "{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.";
+    std::string queryRule = "success :- #count{1,X,Y : holds(on(X,Y),T), goal(X,Y)} = 1.";
+    //std::string queryRule = "goalReachable :- safe(X,Y) : holds(on(X,Y),T).";
 
     // additional rules
     std::vector<std::string> rules;
@@ -554,7 +558,7 @@ int main()
 
     rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
     rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
-    // rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
+    rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
     rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
     rules.emplace_back("factA(X, Y):-factB(X).");
     rules.emplace_back("{maxTimestep(0..(N*N)) : fieldSize(N)} = 1.");

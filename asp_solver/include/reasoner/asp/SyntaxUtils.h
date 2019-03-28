@@ -62,6 +62,21 @@ public:
         return end <= idx ? std::string::npos : idx;
     }
 
+    static bool isMinOrMax(const std::string &rule, size_t openingCurlyBracesIdx)
+    {
+        size_t hashIdx = rule.find_last_of('#', openingCurlyBracesIdx);
+        if (hashIdx == std::string::npos) {
+            return false;
+        }
+        std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx - hashIdx);
+        potentialMinMax = trim(potentialMinMax);
+        if (potentialMinMax.compare("#minimize") == 0 || potentialMinMax.compare("#maximize") == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     static size_t findMatchingClosingBrace(const std::string& predicate, size_t openingBraceIdx)
     {
         int numOpenBraces = 1;
@@ -130,6 +145,8 @@ public:
         predicate.arity = 0;
         return predicate;
     }
+
+
 
     static Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
     {

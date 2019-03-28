@@ -365,7 +365,7 @@ bool isMinOrMax(std::string rule, size_t  openingCurlyBracesIdx) {
     }
     std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx-hashIdx);
     potentialMinMax = trim(potentialMinMax);
-    if (potentialMinMax.compare("minimize") == 0 || potentialMinMax.compare("maximize") == 0) {
+    if (potentialMinMax.compare("#minimize") == 0 || potentialMinMax.compare("#maximize") == 0) {
         return true;
     } else {
         return false;
@@ -527,7 +527,8 @@ int main()
 {
     // query rule
     // std::string queryRule = ":~ not goalReachable. [1@2]";
-    std::string queryRule = "success :- #count{1,X,Y : holds(on(X,Y),T), goal(X,Y)} = 1.";
+    std::string queryRule = "#minimize {2*T@1 : maxTimestep(T)}.";
+    //std::string queryRule = "success :- #count{1,X,Y : holds(on(X,Y),T), goal(X,Y)} = 1.";
     //std::string queryRule = "goalReachable :- safe(X,Y) : holds(on(X,Y),T).";
 
     // additional rules

@@ -473,7 +473,7 @@ bool ExtensionQuery::isMinOrMax(std::string rule, size_t openingCurlyBracesIdx)
     }
     std::string potentialMinMax = rule.substr(hashIdx, openingCurlyBracesIdx - hashIdx);
     potentialMinMax = trim(potentialMinMax);
-    if (potentialMinMax.compare("minimize") || potentialMinMax.compare("maximize")) {
+    if (potentialMinMax.compare("#minimize") == 0 || potentialMinMax.compare("#maximize") == 0) {
         return true;
     } else {
         return false;

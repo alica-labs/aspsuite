@@ -57,7 +57,7 @@ std::string ASPGenerator::transition(const Transition* t, bool dotTerminated)
     return "transition(" + get(t) + (dotTerminated ? ")." : ")");
 }
 
-std::string ASPGenerator::synchronisation(const SyncTransition* sync, bool dotTerminated)
+std::string ASPGenerator::synchronisation(const Synchronisation* sync, bool dotTerminated)
 {
     return "synchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 }
@@ -92,7 +92,7 @@ std::string ASPGenerator::brokenEntryPoint(const EntryPoint* ep, bool dotTermina
     return "brokenEntryPoint(" + get(ep) + (dotTerminated ? ")." : ")");
 }
 
-std::string ASPGenerator::brokenSynchronisation(const SyncTransition* sync, bool dotTerminated)
+std::string ASPGenerator::brokenSynchronisation(const Synchronisation* sync, bool dotTerminated)
 {
     return "brokenSynchronisation(" + get(sync) + (dotTerminated ? ")." : ")");
 }
@@ -179,7 +179,7 @@ std::string ASPGenerator::hasOutTransition(const State* s, const Transition* t, 
     return "hasOutTransition(" + get(s) + ", " + get(t) + (dotTerminated ? ")." : ")");
 }
 
-std::string ASPGenerator::hasSynchedTransition(const SyncTransition* sync, const Transition* t, bool dotTerminated)
+std::string ASPGenerator::hasSynchedTransition(const Synchronisation* sync, const Transition* t, bool dotTerminated)
 {
     return "hasSynchedTransition(" + get(sync) + ", " + get(t) + (dotTerminated ? ")." : ")");
 }
@@ -328,7 +328,7 @@ std::string ASPGenerator::get(const Transition* t)
     return iter->second;
 }
 
-std::string ASPGenerator::get(const SyncTransition* sync)
+std::string ASPGenerator::get(const Synchronisation* sync)
 {
     if (sync == this->wildcard_pointer)
         return this->wildcard_string;

@@ -11,7 +11,7 @@
 #include <engine/model/RuntimeCondition.h>
 #include <engine/model/State.h>
 #include <engine/model/SuccessState.h>
-#include <engine/model/SyncTransition.h>
+#include <engine/model/Synchronisation.h>
 #include <engine/model/Task.h>
 
 #include <CustomHashes.h>
@@ -162,7 +162,7 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan* p, uint64_t instanceElement
     }
 
     // add synchronisations
-    for (auto& syncTransition : p->getSyncTransitions()) {
+    for (auto& syncTransition : p->getSynchronisations()) {
         this->solver->add("planBase", {}, gen->synchronisation(syncTransition).c_str());
         for (auto& transition : syncTransition->getInSync()) {
             this->solver->add("planBase", {}, gen->hasSynchedTransition(syncTransition, transition).c_str());

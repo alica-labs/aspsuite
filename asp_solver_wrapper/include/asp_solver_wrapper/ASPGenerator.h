@@ -10,7 +10,7 @@
 #include <engine/model/PreCondition.h>
 #include <engine/model/RuntimeCondition.h>
 #include <engine/model/State.h>
-#include <engine/model/SyncTransition.h>
+#include <engine/model/Synchronisation.h>
 #include <engine/model/Task.h>
 #include <engine/model/Transition.h>
 
@@ -33,7 +33,7 @@ public:
     std::string planType(const PlanType* s, bool dotTerminated = true);
     std::string successRequired(const EntryPoint* ep, bool dotTerminated = true);
     std::string transition(const Transition* t, bool dotTerminated = true);
-    std::string synchronisation(const SyncTransition* sync, bool dotTerminated = true);
+    std::string synchronisation(const Synchronisation* sync, bool dotTerminated = true);
     std::string preCondition(const PreCondition* cond, bool dotTerminated = true);
     std::string runtimeCondition(const RuntimeCondition* cond, bool dotTerminated = true);
     std::string runningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
@@ -44,7 +44,7 @@ public:
     std::string cycleFree(const Plan* p, bool dotTerminated = true);
     std::string brokenState(const State* s, bool dotTerminated = true);
     std::string brokenEntryPoint(const EntryPoint* e, bool dotTerminated = true);
-    std::string brokenSynchronisation(const SyncTransition* sync, bool dotTerminated = true);
+    std::string brokenSynchronisation(const Synchronisation* sync, bool dotTerminated = true);
     std::string neglocal(const PreCondition* cond, bool dotTerminated = true);
     std::string brokenRunningPlan(uint64_t instanceElementHash, bool dotTerminated = true);
 
@@ -61,7 +61,7 @@ public:
     std::string hasRuntimeCondition(const Plan* p, const RuntimeCondition* cond, bool dotTerminated = true);
     std::string hasInTransition(const State* s, const Transition* t, bool dotTerminated = true);
     std::string hasOutTransition(const State* s, const Transition* t, bool dotTerminated = true);
-    std::string hasSynchedTransition(const SyncTransition* sync, const Transition* t, bool dotTerminated = true);
+    std::string hasSynchedTransition(const Synchronisation* sync, const Transition* t, bool dotTerminated = true);
     std::string brokenPlanTaskPair(const Plan* p, const Task* t, bool dotTerminated = true);
     std::string inRefPlan(std::string prefix, const Condition* c, std::string plan, bool dotTerminated = true);
     std::string hasPlanInstance(const Plan* p, uint64_t instanceElementHash, bool dotTerminated = true);
@@ -87,7 +87,7 @@ public:
     std::string get(const Task* t);
     std::string get(const PlanType* pt);
     std::string get(const Transition* t);
-    std::string get(const SyncTransition* sync);
+    std::string get(const Synchronisation* sync);
     std::string get(std::string prefix, const Condition* cond);
     std::string get(std::string prefix, uint64_t instanceElementHash);
     std::string get(const Behaviour* beh);

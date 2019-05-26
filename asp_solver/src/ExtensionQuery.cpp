@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <regex>
 
-#define QUERY_DEBUG
+#include <chrono>
+
+//#define QUERY_DEBUG
 
 namespace reasoner
 {
@@ -15,6 +17,9 @@ namespace asp
 ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
         : Query(solver, term)
 {
+    //HACK for testing incremental query
+    if(term->getType()== QueryType::Extension) {
+
     this->type = QueryType::Extension;
     std::stringstream ss;
     if (term->getQueryId() == -1) {
@@ -25,6 +30,7 @@ ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
     }
     ss << "query" << term->getQueryId();
     this->queryProgramSection = ss.str();
+
 #ifdef QUERY_DEBUG
     std::cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << std::endl;
 #endif
@@ -34,18 +40,43 @@ ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
     //    if (loaded2) {
     //        this->solver->ground({{"alicaBackground", {}}}, nullptr);
     //    }
-    this->solver->ground({{this->queryProgramSection.c_str(), {}}}, nullptr);
+
+    Clingo::SymbolVector paramsVec;
+    for (auto param : this->term->getProgramSectionParameters()) {
+        paramsVec.push_back(this->solver->parseValue(param.second));
+    }
+
+    this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
+
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
+    }
+
 }
+
 
 ExtensionQuery::~ExtensionQuery() = default;
 
 void ExtensionQuery::createProgramSection()
 {
+    std::stringstream ss;
+    // hacky - how to distinguish normal loading of bg knowledge??
+    if (!term->getProgramSectionParameters().empty() && !term->getRules().empty()) {
+        ss << "(";
+        for (int i = 0; i < term->getProgramSectionParameters().size(); ++i) {
+            ss << term->getProgramSectionParameters().at(i).first;
+            if (i != term->getProgramSectionParameters().size() - 1) {
+                ss << ", ";
+            }
+        }
+        ss << ")";
+    }
+
+    auto wrappedParams = ss.str();
+    auto programSection = this->queryProgramSection + wrappedParams;
     this->externalName = "external" + this->queryProgramSection;
 
     std::stringstream queryProgram;
-    queryProgram << "#program " << queryProgramSection << ".\n";
+    queryProgram << "#program " << programSection << ".\n";
     queryProgram << "#external " << externalName << ".\n";
 
     for (auto& fact : term->getFacts()) {
@@ -61,7 +92,7 @@ void ExtensionQuery::createProgramSection()
 
     for (auto& headPredicate : predicatesToAritiesMap) {
         for (auto& arity : headPredicate.second) {
-            queryProgram << createKBCapturingRule(headPredicate.first, arity);
+            queryProgram << createKBCapturingRule(headPredicate.first, arity, this->queryProgramSection);
         }
     }
 #ifdef QUERY_DEBUG
@@ -87,10 +118,10 @@ void ExtensionQuery::createProgramSection()
 #endif
 
     if (!term->getQueryRule().empty()) {
-        queryProgram << expandRuleModuleProperty(term->getQueryRule());
+        queryProgram << expandRuleModuleProperty(term->getQueryRule(), this->queryProgramSection);
     }
     for (auto& rule : term->getRules()) {
-        queryProgram << expandRuleModuleProperty(rule);
+        queryProgram << expandRuleModuleProperty(rule, this->queryProgramSection);
     }
 
 #ifdef QUERY_DEBUG
@@ -103,6 +134,7 @@ void ExtensionQuery::createProgramSection()
 
 void ExtensionQuery::removeExternal()
 {
+
     this->solver->releaseExternal(*(this->external));
 }
 
@@ -140,11 +172,11 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
     }
 }
 
-std::string ExtensionQuery::createKBCapturingRule(const std::string& headPredicateName, int arity)
+std::string ExtensionQuery::createKBCapturingRule(const std::string& headPredicateName, int arity, const std::string& querySection)
 {
     // build replaced fact
     std::stringstream rule;
-    rule << queryProgramSection << "(" << headPredicateName << SyntaxUtils::createVariableParameters(arity) << ") :- " << headPredicateName
+    rule << querySection << "(" << headPredicateName << SyntaxUtils::createVariableParameters(arity) << ") :- " << headPredicateName
          << SyntaxUtils::createVariableParameters(arity) << ", " << externalName << ".\n";
     //    std::cout << "KB Fact Rule: " << rule.str();
     return rule.str();
@@ -159,8 +191,9 @@ std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
     return ss.str();
 }
 
-std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
+std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule, const std::string& querySection)
 {
+
     std::pair<SyntaxUtils::Separator, size_t> colonPair;
     std::pair<SyntaxUtils::Separator, size_t> semicolonPair;
     std::pair<SyntaxUtils::Separator, size_t> commaPair;
@@ -239,20 +272,20 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             std::cerr << "MP: Separator Char not known!" << std::endl;
         }
 
-        // quick fix for condition rules (only works if the rule contains at most one condition as the last literal)
-        std::string externalSeparator = ", ";
-        if (rule.find(':') != std::string::npos && rule.find_last_of(':') != SyntaxUtils::findImplication(rule) && rule.find(';') == std::string::npos &&
-                rule.find('{') == std::string::npos) {
-            externalSeparator = "; ";
-        }
         // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx
         if (!predicate.name.empty()) {
-            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx + 1);
+            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890n", rule.size(), predicate.parameterEndIdx + 1);
             mpRule << rule.substr(endLastPredicateIdx, (predicate.parameterStartIdx - predicate.name.length()) - endLastPredicateIdx);
             endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
                 // add mp nested predicate
-                mpRule << queryProgramSection << "(" << predicate.name;
+                //FIXME TODO missing functionality for incremental query: distinguish references to older timesteps
+                if(implicationIdx >= currentIdx || implicationIdx == 0 || predicate.name.compare("occurs") == 0 || predicate.name.compare("fieldAhead") == 0) {
+                    mpRule << this->queryProgramSection << "(" << predicate.name;
+                } else {
+                    mpRule << querySection << "(" << predicate.name;
+
+                }
                 if (predicate.arity != 0) {
                     mpRule << "(" << predicate.parameters << "))";
                 } else {
@@ -264,20 +297,21 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                     mpRule << "(" << predicate.parameters << ")";
                 }
             }
-
             if (currentIdx == std::string::npos) {
                 if (implicationIdx == 0) {
+
                     if (openingCurlyBracesIdx != std::string::npos) {
                         mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
                     } else {
-                        mpRule << ", " << externalName << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+
+                        mpRule << ((conditionColonIdx != std::string::npos && rule.find("maximize") == std::string::npos) ? "; " : ", ") << externalName << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
                     }
                 } else if (implicationIdx == std::string::npos) {
                     mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << " :- " << externalName << ".";
                 } else {
                     if (openingCurlyBracesIdx != std::string::npos) {
                         mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx)
-                               << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
+                               << (conditionColonIdx != std::string::npos ? "," : ", ") << externalName << ".";
                     } else {
                         mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName
                                << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
@@ -289,16 +323,19 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
                 mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
             }
         } else {
-            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890", rule.size(), predicate.parameterEndIdx);
+            currentIdx = SyntaxUtils::findNextCharNotOf(rule, " ,;.}=1234567890n", rule.size(), predicate.parameterEndIdx);
             if (currentIdx != std::string::npos) {
                 if (done) {
+
                     mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << "." << rule.substr(rule.find_last_of('.') + 1);
                 } else {
+
                     mpRule << rule.substr(endLastPredicateIdx, currentIdx - endLastPredicateIdx);
                     endLastPredicateIdx = currentIdx;
                 }
             } else {
                 mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx);
+
                 mpRule << (conditionColonIdx != std::string::npos ? "; " : ", ") << externalName << ".";
             }
         }
@@ -311,7 +348,11 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
     }
     mpRule << "\n";
 
+
+
+
     return mpRule.str();
 }
+
 } /* namespace asp */
 } /* namespace reasoner */

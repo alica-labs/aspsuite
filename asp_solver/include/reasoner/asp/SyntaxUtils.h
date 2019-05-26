@@ -148,6 +148,7 @@ public:
 
 
 
+
     static Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
     {
         Predicate predicate;

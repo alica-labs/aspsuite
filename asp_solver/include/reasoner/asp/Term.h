@@ -33,9 +33,9 @@ public:
 
     void setProgramSection(std::string programSection);
 
-    std::vector<std::string> getProgramSectionParameters();
+    std::vector<std::pair<std::string,std::string>> getProgramSectionParameters();
 
-    void addProgramSectionParameter(std::string param);
+    void addProgramSectionParameter(std::string representation, std::string param);
 
     int getLifeTime();
 
@@ -89,7 +89,9 @@ private:
     int queryId;
     int lifeTime;
     std::vector<std::string> facts;
-    std::vector<std::string> programSectionParameters;
+    //pair first: param representation (e.g. 'n'), second: value (e.g. 1)
+    //should be ordered by their occurence in the program section (#program test(n,m).)
+    std::vector<std::pair<std::string,std::string>> programSectionParameters;
     std::shared_ptr<std::map<std::string, bool>> externals;
     QueryType type;
 };

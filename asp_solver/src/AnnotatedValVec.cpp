@@ -4,7 +4,8 @@
 
 namespace reasoner
 {
-    namespace asp{
+namespace asp
+{
 
 AnnotatedValVec::AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> values, std::shared_ptr<Query> query)
 {
@@ -14,7 +15,9 @@ AnnotatedValVec::AnnotatedValVec(long id, std::vector<Clingo::SymbolVector> valu
     extractResponse();
 }
 
-AnnotatedValVec::~AnnotatedValVec() {}
+AnnotatedValVec::~AnnotatedValVec()
+{
+}
 
 void AnnotatedValVec::extractResponse()
 {
@@ -33,5 +36,6 @@ void AnnotatedValVec::extractResponse()
         }
     }
 }
-    } /* namespace asp */
+
+} /* namespace asp */
 } /* namespace reasoner */

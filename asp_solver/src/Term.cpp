@@ -16,6 +16,7 @@ Term::Term(int lifeTime)
     this->numberOfModels = "";
     this->type = QueryType::Undefined;
     this->queryId = -1;
+
 }
 
 Term::~Term()
@@ -71,14 +72,14 @@ void Term::setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilenam
     this->backgroundKnowledgeFilename = backgroundKnowledgeFilename;
 }
 
-std::vector<std::string> Term::getProgramSectionParameters()
+    std::vector<std::pair<std::string,std::string>> Term::getProgramSectionParameters()
 {
     return this->programSectionParameters;
 }
 
-void Term::addProgramSectionParameter(std::string param)
+void Term::addProgramSectionParameter(std::string representation, std::string value)
 {
-    this->programSectionParameters.push_back(param);
+    this->programSectionParameters.push_back(std::make_pair(representation,value));
 }
 
 int Term::getLifeTime()

@@ -21,7 +21,7 @@ void GrdProgramObserver::output_atom(Clingo::Symbol symbol, Clingo::atom_t atom)
 
 void GrdProgramObserver::external(Clingo::atom_t atom, Clingo::ExternalType type)
 {
-    std::cout << "External: " << atom << " " << type << std::endl;
+    //std::cout << "External: " << atom << " " << type << std::endl;
 }
 
 void GrdProgramObserver::clear()

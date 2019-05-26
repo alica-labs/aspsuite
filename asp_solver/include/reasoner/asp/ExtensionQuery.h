@@ -19,21 +19,22 @@ class ExtensionQuery : public Query
 {
 public:
     ExtensionQuery(Solver* solver, Term* term);
+
     virtual ~ExtensionQuery();
-    void removeExternal();
-    void onModel(Clingo::Model& clingoModel);
-
-private:
-
+    virtual void removeExternal();
+    virtual void onModel(Clingo::Model& clingoModel);
     std::shared_ptr<Clingo::Symbol> external;
+
+protected:
+
+
     std::string queryProgramSection;
     std::string externalName;
 
-    std::string createKBCapturingRule(const std::string& headPredicateName, int arity);
+    std::string createKBCapturingRule(const std::string& headPredicateName, int arity, const std::string& querySection);
 
     std::string expandFactModuleProperty(std::string fact);
-    std::string expandRuleModuleProperty(const std::string& rule);
-
+    std::string expandRuleModuleProperty(const std::string& rule, const std::string& querySection);
 
 
     /**
@@ -43,7 +44,7 @@ private:
      *
      * Therefore, it utilises the methods above... expandBlaBla()
      */
-    void createProgramSection();
+    virtual void createProgramSection();
 };
 
 } /* namespace asp */

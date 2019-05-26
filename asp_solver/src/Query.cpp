@@ -28,9 +28,8 @@ Query::Query(Solver* solver, Term* term)
     // ground term program section with given params
     if (!term->getProgramSection().empty()) {
         Clingo::SymbolVector paramsVec;
-        auto params = this->term->getProgramSectionParameters();
-        for (auto param : params) {
-            paramsVec.push_back(this->solver->parseValue(param));
+        for (auto param : this->term->getProgramSectionParameters()) {
+            paramsVec.push_back(this->solver->parseValue(param.second));
 
         }
         this->solver->ground({{term->getProgramSection().c_str(), paramsVec}}, nullptr);

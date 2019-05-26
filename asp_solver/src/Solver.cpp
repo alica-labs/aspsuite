@@ -4,8 +4,11 @@
 #include "reasoner/asp/ExtensionQuery.h"
 #include "reasoner/asp/FilterQuery.h"
 
+#include <chrono>
 #include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/IncrementalExtensionQuery.h>
 #include <reasoner/asp/Query.h>
+#include <reasoner/asp/ReusableExtensionQuery.h>
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
 
@@ -41,6 +44,8 @@ Solver::Solver(std::vector<char const*> args)
     this->clingo->register_observer(this->observer);
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
+    this->clingo->configuration()["configuration"] = "handy";
+
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
 }
@@ -95,6 +100,7 @@ bool Solver::solve()
     // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
     auto result = this->clingo->solve(span, this, false, false);
+
     return result.get().is_satisfiable();
 }
 
@@ -188,6 +194,7 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
         this->removeDeadQueries();
         return false;
     }
+
     for (auto& queriedId : this->currentQueryIds) {
         for (auto& query : this->registeredQueries) {
             std::vector<Clingo::SymbolVector> vals;
@@ -231,6 +238,10 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
                 this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
             } else if (term->getType() == QueryType::Filter) {
                 this->registerQuery(std::make_shared<FilterQuery>(this, term));
+            } else if (term->getType() == QueryType::IncrementalExtension) {
+                this->registerQuery(std::make_shared<IncrementalExtensionQuery>(this, term));
+            } else if (term->getType() == QueryType::ReusableExtension) {
+                this->registerQuery(std::make_shared<ReusableExtensionQuery>(this, term));
             } else {
                 std::cout << "Solver: Query of unknown type registered!" << std::endl;
                 return -1;
@@ -365,11 +376,11 @@ void Solver::printStats()
 
     std::stringstream ss;
     ss << "Solve Statistics:" << std::endl;
-    ss << "TOTAL Time: " << statistics["sumary"]["times"]["total"] << "s" << std::endl;
-    ss << "CPU Time: " << statistics["sumary"]["times"]["cpu"] << "s" << std::endl;
-    ss << "SAT Time: " << (statistics["sumary"]["times"]["sat"] * 1000.0) << "ms" << std::endl;
-    ss << "UNSAT Time: " << (statistics["sumary"]["times"]["unsat"] * 1000.0) << "ms" << std::endl;
-    ss << "SOLVE Time: " << (statistics["sumary"]["times"]["solve"] * 1000.0) << "ms" << std::endl;
+    ss << "TOTAL Time: " << statistics["summary"]["times"]["total"] << "s" << std::endl;
+    ss << "CPU Time: " << statistics["summary"]["times"]["cpu"] << "s" << std::endl;
+    ss << "SAT Time: " << (statistics["summary"]["times"]["sat"] * 1000.0) << "ms" << std::endl;
+    ss << "UNSAT Time: " << (statistics["summary"]["times"]["unsat"] * 1000.0) << "ms" << std::endl;
+    ss << "SOLVE Time: " << (statistics["summary"]["times"]["solve"] * 1000.0) << "ms" << std::endl;
     std::cout << ss.str() << std::flush;
 }
 

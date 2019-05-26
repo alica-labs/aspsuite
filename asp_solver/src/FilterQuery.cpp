@@ -3,6 +3,7 @@
 #include "reasoner/asp/Enums.h"
 #include "reasoner/asp/Solver.h"
 
+
 namespace reasoner
 {
 namespace asp
@@ -37,8 +38,6 @@ FilterQuery::~FilterQuery()
  */
 void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
-    // TODO: Fix nested braces and move funtionality to central accessable helper class
-
     for (auto queryString : queryVec) {
         if (queryString.compare("") == 0) {
             return;
@@ -52,25 +51,19 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
             for (auto pred : preds) {
                 std::stringstream currentQuery;
                 currentQuery << pred.name;
-                if(pred.arity > 0) {
+                if (pred.arity > 0) {
                     currentQuery << "(";
-                }
-                currentQuery << pred.parameters;
-                if(pred.arity > 0) {
+                    currentQuery << pred.parameters;
                     currentQuery << ")";
                 }
                 auto res = currentQuery.str();
-                //TODO remove
-                std::cout << "emplacing entry for " << res << std::endl;
+
                 this->headValues.emplace(this->solver->parseValue(res), std::vector<Clingo::Symbol>());
             }
         } else {
             this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
         }
-
     }
-
-
 }
 
 bool FilterQuery::factsExistForAtLeastOneModel()
@@ -116,6 +109,7 @@ std::vector<std::pair<Clingo::Symbol, TruthValue>> FilterQuery::getTruthValues()
 
 void FilterQuery::onModel(Clingo::Model& clingoModel)
 {
+
     // Remember model
     Clingo::SymbolVector vec;
     auto tmp = clingoModel.symbols(clingo_show_type_shown);
@@ -140,20 +134,18 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
         while (it) {
             if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol())) {
 
-                //TODO hack for accumulating too many models in optimization
-                if(isNewModel) {
+                // TODO hack for accumulating too many models in optimization
+                if (isNewModel) {
                     isNewModel = false;
                     auto entry = this->headValues.find(Clingo::Symbol(value.first));
                     if (entry != this->headValues.end()) {
                         entry->second.clear();
                     }
-
                 }
                 this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
             }
             it++;
         }
-
     }
 }
 } /* namespace asp */

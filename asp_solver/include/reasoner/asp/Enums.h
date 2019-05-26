@@ -8,6 +8,8 @@ enum QueryType
 {
     Filter,
     Extension,
+    IncrementalExtension,
+    ReusableExtension,
     Undefined
 };
 

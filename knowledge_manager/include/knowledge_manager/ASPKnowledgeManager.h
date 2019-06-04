@@ -5,11 +5,11 @@
 
 namespace knowledge_manager
 {
-class ASPKnowledgeManger
+class ASPKnowledgeManager
 {
 public:
-    ASPKnowledgeManger();
-    virtual ~ASPKnowledgeManger();
+    ASPKnowledgeManager();
+    virtual ~ASPKnowledgeManager();
     void initializeSolver(::reasoner::asp::Solver* solver);
     std::vector<std::string> solve(std::string queryRule, std::string programSection);
     int addInformation(std::vector<std::string>& information, int lifetime = -1);

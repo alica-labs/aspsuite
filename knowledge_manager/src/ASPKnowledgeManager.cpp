@@ -11,18 +11,18 @@
 
 namespace knowledge_manager
 {
-    ASPKnowledgeManger::ASPKnowledgeManger()
+    ASPKnowledgeManager::ASPKnowledgeManager()
         : solver(nullptr)
 {
 }
 
-    ASPKnowledgeManger::~ASPKnowledgeManger() {}
+    ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
 /**
  *TODO would it be better to filter results with a facts query?
  * Solves the current ASP Program of the Knowledge Base according to specified queryRule
  */
-std::vector<std::string> ASPKnowledgeManger::solve(std::string queryRule, std::string programSection)
+std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::string programSection)
 {
     auto vars = std::vector<reasoner::asp::Variable*>();
     vars.push_back(new reasoner::asp::Variable());
@@ -76,7 +76,7 @@ std::vector<std::string> ASPKnowledgeManger::solve(std::string queryRule, std::s
  * Combines information into a term, wraps it in a query and registers it in the solver
  * @return id of query
  */
-int ASPKnowledgeManger::addInformation(std::vector<std::string>& information, int lifetime)
+int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, int lifetime)
 {
     std::lock_guard<std::mutex> lock(mtx);
     ::reasoner::asp::Term* term = new ::reasoner::asp::Term(lifetime);
@@ -106,7 +106,7 @@ int ASPKnowledgeManger::addInformation(std::vector<std::string>& information, in
 /**
  * Removes a specified query from solver
  */
-bool ASPKnowledgeManger::revoke(int queryId)
+bool ASPKnowledgeManager::revoke(int queryId)
 {
     std::lock_guard<std::mutex> lock(mtx);
     bool success = false;
@@ -134,7 +134,7 @@ bool ASPKnowledgeManger::revoke(int queryId)
 /**
  * Helper method. Solver can't be instantiated at construction time
  */
-void ASPKnowledgeManger::initializeSolver(::reasoner::asp::Solver* solver)
+void ASPKnowledgeManager::initializeSolver(::reasoner::asp::Solver* solver)
 {
     if (this->solver == nullptr) {
 #ifdef ASPKB_DEBUG

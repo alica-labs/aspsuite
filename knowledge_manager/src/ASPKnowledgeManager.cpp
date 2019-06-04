@@ -121,7 +121,7 @@ bool ASPKnowledgeManager::revoke(int queryId)
     }
     if(success) {
         auto position = std::find(this->currentQueryIDs.begin(), this->currentQueryIDs.end(), 8);
-        if (position != this->currentQueryIDs.end()) // == myVector.end() means the element was not found
+        if (position != this->currentQueryIDs.end())
             this->currentQueryIDs.erase(position);
     }
 
@@ -134,14 +134,9 @@ bool ASPKnowledgeManager::revoke(int queryId)
 /**
  * Helper method. Solver can't be instantiated at construction time
  */
-void ASPKnowledgeManager::initializeSolver(::reasoner::asp::Solver* solver)
+void ASPKnowledgeManager::setSolver(reasoner::asp::Solver *solver)
 {
-    if (this->solver == nullptr) {
-#ifdef ASPKB_DEBUG
-        std::cout << "ASPKB: Initialize Solver." << std::endl;
-#endif
         this->solver = solver;
-    }
 }
 
 } /* namespace knowledge_manager */

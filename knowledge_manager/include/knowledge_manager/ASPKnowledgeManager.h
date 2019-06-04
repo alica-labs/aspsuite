@@ -10,7 +10,7 @@ class ASPKnowledgeManager
 public:
     ASPKnowledgeManager();
     virtual ~ASPKnowledgeManager();
-    void initializeSolver(::reasoner::asp::Solver* solver);
+    void setSolver(reasoner::asp::Solver *solver);
     std::vector<std::string> solve(std::string queryRule, std::string programSection);
     int addInformation(std::vector<std::string>& information, int lifetime = -1);
     bool revoke(int queryId);

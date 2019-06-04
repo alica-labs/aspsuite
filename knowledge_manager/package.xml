@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>knowledge_manager</name>
+  <version>0.0.0</version>
+  <description>The knowledge_manager package</description>
+
+  <maintainer email="jakob@vs.uni-kassel.de">Stefan Jakob</maintainer>
+
+  <license>MIT</license>
+
+	<depend>asp_solver</depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <export>
+  </export>
+</package>

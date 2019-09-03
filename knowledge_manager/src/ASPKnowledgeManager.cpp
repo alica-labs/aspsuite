@@ -1,9 +1,9 @@
 #include "knowledge_manager/ASPKnowledgeManager.h"
+#include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/ExtensionQuery.h>
+#include <reasoner/asp/Solver.h>
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
-#include <reasoner/asp/AnnotatedValVec.h>
-#include <reasoner/asp/Solver.h>
-#include <reasoner/asp/ExtensionQuery.h>
 
 #include <algorithm>
 
@@ -11,12 +11,12 @@
 
 namespace knowledge_manager
 {
-    ASPKnowledgeManager::ASPKnowledgeManager()
+ASPKnowledgeManager::ASPKnowledgeManager()
         : solver(nullptr)
 {
 }
 
-    ASPKnowledgeManager::~ASPKnowledgeManager() {}
+ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
 /**
  *TODO would it be better to filter results with a facts query?
@@ -93,7 +93,7 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
     bool success = this->solver->registerQuery(query);
 
 #ifdef ASPKB_DEBUG
-        std::cout << "ASPKB: Adding query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
+    std::cout << "ASPKB: Adding query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
 #endif
 
     if (success) {
@@ -119,14 +119,14 @@ bool ASPKnowledgeManager::revoke(int queryId)
             break;
         }
     }
-    if(success) {
+    if (success) {
         auto position = std::find(this->currentQueryIDs.begin(), this->currentQueryIDs.end(), 8);
         if (position != this->currentQueryIDs.end())
             this->currentQueryIDs.erase(position);
     }
 
 #ifdef ASPKB_DEBUG
-        std::cout << "ASPKB: Removing query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
+    std::cout << "ASPKB: Removing query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
 #endif
     return success;
 }
@@ -134,9 +134,28 @@ bool ASPKnowledgeManager::revoke(int queryId)
 /**
  * Helper method. Solver can't be instantiated at construction time
  */
-void ASPKnowledgeManager::setSolver(reasoner::asp::Solver *solver)
+void ASPKnowledgeManager::setSolver(reasoner::asp::Solver* solver)
 {
-        this->solver = solver;
+    this->solver = solver;
+}
+
+void ASPKnowledgeManager::add(char const* name, Clingo::StringSpan const& params, char const* part)
+{
+    this->solver->add(name, params, part);
+}
+
+void ASPKnowledgeManager::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
+{
+    this->solver->ground(vec, callBack);
+}
+
+bool ASPKnowledgeManager::solve()
+{
+    return this->solver->solve();
+}
+
+Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str) {
+    return this->solver->parseValue(str);
 }
 
 } /* namespace knowledge_manager */

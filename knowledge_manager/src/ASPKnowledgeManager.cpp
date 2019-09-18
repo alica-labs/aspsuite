@@ -158,4 +158,8 @@ Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str) {
     return this->solver->parseValue(str);
 }
 
+    reasoner::asp::Solver *ASPKnowledgeManager::getSolver() {
+        return solver;
+    }
+
 } /* namespace knowledge_manager */

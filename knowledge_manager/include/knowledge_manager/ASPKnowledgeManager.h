@@ -21,6 +21,8 @@ public:
     bool solve();
     Clingo::Symbol parseValue(std::string const& str);
 
+    reasoner::asp::Solver *getSolver();
+
 private:
     ::reasoner::asp::Solver* solver;
     std::vector<std::string> currentSolution;

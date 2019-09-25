@@ -38,7 +38,7 @@ int main()
         }
     };
 
-    /*std::ofstream myfile;
+    std::ofstream myfile;
     myfile.open("facts.csv");
     std::string facts = createFacts(100);
     for (int j = 1; j <= 10; j++) {
@@ -57,10 +57,9 @@ int main()
         }
         myfile << std::endl;
     }
-    myfile.close();*/
+    myfile.close();
 
-    std::ofstream myfile;
-    myfile.open("externals.csv");
+    myfile.open("externals_single.csv");
     std::string externals = createExternals(100);
     for (int j = 1; j <= 10; j++) {
         myfile << std::to_string(j * 10) + ",";
@@ -71,9 +70,9 @@ int main()
             auto start = std::chrono::high_resolution_clock::now();
             for (int k = 0; k < j * 10; k++) {
                 std::string ext = "test" + std::to_string(i);
-                clingo.assign_external(Clingo::parse_term(ext.c_str()), Clingo::TruthValue::True),
-                clingo.solve();
+                clingo.assign_external(Clingo::parse_term(ext.c_str()), Clingo::TruthValue::True);
             }
+            clingo.solve();
             auto end = std::chrono::high_resolution_clock::now();
             auto duration = end - start;
             auto ms = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
@@ -83,12 +82,11 @@ int main()
     }
     myfile.close();
 
-    /*std::ofstream myfile2;
-    myfile2.open("externals.csv");
-    std::string externals = createExternals(100);
+    myfile.open("externals_batch.csv");
+    externals = createExternals(100);
     for (int i = 1; i <= 1000; i++) {
         std::cout << i * 100 << std::endl;
-        myfile2 << std::to_string(i * 100) + ",";
+        myfile << std::to_string(i * 100) + ",";
         for (int j = 0; j < 1000; j++) {
             Clingo::Control clingo = Clingo::Control({}, logger, 20);
             auto start = std::chrono::high_resolution_clock::now();
@@ -97,10 +95,10 @@ int main()
             auto end = std::chrono::high_resolution_clock::now();
             auto duration = end - start;
             auto ms = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-            myfile2 << std::to_string(ms) + ",";
+            myfile << std::to_string(ms) + ",";
         }
-        myfile2 << "\n";
+        myfile << "\n";
     }
-    myfile2.close();*/
+    myfile.close();
     return 0;
 }

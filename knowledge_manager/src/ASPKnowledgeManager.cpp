@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#define ASPKB_DEBUG
+#define ASPKM_DEBUG
 
 namespace knowledge_manager
 {
@@ -46,8 +46,8 @@ std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::
     this->solver->getSolution(vars, terms, results);
     if (results.size() > 0) {
 
-#ifdef ASPKB_DEBUG
-        std::cout << "ASPKB: Found Result!" << std::endl;
+#ifdef ASPKM_DEBUG
+        std::cout << "[ASPKnowledgeManager] Found Result!" << std::endl;
 #endif
 
         for (auto res : results) {
@@ -55,7 +55,7 @@ std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::
             for (size_t i = 0; i < res->factQueryValues.size(); ++i) {
                 for (size_t j = 0; j < res->factQueryValues.at(i).size(); ++j) {
                     auto elem = res->factQueryValues.at(i).at(j);
-                    std::cout << "ASPKB: " << i << "," << j << ", " << elem << std::endl;
+                    std::cout << "[ASPKnowledgeManager] " << i << "," << j << ", " << elem << std::endl;
                     this->currentSolution.push_back(elem);
                 }
             }
@@ -81,7 +81,6 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
     std::lock_guard<std::mutex> lock(mtx);
     ::reasoner::asp::Term* term = new ::reasoner::asp::Term(lifetime);
     int queryId = this->solver->getRegisteredQueriesCount();
-    //    term->setProgramSection("wumpusBackgroundKnowledgeFile");
     term->setQueryId(queryId);
     this->currentQueryIDs.push_back(queryId);
     std::stringstream ss;
@@ -92,8 +91,8 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
     std::shared_ptr<::reasoner::asp::Query> query = std::make_shared<::reasoner::asp::ExtensionQuery>(this->solver, term);
     bool success = this->solver->registerQuery(query);
 
-#ifdef ASPKB_DEBUG
-    std::cout << "ASPKB: Adding query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
+#ifdef ASPKM_DEBUG
+    std::cout << "[ASPKnowledgeManager] Adding query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
 #endif
 
     if (success) {
@@ -125,14 +124,14 @@ bool ASPKnowledgeManager::revoke(int queryId)
             this->currentQueryIDs.erase(position);
     }
 
-#ifdef ASPKB_DEBUG
-    std::cout << "ASPKB: Removing query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
+#ifdef ASPKM_DEBUG
+    std::cout << "[ASPKnowledgeManager] Removing query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
 #endif
     return success;
 }
 
 /**
- * Helper method. Solver can't be instantiated at construction time
+ * Sets the solver because it cannot be instantiated at construction time.
  */
 void ASPKnowledgeManager::setSolver(reasoner::asp::Solver* solver)
 {

@@ -3,66 +3,47 @@
 #include "reasoner/asp/Solver.h"
 
 #include <algorithm>
-#include <regex>
 
 namespace reasoner
 {
 namespace asp
 {
 
-ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
-        : Query(solver, term)
+ExtensionQuery::ExtensionQuery(int queryID, Solver* solver, Term* term)
+        : Query(queryID, solver, term, QueryType::Extension)
 {
-    this->type = QueryType::Extension;
-    std::stringstream ss;
-    if (term->getQueryId() == -1) {
-#ifdef ASPVARIABLEQUERY_DEBUG
-        cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << endl;
-#endif
-        return;
-    }
-    ss << "query" << term->getQueryId();
-    this->queryProgramSection = ss.str();
-#ifdef ASPVARIABLEQUERY_DEBUG
-    cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << endl;
-#endif
-    this->createProgramSection();
-    //    // is added manually to recreate eval for LNAI17 paper
-    //    auto loaded2 = this->solver->loadFileFromConfig("alicaBackgroundKnowledgeFile");
-    //    if (loaded2) {
-    //        this->solver->ground({{"alicaBackground", {}}}, nullptr);
-    //    }
+    this->generateQueryProgram();
+    this->solver->add(this->queryProgramSection.c_str(), {}, this->queryProgram.c_str());
+    this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
     this->solver->ground({{this->queryProgramSection.c_str(), {}}}, nullptr);
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 }
 
-ExtensionQuery::~ExtensionQuery() = default;
-
-void ExtensionQuery::createProgramSection()
+void ExtensionQuery::generateQueryProgram()
 {
+    this->queryProgramSection = "query" + std::to_string(this->queryID);
     this->externalName = "external" + this->queryProgramSection;
 
-    std::stringstream queryProgram;
-    queryProgram << "#program " << queryProgramSection << ".\n";
-    queryProgram << "#external " << externalName << ".\n";
+    std::stringstream queryProgramStream;
+    queryProgramStream << "#program " << queryProgramSection << ".\n";
+    queryProgramStream << "#external " << externalName << ".\n";
 
     for (auto& fact : term->getFacts()) {
-        queryProgram << expandFactModuleProperty(fact);
+        queryProgramStream << expandFactModuleProperty(fact);
         extractHeadPredicates(fact);
     }
-    if (!term->getQueryRule().empty()) {
-        extractHeadPredicates(term->getQueryRule());
-    }
+    extractHeadPredicates(term->getQueryRule());
     for (auto& rule : term->getRules()) {
         extractHeadPredicates(rule);
     }
 
     for (auto& headPredicate : predicatesToAritiesMap) {
         for (auto& arity : headPredicate.second) {
-            queryProgram << createKBCapturingRule(headPredicate.first, arity);
+            queryProgramStream << createKBCapturingRule(headPredicate.first, arity);
         }
     }
-#ifdef ASPVARIABLEQUERY_DEBUG
+
+#ifdef EXTENSIONQUERY_DEBUG
     std::cout << "INPUT PROGRAM: " << std::endl;
     std::cout << term->getQueryRule() << std::endl;
     for (auto& rule : term->getRules()) {
@@ -84,27 +65,20 @@ void ExtensionQuery::createProgramSection()
     std::cout << std::endl;
 #endif
 
-    queryProgram << expandRuleModuleProperty(term->getQueryRule());
+    queryProgramStream << expandRuleModuleProperty(term->getQueryRule());
     for (auto& rule : term->getRules()) {
-        queryProgram << expandRuleModuleProperty(rule);
+        queryProgramStream << expandRuleModuleProperty(rule);
     }
 
-#ifdef ASPVARIABLEQUERY_DEBUG
-    std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
+#ifdef EXTENSIONQUERY_DEBUG
+    std::cout << "RESULT: " << std::endl << queryProgramStream.str() << std::endl;
 #endif
-
-    this->solver->add(this->queryProgramSection.c_str(), {}, queryProgram.str().c_str());
-    this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
+    this->queryProgram = queryProgramStream.str();
 }
 
 void ExtensionQuery::removeExternal()
 {
     this->solver->releaseExternal(*(this->external));
-}
-
-QueryType ExtensionQuery::getType()
-{
-    return this->type;
 }
 
 void ExtensionQuery::onModel(Clingo::Model& clingoModel)
@@ -115,20 +89,19 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
         vec.push_back(tmp[i]);
     }
     this->getCurrentModels()->push_back(vec);
-    //	cout << "Query: processing query '" << queryMapPair.first << "'" << endl;
 
     // determine the domain of the query predicate
     for (auto& value : this->headValues) {
 
         value.second.clear();
 #ifdef ASPQUERY_DEBUG
-        cout << "ExtensionQuery::onModel: " << value.first << endl;
+        std::cout << "[ExtensionQuery] Head value " << value.first << std::endl;
 #endif
         auto it = ((Solver*) this->solver)
-                          ->clingo->symbolic_atoms()
-                          .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
-        if (it == ((Solver*) this->solver)->clingo->symbolic_atoms().end()) {
-            std::cout << "ExtensionQuery: Didn't find any suitable domain!" << std::endl;
+                          ->getSymbolicAtoms()
+                          .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive()));
+        if (it == ((Solver*) this->solver)->getSymbolicAtoms().end()) {
+            std::cout << "[ExtensionQuery] Didn't find any suitable domain!" << std::endl;
             continue;
         }
         while (it) {
@@ -166,7 +139,7 @@ size_t ExtensionQuery::findNextCharNotOf(const std::string& predicate, const std
 }
 
 /**
- * Finds the implication of a given rule. Also handles #minimize and #maximize, as they are converted to
+ * Finds the first implication of a given rule. Also handles #minimize and #maximize, as they are converted to
  * a weak constraint like ":~ not goalReachable(id) : goal(id,_,_). [1@2]"
  * @param rule
  * @return Idx of the implication ":-"
@@ -361,6 +334,9 @@ std::pair<ExtensionQuery::Separator, size_t> ExtensionQuery::determineFirstSepar
 
 void ExtensionQuery::extractHeadPredicates(const std::string& rule)
 {
+    if (rule.empty())
+        return;
+
     size_t implicationIdx = findImplication(rule);
     if (implicationIdx == 0) {
         return;
@@ -433,7 +409,7 @@ void ExtensionQuery::extractHeadPredicates(const std::string& rule)
             }
             break;
         default:
-            std::cerr << "MP: Separator Char not known!" << std::endl;
+            std::cerr << "extractHeadPredicates: Separator Char not known!" << std::endl;
         }
 
         // update currentIdx
@@ -557,7 +533,7 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule)
             done = true;
             break;
         default:
-            std::cerr << "MP: Separator Char not known!" << std::endl;
+            std::cerr << "expandRuleModuleProperty: Separator Char not known!" << std::endl;
         }
 
         // update currentIdx & endLastPredicateIdx while skipping stuff between predicates for currentIdx

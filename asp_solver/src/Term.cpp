@@ -15,7 +15,7 @@ Term::Term(int lifeTime)
     this->externals = nullptr;
     this->numberOfModels = "";
     this->type = QueryType::Undefined;
-    this->queryId = -1;
+//    this->queryId = -1;
 }
 
 Term::~Term() {}
@@ -32,11 +32,7 @@ void Term::addFact(std::string fact)
     if (fact.empty()) {
         return;
     }
-    if (fact.find(".") == std::string::npos) {
-        this->facts.push_back(fact + ".");
-    } else {
-        this->facts.push_back(fact);
-    }
+    this->facts.push_back(fact);
 }
 
 std::vector<std::string> Term::getRuleHeads()
@@ -134,20 +130,20 @@ void Term::setId(long id)
  * heads and facts!
  * An unique id is given by the Solver!
  */
-int Term::getQueryId()
-{
-    return queryId;
-}
+//int Term::getQueryId()
+//{
+//    return queryId;
+//}
 
 /**
  * The query id has to be added to any predicate which is added to the program, naming rule
  * heads and facts!
  * An unique id is given by the Solver!
  */
-void Term::setQueryId(int queryId)
-{
-    this->queryId = queryId;
-}
+//void Term::setQueryId(int queryId)
+//{
+//    this->queryId = queryId;
+//}
 
 std::string Term::getQueryRule()
 {

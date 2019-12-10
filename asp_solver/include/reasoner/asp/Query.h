@@ -21,7 +21,7 @@ class Solver;
 class Query
 {
 public:
-    Query(Solver* solver, Term* term);
+    Query(int queryID, Solver* solver, Term* term, QueryType type);
     virtual ~Query();
 
     std::shared_ptr<std::vector<Clingo::SymbolVector>> getCurrentModels();
@@ -43,6 +43,7 @@ public:
 
     std::string toString();
     QueryType getType();
+    int getQueryID() const;
     void saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value);
     bool checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2);
 
@@ -53,6 +54,9 @@ protected:
      * meaning that there is a rule for every predicate
      */
     Solver* solver;
+    Term* term;
+    QueryType type;
+    int queryID;
     std::shared_ptr<std::vector<Clingo::SymbolVector>> currentModels;
     // key := headValue , value := values which satisfies it
     std::map<Clingo::Symbol, Clingo::SymbolVector> headValues;
@@ -61,8 +65,6 @@ protected:
     // LifeTime == -1 => query is used until unregistered
     int lifeTime;
     std::string programSection;
-    Term* term;
-    QueryType type;
     std::string backgroundKnowledgeFilename;
 };
 } /* namespace asp */

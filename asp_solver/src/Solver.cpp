@@ -1,13 +1,13 @@
 #include "reasoner/asp/Solver.h"
 
+#include "reasoner/asp/AnnotatedExternal.h"
 #include "reasoner/asp/ExtensionQuery.h"
 #include "reasoner/asp/FilterQuery.h"
-#include "reasoner/asp/AnnotatedExternal.h"
 
-#include <reasoner/asp/Variable.h>
-#include <reasoner/asp/Query.h>
 #include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/Query.h>
 #include <reasoner/asp/Term.h>
+#include <reasoner/asp/Variable.h>
 
 namespace reasoner
 {
@@ -144,25 +144,22 @@ Clingo::Symbol Solver::parseValue(const std::string& str)
     return Clingo::parse_term(str.c_str(), nullptr, 20);
 }
 
-bool Solver::registerQuery(std::shared_ptr<Query> query)
+void Solver::registerQuery(std::shared_ptr<Query> query)
 {
+    // TODO: Queries do not have the operator== overloaded, so this find only finds objects that are at the same place in memory, I guess. Is that intended?
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry == this->registeredQueries.end()) {
         this->registeredQueries.push_back(query);
-        return true;
     }
-    return false;
 }
 
-bool Solver::unregisterQuery(std::shared_ptr<Query> query)
+void Solver::unregisterQuery(std::shared_ptr<Query> query)
 {
     query->removeExternal();
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry != this->registeredQueries.end()) {
         this->registeredQueries.erase(entry);
-        return true;
     }
-    return false;
 }
 
 bool Solver::existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
@@ -213,27 +210,27 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
 
 int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
 {
-
     auto cVars = std::vector<Variable*>(vars.size());
     for (int i = 0; i < vars.size(); ++i) {
         cVars.at(i) = vars.at(i);
     }
     for (auto term : calls) {
-        this->currentQueryIds.push_back(term->getId());
+        int queryID = this->generateQueryID();
+        this->currentQueryIds.push_back(queryID);
         if (!term->getNumberOfModels().empty()) {
             this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
         }
         bool found = false;
         for (auto query : this->registeredQueries) {
-            if (term->getId() == query->getTerm()->getId()) {
+            if (queryID == query->getQueryID()) {
                 found = true;
             }
         }
         if (!found) {
             if (term->getType() == QueryType::Extension) {
-                this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
+                this->registerQuery(std::make_shared<ExtensionQuery>(queryID, this, term));
             } else if (term->getType() == QueryType::Filter) {
-                this->registerQuery(std::make_shared<FilterQuery>(this, term));
+                this->registerQuery(std::make_shared<FilterQuery>(queryID, this, term));
             } else {
                 std::cout << "Solver: Query of unknown type registered!" << std::endl;
                 return -1;
@@ -283,21 +280,6 @@ void Solver::removeDeadQueries()
     }
 }
 
-const void* Solver::getWildcardPointer()
-{
-    return WILDCARD_POINTER;
-}
-
-const std::string& Solver::getWildcardString()
-{
-    return WILDCARD_STRING;
-}
-
-int Solver::getRegisteredQueriesCount()
-{
-    return this->registeredQueries.size();
-}
-
 void Solver::reduceQueryLifeTime()
 {
     for (auto query : this->registeredQueries) {
@@ -334,12 +316,15 @@ const double Solver::getModelCount()
     return this->clingo->statistics()["summary"]["models"]["enumerated"];
 }
 
-int Solver::getQueryCounter()
+void  Solver::setNumberOfModels(int numberOfModels)
+{
+    this->clingo->configuration()["solve"]["models"] = std::to_string(numberOfModels).c_str();
+}
+
+int Solver::generateQueryID()
 {
     std::lock_guard<std::mutex> lock(queryCounterMutex);
-
-    this->queryCounter++;
-    return this->queryCounter;
+    return ++this->queryCounter;
 }
 
 const double Solver::getAtomCount()
@@ -360,6 +345,11 @@ const double Solver::getAuxAtomsCount()
 std::vector<Clingo::SymbolVector> Solver::getCurrentModels()
 {
     return this->currentModels;
+}
+
+Clingo::SymbolicAtoms Solver::getSymbolicAtoms()
+{
+    return this->clingo->symbolic_atoms();
 }
 
 void Solver::printStats()

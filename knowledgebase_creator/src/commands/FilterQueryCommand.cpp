@@ -38,9 +38,9 @@ void FilterQueryCommand::execute()
     // create ASP term
     auto term = new reasoner::asp::Term();
     term->setType(reasoner::asp::QueryType::Filter);
-    int queryId = this->gui->getSolver()->getQueryCounter();
+    int queryId = this->gui->getSolver()->generateQueryID();
     term->setId(queryId);
-    term->setQueryId(queryId);
+//    term->setQueryId(queryId);
     // get number of models from gui
     if (this->gui->modelSettingsDialog->getNumberOfModels() != -1) {
         term->setNumberOfModels(std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()));

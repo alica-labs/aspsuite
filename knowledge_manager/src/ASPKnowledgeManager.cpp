@@ -19,7 +19,7 @@ ASPKnowledgeManager::ASPKnowledgeManager()
 ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
 /**
- *TODO would it be better to filter results with a facts query?
+ * TODO: Would it be better to filter results with a facts query?
  * Solves the current ASP Program of the Knowledge Base according to specified queryRule
  */
 std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::string programSection)
@@ -34,24 +34,17 @@ std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::
     term->setQueryRule(queryRule);
     term->setType(::reasoner::asp::QueryType::Filter);
     term->setProgramSection(programSection);
+
     std::lock_guard<std::mutex> lock(mtx);
-    auto queryId = this->solver->getRegisteredQueriesCount();
-    this->currentQueryIDs.push_back(queryId);
-    // TODO set ids properly
-    //============
-    term->setId(queryId);
-    //============
-    term->setQueryId(queryId);
+    term->setId(this->solver->generateQueryID());
     terms.push_back(term);
     this->solver->getSolution(vars, terms, results);
-    if (results.size() > 0) {
 
+    if (results.size() > 0) {
 #ifdef ASPKM_DEBUG
         std::cout << "[ASPKnowledgeManager] Found Result!" << std::endl;
 #endif
-
         for (auto res : results) {
-
             for (size_t i = 0; i < res->factQueryValues.size(); ++i) {
                 for (size_t j = 0; j < res->factQueryValues.at(i).size(); ++j) {
                     auto elem = res->factQueryValues.at(i).at(j);
@@ -68,7 +61,7 @@ std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::
     for (auto t : terms) {
         delete t;
     }
-    // TODO
+
     return this->currentSolution;
 }
 
@@ -80,54 +73,32 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
 {
     std::lock_guard<std::mutex> lock(mtx);
     ::reasoner::asp::Term* term = new ::reasoner::asp::Term(lifetime);
-    int queryId = this->solver->getRegisteredQueriesCount();
-    term->setQueryId(queryId);
-    this->currentQueryIDs.push_back(queryId);
-    std::stringstream ss;
     for (auto inf : information) {
         term->addFact(inf);
     }
-
-    std::shared_ptr<::reasoner::asp::Query> query = std::make_shared<::reasoner::asp::ExtensionQuery>(this->solver, term);
-    bool success = this->solver->registerQuery(query);
-
-#ifdef ASPKM_DEBUG
-    std::cout << "[ASPKnowledgeManager] Adding query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
-#endif
-
-    if (success) {
-        return queryId;
-    }
-
-    return -1;
+    int queryId = this->solver->generateQueryID();
+    std::shared_ptr<::reasoner::asp::Query> query = std::make_shared<::reasoner::asp::ExtensionQuery>(queryId, this->solver, term);
+    this->solver->registerQuery(query);
+    this->currentQueryIDs.push_back(queryId);
+    return queryId;
 }
 
 /**
  * Removes a specified query from solver
  */
-bool ASPKnowledgeManager::revoke(int queryId)
+void ASPKnowledgeManager::revoke(int queryID)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    bool success = false;
-    auto registered = this->solver->getRegisteredQueries();
-
-    for (auto query : registered) {
-        int registeredId = query->getTerm()->getQueryId();
-        if (registeredId == queryId) {
-            success = solver->unregisterQuery(query);
-            break;
+    auto registeredQueries = this->solver->getRegisteredQueries();
+    auto position = std::find(this->currentQueryIDs.begin(), this->currentQueryIDs.end(), queryID);
+    if (position != this->currentQueryIDs.end()) {
+        this->currentQueryIDs.erase(position);
+    }
+    for (auto query : registeredQueries) {
+        if (query->getQueryID() == queryID) {
+            solver->unregisterQuery(query);
         }
     }
-    if (success) {
-        auto position = std::find(this->currentQueryIDs.begin(), this->currentQueryIDs.end(), 8);
-        if (position != this->currentQueryIDs.end())
-            this->currentQueryIDs.erase(position);
-    }
-
-#ifdef ASPKM_DEBUG
-    std::cout << "[ASPKnowledgeManager] Removing query " << queryId << " was " << (success ? "successful" : "not successful") << std::endl;
-#endif
-    return success;
 }
 
 /**
@@ -153,12 +124,14 @@ bool ASPKnowledgeManager::solve()
     return this->solver->solve();
 }
 
-Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str) {
+Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str)
+{
     return this->solver->parseValue(str);
 }
 
-    reasoner::asp::Solver *ASPKnowledgeManager::getSolver() {
-        return solver;
-    }
+reasoner::asp::Solver* ASPKnowledgeManager::getSolver()
+{
+    return solver;
+}
 
 } /* namespace knowledge_manager */

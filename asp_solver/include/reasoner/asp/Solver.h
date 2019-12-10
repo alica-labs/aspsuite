@@ -37,91 +37,62 @@ public:
     virtual ~Solver();
 
     bool existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
-
     bool getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls, std::vector<AnnotatedValVec*>& results);
-
     std::shared_ptr<Variable> createVariable(int64_t representingVariableId);
-
     bool loadFileFromConfig(std::string configKey);
-
     void loadFile(std::string filename);
-
     void ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack);
-
     void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue);
-
     void releaseExternal(Clingo::Symbol ext);
-
     bool solve();
-
     void add(char const* name, Clingo::StringSpan const& params, char const* par);
-
     Clingo::Symbol parseValue(std::string const& str);
-
-    int getRegisteredQueriesCount();
 
     /**
      * The query id has to be added to any predicate in an ASPTerm with type Variable
      * which is added to the program, naming rule heads and facts!
      * An unique id is given by the ASPSolver!
      */
-    int getQueryCounter();
-
+    int generateQueryID();
     void removeDeadQueries();
-
-    bool registerQuery(std::shared_ptr<Query> query);
-
-    bool unregisterQuery(std::shared_ptr<Query> query);
-
+    /**
+     * Registers the given query.
+     * @param query
+     * @return
+     */
+    void registerQuery(std::shared_ptr<Query> query);
+    void unregisterQuery(std::shared_ptr<Query> query);
     void printStats();
-
     const double getSolvingTime();
-
     const double getSatTime();
-
     const double getUnsatTime();
-
     const double getModelCount();
-
+    void setNumberOfModels(int numberOfModels);
     const double getAtomCount();
-
     const double getBodiesCount();
-
     const double getAuxAtomsCount();
-
-    static const void* getWildcardPointer();
-
-    static const std::string& getWildcardString();
-
     std::vector<std::shared_ptr<Query>> getRegisteredQueries();
-
     std::vector<Clingo::SymbolVector> getCurrentModels();
-
+    Clingo::SymbolicAtoms getSymbolicAtoms();
     const std::string getGroundProgram() const;
-
-    std::shared_ptr<Clingo::Control> clingo;
 
 private:
     bool on_model(Clingo::Model& m);
-
     void reduceQueryLifeTime();
-
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
-
     void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
 
+    essentials::SystemConfig* sc;
+    GrdProgramObserver observer;
+    std::shared_ptr<Clingo::Control> clingo;
+
+    static std::mutex queryCounterMutex; /**< Making the creation of query IDs thread-safe */
+    int queryCounter; /**< Used for generating unique query IDs*/
     std::vector<long> currentQueryIds;
     std::vector<std::string> alreadyLoaded;
     std::vector<std::shared_ptr<AnnotatedExternal>> assignedExternals;
     std::vector<std::shared_ptr<Query>> registeredQueries;
     std::vector<Clingo::SymbolVector> currentModels;
-
-    int queryCounter;
-    essentials::SystemConfig* sc;
-    GrdProgramObserver observer;
-
-protected:
-    static std::mutex queryCounterMutex;
 
 #ifdef ASPSolver_DEBUG
     int modelCount;

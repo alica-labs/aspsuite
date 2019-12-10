@@ -1,17 +1,16 @@
 #include "reasoner/asp/FilterQuery.h"
 
-#include "reasoner/asp/Solver.h"
 #include "reasoner/asp/Enums.h"
+#include "reasoner/asp/Solver.h"
 
 namespace reasoner
 {
 namespace asp
 {
 
-FilterQuery::FilterQuery(Solver* solver, Term* term)
-        : Query(solver, term)
+FilterQuery::FilterQuery(int queryID, Solver* solver, Term* term)
+        : Query(queryID, solver, term, QueryType::Filter)
 {
-    this->type = QueryType ::Filter;
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
@@ -35,7 +34,7 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
         if (queryString.compare("") == 0) {
             return;
         }
-        // TODO: Fix nested braces and move funtionality to central accessable helper class
+        // TODO: Fix nested braces and move functionality to central accessible helper class
         if (queryString.find(",") != std::string::npos) {
             size_t start = 0;
             size_t end = std::string::npos;
@@ -116,9 +115,9 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
         cout << "FilterQuery::onModel: " << value.first << endl;
 #endif
         auto it = ((Solver*) this->solver)
-                          ->clingo->symbolic_atoms()
+                          ->getSymbolicAtoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
-        if (it == ((Solver*) this->solver)->clingo->symbolic_atoms().end()) {
+        if (it == ((Solver*) this->solver)->getSymbolicAtoms().end()) {
             std::cout << "FilterQuery: Didn't find any suitable domain!" << std::endl;
             continue;
         }

@@ -11,11 +11,12 @@ namespace reasoner
 namespace asp
 {
 
-Query::Query(Solver* solver, Term* term)
+Query::Query(int queryID, Solver* solver, Term* term, QueryType type)
+        : queryID(queryID)
+        , solver(solver)
+        , term(term)
+        , type(type)
 {
-    this->type = QueryType::Undefined;
-    this->solver = solver;
-    this->term = term;
     this->programSection = term->getProgramSection();
     this->lifeTime = term->getLifeTime();
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
@@ -184,6 +185,11 @@ Term* Query::getTerm()
 QueryType Query::getType()
 {
     return type;
+}
+
+int Query::getQueryID() const
+{
+    return this->queryID;
 }
 
 } /* namespace asp */

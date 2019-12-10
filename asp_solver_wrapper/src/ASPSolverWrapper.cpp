@@ -35,9 +35,9 @@ ASPSolverWrapper::~ASPSolverWrapper()
     delete this->gen;
 }
 
-int ASPSolverWrapper::getQueryCounter()
+int ASPSolverWrapper::generateQueryID()
 {
-    return this->solver->getQueryCounter();
+    return this->solver->generateQueryID();
 }
 
 bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls)
@@ -113,7 +113,7 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
         ret->addFact(it);
     }
     ret->setId(tmp->getId());
-    ret->setQueryId(tmp->getQueryId());
+//    ret->setQueryId(tmp->getQueryId());
     ret->setExternals(tmp->getExternals());
     ret->setNumberOfModels(tmp->getNumberOfModels());
     ret->setProgramSection(tmp->getProgramSection());
@@ -150,14 +150,14 @@ void alica::reasoner::ASPSolverWrapper::removeDeadQueries()
     this->solver->removeDeadQueries();
 }
 
-bool alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner::asp::Query> query)
+void alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner::asp::Query> query)
 {
-    return this->solver->registerQuery(query);
+    this->solver->registerQuery(query);
 }
 
-bool alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query)
+void alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query)
 {
-    return this->solver->unregisterQuery(query);
+    this->solver->unregisterQuery(query);
 }
 
 void alica::reasoner::ASPSolverWrapper::printStats()

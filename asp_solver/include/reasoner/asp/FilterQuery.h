@@ -15,7 +15,7 @@ class Solver;
 class FilterQuery : public Query
 {
 public:
-    FilterQuery(Solver* solver, Term* term);
+    FilterQuery(int queryID, Solver* solver, Term* term);
     virtual ~FilterQuery();
 
     bool factsExistForAllModels();

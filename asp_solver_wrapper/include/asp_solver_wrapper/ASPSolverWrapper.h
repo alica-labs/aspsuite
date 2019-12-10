@@ -45,13 +45,13 @@ public:
 
     ::reasoner::asp::Solver* getSolver();
     void init(::reasoner::asp::Solver* solver);
-    int getQueryCounter();
+    int generateQueryID();
     bool validatePlan(Plan* plan);
     alica::reasoner::ASPGenerator* gen;
 
     void removeDeadQueries();
-    bool registerQuery(std::shared_ptr<::reasoner::asp::Query> query);
-    bool unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query);
+    void registerQuery(std::shared_ptr<::reasoner::asp::Query> query);
+    void unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query);
     void printStats();
     std::vector<std::shared_ptr<::reasoner::asp::Query>> getRegisteredQueries();
 

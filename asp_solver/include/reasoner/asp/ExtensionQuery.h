@@ -9,7 +9,7 @@
 #include <memory>
 #include <unordered_set>
 
-//#define ASPVARIABLEQUERY_DEBUG
+#define EXTENSIONQUERY_DEBUG
 
 namespace reasoner
 {
@@ -19,9 +19,9 @@ class Solver;
 class ExtensionQuery : public Query
 {
 public:
-    ExtensionQuery(Solver* solver, Term* term);
-    virtual ~ExtensionQuery();
-    QueryType getType();
+    ExtensionQuery(int queryID, Solver* solver, Term* term);
+    virtual ~ExtensionQuery() = default;
+
     void removeExternal();
     void onModel(Clingo::Model& clingoModel);
 
@@ -52,9 +52,6 @@ private:
         None
     };
 
-    std::shared_ptr<Clingo::Symbol> external;
-    std::string queryProgramSection;
-    std::string externalName;
     std::string trim(const std::string& str);
     bool isMinOrMax(std::string rule, size_t openingCurlyBracesIdx);
     size_t findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start = 0);
@@ -75,8 +72,6 @@ private:
     std::string expandFactModuleProperty(std::string fact);
     std::string expandRuleModuleProperty(const std::string& rule);
 
-    std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
-
     /**
      * Encapsulates the query in an extra program section including an external (the query external, e.g., query1).
      * The query external is added to every rule in the query, in order to guard it: bla bla :- blub blub, query1.
@@ -84,7 +79,14 @@ private:
      *
      * Therefore, it utilises the methods above... expandBlaBla()
      */
-    void createProgramSection();
+    void generateQueryProgram();
+
+    std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
+
+    std::string queryProgramSection;
+    std::string externalName;
+    std::string queryProgram;
+    std::shared_ptr<Clingo::Symbol> external;
 };
 
 } /* namespace asp */

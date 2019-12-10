@@ -26,7 +26,7 @@ ExternalTableHandler::~ExternalTableHandler() {}
 void ExternalTableHandler::fillExternalTable()
 {
     drawExternalTable();
-    for (Clingo::SymbolicAtom atom : this->gui->getSolver()->clingo->symbolic_atoms()) {
+    for (Clingo::SymbolicAtom atom : this->gui->getSolver()->getSymbolicAtoms()) {
         if (atom.is_external()) {
             int pos = this->gui->getUi()->externalTable->rowCount();
             this->gui->getUi()->externalTable->insertRow(pos);

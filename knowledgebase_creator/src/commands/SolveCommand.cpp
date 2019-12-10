@@ -38,7 +38,7 @@ void SolveCommand::printModels()
 void SolveCommand::execute()
 {
     if (this->gui->modelSettingsDialog->getNumberOfModels() != -1) {
-        this->gui->getSolver()->clingo->configuration()["solve"]["models"] = std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()).c_str();
+        this->gui->getSolver()->setNumberOfModels(this->gui->modelSettingsDialog->getNumberOfModels());
     }
     this->satisfiable = this->gui->getSolver()->solve();
     this->currentModels = this->gui->getSolver()->getCurrentModels();

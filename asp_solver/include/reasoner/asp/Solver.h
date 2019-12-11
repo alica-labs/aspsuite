@@ -99,8 +99,8 @@ public:
 
     const std::string getGroundProgram() const;
 
-    std::shared_ptr<Clingo::Control> clingo;
-
+//    std::shared_ptr<Clingo::Control> clingo;
+    Clingo::Control* clingo;
 private:
     bool on_model(Clingo::Model& m);
 
@@ -122,6 +122,7 @@ private:
 
 protected:
     static std::mutex queryCounterMutex;
+    static std::mutex clingoMtx;
 
 #ifdef ASPSolver_DEBUG
     int modelCount;

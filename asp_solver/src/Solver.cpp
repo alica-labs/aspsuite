@@ -12,7 +12,7 @@
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
 
-#define Solver_DEBUG
+//#define Solver_DEBUG
 
 namespace reasoner
 {
@@ -23,6 +23,7 @@ const void* const Solver::WILDCARD_POINTER = new int(0);
 const std::string Solver::WILDCARD_STRING = "wildcard";
 
 std::mutex Solver::queryCounterMutex;
+std::mutex Solver::clingoMtx;
 
 Solver::Solver(std::vector<char const*> args)
 {
@@ -40,7 +41,8 @@ Solver::Solver(std::vector<char const*> args)
             std::cerr << message << std::endl;
         }
     };
-    this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    // this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    this->clingo = new Clingo::Control(args, logger, 20);
     this->clingo->register_observer(this->observer);
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
@@ -52,6 +54,9 @@ Solver::Solver(std::vector<char const*> args)
 
 Solver::~Solver()
 {
+    this->clingo->cleanup();
+    //    std::cout << "deleting clingo!" << std::endl;
+    delete this->clingo;
 }
 
 void Solver::loadFile(std::string absolutFilename)
@@ -86,6 +91,7 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 #ifdef ASPSOLVER_DEBUG
     cout << "Solver_ground: " << vec.at(0).first << endl;
 #endif
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->observer.clear();
     this->clingo->ground(vec, callBack);
 }
@@ -95,6 +101,7 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
  */
 bool Solver::solve()
 {
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->currentModels.clear();
     this->reduceQueryLifeTime();
     // bind(&Solver::onModel, this, placeholders::_1)
@@ -163,7 +170,10 @@ bool Solver::unregisterQuery(std::shared_ptr<Query> query)
     query->removeExternal();
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry != this->registeredQueries.end()) {
-        this->registeredQueries.erase(entry);
+        // FIXME what is the correct way of handling this?
+//        if (query->getType() != reasoner::asp::QueryType::ReusableExtension) {
+            this->registeredQueries.erase(entry);
+//        }
         return true;
     }
     return false;

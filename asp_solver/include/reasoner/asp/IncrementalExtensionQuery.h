@@ -12,9 +12,10 @@ class IncrementalExtensionQuery : public ::reasoner::asp::ExtensionQuery
 {
 
 public:
-    static void cleanUp();
     static bool isPresent(int horizon);
     static void activate(int horizon);
+    static void cleanUp();
+    static void clear();
     static std::vector<IncrementalExtensionQuery*> queries;
     static int queryId;
 

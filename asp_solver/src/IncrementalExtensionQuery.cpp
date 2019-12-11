@@ -8,6 +8,15 @@ namespace asp
 std::vector<IncrementalExtensionQuery*> IncrementalExtensionQuery::queries = std::vector<IncrementalExtensionQuery*>();
 int IncrementalExtensionQuery::queryId = 0;
 
+void IncrementalExtensionQuery::clear() {
+//    for(auto query : IncrementalExtensionQuery::queries) { //FIXME double free - who is deleting these?
+//        delete query;
+//    }
+
+    IncrementalExtensionQuery::queries.clear();
+    IncrementalExtensionQuery::queryId = 0;
+}
+
 //#define QUERY_DEBUG
 void IncrementalExtensionQuery::cleanUp()
 {

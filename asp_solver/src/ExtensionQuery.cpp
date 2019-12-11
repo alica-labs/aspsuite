@@ -46,6 +46,7 @@ ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
         paramsVec.push_back(this->solver->parseValue(param.second));
     }
 
+    //TODO segfault here
     this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
 
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
@@ -134,7 +135,7 @@ void ExtensionQuery::createProgramSection()
 
 void ExtensionQuery::removeExternal()
 {
-
+//    std::cout << "releasing external of extquery " << this->getTerm()->getId() << std::endl;
     this->solver->releaseExternal(*(this->external));
 }
 

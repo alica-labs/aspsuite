@@ -9,6 +9,7 @@ namespace asp
 ReusableExtensionQuery::ReusableExtensionQuery(reasoner::asp::Solver* solver, reasoner::asp::Term* term)
         : ExtensionQuery(solver, term)
 {
+//        std::cout << "New reusable ext query " << term->getId() << std::endl;
         this->type = QueryType::ReusableExtension;
         std::stringstream ss;
         if (term->getQueryId() == -1) {
@@ -24,21 +25,28 @@ ReusableExtensionQuery::ReusableExtensionQuery(reasoner::asp::Solver* solver, re
             paramsVec.push_back(this->solver->parseValue(param.second));
         }
 
-
         this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
 
         this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 }
 
+//TODO strange naming for this query type
 void ReusableExtensionQuery::removeExternal()
 {
-
+//    std::cout << "Reusable Ext. Query " << this->term->getId() << " unregistered" << std::endl;
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::False);
 }
 
 void ReusableExtensionQuery::reactivate()
 {
+//    std::cout << "Reusable Ext. Query " << this->term->getId() << " reactivated" << std::endl;
+//    // FIXME how to handle?
+//    this->setLifeTime(1);
+//    std::cout << "RExt: solver is " << (this->solver == nullptr ?  "null" : "not null") << std::endl;
+//    this->getTerm()->setLifeTime(1);
+//    std::cout << "Rext: external is " << (this->external == nullptr ? "null" : "not null") << std::endl;
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
+//    std::cout << "reactivated query" << std::endl;
 }
 } /* namespace asp */
 } /* namespace reasoner */

@@ -49,10 +49,6 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
                 auto res = currentQuery.str();
 
                 this->headValues.emplace(this->solver->parseValue(res), std::vector<Clingo::Symbol>());
-		start = queryString.find(",", end);
-                if (start != std::string::npos) {
-                    start += 1;
-                }
             }
         } else {
             this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());

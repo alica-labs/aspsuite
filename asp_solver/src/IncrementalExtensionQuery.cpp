@@ -39,22 +39,13 @@ void IncrementalExtensionQuery::activate(int horizon)
     auto query = IncrementalExtensionQuery::queries.at(horizon);
     query->getSolver()->assignExternal(*(query->external), Clingo::TruthValue::True);
 }
-IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
-        : ExtensionQuery(solver, term)
-
+IncrementalExtensionQuery::IncrementalExtensionQuery(int queryID, Solver* solver, Term* term)
+        : ExtensionQuery(queryID, solver, term)
 {
-
     IncrementalExtensionQuery::queries.push_back(this);
-
     this->type = QueryType::IncrementalExtension;
-    std::stringstream ss;
-    if (term->getQueryId() == -1) {
-#ifdef QUERY_DEBUG
-        std::cout << "IncrementalQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << std::endl;
-#endif
-        return;
-    }
 
+    std::stringstream ss;
     ss << "incquery"; // << IncrementalExtensionQuery::queryId;
     this->queryProgramSection = ss.str();
     this->lastQuerySection = "";
@@ -71,8 +62,10 @@ IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
         this->queryProgramSection = this->queryProgramSection + "0";
     }
 
-    this->createProgramSection();
+    this->generateQueryProgram();
+    this->solver->add(this->queryProgramSection.c_str(), {}, this->queryProgram.c_str());
     this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
+    this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
     this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
 }
 
@@ -83,9 +76,8 @@ void IncrementalExtensionQuery::onModel(Clingo::Model& clingoModel)
     //IncrementalExtensionQuery::cleanUp();
 }
 
-void IncrementalExtensionQuery::createProgramSection()
+void IncrementalExtensionQuery::generateQueryProgram()
 {
-
     std::stringstream ss;
     // hacky - how to distinguish normal loading of bg knowledge??
     if (!term->getProgramSectionParameters().empty() && !term->getRules().empty()) {
@@ -103,12 +95,12 @@ void IncrementalExtensionQuery::createProgramSection()
     auto programSection = this->queryProgramSection + wrappedParams;
     this->externalName = "external" + this->queryProgramSection;
 
-    std::stringstream queryProgram;
-    queryProgram << "#program " << programSection << ".\n";
-    queryProgram << "#external " << externalName << ".\n";
+    std::stringstream queryProgramStream;
+    queryProgramStream << "#program " << programSection << ".\n";
+    queryProgramStream << "#external " << externalName << ".\n";
 
     for (auto& fact : term->getFacts()) {
-        queryProgram << expandFactModuleProperty(fact);
+        queryProgramStream << expandFactModuleProperty(fact);
         extractHeadPredicates(fact);
     }
     if (!term->getQueryRule().empty()) {
@@ -120,7 +112,7 @@ void IncrementalExtensionQuery::createProgramSection()
 
     for (auto& headPredicate : predicatesToAritiesMap) {
         for (auto& arity : headPredicate.second) {
-            queryProgram << createKBCapturingRule(
+            queryProgramStream << createKBCapturingRule(
                     headPredicate.first, arity,this->queryProgramSection);
         }
     }
@@ -147,18 +139,17 @@ void IncrementalExtensionQuery::createProgramSection()
 #endif
 
     if (!term->getQueryRule().empty()) {
-        queryProgram << expandRuleModuleProperty(term->getQueryRule(), (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
+        queryProgramStream << expandRuleModuleProperty(term->getQueryRule(), (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
     }
     for (auto& rule : term->getRules()) {
-        queryProgram << expandRuleModuleProperty(rule, (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
+        queryProgramStream << expandRuleModuleProperty(rule, (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
     }
+    this->queryProgram = queryProgramStream.str();
 
 #ifdef QUERY_DEBUG
-    std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
+    std::cout << "RESULT: " << std::endl << this->queryProgram << std::endl;
 #endif
 
-    this->solver->add(this->queryProgramSection.c_str(), {}, queryProgram.str().c_str());
-    this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
 }
 
 void IncrementalExtensionQuery::removeExternal()

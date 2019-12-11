@@ -76,8 +76,6 @@ public:
     Clingo::SymbolicAtoms getSymbolicAtoms();
     const std::string getGroundProgram() const;
 
-//    std::shared_ptr<Clingo::Control> clingo;
-    Clingo::Control* clingo;
 private:
     bool on_model(Clingo::Model& m);
     void reduceQueryLifeTime();
@@ -86,7 +84,7 @@ private:
 
     essentials::SystemConfig* sc;
     GrdProgramObserver observer;
-    std::shared_ptr<Clingo::Control> clingo;
+    Clingo::Control* clingo;
 
 
     int queryCounter; /**< Used for generating unique query IDs*/

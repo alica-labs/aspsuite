@@ -19,13 +19,12 @@ public:
     static std::vector<IncrementalExtensionQuery*> queries;
     static int queryId;
 
-
-    IncrementalExtensionQuery(Solver* solver, Term* term);
+    IncrementalExtensionQuery(int queryID, Solver* solver, Term* term);
     void onModel(Clingo::Model& clingoModel) override;
     void removeExternal() override;
 
 private:
-    void createProgramSection() override;
+    void generateQueryProgram() override;
     std::string lastQuerySection;
 };
 

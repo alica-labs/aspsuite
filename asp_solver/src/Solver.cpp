@@ -4,10 +4,15 @@
 #include "reasoner/asp/ExtensionQuery.h"
 #include "reasoner/asp/FilterQuery.h"
 
+#include <chrono>
 #include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/IncrementalExtensionQuery.h>
 #include <reasoner/asp/Query.h>
+#include <reasoner/asp/ReusableExtensionQuery.h>
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
+
+//#define Solver_DEBUG
 
 namespace reasoner
 {
@@ -18,6 +23,7 @@ const void* const Solver::WILDCARD_POINTER = new int(0);
 const std::string Solver::WILDCARD_STRING = "wildcard";
 
 std::mutex Solver::queryCounterMutex;
+std::mutex Solver::clingoMtx;
 
 Solver::Solver(std::vector<char const*> args)
 {
@@ -35,10 +41,12 @@ Solver::Solver(std::vector<char const*> args)
             std::cerr << message << std::endl;
         }
     };
-    this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    // this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    this->clingo = new Clingo::Control(args, logger, 20);
     this->clingo->register_observer(this->observer);
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
+    this->clingo->configuration()["configuration"] = "handy";
 #ifdef Solver_DEBUG
     this->modelCount = 0;
 #endif
@@ -80,6 +88,7 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 #ifdef ASPSOLVER_DEBUG
     cout << "Solver_ground: " << vec.at(0).first << endl;
 #endif
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->observer.clear();
     this->clingo->ground(vec, callBack);
 }
@@ -89,6 +98,7 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
  */
 bool Solver::solve()
 {
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->currentModels.clear();
     this->reduceQueryLifeTime();
 #ifdef Solver_DEBUG
@@ -106,11 +116,11 @@ bool Solver::solve()
 bool Solver::on_model(Clingo::Model& m)
 {
 #ifdef Solver_DEBUG
-    cout << "Solver: Found the following model :" << endl;
+    std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
-        cout << atom << " ";
+        std::cout << atom << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
 #endif
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
@@ -158,7 +168,10 @@ void Solver::unregisterQuery(std::shared_ptr<Query> query)
     query->removeExternal();
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry != this->registeredQueries.end()) {
-        this->registeredQueries.erase(entry);
+        // FIXME what is the correct way of handling this?
+//        if (query->getType() != reasoner::asp::QueryType::ReusableExtension) {
+            this->registeredQueries.erase(entry);
+//        }
     }
 }
 
@@ -231,6 +244,10 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
                 this->registerQuery(std::make_shared<ExtensionQuery>(queryID, this, term));
             } else if (term->getType() == QueryType::Filter) {
                 this->registerQuery(std::make_shared<FilterQuery>(queryID, this, term));
+            } else if (term->getType() == QueryType::IncrementalExtension) {
+                this->registerQuery(std::make_shared<IncrementalExtensionQuery>(queryID,this, term));
+            } else if (term->getType() == QueryType::ReusableExtension) {
+                this->registerQuery(std::make_shared<ReusableExtensionQuery>(queryID,this, term));
             } else {
                 std::cout << "Solver: Query of unknown type registered!" << std::endl;
                 return -1;
@@ -358,12 +375,11 @@ void Solver::printStats()
 
     std::stringstream ss;
     ss << "Solve Statistics:" << std::endl;
-    ss << "TOTAL Time: " << statistics["sumary"]["times"]["total"] << "s" << std::endl;
-    ss << "CPU Time: " << statistics["sumary"]["times"]["cpu"] << "s" << std::endl;
-    ss << "SAT Time: " << (statistics["sumary"]["times"]["sat"] * 1000.0) << "ms" << std::endl;
-    ss << "UNSAT Time: " << (statistics["sumary"]["times"]["unsat"] * 1000.0) << "ms" << std::endl;
-    ss << "SOLVE Time: " << (statistics["sumary"]["times"]["solve"] * 1000.0) << "ms" << std::endl;
-
+    ss << "TOTAL Time: " << statistics["summary"]["times"]["total"] << "s" << std::endl;
+    ss << "CPU Time: " << statistics["summary"]["times"]["cpu"] << "s" << std::endl;
+    ss << "SAT Time: " << (statistics["summary"]["times"]["sat"] * 1000.0) << "ms" << std::endl;
+    ss << "UNSAT Time: " << (statistics["summary"]["times"]["unsat"] * 1000.0) << "ms" << std::endl;
+    ss << "SOLVE Time: " << (statistics["summary"]["times"]["solve"] * 1000.0) << "ms" << std::endl;
     std::cout << ss.str() << std::flush;
 }
 

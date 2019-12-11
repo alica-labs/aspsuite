@@ -27,6 +27,7 @@ ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> arg
     this->planIntegrator = nullptr;
     this->masterPlanLoaded = false;
     this->gen = nullptr;
+    this->resetted = false;
 }
 
 ASPSolverWrapper::~ASPSolverWrapper()
@@ -131,6 +132,18 @@ void ASPSolverWrapper::init(::reasoner::asp::Solver* solver)
     this->solver = solver;
     this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
     this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
+}
+
+void ASPSolverWrapper::reset() {
+
+    //the solver is initially created in the base
+    delete this->solver;
+    this->solver = new ::reasoner::asp::Solver({});
+    delete this->gen;
+    this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
+    this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
+//    std::cout << "ASPSolverWrapper: Resetted!" << std::endl;
+    this->resetted = true;
 }
 
 /**

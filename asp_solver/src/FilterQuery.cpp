@@ -14,14 +14,14 @@ FilterQuery::FilterQuery(int queryID, Solver* solver, Term* term)
     this->addQueryValues(term->getRuleHeads());
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
-#ifdef Solver_DEBUG
-    std::cout << "Solver: Query contains rule: " << std::endl;
+#ifdef FILTERQUERY_DEBUG
+    std::cout << "FilterQuery: Query contains rule: " << std::endl;
     for (auto rule : this->term->getRules()) {
         std::cout << rule << std::endl;
     }
 
     for (auto fact : this->term->getFacts()) {
-        std::cout << "Solver: Query contains fact: " << fact << std::endl;
+        std::cout << "FilterQuery: Query contains fact: " << fact << std::endl;
     }
 #endif
 }
@@ -36,18 +36,20 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
         }
         // TODO: Fix nested braces and move functionality to central accessible helper class
         if (queryString.find(",") != std::string::npos) {
-            size_t start = 0;
-            size_t end = std::string::npos;
-            std::string currentQuery = "";
-            while (start != std::string::npos) {
-                end = queryString.find(")", start);
-                if (end == std::string::npos || end == queryString.size()) {
-                    break;
+
+            auto preds = this->determineHeadPredicates(queryString);
+            for (auto pred : preds) {
+                std::stringstream currentQuery;
+                currentQuery << pred.name;
+                if (pred.arity > 0) {
+                    currentQuery << "(";
+                    currentQuery << pred.parameters;
+                    currentQuery << ")";
                 }
-                currentQuery = queryString.substr(start, end - start + 1);
-                currentQuery = essentials::Configuration::trim(currentQuery);
-                this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
-                start = queryString.find(",", end);
+                auto res = currentQuery.str();
+
+                this->headValues.emplace(this->solver->parseValue(res), std::vector<Clingo::Symbol>());
+		start = queryString.find(",", end);
                 if (start != std::string::npos) {
                     start += 1;
                 }
@@ -112,7 +114,7 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
     // Fill mapping from query fact towards model fact
     for (auto value : this->getHeadValues()) {
 #ifdef QUERY_DEBUG
-        cout << "FilterQuery::onModel: " << value.first << endl;
+        std::cout << "FilterQuery::onModel: " << value.first << std::endl;
 #endif
         auto it = ((Solver*) this->solver)
                           ->getSymbolicAtoms()
@@ -122,8 +124,18 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
             continue;
         }
 
+        bool isNewModel = true;
         while (it) {
             if (clingoModel.contains((*it).symbol()) && this->checkMatchValues(Clingo::Symbol(value.first), (*it).symbol())) {
+
+                // TODO hack for accumulating too many models in optimization
+                if (isNewModel) {
+                    isNewModel = false;
+                    auto entry = this->headValues.find(Clingo::Symbol(value.first));
+                    if (entry != this->headValues.end()) {
+                        entry->second.clear();
+                    }
+                }
                 this->saveHeadValuePair(Clingo::Symbol(value.first), (*it).symbol());
             }
             it++;

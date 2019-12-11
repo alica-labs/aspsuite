@@ -55,14 +55,24 @@ void Term::setProgramSection(std::string programSection)
     this->programSection = programSection;
 }
 
-std::vector<std::string> Term::getProgramSectionParameters()
+std::string Term::getBackgroundKnowledgeFilename()
+{
+    return this->backgroundKnowledgeFilename;
+}
+
+void Term::setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilename)
+{
+    this->backgroundKnowledgeFilename = backgroundKnowledgeFilename;
+}
+
+std::vector<std::pair<std::string,std::string>> Term::getProgramSectionParameters()
 {
     return this->programSectionParameters;
 }
 
-void Term::addProgramSectionParameter(std::string param)
+void Term::addProgramSectionParameter(std::string representation, std::string value)
 {
-    this->programSectionParameters.push_back(param);
+    this->programSectionParameters.push_back(std::make_pair(representation,value));
 }
 
 int Term::getLifeTime()
@@ -124,26 +134,6 @@ void Term::setId(long id)
 {
     this->id = id;
 }
-
-/**
- * The query id has to be added to any predicate which is added to the program, naming rule
- * heads and facts!
- * An unique id is given by the Solver!
- */
-//int Term::getQueryId()
-//{
-//    return queryId;
-//}
-
-/**
- * The query id has to be added to any predicate which is added to the program, naming rule
- * heads and facts!
- * An unique id is given by the Solver!
- */
-//void Term::setQueryId(int queryId)
-//{
-//    this->queryId = queryId;
-//}
 
 std::string Term::getQueryRule()
 {

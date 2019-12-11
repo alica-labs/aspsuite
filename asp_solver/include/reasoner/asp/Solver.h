@@ -76,6 +76,8 @@ public:
     Clingo::SymbolicAtoms getSymbolicAtoms();
     const std::string getGroundProgram() const;
 
+//    std::shared_ptr<Clingo::Control> clingo;
+    Clingo::Control* clingo;
 private:
     bool on_model(Clingo::Model& m);
     void reduceQueryLifeTime();
@@ -86,13 +88,17 @@ private:
     GrdProgramObserver observer;
     std::shared_ptr<Clingo::Control> clingo;
 
-    static std::mutex queryCounterMutex; /**< Making the creation of query IDs thread-safe */
+
     int queryCounter; /**< Used for generating unique query IDs*/
     std::vector<long> currentQueryIds;
     std::vector<std::string> alreadyLoaded;
     std::vector<std::shared_ptr<AnnotatedExternal>> assignedExternals;
     std::vector<std::shared_ptr<Query>> registeredQueries;
     std::vector<Clingo::SymbolVector> currentModels;
+
+protected:
+    static std::mutex queryCounterMutex; /**< Making the creation of query IDs thread-safe */
+    static std::mutex clingoMtx;
 
 #ifdef ASPSolver_DEBUG
     int modelCount;

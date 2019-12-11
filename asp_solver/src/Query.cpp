@@ -22,14 +22,16 @@ Query::Query(int queryID, Solver* solver, Term* term, QueryType type)
     this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
 
     // load background knowledge file only once (it does not ground anything)
-    this->solver->loadFileFromConfig(this->backgroundKnowledgeFilename);
+    if (!this->term->getBackgroundKnowledgeFilename().empty()) {
+        this->solver->loadFileFromConfig(this->term->getBackgroundKnowledgeFilename());
+    }
 
     // ground term program section with given params
     if (!term->getProgramSection().empty()) {
         Clingo::SymbolVector paramsVec;
-        auto params = this->term->getProgramSectionParameters();
-        for (auto param : params) {
-            paramsVec.push_back(this->solver->parseValue(param));
+        for (auto param : this->term->getProgramSectionParameters()) {
+            paramsVec.push_back(this->solver->parseValue(param.second));
+
         }
         this->solver->ground({{term->getProgramSection().c_str(), paramsVec}}, nullptr);
     }
@@ -101,7 +103,7 @@ std::string Query::toString()
     }
     ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
 
-    if (this->getType() == QueryType ::Filter) {
+    if (this->getType() == QueryType::Filter) {
         ss << "\tQuery is of type Filter.\n";
         ss << "\tFacts:"
            << "\n";

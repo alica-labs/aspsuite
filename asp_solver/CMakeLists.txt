@@ -40,6 +40,8 @@ add_library(${PROJECT_NAME}
     src/AnnotatedExternal.cpp
 	src/FilterQuery.cpp
 	src/ExtensionQuery.cpp
+		src/IncrementalExtensionQuery.cpp
+		src/ReusableExtensionQuery.cpp
     src/GrdProgramObserver.cpp
 	src/Term.cpp
 	src/Variable.cpp

@@ -45,6 +45,7 @@ public:
 
     ::reasoner::asp::Solver* getSolver();
     void init(::reasoner::asp::Solver* solver);
+    void reset();
     int generateQueryID();
     bool validatePlan(Plan* plan);
     alica::reasoner::ASPGenerator* gen;
@@ -54,6 +55,7 @@ public:
     void unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query);
     void printStats();
     std::vector<std::shared_ptr<::reasoner::asp::Query>> getRegisteredQueries();
+    bool resetted;
 
 private:
     AlicaEngine* ae;

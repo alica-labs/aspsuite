@@ -20,10 +20,13 @@ public:
     void addRule(std::string rule);
     std::vector<std::string> getRuleHeads();
     std::vector<std::string> getRuleBodies();
+    std::string getBackgroundKnowledgeFilename();
+    void setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilename);
     std::string getProgramSection();
     void setProgramSection(std::string programSection);
-    std::vector<std::string> getProgramSectionParameters();
-    void addProgramSectionParameter(std::string param);
+    std::vector<std::pair<std::string,std::string>> getProgramSectionParameters();
+    void addProgramSectionParameter(std::string representation, std::string param);
+
     int getLifeTime();
     void setLifeTime(int lifeTime);
     std::vector<std::string> getRules();
@@ -37,8 +40,6 @@ public:
     void setType(QueryType type);
     long getId();
     void setId(long id);
-//    int getQueryId();
-//    void setQueryId(int queryId);
     std::string getQueryRule();
     void setQueryRule(std::string queryRule);
 
@@ -49,16 +50,14 @@ private:
     std::vector<std::string> heads;
     std::vector<std::string> bodies;
     std::string programSection;
+    std::string backgroundKnowledgeFilename;
+
     long id;
-    /**
-     * The query id has to be added to any predicate which is added to the program, naming rule
-     * heads and facts!
-     * An unique id is given by the ASPSolver!
-     */
-//    int queryId;
     int lifeTime;
     std::vector<std::string> facts;
-    std::vector<std::string> programSectionParameters;
+    //pair first: param representation (e.g. 'n'), second: value (e.g. 1)
+    //should be ordered by their occurence in the program section (#program test(n,m).)
+    std::vector<std::pair<std::string,std::string>> programSectionParameters;
     std::shared_ptr<std::map<std::string, bool>> externals;
     QueryType type;
 };

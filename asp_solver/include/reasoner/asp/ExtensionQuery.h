@@ -22,10 +22,11 @@ public:
     ExtensionQuery(int queryID, Solver* solver, Term* term);
     virtual ~ExtensionQuery() = default;
 
-    void removeExternal();
-    void onModel(Clingo::Model& clingoModel);
+    virtual void removeExternal();
+    virtual void onModel(Clingo::Model& clingoModel);
 
-private:
+
+protected:
     struct Predicate
     {
         std::string name;
@@ -67,10 +68,11 @@ private:
     bool lookUpPredicate(const std::string& predicateName, int arity);
 
     std::string createVariableParameters(int arity);
-    std::string createKBCapturingRule(const std::string& headPredicateName, int arity);
+    std::string createKBCapturingRule(const std::string& headPredicateName, int arity, const std::string& querySection);
 
     std::string expandFactModuleProperty(std::string fact);
-    std::string expandRuleModuleProperty(const std::string& rule);
+    std::string expandRuleModuleProperty(const std::string& rule, const std::string& querySection);
+
 
     /**
      * Encapsulates the query in an extra program section including an external (the query external, e.g., query1).
@@ -79,7 +81,7 @@ private:
      *
      * Therefore, it utilises the methods above... expandBlaBla()
      */
-    void generateQueryProgram();
+    virtual void generateQueryProgram();
 
     std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
 

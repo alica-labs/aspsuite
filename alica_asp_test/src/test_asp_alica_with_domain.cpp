@@ -12,11 +12,11 @@
 #include "ConstraintCreator.h"
 #include "UtilityFunctionCreator.h"
 #include <engine/AlicaEngine.h>
-#include <engine/IPlanParser.h>
 #include <engine/PlanBase.h>
 #include <engine/model/Plan.h>
 #include <engine/model/PlanType.h>
 #include <engine/model/State.h>
+#include <engine/parser/PlanParser.h>
 
 // ALICA ASP Solver
 #include <asp_commons/ASPCommonsTerm.h>
@@ -30,55 +30,44 @@
 class AspAlicaEngineWithDomain : public ::testing::Test
 {
 
-protected:
-    essentials::SystemConfig* sc;
-    alica::AlicaEngine* ae;
-    alica::BehaviourCreator* bc;
-    alica::ConditionCreator* cc;
-    alica::UtilityFunctionCreator* uc;
-    alica::ConstraintCreator* crc;
+  protected:
+    supplementary::SystemConfig *sc;
+    alica::AlicaEngine *ae;
+    alica::BehaviourCreator *bc;
+    alica::ConditionCreator *cc;
+    alica::UtilityFunctionCreator *uc;
+    alica::ConstraintCreator *crc;
     std::chrono::_V2::system_clock::time_point start;
 
     virtual void SetUp()
     {
         // determine the path to the test config
-        string path = essentials::FileSystem::getSelfPath();
+        string path = supplementary::FileSystem::getSelfPath();
         int place = path.rfind("devel");
         path = path.substr(0, place);
         path = path + "src/symrock/alica_asp_test/src";
 
         // bring up the SystemConfig with the corresponding path
-        sc = essentials::SystemConfig::getInstance();
+        sc = supplementary::SystemConfig::getInstance();
         sc->setRootPath(path);
         sc->setConfigPath(path + "/etc");
         sc->setHostname("nase");
 
         // setup the engine
-        ae = new alica::AlicaEngine();
         bc = new alica::BehaviourCreator();
         cc = new alica::ConditionCreator();
         uc = new alica::UtilityFunctionCreator();
         crc = new alica::ConstraintCreator();
-        ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
-        ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
 
         start = std::chrono::high_resolution_clock::now(); // start time measurement
-
-        std::vector<char const*> args{"clingo", "-W", "no-atom-undefined", nullptr};
-        auto solver = new ::reasoner::ASPSolver(args);
-        auto solverWrapper = new alica::reasoner::ASPSolverWrapper(ae, args);
-        solverWrapper->init(solver);
-        ae->addSolver(1, solverWrapper);
-        alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
-
-        aspSolver->getSolver()->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
     }
 
     virtual void TearDown()
     {
         // stop time measurement and report
         std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-        cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl;
+        cout << "Measured Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms"
+             << endl;
         ae->shutdown();
         sc->shutdown();
         delete ae->getIAlicaClock();
@@ -95,11 +84,24 @@ protected:
  */
 TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 {
-    EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "CarryBookMaster", ".", false)) << "Unable to initialise the ALICA Engine!";
+    ae = new alica::AlicaEngine(new supplementary::AgentIDManager(new supplementary::AgentIDFactory()),
+                                "ReusePlanWithoutCycle", "CarryBookMaster", ".", false);
+    ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
+    ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
+    // "1" stands for the ASPSolver in this test suite only!
+    std::vector<char const *> args{"clingo", "-W", "no-atom-undefined", nullptr};
+    auto solver = new ::reasoner::ASPSolver(args);
+    auto solverWrapper = new alica::reasoner::ASPSolverWrapper(ae, args);
+    solverWrapper->init(solver);
 
-    alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
+    solverWrapper->getSolver()->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
+    ae->addSolver(1, solverWrapper);
+    EXPECT_TRUE(ae->init(bc, cc, uc, crc)) << "Unable to initialise the ALICA Engine!";
 
-    alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+    alica::reasoner::ASPSolverWrapper *aspSolver =
+        dynamic_cast<alica::reasoner::ASPSolverWrapper *>(ae->getSolver(1)); // "1" for ASPSolver
+
+    alica::Plan *plan = ae->getPlanBase()->getMasterPlan();
 
     string queryString1 = "brokenPlanBase(donatello)";
     string queryString2 = "brokenPlanBase(leonardo)";
@@ -122,29 +124,33 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
     constraint4->setProgramSection("assistanceTestFacts");
     constraint4->setType(::reasoner::ASPQueryType::Facts);
     shared_ptr<::reasoner::ASPFactsQuery> queryObject1 =
-            make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*) (aspSolver->getSolver())), constraint1);
+        make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver *)(aspSolver->getSolver())), constraint1);
     shared_ptr<::reasoner::ASPFactsQuery> queryObject2 =
-            make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*) (aspSolver->getSolver())), constraint2);
+        make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver *)(aspSolver->getSolver())), constraint2);
     shared_ptr<::reasoner::ASPFactsQuery> queryObject3 =
-            make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*) (aspSolver->getSolver())), constraint3);
+        make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver *)(aspSolver->getSolver())), constraint3);
     shared_ptr<::reasoner::ASPFactsQuery> queryObject4 =
-            make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*) (aspSolver->getSolver())), constraint4);
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->registerQuery(queryObject1);
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->registerQuery(queryObject2);
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->registerQuery(queryObject3);
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->registerQuery(queryObject4);
+        make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver *)(aspSolver->getSolver())), constraint4);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->registerQuery(queryObject1);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->registerQuery(queryObject2);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->registerQuery(queryObject3);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->registerQuery(queryObject4);
 
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->ground({{"assistanceTestFacts", {}}}, nullptr);
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->ground({{"assistanceBackground", {}}}, nullptr);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->ground({{"assistanceTestFacts", {}}}, nullptr);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->ground({{"assistanceBackground", {}}}, nullptr);
     // start time measurement for grounding
     std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
-    if (!((alica::reasoner::ASPSolverWrapper*) (aspSolver->getSolver()))->validatePlan(plan)) {
+    if (!((alica::reasoner::ASPSolverWrapper *)(aspSolver->getSolver()))->validatePlan(plan))
+    {
         cout << "ASPAlicaTest: No Model found!" << endl;
-    } else {
-        ((alica::reasoner::ASPSolverWrapper*) (aspSolver->getSolver()))->printStats();
+    }
+    else
+    {
+        ((alica::reasoner::ASPSolverWrapper *)(aspSolver->getSolver()))->printStats();
     }
     std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-    cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
+    cout << "Measured Grounding Time: "
+         << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
     EXPECT_TRUE(queryObject1->factsExistForAllModels()) << "The planbase of agent donatello should be broken.";
     EXPECT_FALSE(queryObject2->factsExistForAllModels()) << "The planbase of agent leonardo should not be broken.";
@@ -158,12 +164,24 @@ TEST_F(AspAlicaEngineWithDomain, AgentInTwoStatesOfSamePlan)
 
 TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
 {
-    EXPECT_TRUE(ae->init(bc, cc, uc, crc, "ReusePlanWithoutCycle", "ReusePlanFromPlantypeWithoutCycle", ".", false))
-            << "Unable to initialise the ALICA Engine!";
+    ae = new alica::AlicaEngine(new supplementary::AgentIDManager(new supplementary::AgentIDFactory()),
+                                "ReusePlanWithoutCycle", "ReusePlanFromPlantypeWithoutCycle", ".", false);
+    ae->setIAlicaClock(new alica_dummy_proxy::AlicaSystemClock());
+    ae->setCommunicator(new alica_dummy_proxy::AlicaDummyCommunication(ae));
+    // "1" stands for the ASPSolver in this test suite only!
+    std::vector<char const *> args{"clingo", "-W", "no-atom-undefined", nullptr};
+    auto solver = new ::reasoner::ASPSolver(args);
+    auto solverWrapper = new alica::reasoner::ASPSolverWrapper(ae, args);
+    solverWrapper->init(solver);
 
-    alica::reasoner::ASPSolverWrapper* aspSolver = dynamic_cast<alica::reasoner::ASPSolverWrapper*>(ae->getSolver(1)); // "1" for ASPSolver
+    solverWrapper->getSolver()->loadFileFromConfig("assistanceBackgroundKnowledgeFile");
+    ae->addSolver(1, solverWrapper);
+    EXPECT_TRUE(ae->init(bc, cc, uc, crc)) << "Unable to initialise the ALICA Engine!";
 
-    alica::Plan* plan = ae->getPlanBase()->getMasterPlan();
+    alica::reasoner::ASPSolverWrapper *aspSolver =
+        dynamic_cast<alica::reasoner::ASPSolverWrapper *>(ae->getSolver(1)); // "1" for ASPSolver
+
+    alica::Plan *plan = ae->getPlanBase()->getMasterPlan();
 
     string queryString1 = "brokenPlanBase(donatello)";
     auto constraint = make_shared<::reasoner::ASPCommonsTerm>();
@@ -171,21 +189,25 @@ TEST_F(AspAlicaEngineWithDomain, ReusePlanFromPlantypeWithoutCycle_PlanBase)
     constraint->setType(::reasoner::ASPQueryType::Facts);
     constraint->setProgramSection("assistanceTestFacts");
 
-    ((::reasoner::ASPSolver*) (aspSolver->getSolver()))->ground({{"assistanceBackground", {}}}, nullptr);
+    ((::reasoner::ASPSolver *)(aspSolver->getSolver()))->ground({{"assistanceBackground", {}}}, nullptr);
 
     shared_ptr<::reasoner::ASPFactsQuery> queryObject1 =
-            make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver*) (aspSolver->getSolver())), constraint);
-    ((alica::reasoner::ASPSolverWrapper*) (aspSolver->getSolver()))->registerQuery(queryObject1);
+        make_shared<::reasoner::ASPFactsQuery>(((::reasoner::ASPSolver *)(aspSolver->getSolver())), constraint);
+    ((alica::reasoner::ASPSolverWrapper *)(aspSolver->getSolver()))->registerQuery(queryObject1);
 
     // start time measurement for grounding
     std::chrono::_V2::system_clock::time_point groundingStart = std::chrono::high_resolution_clock::now();
-    if (!((alica::reasoner::ASPSolverWrapper*) (aspSolver->getSolver()))->validatePlan(plan)) {
+    if (!((alica::reasoner::ASPSolverWrapper *)(aspSolver->getSolver()))->validatePlan(plan))
+    {
         cout << "ASPAlicaTest: No Model found!" << endl;
-    } else {
-        ((alica::reasoner::ASPSolverWrapper*) (aspSolver->getSolver()))->printStats();
+    }
+    else
+    {
+        ((alica::reasoner::ASPSolverWrapper *)(aspSolver->getSolver()))->printStats();
     }
     std::chrono::_V2::system_clock::time_point end = std::chrono::high_resolution_clock::now();
-    cout << "Measured Grounding Time: " << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
+    cout << "Measured Grounding Time: "
+         << std::chrono::duration_cast<chrono::milliseconds>(end - groundingStart).count() << " ms" << endl;
 
     EXPECT_FALSE(queryObject1->factsExistForAllModels()) << "The plan base of agent donatello should not be broken.";
     cout << queryObject1->toString() << endl;

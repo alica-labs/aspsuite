@@ -3,14 +3,17 @@
 
 #include "engine/BasicBehaviour.h"
 
+#include <string>
+
 namespace alica
 {
-class DomainBehaviour : public BasicBehaviour
-{
-public:
-    DomainBehaviour(string name);
-    virtual ~DomainBehaviour();
-};
+    class DomainBehaviour : public BasicBehaviour
+    {
+    public:
+        DomainBehaviour(std::string name);
+        virtual ~DomainBehaviour();
+
+    };
 } /* namespace alica */
 
 #endif /* DomainBehaviour_H_ */

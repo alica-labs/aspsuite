@@ -13,7 +13,7 @@ class ReusableExtensionQuery : public ExtensionQuery
 {
 
 public:
-    ReusableExtensionQuery(int queryID, reasoner::asp::Solver* solver, reasoner::asp::Term* term);
+    ReusableExtensionQuery(int queryID, Solver* solver, Term* term);
     void removeExternal() override;
     void reactivate();
 };

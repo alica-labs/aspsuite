@@ -6,14 +6,14 @@
 #include <engine/PlanBase.h>
 #include <engine/constraintmodul/ProblemDescriptor.h>
 
-#include <reasoner/asp/Term.h>
-#include <reasoner/asp/Variable.h>
-#include <reasoner/asp/Query.h>
-#include <reasoner/asp/AnnotatedValVec.h>
-#include <reasoner/asp/Solver.h>
 #include <asp_solver_wrapper/ASPAlicaPlanIntegrator.h>
 #include <asp_solver_wrapper/ASPGenerator.h>
 #include <asp_solver_wrapper/ASPSolverContext.h>
+#include <reasoner/asp/AnnotatedValVec.h>
+#include <reasoner/asp/Query.h>
+#include <reasoner/asp/Solver.h>
+#include <reasoner/asp/Term.h>
+#include <reasoner/asp/Variable.h>
 
 namespace alica
 {
@@ -114,7 +114,7 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
         ret->addFact(it);
     }
     ret->setId(tmp->getId());
-//    ret->setQueryId(tmp->getQueryId());
+    //    ret->setQueryId(tmp->getQueryId());
     ret->setExternals(tmp->getExternals());
     ret->setNumberOfModels(tmp->getNumberOfModels());
     ret->setProgramSection(tmp->getProgramSection());
@@ -134,15 +134,16 @@ void ASPSolverWrapper::init(::reasoner::asp::Solver* solver)
     this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
 }
 
-void ASPSolverWrapper::reset() {
+void ASPSolverWrapper::reset()
+{
 
-    //the solver is initially created in the base
+    // the solver is initially created in the base
     delete this->solver;
     this->solver = new ::reasoner::asp::Solver({});
     delete this->gen;
     this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
     this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
-//    std::cout << "ASPSolverWrapper: Resetted!" << std::endl;
+    //    std::cout << "ASPSolverWrapper: Resetted!" << std::endl;
     this->resetted = true;
 }
 
@@ -170,7 +171,7 @@ void alica::reasoner::ASPSolverWrapper::registerQuery(std::shared_ptr<::reasoner
 
 void alica::reasoner::ASPSolverWrapper::unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query)
 {
-    this->solver->unregisterQuery(query);
+    this->solver->unregisterQuery(query->getQueryID());
 }
 
 void alica::reasoner::ASPSolverWrapper::printStats()
@@ -178,7 +179,7 @@ void alica::reasoner::ASPSolverWrapper::printStats()
     this->solver->printStats();
 }
 
-    std::vector<std::shared_ptr<::reasoner::asp::Query>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries()
+const std::unordered_map<int, std::shared_ptr<::reasoner::asp::Query>> alica::reasoner::ASPSolverWrapper::getRegisteredQueries() const
 {
     return this->solver->getRegisteredQueries();
 }

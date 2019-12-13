@@ -19,7 +19,6 @@ ASPKnowledgeManager::ASPKnowledgeManager()
 ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
 /**
- * TODO: Would it be better to filter results with a facts query?
  * Solves the current ASP Program of the Knowledge Base according to specified queryRule
  */
 std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::string programSection)
@@ -79,7 +78,6 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
     int queryId = this->solver->generateQueryID();
     std::shared_ptr<::reasoner::asp::Query> query = std::make_shared<::reasoner::asp::ExtensionQuery>(queryId, this->solver, term);
     this->solver->registerQuery(query);
-    this->currentQueryIDs.push_back(queryId);
     return queryId;
 }
 
@@ -89,16 +87,7 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
 void ASPKnowledgeManager::revoke(int queryID)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    auto registeredQueries = this->solver->getRegisteredQueries();
-    auto position = std::find(this->currentQueryIDs.begin(), this->currentQueryIDs.end(), queryID);
-    if (position != this->currentQueryIDs.end()) {
-        this->currentQueryIDs.erase(position);
-    }
-    for (auto query : registeredQueries) {
-        if (query->getQueryID() == queryID) {
-            solver->unregisterQuery(query);
-        }
-    }
+    solver->unregisterQuery(queryID);
 }
 
 /**

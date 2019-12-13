@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace reasoner
 {
@@ -54,7 +54,7 @@ public:
     void registerQuery(std::shared_ptr<::reasoner::asp::Query> query);
     void unregisterQuery(std::shared_ptr<::reasoner::asp::Query> query);
     void printStats();
-    std::vector<std::shared_ptr<::reasoner::asp::Query>> getRegisteredQueries();
+    const std::unordered_map<int, std::shared_ptr<::reasoner::asp::Query>> getRegisteredQueries() const;
     bool resetted;
 
 private:

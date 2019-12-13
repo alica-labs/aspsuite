@@ -9,8 +9,8 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <unordered_map>
 
-//#define ASPSolver_DEBUG
 //#define ASP_TEST_RELATED
 
 namespace reasoner
@@ -39,8 +39,8 @@ public:
     bool existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
     bool getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls, std::vector<AnnotatedValVec*>& results);
     std::shared_ptr<Variable> createVariable(int64_t representingVariableId);
-    bool loadFileFromConfig(std::string configKey);
-    void loadFile(std::string filename);
+    bool loadFileFromConfig(const std::string& configKey);
+    void loadFile(const std::string& filename);
     void ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack);
     void assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue);
     void releaseExternal(Clingo::Symbol ext);
@@ -61,23 +61,23 @@ public:
      * @return
      */
     void registerQuery(std::shared_ptr<Query> query);
-    void unregisterQuery(std::shared_ptr<Query> query);
-    void printStats();
-    const double getSolvingTime();
-    const double getSatTime();
-    const double getUnsatTime();
-    const double getModelCount();
+    void unregisterQuery(int queryID);
     void setNumberOfModels(int numberOfModels);
-    const double getAtomCount();
-    const double getBodiesCount();
-    const double getAuxAtomsCount();
-    std::vector<std::shared_ptr<Query>> getRegisteredQueries();
+    void printStats();
+    double getSolvingTime();
+    double getSatTime();
+    double getUnsatTime();
+    double getModelCount();
+    double getAtomCount();
+    double getBodiesCount();
+    double getAuxAtomsCount();
+    const std::unordered_map<int, std::shared_ptr<Query>> getRegisteredQueries() const;
     std::vector<Clingo::SymbolVector> getCurrentModels();
     Clingo::SymbolicAtoms getSymbolicAtoms();
     const std::string getGroundProgram() const;
 
 private:
-    bool on_model(Clingo::Model& m);
+    bool onModel(Clingo::Model& m);
     void reduceQueryLifeTime();
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
     void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
@@ -86,19 +86,17 @@ private:
     GrdProgramObserver observer;
     Clingo::Control* clingo;
 
-
     int queryCounter; /**< Used for generating unique query IDs*/
-    std::vector<long> currentQueryIds;
-    std::vector<std::string> alreadyLoaded;
+    std::vector<std::string> alreadyLoaded; /**< Knowledge files that are already loaded*/
     std::vector<std::shared_ptr<AnnotatedExternal>> assignedExternals;
-    std::vector<std::shared_ptr<Query>> registeredQueries;
+    std::unordered_map<int, std::shared_ptr<Query>> registeredQueries;
     std::vector<Clingo::SymbolVector> currentModels;
 
 protected:
     static std::mutex queryCounterMutex; /**< Making the creation of query IDs thread-safe */
     static std::mutex clingoMtx;
 
-#ifdef ASPSolver_DEBUG
+#ifdef SOLVER_DEBUG
     int modelCount;
 #endif
 };

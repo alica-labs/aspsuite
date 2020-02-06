@@ -44,7 +44,7 @@ public:
     virtual std::unique_ptr<SolverContext> createSolverContext() override;
 
     ::reasoner::asp::Solver* getSolver();
-    void init(::reasoner::asp::Solver* solver);
+    void init(::reasoner::asp::Solver* aspSolver);
     void reset();
     int getQueryCounter();
     bool validatePlan(Plan* plan);

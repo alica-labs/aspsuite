@@ -41,12 +41,13 @@ Solver::Solver(std::vector<char const*> args)
             std::cerr << message << std::endl;
         }
     };
-    // this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
-    this->clingo = new Clingo::Control(args, logger, 20);
+
+    this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
+    //    this->clingo = new Clingo::Control(args, logger, 20);
     this->clingo->register_observer(this->observer);
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
-    this->clingo->configuration()["configuration"] = "handy";
+    // this->clingo->configuration()["configuration"] = "handy";
 
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
@@ -54,13 +55,14 @@ Solver::Solver(std::vector<char const*> args)
 
 Solver::~Solver()
 {
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     this->clingo->cleanup();
-    //    std::cout << "deleting clingo!" << std::endl;
-    delete this->clingo;
 }
 
 void Solver::loadFile(std::string absolutFilename)
 {
+
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     this->clingo->load(absolutFilename.c_str());
 }
 
@@ -79,7 +81,12 @@ bool Solver::loadFileFromConfig(std::string configKey)
     std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
     backGroundKnowledgeFile = essentials::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
+
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
+
     this->clingo->load(backGroundKnowledgeFile.c_str());
+//    std::cout << "RELEASE LOAD " << backGroundKnowledgeFile << std::endl;
+
     return true;
 }
 
@@ -88,12 +95,22 @@ bool Solver::loadFileFromConfig(std::string configKey)
  */
 void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 {
-#ifdef ASPSOLVER_DEBUG
-    cout << "Solver_ground: " << vec.at(0).first << endl;
+#ifdef Solver_DEBUG
+    std::cout << "================================ Solver_ground: " << std::endl;
+    for (auto part : vec) {
+        std::cout << part.name() << std::endl;
+        for (auto param : part.params()) {
+            std::cout << param.to_string() << std::endl;
+        }
+    }
+
 #endif
     std::lock_guard<std::mutex> lock(clingoMtx);
+
     this->observer.clear();
     this->clingo->ground(vec, callBack);
+    //    std::cout << "1111" << std::endl;
+    //    std::cout << this->observer.getGroundProgram() << std::endl;
 }
 
 /**
@@ -101,13 +118,12 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
  */
 bool Solver::solve()
 {
-    std::lock_guard<std::mutex> lock(clingoMtx);
     this->currentModels.clear();
     this->reduceQueryLifeTime();
     // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     auto result = this->clingo->solve(span, this, false, false);
-
     return result.get().is_satisfiable();
 }
 
@@ -116,13 +132,15 @@ bool Solver::solve()
  */
 bool Solver::on_model(Clingo::Model& m)
 {
-#ifdef Solver_DEBUG
+
+//    std::lock_guard<std::mutex> lock(this->clingoMtx);
+//#ifdef Solver_DEBUG
     std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         std::cout << atom << " ";
     }
     std::cout << std::endl;
-#endif
+//#endif
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
     for (int i = 0; i < tmp.size(); i++) {
@@ -137,21 +155,28 @@ bool Solver::on_model(Clingo::Model& m)
 
 void Solver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
 {
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     this->clingo->assign_external(ext, truthValue);
 }
 
 void Solver::releaseExternal(Clingo::Symbol ext)
 {
+
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     this->clingo->release_external(ext);
 }
 
 void Solver::add(char const* name, const Clingo::StringSpan& params, char const* par)
 {
+
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
     this->clingo->add(name, params, par);
 }
 
 Clingo::Symbol Solver::parseValue(const std::string& str)
 {
+    std::lock_guard<std::mutex> lock(this->clingoMtx);
+
     return Clingo::parse_term(str.c_str(), nullptr, 20);
 }
 
@@ -171,9 +196,9 @@ bool Solver::unregisterQuery(std::shared_ptr<Query> query)
     auto entry = find(this->registeredQueries.begin(), this->registeredQueries.end(), query);
     if (entry != this->registeredQueries.end()) {
         // FIXME what is the correct way of handling this?
-//        if (query->getType() != reasoner::asp::QueryType::ReusableExtension) {
-            this->registeredQueries.erase(entry);
-//        }
+        //        if (query->getType() != reasoner::asp::QueryType::ReusableExtension) {
+        this->registeredQueries.erase(entry);
+        //        }
         return true;
     }
     return false;
@@ -181,6 +206,7 @@ bool Solver::unregisterQuery(std::shared_ptr<Query> query)
 
 bool Solver::existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls)
 {
+
     this->clingo->configuration()["solve"]["models"] = "1";
     int dim = prepareSolution(vars, calls);
     if (dim == -1) {
@@ -193,7 +219,7 @@ bool Solver::existsSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
 
 bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls, std::vector<AnnotatedValVec*>& results)
 {
-    this->clingo->configuration()["solve"]["models"] = "0";
+    //    this->clingo->configuration()["solve"]["models"] = "0";
     int dim = prepareSolution(vars, calls);
     if (dim == -1) {
         this->removeDeadQueries();
@@ -235,7 +261,7 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
     for (auto term : calls) {
         this->currentQueryIds.push_back(term->getId());
         if (!term->getNumberOfModels().empty()) {
-            this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
+            //            this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
         }
         bool found = false;
         for (auto query : this->registeredQueries) {
@@ -245,11 +271,14 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
         }
         if (!found) {
             if (term->getType() == QueryType::Extension) {
+//                std::cout << "register ext query" << std::endl;
                 this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
+//                std::cout << "*** register ext query DONE" << std::endl;
             } else if (term->getType() == QueryType::Filter) {
                 this->registerQuery(std::make_shared<FilterQuery>(this, term));
             } else if (term->getType() == QueryType::IncrementalExtension) {
                 this->registerQuery(std::make_shared<IncrementalExtensionQuery>(this, term));
+
             } else if (term->getType() == QueryType::ReusableExtension) {
                 this->registerQuery(std::make_shared<ReusableExtensionQuery>(this, term));
             } else {
@@ -259,11 +288,14 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
         }
     }
 
+//    std::cout << "iterate over registered queries" << std::endl;
     // Handle externals from registered queries and the term from this solve call
     for (auto q : this->registeredQueries) {
         auto ext = q->getTerm()->getExternals();
         if (ext != nullptr) {
+//            std::cout << "handle externals getsolution" << std::endl;
             this->handleExternals(ext);
+//            std::cout << "handle externals getsolution DONE" << std::endl;
         }
     }
     return vars.size();
@@ -276,10 +308,13 @@ void Solver::handleExternals(std::shared_ptr<std::map<std::string, bool>> extern
                 [p](std::shared_ptr<AnnotatedExternal> element) { return element->getAspPredicate() == p.first; });
         if (it == this->assignedExternals.end()) {
             std::shared_ptr<Clingo::Symbol> val = std::make_shared<Clingo::Symbol>(Clingo::parse_term(p.first.c_str()));
+            std::lock_guard<std::mutex> lock(this->clingoMtx);
             this->clingo->assign_external(*val, p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
             this->assignedExternals.push_back(std::make_shared<AnnotatedExternal>(p.first, val, p.second));
+
         } else {
             if (p.second != (*it)->getValue()) {
+                std::lock_guard<std::mutex> lock(this->clingoMtx);
                 this->clingo->assign_external(*((*it)->getGringoValue()), p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
                 (*it)->setValue(p.second);
             }

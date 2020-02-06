@@ -22,6 +22,7 @@ namespace reasoner
 ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args)
         : alica::ISolver<ASPSolverWrapper, ::reasoner::asp::AnnotatedValVec*>(ae)
 {
+    std::cout << "Creating ASPSolverWrapper" << std::endl;
     this->ae = ae;
     this->solver = nullptr;
     this->planIntegrator = nullptr;
@@ -32,6 +33,7 @@ ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> arg
 
 ASPSolverWrapper::~ASPSolverWrapper()
 {
+    std::cout << "Destructing ASPSolverWrapper!" << std::endl;
     delete this->solver;
     delete this->gen;
 }
@@ -127,14 +129,15 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
     return solver;
 }
 
-void ASPSolverWrapper::init(::reasoner::asp::Solver* solver)
+void ASPSolverWrapper::init(::reasoner::asp::Solver* aspSolver)
 {
-    this->solver = solver;
-    this->gen = new ASPGenerator(solver->WILDCARD_POINTER, solver->WILDCARD_STRING);
+    this->solver = aspSolver;
+    this->gen = new ASPGenerator(aspSolver->WILDCARD_POINTER, aspSolver->WILDCARD_STRING);
     this->planIntegrator = std::make_shared<ASPAlicaPlanIntegrator>(this->solver, this->gen);
 }
 
 void ASPSolverWrapper::reset() {
+    std::cout << "Resetting ASPSolverWrapper!" << std::endl;
 
     //the solver is initially created in the base
     delete this->solver;

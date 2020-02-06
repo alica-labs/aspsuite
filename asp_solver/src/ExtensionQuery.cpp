@@ -17,43 +17,40 @@ namespace asp
 ExtensionQuery::ExtensionQuery(Solver* solver, Term* term)
         : Query(solver, term)
 {
-    //HACK for testing incremental query
-    if(term->getType()== QueryType::Extension) {
+    // HACK for testing incremental query
+    if (term->getType() == QueryType::Extension) {
 
-    this->type = QueryType::Extension;
-    std::stringstream ss;
-    if (term->getQueryId() == -1) {
+        this->type = QueryType::Extension;
+        std::stringstream ss;
+        if (term->getQueryId() == -1) {
 #ifdef QUERY_DEBUG
-        std::cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << std::endl;
+            std::cout << "ExtensionQuery: Error please set the queryId and add it to any additional Fact or Rule that is going to be queried! " << std::endl;
 #endif
-        return;
-    }
-    ss << "query" << term->getQueryId();
-    this->queryProgramSection = ss.str();
+            return;
+        }
+        ss << "query" << term->getQueryId();
+        this->queryProgramSection = ss.str();
 
 #ifdef QUERY_DEBUG
-    std::cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << std::endl;
+        std::cout << "ExtensionQuery: creating query number " << term->getQueryId() << " and program section " << this->queryProgramSection << std::endl;
 #endif
-    this->createProgramSection();
-    //    // is added manually to recreate eval for LNAI17 paper
-    //    auto loaded2 = this->solver->loadFileFromConfig("alicaBackgroundKnowledgeFile");
-    //    if (loaded2) {
-    //        this->solver->ground({{"alicaBackground", {}}}, nullptr);
-    //    }
+        this->createProgramSection();
+        //    // is added manually to recreate eval for LNAI17 paper
+        //    auto loaded2 = this->solver->loadFileFromConfig("alicaBackgroundKnowledgeFile");
+        //    if (loaded2) {
+        //        this->solver->ground({{"alicaBackground", {}}}, nullptr);
+        //    }
 
-    Clingo::SymbolVector paramsVec;
-    for (auto param : this->term->getProgramSectionParameters()) {
-        paramsVec.push_back(this->solver->parseValue(param.second));
+        Clingo::SymbolVector paramsVec;
+        for (auto param : this->term->getProgramSectionParameters()) {
+            paramsVec.push_back(this->solver->parseValue(param.second));
+        }
+
+        // TODO segfault here
+        this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
+        this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
     }
-
-    //TODO segfault here
-    this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
-
-    this->solver->assignExternal(*(this->external), Clingo::TruthValue::True);
-    }
-
 }
-
 
 ExtensionQuery::~ExtensionQuery() = default;
 
@@ -128,19 +125,19 @@ void ExtensionQuery::createProgramSection()
 #ifdef QUERY_DEBUG
     std::cout << "RESULT: " << std::endl << queryProgram.str() << std::endl;
 #endif
-
     this->solver->add(this->queryProgramSection.c_str(), {}, queryProgram.str().c_str());
     this->external = std::make_shared<Clingo::Symbol>(this->solver->parseValue(this->externalName));
 }
 
 void ExtensionQuery::removeExternal()
 {
-//    std::cout << "releasing external of extquery " << this->getTerm()->getId() << std::endl;
+    std::cout << "~~+~~~~~~~~~~~~~~ releasing external of extquery " << this->getTerm()->getId() << std::endl;
     this->solver->releaseExternal(*(this->external));
 }
 
 void ExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
+
     Clingo::SymbolVector vec;
     auto tmp = clingoModel.symbols(clingo_show_type_shown);
     for (int i = 0; i < tmp.size(); i++) {
@@ -157,6 +154,7 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
 #ifdef QUERY_DEBUG
         std::cout << "ExtensionQuery::onModel: " << value.first << std::endl;
 #endif
+//        std::lock_guard<std::mutex> lock(this->solver->clingoMtx);
         auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
@@ -280,12 +278,11 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule, co
             endLastPredicateIdx = predicate.parameterEndIdx + 1;
             if (lookUpPredicate(predicate.name, predicate.arity)) {
                 // add mp nested predicate
-                //FIXME TODO missing functionality for incremental query: distinguish references to older timesteps
-                if(implicationIdx >= currentIdx || implicationIdx == 0 || predicate.name.compare("occurs") == 0 || predicate.name.compare("fieldAhead") == 0) {
+                // FIXME TODO missing functionality for incremental query: distinguish references to older timesteps
+                if (implicationIdx >= currentIdx || implicationIdx == 0 || predicate.name.compare("occurs") == 0 || predicate.name.compare("fieldAhead") == 0) {
                     mpRule << this->queryProgramSection << "(" << predicate.name;
                 } else {
                     mpRule << querySection << "(" << predicate.name;
-
                 }
                 if (predicate.arity != 0) {
                     mpRule << "(" << predicate.parameters << "))";
@@ -305,7 +302,8 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule, co
                         mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ", " << externalName << ".";
                     } else {
 
-                        mpRule << ((conditionColonIdx != std::string::npos && rule.find("maximize") == std::string::npos) ? "; " : ", ") << externalName << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
+                        mpRule << ((conditionColonIdx != std::string::npos && rule.find("maximize") == std::string::npos) ? "; " : ", ") << externalName
+                               << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << ".";
                     }
                 } else if (implicationIdx == std::string::npos) {
                     mpRule << rule.substr(endLastPredicateIdx, rule.find_last_of('.') - endLastPredicateIdx) << " :- " << externalName << ".";
@@ -348,9 +346,6 @@ std::string ExtensionQuery::expandRuleModuleProperty(const std::string& rule, co
         openingBraceIdx = std::string::npos;
     }
     mpRule << "\n";
-
-
-
 
     return mpRule.str();
 }

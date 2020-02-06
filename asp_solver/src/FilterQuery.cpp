@@ -109,7 +109,6 @@ std::vector<std::pair<Clingo::Symbol, TruthValue>> FilterQuery::getTruthValues()
 
 void FilterQuery::onModel(Clingo::Model& clingoModel)
 {
-
     // Remember model
     Clingo::SymbolVector vec;
     auto tmp = clingoModel.symbols(clingo_show_type_shown);
@@ -123,6 +122,8 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
 #ifdef QUERY_DEBUG
         std::cout << "FilterQuery::onModel: " << value.first << std::endl;
 #endif
+//        std::lock_guard<std::mutex> lock(this->solver->clingoMtx);
+
         auto it = this->solver->clingo->symbolic_atoms().begin(
                 Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == this->solver->clingo->symbolic_atoms().end()) {

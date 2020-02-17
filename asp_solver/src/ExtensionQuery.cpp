@@ -334,6 +334,11 @@ std::string ExtensionQuery::createKBCapturingRule(const std::string& headPredica
     return rule.str();
 }
 
+/**
+ * Expects the given fact to end with a dot!
+ * @param fact
+ * @return
+ */
 std::string ExtensionQuery::expandFactModuleProperty(std::string fact)
 {
     fact = SyntaxUtils::trim(fact);

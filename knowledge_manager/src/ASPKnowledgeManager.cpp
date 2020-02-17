@@ -82,6 +82,21 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
 }
 
 /**
+ * Adds the given rules permanently to the base program section and grounds it.
+ * @param backgroundInformation
+ */
+void ASPKnowledgeManager::addBackgroundRules(std::vector<std::string> &backgroundInformation) {
+    std::stringstream backgroundInfoStream;
+    for (const auto& info : backgroundInformation) {
+        backgroundInfoStream << info;
+    }
+    std::lock_guard<std::mutex> lock(mtx);
+    std::cout << "[ASPKnowledgeManager] background rules: " << backgroundInfoStream.str() << std::endl;
+    this->solver->add("base", {}, backgroundInfoStream.str().c_str());
+    this->solver->ground({{"base", {}}}, nullptr);
+}
+
+/**
  * Removes a specified query from solver
  */
 void ASPKnowledgeManager::revoke(int queryID)

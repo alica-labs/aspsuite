@@ -117,7 +117,7 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
     //    ret->setQueryId(tmp->getQueryId());
     ret->setExternals(tmp->getExternals());
     ret->setNumberOfModels(tmp->getNumberOfModels());
-    ret->setProgramSection(tmp->getProgramSection());
+    ret->setBackgroundKnowledgeProgramSection(tmp->getBackgroundKnowledgeProgramSection());
     ret->setType(tmp->getType());
     return ret;
 }

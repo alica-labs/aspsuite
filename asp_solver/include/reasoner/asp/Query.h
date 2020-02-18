@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Enums.h"
 #include "PredicateContainer.h"
+#include "QueryType.h"
 
 #include <clingo.hh>
 
@@ -23,51 +23,68 @@ class Query : public PredicateContainer
 {
 public:
     Query(int queryID, Solver* solver, Term* term, QueryType type);
-    virtual ~Query();
+    virtual ~Query() = default;
 
-    std::shared_ptr<std::vector<Clingo::SymbolVector>> getCurrentModels();
-
-    int getLifeTime();
-    void setLifeTime(int lifeTime);
-    void reduceLifeTime();
-
-    virtual void onModel(Clingo::Model& clingoModel) = 0;
-
-    std::map<Clingo::Symbol, Clingo::SymbolVector>& getHeadValues();
-
-    Solver* getSolver();
+    // CONFIGURATION and STATE STUFF
     Term* getTerm();
-
-    std::string getProgramSection();
-    void setProgramSection(std::string programSection);
-    virtual void removeExternal() = 0;
-
-    std::string toString();
+    Solver* getSolver();
+    int getLifeTime();
+    void setLifeTime(int newLifeTime);
+    void reduceLifeTime();
     QueryType getType();
     int getQueryID() const;
-    void saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value);
-    bool checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2);
 
-protected:
+    // RESULT STUFF
+    void addQueryValues(const std::vector<std::string>& queryVec);
+    void addQueryResultMapping(int modelIdx, Clingo::Symbol key, Clingo::Symbol value);
+    const std::vector<std::map<Clingo::Symbol, Clingo::SymbolVector>>& getQueryResultMappings();
+    const std::vector<Clingo::SymbolVector>& getCurrentModels();
+
+    std::string toString(bool verbose = false);
 
     /**
-     * queryString is used to ask the solver if specific predicates are true.
-     * predicates are separated by "," meaning all of them will be in the same rule and ";"
-     * meaning that there is a rule for every predicate
+     * Called if the lifetime is over, or if the
+     * Query is unregistered. Must be overwritten by derived query
+     * classes.
      */
+    virtual void removeExternal() = 0;
+
+    /**
+     * Callback for Clingo to return a model.
+     * @param clingoModel
+     */
+    virtual void onModel(Clingo::Model& clingoModel);
+protected:
+    /**
+     * Determines whether two symbols mean the same, taking wildcard
+     * placeholders into account.
+     * @param value1
+     * @param value2
+     * @return True, if they match. False, otherwise.
+     */
+    static bool match(Clingo::Symbol value1, Clingo::Symbol value2);
+
+    int queryID;
     Solver* solver;
     Term* term;
     QueryType type;
-    int queryID;
-    std::shared_ptr<std::vector<Clingo::SymbolVector>> currentModels;
-    // key := headValue , value := values which satisfies it
-    std::map<Clingo::Symbol, Clingo::SymbolVector> headValues;
-    // lifeTime == 1 => query is used once
-    // lifeTime == x => query is used x times
-    // LifeTime == -1 => query is used until unregistered
-    int lifeTime;
-    std::string programSection;
-    std::string backgroundKnowledgeFilename;
+    int lifeTime; /**< -1 means forever until unregistered, X > 0 means it is used X times */
+
+    Clingo::SymbolVector queriedValues;
+
+    /**
+     * Vector of  models, received from the last solve call.
+     * The order matches the order in the queryResultMappings vector.
+     */
+    std::vector<Clingo::SymbolVector> currentModels;
+
+    /**
+     * The vector matches the order of models in "currentModels".
+     * The map is organised as follows:
+     * key := queriedValue , vector<value> := result values which satisfies the key
+     */
+    std::vector<std::map<Clingo::Symbol, Clingo::SymbolVector>> queryResultMappings;
+
 };
 } /* namespace asp */
 } /* namespace reasoner */

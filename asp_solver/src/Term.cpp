@@ -2,32 +2,31 @@
 
 #include <SystemConfig.h>
 
+#include <utility>
+
 namespace reasoner
 {
 namespace asp
 {
 
 Term::Term(int lifeTime)
+        : backgroundKnowledgeProgramSection("")
+        , id(-1)
+        , lifeTime(lifeTime)
+        , externals(nullptr)
+        , numberOfModels("")
+        , type(QueryType::Undefined)
 {
-    this->programSection = "";
-    this->id = -1;
-    this->lifeTime = lifeTime;
-    this->externals = nullptr;
-    this->numberOfModels = "";
-    this->type = QueryType::Undefined;
-//    this->queryId = -1;
 }
 
-Term::~Term() {}
-
-void Term::addRule(std::string rule)
+void Term::addRule(const std::string& rule)
 {
     if (!rule.empty()) {
         this->rules.push_back(rule);
     }
 }
 
-void Term::addFact(std::string fact)
+void Term::addFact(const std::string& fact)
 {
     if (fact.empty()) {
         return;
@@ -45,14 +44,14 @@ std::vector<std::string> Term::getRuleBodies()
     return this->bodies;
 }
 
-std::string Term::getProgramSection()
+std::string Term::getBackgroundKnowledgeProgramSection()
 {
-    return this->programSection;
+    return this->backgroundKnowledgeProgramSection;
 }
 
-void Term::setProgramSection(std::string programSection)
+void Term::setBackgroundKnowledgeProgramSection(std::string newBackgroundKnowledgeProgramSection)
 {
-    this->programSection = programSection;
+    this->backgroundKnowledgeProgramSection = std::move(newBackgroundKnowledgeProgramSection);
 }
 
 std::string Term::getBackgroundKnowledgeFilename()
@@ -60,19 +59,19 @@ std::string Term::getBackgroundKnowledgeFilename()
     return this->backgroundKnowledgeFilename;
 }
 
-void Term::setBackgroundKnowledgeFilename(std::string backgroundKnowledgeFilename)
+void Term::setBackgroundKnowledgeFilename(std::string newBackgroundKnowledgeFilename)
 {
-    this->backgroundKnowledgeFilename = backgroundKnowledgeFilename;
+    this->backgroundKnowledgeFilename = std::move(newBackgroundKnowledgeFilename);
 }
 
-std::vector<std::pair<std::string,std::string>> Term::getProgramSectionParameters()
+std::vector<std::pair<std::string, std::string>> Term::getProgramSectionParameters()
 {
     return this->programSectionParameters;
 }
 
-void Term::addProgramSectionParameter(std::string representation, std::string value)
+void Term::addProgramSectionParameter(const std::string& representation, const std::string& value)
 {
-    this->programSectionParameters.push_back(std::make_pair(representation,value));
+    this->programSectionParameters.emplace_back(representation, value);
 }
 
 int Term::getLifeTime()
@@ -80,9 +79,9 @@ int Term::getLifeTime()
     return this->lifeTime;
 }
 
-void Term::setLifeTime(int lifeTime)
+void Term::setLifeTime(int newLifeTime)
 {
-    this->lifeTime = lifeTime;
+    this->lifeTime = newLifeTime;
 }
 
 std::vector<std::string> Term::getRules()
@@ -95,9 +94,9 @@ std::vector<std::string> Term::getFacts()
     return this->facts;
 }
 
-void Term::setExternals(std::shared_ptr<std::map<std::string, bool>> externals)
+void Term::setExternals(std::shared_ptr<std::map<std::string, bool>> newExternals)
 {
-    this->externals = externals;
+    this->externals = std::move(newExternals);
 }
 
 std::shared_ptr<std::map<std::string, bool>> Term::getExternals()
@@ -110,9 +109,9 @@ std::string Term::getNumberOfModels()
     return this->numberOfModels;
 }
 
-void Term::setNumberOfModels(std::string numberOfModels)
+void Term::setNumberOfModels(std::string newNumberOfModels)
 {
-    this->numberOfModels = numberOfModels;
+    this->numberOfModels = std::move(newNumberOfModels);
 }
 
 QueryType Term::getType()
@@ -120,9 +119,9 @@ QueryType Term::getType()
     return this->type;
 }
 
-void Term::setType(QueryType type)
+void Term::setType(QueryType newType)
 {
-    this->type = type;
+    this->type = newType;
 }
 
 long Term::getId()
@@ -130,9 +129,9 @@ long Term::getId()
     return id;
 }
 
-void Term::setId(long id)
+void Term::setId(long newId)
 {
-    this->id = id;
+    this->id = newId;
 }
 
 std::string Term::getQueryRule()
@@ -140,24 +139,24 @@ std::string Term::getQueryRule()
     return queryRule;
 }
 
-void Term::setQueryRule(std::string queryRule)
+void Term::setQueryRule(std::string newQueryRule)
 {
-    if (queryRule.empty()) {
+    if (newQueryRule.empty()) {
         return;
     }
 
-    queryRule = essentials::Configuration::trim(queryRule);
-    size_t endOfHead = queryRule.find(":-");
+    newQueryRule = essentials::Configuration::trim(newQueryRule);
+    size_t endOfHead = newQueryRule.find(":-");
     if (endOfHead != std::string::npos) {
         // for rules (including variables)
         size_t startOfBody = endOfHead + 2;
-        this->heads.push_back(essentials::Configuration::trim(queryRule.substr(0, endOfHead)));
-        this->bodies.push_back(essentials::Configuration::trim(queryRule.substr(startOfBody, queryRule.size() - startOfBody - 1)));
+        this->heads.push_back(essentials::Configuration::trim(newQueryRule.substr(0, endOfHead)));
+        this->bodies.push_back(essentials::Configuration::trim(newQueryRule.substr(startOfBody, newQueryRule.size() - startOfBody - 1)));
     } else {
         // for ground literals
-        this->heads.push_back(queryRule);
+        this->heads.push_back(newQueryRule);
     }
-    this->queryRule = queryRule;
+    this->queryRule = newQueryRule;
 }
 } /* namespace asp */
 } /* namespace reasoner */

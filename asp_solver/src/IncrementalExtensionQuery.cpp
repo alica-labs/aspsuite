@@ -8,10 +8,11 @@ namespace asp
 std::vector<IncrementalExtensionQuery*> IncrementalExtensionQuery::queries = std::vector<IncrementalExtensionQuery*>();
 int IncrementalExtensionQuery::queryId = 0;
 
-void IncrementalExtensionQuery::clear() {
-//    for(auto query : IncrementalExtensionQuery::queries) { //FIXME double free - who is deleting these?
-//        delete query;
-//    }
+void IncrementalExtensionQuery::clear()
+{
+    //    for(auto query : IncrementalExtensionQuery::queries) { //FIXME double free - who is deleting these?
+    //        delete query;
+    //    }
 
     IncrementalExtensionQuery::queries.clear();
     IncrementalExtensionQuery::queryId = 0;
@@ -73,13 +74,12 @@ void IncrementalExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
     // incremental query was successful, so the next inc query can be queried
     IncrementalExtensionQuery::queryId += 1;
-    //IncrementalExtensionQuery::cleanUp();
+    // IncrementalExtensionQuery::cleanUp();
 }
 
 void IncrementalExtensionQuery::generateQueryProgram()
 {
     std::stringstream ss;
-    // hacky - how to distinguish normal loading of bg knowledge??
     if (!term->getProgramSectionParameters().empty() && !term->getRules().empty()) {
         ss << "(";
         for (int i = 0; i < term->getProgramSectionParameters().size(); ++i) {
@@ -96,27 +96,28 @@ void IncrementalExtensionQuery::generateQueryProgram()
     this->externalName = "external" + this->queryProgramSection;
 
     std::stringstream queryProgramStream;
-    queryProgramStream << "#program " << programSection << ".\n";
+    queryProgramStream << "#program " << this->queryProgramSection + ss.str() << ".\n";
     queryProgramStream << "#external " << externalName << ".\n";
 
-    for (auto& fact : term->getFacts()) {
-        queryProgramStream << expandFactModuleProperty(fact);
-        extractHeadPredicates(fact);
+    // 1. collect head predicates for encapsulating these for module property
+    std::vector<SyntaxUtils::Predicate> predicates = determineHeadPredicates(term->getQueryRule());
+    rememberPredicates(predicates);
+
+    // remember queried values from query rule head
+    std::vector<std::string> queryValues;
+    for (auto predicate : predicates) {
+        queryValues.push_back(predicate.toString());
     }
-    if (!term->getQueryRule().empty()) {
-        extractHeadPredicates(term->getQueryRule());
-    }
+    this->addQueryValues(queryValues);
+
     for (auto& rule : term->getRules()) {
-        extractHeadPredicates(rule);
+        rememberPredicates(determineHeadPredicates(rule));
+    }
+    for (auto& fact : term->getFacts()) {
+        rememberPredicates(determineHeadPredicates(fact));
     }
 
-    for (auto& headPredicate : predicatesToAritiesMap) {
-        for (auto& arity : headPredicate.second) {
-            queryProgramStream << createKBCapturingRule(
-                    headPredicate.first, arity,this->queryProgramSection);
-        }
-    }
-#ifdef QUERY_DEBUG
+#ifdef ASPQUERY_DEBUG
     std::cout << "INPUT PROGRAM: " << std::endl;
     std::cout << term->getQueryRule() << std::endl;
     for (auto& rule : term->getRules()) {
@@ -138,23 +139,34 @@ void IncrementalExtensionQuery::generateQueryProgram()
     std::cout << std::endl;
 #endif
 
+    // 2. generate knowledge base capturing rules
+    for (auto& headPredicate : predicatesToAritiesMap) {
+        for (auto& arity : headPredicate.second) {
+            queryProgramStream << createKBCapturingRule(headPredicate.first, arity, this->queryProgramSection);
+        }
+    }
+
+    // 3. taking care of module property after head predicates where collected
+    for (auto& fact : term->getFacts()) {
+        queryProgramStream << expandFactModuleProperty(fact);
+    }
     if (!term->getQueryRule().empty()) {
-        queryProgramStream << expandRuleModuleProperty(term->getQueryRule(), (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
+        queryProgramStream << expandRuleModuleProperty(
+                term->getQueryRule(), (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
     }
     for (auto& rule : term->getRules()) {
         queryProgramStream << expandRuleModuleProperty(rule, (this->lastQuerySection.empty() ? this->queryProgramSection : this->lastQuerySection));
     }
     this->queryProgram = queryProgramStream.str();
 
-#ifdef QUERY_DEBUG
+#ifdef ASPQUERY_DEBUG
     std::cout << "RESULT: " << std::endl << this->queryProgram << std::endl;
 #endif
-
 }
 
 void IncrementalExtensionQuery::removeExternal()
 {
     this->solver->assignExternal(*(this->external.get()), Clingo::TruthValue::False);
 }
-}
-}
+} // namespace asp
+} // namespace reasoner

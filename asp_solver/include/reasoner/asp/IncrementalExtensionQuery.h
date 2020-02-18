@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ExtensionQuery.h"
+#include "reasoner/asp/ExtensionQuery.h"
 
 namespace reasoner
 {
@@ -10,7 +10,6 @@ class Solver;
 class Term;
 class IncrementalExtensionQuery : public ::reasoner::asp::ExtensionQuery
 {
-
 public:
     static bool isPresent(int horizon);
     static void activate(int horizon);

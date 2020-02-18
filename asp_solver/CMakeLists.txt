@@ -37,16 +37,20 @@ include_directories(
 
 add_library(${PROJECT_NAME}
 	src/Solver.cpp
-    src/AnnotatedExternal.cpp
+  src/AnnotatedExternal.cpp
 	src/FilterQuery.cpp
 	src/ExtensionQuery.cpp
-		src/IncrementalExtensionQuery.cpp
-		src/ReusableExtensionQuery.cpp
-    src/GrdProgramObserver.cpp
+	src/IncrementalExtensionQuery.cpp
+	src/ReusableExtensionQuery.cpp
+  src/GrdProgramObserver.cpp
 	src/Term.cpp
 	src/Variable.cpp
 	src/AnnotatedValVec.cpp
 	src/Query.cpp
+  src/PredicateContainer.cpp
+  src/TruthValue.cpp
+  src/QueryType.cpp
+  src/BackgroundKnowledgeQuery.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} clingo)

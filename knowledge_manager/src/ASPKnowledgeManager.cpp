@@ -13,15 +13,20 @@ namespace knowledge_manager
 {
 ASPKnowledgeManager::ASPKnowledgeManager()
         : solver(nullptr)
+        , isDirty(false)
 {
 }
 
 ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
+std::vector<std::string> ASPKnowledgeManager::filterModel() {
+ // TODO
+}
+
 /**
  * Solves the current ASP Program of the Knowledge Base according to specified queryRule
  */
-std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::string programSection)
+std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule)
 {
     auto vars = std::vector<reasoner::asp::Variable*>();
     vars.push_back(new reasoner::asp::Variable());
@@ -32,7 +37,6 @@ std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule, std::
     auto term = new ::reasoner::asp::Term();
     term->setQueryRule(queryRule);
     term->setType(::reasoner::asp::QueryType::Filter);
-    term->setProgramSection(programSection);
 
     std::lock_guard<std::mutex> lock(mtx);
     term->setId(this->solver->generateQueryID());
@@ -133,9 +137,10 @@ Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str)
     return this->solver->parseValue(str);
 }
 
-reasoner::asp::Solver* ASPKnowledgeManager::getSolver()
-{
-    return solver;
-}
+//
+//reasoner::asp::Solver* ASPKnowledgeManager::getSolver()
+//{
+//    return solver;
+//}
 
 } /* namespace knowledge_manager */

@@ -77,8 +77,8 @@ void FilterQueryCommand::execute()
             // print models
             if (this->gui->modelSettingsDialog->isShowModelsInQuery()) {
                 ss << "The queried model contains the following predicates: " << std::endl;
-                for (int i = 0; i < result.at(0)->query->getCurrentModels()->at(0).size(); i++) {
-                    ss << result.at(0)->query->getCurrentModels()->at(0).at(i) << " ";
+                for (int i = 0; i < result.at(0)->query->getCurrentModels().at(0).size(); i++) {
+                    ss << result.at(0)->query->getCurrentModels().at(0).at(i) << " ";
                 }
                 ss << std::endl;
             }

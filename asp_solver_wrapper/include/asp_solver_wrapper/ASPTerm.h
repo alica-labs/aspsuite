@@ -1,7 +1,7 @@
 #pragma once
 
 #include <alica_solver_interface/SolverTerm.h>
-#include <reasoner/asp/Enums.h>
+#include <reasoner/asp/QueryType.h>
 
 #include <map>
 #include <memory>

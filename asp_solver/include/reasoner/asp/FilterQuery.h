@@ -1,8 +1,8 @@
 #pragma once
-
-#include "reasoner/asp/Enums.h"
 #include "reasoner/asp/Query.h"
+
 #include "reasoner/asp/Term.h"
+#include "reasoner/asp/TruthValue.h"
 
 #include <clingo.hh>
 
@@ -16,20 +16,15 @@ class FilterQuery : public Query
 {
 public:
     FilterQuery(int queryID, Solver* solver, Term* term);
-    virtual ~FilterQuery();
+    ~FilterQuery() override = default;
 
-    bool factsExistForAllModels();
-    bool factsExistForAtLeastOneModel();
+    bool queryValuesExistForAllModels();
+    bool queryValuesExistForAtLeastOneModel();
+    std::vector<std::pair<Clingo::Symbol, TruthValue>> getTruthValues(int modelIdx = 0);
 
-    // NOOP in case of ASPFilterQuery
-    void removeExternal();
-
-    std::vector<std::pair<Clingo::Symbol, TruthValue>> getTruthValues();
-
-    void onModel(Clingo::Model& clingoModel);
-
+    void removeExternal() override; /**< NOOP in case of ASPFilterQuery */
 private:
-    void addQueryValues(std::vector<std::string> queryString);
+
 };
 } /* namespace asp */
 } /* namespace reasoner */

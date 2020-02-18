@@ -197,7 +197,9 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
 
     for (auto& queryEntry : this->registeredQueries) {
         std::vector<Clingo::SymbolVector> vals;
-        for (auto& pair : queryEntry.second->getHeadValues()) {
+        // FIXME: only returns values from first model (idx = 0)
+        auto& mapping = queryEntry.second->getQueryResultMappings()[0];
+        for (auto& pair : mapping) {
             vals.push_back(pair.second);
         }
         results.push_back(new AnnotatedValVec(queryEntry.second->getTerm()->getId(), vals, queryEntry.second));

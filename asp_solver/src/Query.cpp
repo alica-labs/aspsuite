@@ -17,27 +17,31 @@ Query::Query(int queryID, Solver* solver, Term* term, QueryType type)
         , term(term)
         , type(type)
 {
-    this->programSection = term->getProgramSection();
+
     this->lifeTime = term->getLifeTime();
-    this->currentModels = std::make_shared<std::vector<Clingo::SymbolVector>>();
-
-    // load background knowledge file only once (it does not ground anything)
-    if (!this->term->getBackgroundKnowledgeFilename().empty()) {
-        this->solver->loadFileFromConfig(this->term->getBackgroundKnowledgeFilename());
-    }
-
-    // ground term program section with given params
-    if (!term->getProgramSection().empty()) {
-        Clingo::SymbolVector paramsVec;
-        for (auto param : this->term->getProgramSectionParameters()) {
-            paramsVec.push_back(this->solver->parseValue(param.second));
-
-        }
-        this->solver->ground({{term->getProgramSection().c_str(), paramsVec}}, nullptr);
-    }
 }
 
-Query::~Query() {}
+// CONFIGURATION and STATE STUFF
+
+Term* Query::getTerm()
+{
+    return term;
+}
+
+Solver* Query::getSolver()
+{
+    return this->solver;
+}
+
+int Query::getLifeTime()
+{
+    return this->lifeTime;
+}
+
+void Query::setLifeTime(int newLifeTime)
+{
+    this->lifeTime = newLifeTime;
+}
 
 void Query::reduceLifeTime()
 {
@@ -46,17 +50,74 @@ void Query::reduceLifeTime()
     }
 }
 
-void Query::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
+QueryType Query::getType()
 {
-    auto entry = this->headValues.find(key);
-    if (entry != this->headValues.end()) {
+    return type;
+}
+
+int Query::getQueryID() const
+{
+    return this->queryID;
+}
+
+// RESULT STUFF
+
+void Query::addQueryValues(const std::vector<std::string>& queryVec)
+{
+    for (const auto& queryString : queryVec) {
+        this->queriedValues.push_back(this->solver->parseValue(queryString));
+#ifdef ASPQUERY_DEBUG
+        std::cout << "[Query] Queried value: " << queryString << std::endl;
+#endif
+    }
+}
+
+void Query::onModel(Clingo::Model& clingoModel)
+{
+    Clingo::SymbolVector newModel;
+    this->queryResultMappings.emplace_back();
+    auto& mapping = this->queryResultMappings.back();
+    for (const auto& queriedValue : this->queriedValues) {
+        mapping.emplace(queriedValue, Clingo::SymbolVector());
+    }
+    for (auto& modelSymbol : clingoModel.symbols(clingo_show_type_shown)) {
+        for (auto& entry : mapping) {
+            if (Query::match(entry.first, modelSymbol)) {
+#ifdef ASPQUERY_DEBUG
+                std::cout << "[FilterQuery] Queried value: " << entry.first << " Model value: " << modelSymbol << std::endl;
+#endif
+                entry.second.push_back(modelSymbol);
+            }
+        }
+        newModel.push_back(modelSymbol);
+    }
+    this->currentModels.push_back(newModel);
+}
+
+void Query::addQueryResultMapping(int modelIdx, Clingo::Symbol key, Clingo::Symbol value)
+{
+    auto& queryResultMapping = this->queryResultMappings[modelIdx];
+    auto entry = queryResultMapping.find(key);
+    if (entry != queryResultMapping.end()) {
         if (find(entry->second.begin(), entry->second.end(), value) == entry->second.end()) {
             entry->second.push_back(value);
         }
     }
 }
 
-bool Query::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
+const std::vector<Clingo::SymbolVector>& Query::getCurrentModels()
+{
+    return this->currentModels;
+}
+
+const std::vector<std::map<Clingo::Symbol, Clingo::SymbolVector>>& Query::getQueryResultMappings()
+{
+    return this->queryResultMappings;
+}
+
+// UTILITY FUNCTIONS
+
+bool Query::match(Clingo::Symbol value1, Clingo::Symbol value2)
 {
     if (value2.type() != Clingo::SymbolType::Function) {
         return false;
@@ -76,7 +137,7 @@ bool Query::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
         }
 
         if (arg.type() == Clingo::SymbolType::Function && value2.arguments()[i].type() == Clingo::SymbolType::Function) {
-            if (false == checkMatchValues(arg, value2.arguments()[i])) {
+            if (!match(arg, value2.arguments()[i])) { // recursive call
                 return false;
             }
         } else if (arg != value2.arguments()[i]) {
@@ -86,112 +147,34 @@ bool Query::checkMatchValues(Clingo::Symbol value1, Clingo::Symbol value2)
     return true;
 }
 
-std::string Query::toString()
+std::string Query::toString(bool verbose)
 {
     std::stringstream ss;
-    ss << "Query:"
-       << "\n";
-    ss << "\tModels: \n\t\t";
-    int counter = 0;
-    for (auto model : *this->currentModels) {
-        counter++;
-        ss << "Number " << counter << ":\n\t\t\t";
-        for (auto pred : model) {
-            ss << pred << " ";
-        }
-        ss << "\n";
-    }
-    ss << "\tQuery will be used " << this->lifeTime << " times again.\n";
+    ss << "[Query]" << std::endl;
+    ss << "Type: " << this->type << std::endl;
+    ss << "Current lifetime: " << this->lifeTime << std::endl;
+    ss << this->currentModels.size() << " Models" << std::endl;
 
-    if (this->getType() == QueryType::Filter) {
-        ss << "\tQuery is of type Filter.\n";
-        ss << "\tFacts:"
-           << "\n";
-        for (auto value : this->headValues) {
-            ss << "\t\t" << value.first << "\n";
-        }
-        ss << "\tFacts in models:"
-           << "\n";
-        for (auto value : this->headValues) {
-            ss << "\t\tFact: " << value.first << "\n";
-            ss << "\t\t\t In Model: ";
-            for (auto predicate : value.second) {
-                ss << predicate << " ";
+    int modelCounter = 0;
+    while (modelCounter < this->currentModels.size()) {
+        if (verbose) {
+            ss << "Model " << modelCounter << ":" << std::endl;
+            for (auto pred : this->currentModels[modelCounter]) {
+                ss << pred << " ";
             }
-            ss << "\n";
+            ss << std::endl;
         }
-    } else if (this->getType() == QueryType::Extension) {
-        ss << "\tQuery is of type Extension.\n";
-        ss << "\tRuleHeadValues:"
-           << "\n";
-        for (auto value : this->headValues) {
-            ss << "\t\t" << value.first << "\n";
-        }
-        ss << "\tRuleHeadValues with models:"
-           << "\n";
-        for (auto value : this->headValues) {
-            ss << "\t\tRuleHead: " << value.first << "\n";
-            ss << "\t\t\t Grounded in Model: ";
-            for (auto predicate : value.second) {
-                ss << predicate << " ";
+        auto& queryResultMapping = this->queryResultMappings[modelCounter];
+        for (auto& valueMapping : queryResultMapping) {
+            ss << "Queried Value: " << valueMapping.first << " Matched Values: ";
+            for (auto matchedValue : valueMapping.second) {
+                ss << matchedValue << " ";
             }
-            ss << "\n";
+            ss << std::endl;
         }
-    } else {
-        ss << "\tQuery type is undefined!.\n";
+        modelCounter++;
     }
-
     return ss.str();
-}
-
-std::string Query::getProgramSection()
-{
-    return this->programSection;
-}
-
-void Query::setProgramSection(std::string programSection)
-{
-    this->programSection = programSection;
-}
-
-Solver* Query::getSolver()
-{
-    return this->solver;
-}
-
-std::shared_ptr<std::vector<Clingo::SymbolVector>> Query::getCurrentModels()
-{
-    return this->currentModels;
-}
-
-int Query::getLifeTime()
-{
-    return this->lifeTime;
-}
-
-void Query::setLifeTime(int lifeTime)
-{
-    this->lifeTime = lifeTime;
-}
-
-std::map<Clingo::Symbol, Clingo::SymbolVector>& Query::getHeadValues()
-{
-    return this->headValues;
-}
-
-Term* Query::getTerm()
-{
-    return term;
-}
-
-QueryType Query::getType()
-{
-    return type;
-}
-
-int Query::getQueryID() const
-{
-    return this->queryID;
 }
 
 } /* namespace asp */

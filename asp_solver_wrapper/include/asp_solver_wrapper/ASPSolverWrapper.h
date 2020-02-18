@@ -1,8 +1,8 @@
 #pragma once
 
-#include <reasoner/asp/AnnotatedValVec.h>
 #include <engine/constraintmodul/ISolver.h>
 #include <engine/model/Variable.h>
+#include <reasoner/asp/AnnotatedValVec.h>
 
 #include <memory>
 #include <string>
@@ -10,15 +10,13 @@
 
 namespace reasoner
 {
-    namespace asp {
-        class Solver;
-
-        class Term;
-
-        class AVariable;
-
-        class Query;
-    } //namespace asp
+namespace asp
+{
+class Solver;
+class Term;
+class AVariable;
+class Query;
+} // namespace asp
 } // namespace reasoner
 
 namespace alica
@@ -38,7 +36,8 @@ public:
     virtual ~ASPSolverWrapper();
 
     bool existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
-    bool getSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<::reasoner::asp::AnnotatedValVec*>& results);
+    bool getSolutionImpl(
+            SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<::reasoner::asp::AnnotatedValVec*>& results);
 
     virtual SolverVariable* createVariable(int64_t representingVariableID, SolverContext* ctx) override;
     virtual std::unique_ptr<SolverContext> createSolverContext() override;

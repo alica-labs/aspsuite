@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -11,7 +12,6 @@ namespace asp
 class SyntaxUtils
 {
 public:
-
     struct Predicate
     {
         std::string name;
@@ -28,6 +28,8 @@ public:
                 , parameterEndIdx(0)
         {
         }
+
+        std::string toString() { return name + parameters; }
     };
     enum Separator
     {
@@ -50,19 +52,19 @@ public:
         return str.substr(strBegin, strRange);
     }
 
-    static size_t findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start)
+    static size_t findNextChar(const std::string& predicate, const std::string& chars, size_t end, size_t start = 0)
     {
         size_t idx = predicate.find_first_of(chars, start);
         return end <= idx ? std::string::npos : idx;
     }
 
-    static size_t findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start)
+    static size_t findNextCharNotOf(const std::string& predicate, const std::string& chars, size_t end, size_t start = 0)
     {
         size_t idx = predicate.find_first_not_of(chars, start);
         return end <= idx ? std::string::npos : idx;
     }
 
-    static bool isMinOrMax(const std::string &rule, size_t openingCurlyBracesIdx)
+    static bool isMinOrMax(const std::string& rule, size_t openingCurlyBracesIdx)
     {
         size_t hashIdx = rule.find_last_of('#', openingCurlyBracesIdx);
         if (hashIdx == std::string::npos) {
@@ -145,9 +147,6 @@ public:
         predicate.arity = 0;
         return predicate;
     }
-
-
-
 
     static Predicate extractPredicate(std::string rule, size_t parameterStartIdx)
     {

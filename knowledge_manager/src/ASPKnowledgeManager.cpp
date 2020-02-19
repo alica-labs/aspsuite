@@ -1,6 +1,7 @@
 #include "knowledge_manager/ASPKnowledgeManager.h"
 #include <reasoner/asp/AnnotatedValVec.h>
 #include <reasoner/asp/ExtensionQuery.h>
+#include <reasoner/asp/FilterQuery.h>
 #include <reasoner/asp/Solver.h>
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
@@ -19,53 +20,35 @@ ASPKnowledgeManager::ASPKnowledgeManager()
 
 ASPKnowledgeManager::~ASPKnowledgeManager() {}
 
-std::vector<std::string> ASPKnowledgeManager::filterModel() {
- // TODO
-}
-
-/**
- * Solves the current ASP Program of the Knowledge Base according to specified queryRule
- */
-std::vector<std::string> ASPKnowledgeManager::solve(std::string queryRule)
+std::vector<std::string> ASPKnowledgeManager::filterModel(const std::string& queryValue)
 {
-    auto vars = std::vector<reasoner::asp::Variable*>();
-    vars.push_back(new reasoner::asp::Variable());
-    auto terms = std::vector<reasoner::asp::Term*>();
-    std::vector<reasoner::asp::AnnotatedValVec*> results;
-
-    auto ret = std::vector<std::string>();
-    auto term = new ::reasoner::asp::Term();
-    term->setQueryRule(queryRule);
-    term->setType(::reasoner::asp::QueryType::Filter);
-
     std::lock_guard<std::mutex> lock(mtx);
-    term->setId(this->solver->generateQueryID());
-    terms.push_back(term);
-    this->solver->getSolution(vars, terms, results);
+    auto term = new ::reasoner::asp::Term();
+    term->setLifeTime(1);
+    term->addQueryValue(queryValue);
+    term->setType(reasoner::asp::QueryType::Filter);
 
-    if (results.size() > 0) {
-#ifdef ASPKM_DEBUG
-        std::cout << "[ASPKnowledgeManager] Found Result!" << std::endl;
-#endif
-        for (auto res : results) {
-            for (size_t i = 0; i < res->factQueryValues.size(); ++i) {
-                for (size_t j = 0; j < res->factQueryValues.at(i).size(); ++j) {
-                    auto elem = res->factQueryValues.at(i).at(j);
-                    std::cout << "[ASPKnowledgeManager] " << i << "," << j << ", " << elem << std::endl;
-                    this->currentSolution.push_back(elem);
-                }
+    std::shared_ptr<reasoner::asp::FilterQuery> fq = std::make_shared<reasoner::asp::FilterQuery>(this->solver->generateQueryID(), this->solver, term);
+    this->solver->registerQuery(fq);
+    if (this->solver->solve()) {
+        std::cout << "[ASPKnowledgeManager] Solving success!" << std::endl;
+    } else {
+        std::cout << "[ASPKnowledgeManager] Solving unsuccessful!" << std::endl;
+    }
+    this->solver->unregisterQuery(fq->getQueryID());
+
+    // extract results from query
+    std::vector<std::string> results;
+    for (auto& mapping : fq->getQueryResultMappings()) {
+        for (auto& entry : mapping) {
+            for (auto& resultValue : entry.second) {
+                results.push_back(resultValue.to_string());
             }
         }
     }
 
-    for (auto var : vars) {
-        delete var;
-    }
-    for (auto t : terms) {
-        delete t;
-    }
-
-    return this->currentSolution;
+    delete term;
+    return results;
 }
 
 /**
@@ -89,7 +72,9 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
  * Adds the given rules permanently to the base program section and grounds it.
  * @param backgroundInformation
  */
-void ASPKnowledgeManager::addBackgroundRules(std::vector<std::string> &backgroundInformation) {
+void ASPKnowledgeManager::addBackgroundRules(std::vector<std::string>& backgroundInformation)
+{
+    // TODO change to background knowledge query
     std::stringstream backgroundInfoStream;
     for (const auto& info : backgroundInformation) {
         backgroundInfoStream << info;
@@ -138,7 +123,7 @@ Clingo::Symbol ASPKnowledgeManager::parseValue(std::string const& str)
 }
 
 //
-//reasoner::asp::Solver* ASPKnowledgeManager::getSolver()
+// reasoner::asp::Solver* ASPKnowledgeManager::getSolver()
 //{
 //    return solver;
 //}

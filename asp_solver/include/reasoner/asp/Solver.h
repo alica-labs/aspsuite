@@ -77,7 +77,7 @@ public:
     const std::string getGroundProgram() const;
 
 private:
-    bool onModel(Clingo::Model& m);
+    bool on_model(Clingo::Model& m);
     void reduceQueryLifeTime();
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
     void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);

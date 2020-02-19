@@ -11,7 +11,6 @@ namespace asp
 FilterQuery::FilterQuery(int queryID, Solver* solver, Term* term)
         : Query(queryID, solver, term, QueryType::Filter)
 {
-    this->addQueryValues(term->getFacts());
 }
 
 bool FilterQuery::queryValuesExistForAtLeastOneModel()

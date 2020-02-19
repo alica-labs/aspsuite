@@ -13,7 +13,7 @@
 #include <chrono>
 #include <utility>
 
-//#define SOLVER_DEBUG
+#define SOLVER_DEBUG
 
 namespace reasoner
 {
@@ -47,9 +47,6 @@ Solver::Solver(std::vector<char const*> args)
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
     this->clingo->configuration()["configuration"] = "handy";
-#ifdef SOLVER_DEBUG
-    this->modelCount = 0;
-#endif
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
 }
@@ -58,6 +55,7 @@ Solver::~Solver() = default;
 
 void Solver::loadFile(const std::string& absolutFilename)
 {
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->load(absolutFilename.c_str());
 }
 
@@ -76,6 +74,7 @@ bool Solver::loadFileFromConfig(const std::string& configKey)
     std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
     backGroundKnowledgeFile = essentials::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->load(backGroundKnowledgeFile.c_str());
     return true;
 }
@@ -86,7 +85,15 @@ bool Solver::loadFileFromConfig(const std::string& configKey)
 void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 {
 #ifdef SOLVER_DEBUG
-    cout << "Solver_ground: " << vec.at(0).first << endl;
+    std::cout << "[Solver] grounding ";
+    for (auto& part : vec ) {
+        std::cout << "'" << part.name() << "(";
+        for (auto& param : part.params()) {
+            std::cout << param.to_string();
+        }
+        std::cout << ")' ";
+    }
+    std::cout << std::endl;
 #endif
     std::lock_guard<std::mutex> lock(clingoMtx);
     this->observer.clear();
@@ -98,13 +105,12 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
  */
 bool Solver::solve()
 {
+#ifdef SOLVER_DEBUG
+        std::cout << "[Solver] solving " << std::endl;
+#endif
     std::lock_guard<std::mutex> lock(clingoMtx);
     this->currentModels.clear();
     this->reduceQueryLifeTime();
-#ifdef SOLVER_DEBUG
-    this->modelCount = 0;
-#endif
-    // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
     auto result = this->clingo->solve(span, this, false, false);
     return result.get().is_satisfiable();
@@ -112,11 +118,13 @@ bool Solver::solve()
 
 /**
  * Callback for created models during solving.
+ *
+ * ATTENTION: Must exactly be named 'on_model', because clingo expects that.
  */
-bool Solver::onModel(Clingo::Model& m)
+bool Solver::on_model(Clingo::Model& m)
 {
 #ifdef SOLVER_DEBUG
-    std::cout << "Solver: Found the following model :" << std::endl;
+    std::cout << "[Solver] Found the following model: " << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         std::cout << atom << " ";
     }
@@ -136,16 +144,22 @@ bool Solver::onModel(Clingo::Model& m)
 
 void Solver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
 {
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->assign_external(ext, truthValue);
 }
 
 void Solver::releaseExternal(Clingo::Symbol ext)
 {
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->release_external(ext);
 }
 
 void Solver::add(char const* name, const Clingo::StringSpan& params, char const* par)
 {
+#ifdef SOLVER_DEBUG
+    std::cout << "[Solver] adding '" << par << "'" << std::endl;
+#endif
+    std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->add(name, params, par);
 }
 
@@ -236,7 +250,7 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
             } else if (term->getType() == QueryType::ReusableExtension) {
                 this->registerQuery(std::make_shared<ReusableExtensionQuery>(queryID, this, term));
             } else {
-                std::cout << "Solver: Query of unknown type registered!" << std::endl;
+                std::cout << "[Solver] Query of unknown type registered!" << std::endl;
                 return -1;
             }
         }

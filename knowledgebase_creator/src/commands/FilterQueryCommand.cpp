@@ -32,7 +32,7 @@ void FilterQueryCommand::execute()
     auto prgm = this->factsString.trimmed();
     // handle Wrong input
     if (prgm.contains("\n")) {
-        std::cout << "FilterQueryCommand: A facts query only contains one set of facts separated by commata." << std::endl;
+        std::cout << "FilterQueryCommand: A filter query only contains one set of facts separated by commas." << std::endl;
         return;
     }
     // create ASP term
@@ -46,7 +46,7 @@ void FilterQueryCommand::execute()
         term->setNumberOfModels(std::to_string(this->gui->modelSettingsDialog->getNumberOfModels()));
     }
     prgm = prgm.left(prgm.size() - 1);
-    term->setQueryRule(prgm.toStdString());
+    term->addQueryValue(prgm.toStdString());
     // prepare get solution
     std::vector<reasoner::asp::Variable*> vars;
     vars.push_back(new reasoner::asp::Variable());
@@ -64,8 +64,11 @@ void FilterQueryCommand::execute()
         } else {
             // print result
             std::stringstream ss;
-            ss << "Facts Query: " << term->getQueryRule() << std::endl;
-            ss << "Result contains the predicates: " << std::endl;
+            ss << "Filter Query: ";
+            for (auto& queryValue : term->getQueryValues()) {
+                ss << queryValue << " ";
+            }
+            ss << std::endl << "Result contains the predicates: " << std::endl;
             for (int i = 0; i < result.size(); i++) {
                 for (int j = 0; j < result.at(i)->factQueryValues.size(); j++) {
                     for (int k = 0; k < result.at(i)->factQueryValues.at(j).size(); k++) {

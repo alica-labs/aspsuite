@@ -19,8 +19,7 @@ public:
     ASPKnowledgeManager();
     virtual ~ASPKnowledgeManager();
 
-    std::vector<std::string> solve(std::string queryRule);
-    std::vector<std::string> filterModel();
+    std::vector<std::string> filterModel(const std::string& queryValue);
     int addInformation(std::vector<std::string>& information, int lifetime = -1);
     void addBackgroundRules(std::vector<std::string>& backgroundInformation);
     void revoke(int queryID);

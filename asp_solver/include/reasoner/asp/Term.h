@@ -17,19 +17,26 @@ class Term : public std::enable_shared_from_this<Term>
 public:
     Term(int lifeTime = 1);
     virtual ~Term() = default;
+
+    void addQueryValue(const std::string& queryValue);
+    const std::vector<std::string>& getQueryValues();
+
     void addRule(const std::string& rule);
-    std::vector<std::string> getRuleHeads();
-    std::vector<std::string> getRuleBodies();
+    std::vector<std::string> getRules();
+//    std::vector<std::string> getRuleHeads();
+//    std::vector<std::string> getRuleBodies();
+
     std::string getBackgroundKnowledgeFilename();
     void setBackgroundKnowledgeFilename(std::string newBackgroundKnowledgeFilename);
     std::string getBackgroundKnowledgeProgramSection();
     void setBackgroundKnowledgeProgramSection(std::string newBackgroundKnowledgeProgramSection);
+
     std::vector<std::pair<std::string,std::string>> getProgramSectionParameters();
     void addProgramSectionParameter(const std::string& representation, const std::string& param);
 
     int getLifeTime();
     void setLifeTime(int newLifeTime);
-    std::vector<std::string> getRules();
+
     void addFact(const std::string& fact); /**< Fact needs to end with a '.'! */
     std::vector<std::string> getFacts();
     void setExternals(std::shared_ptr<std::map<std::string, bool>> newExternals);
@@ -40,8 +47,8 @@ public:
     void setType(QueryType newType);
     long getId();
     void setId(long newId);
-    std::string getQueryRule();
-    void setQueryRule(std::string newQueryRule);
+//    std::string getQueryRule();
+//    void setQueryRule(std::string newQueryRule);
 
 private:
     long id;
@@ -50,15 +57,11 @@ private:
     std::string backgroundKnowledgeProgramSection;
     std::string backgroundKnowledgeFilename;
     std::string numberOfModels;
-    std::string queryRule; /**< The head predicates of this rule are the ones to search for in returned models.*/
+//    std::string queryRule; /**< The head predicates of this rule are the ones to search for in returned models.*/
+    std::vector<std::string> queryValues;
     std::vector<std::string> rules;
-    std::vector<std::string> heads;
-    std::vector<std::string> bodies;
-
-    /**
-     * Facts are used as queried values in case of a FilterQuery.
-     * In ExtensionQueries, they are simply add to the knowledge base, guarded by the query external.
-     */
+//    std::vector<std::string> heads;
+//    std::vector<std::string> bodies;
     std::vector<std::string> facts;
 
     /**

@@ -1,7 +1,5 @@
 #include "reasoner/asp/Term.h"
 
-#include <SystemConfig.h>
-
 #include <utility>
 
 namespace reasoner
@@ -34,15 +32,15 @@ void Term::addFact(const std::string& fact)
     this->facts.push_back(fact);
 }
 
-std::vector<std::string> Term::getRuleHeads()
-{
-    return this->heads;
-}
-
-std::vector<std::string> Term::getRuleBodies()
-{
-    return this->bodies;
-}
+//std::vector<std::string> Term::getRuleHeads()
+//{
+//    return this->heads;
+//}
+//
+//std::vector<std::string> Term::getRuleBodies()
+//{
+//    return this->bodies;
+//}
 
 std::string Term::getBackgroundKnowledgeProgramSection()
 {
@@ -134,29 +132,39 @@ void Term::setId(long newId)
     this->id = newId;
 }
 
-std::string Term::getQueryRule()
+const std::vector<std::string>& Term::getQueryValues()
 {
-    return queryRule;
+    return this->queryValues;
 }
 
-void Term::setQueryRule(std::string newQueryRule)
+void Term::addQueryValue(const std::string& queryValue)
 {
-    if (newQueryRule.empty()) {
-        return;
-    }
-
-    newQueryRule = essentials::Configuration::trim(newQueryRule);
-    size_t endOfHead = newQueryRule.find(":-");
-    if (endOfHead != std::string::npos) {
-        // for rules (including variables)
-        size_t startOfBody = endOfHead + 2;
-        this->heads.push_back(essentials::Configuration::trim(newQueryRule.substr(0, endOfHead)));
-        this->bodies.push_back(essentials::Configuration::trim(newQueryRule.substr(startOfBody, newQueryRule.size() - startOfBody - 1)));
-    } else {
-        // for ground literals
-        this->heads.push_back(newQueryRule);
-    }
-    this->queryRule = newQueryRule;
+    this->queryValues.push_back(queryValue);
 }
+
+//std::string Term::getQueryRule()
+//{
+//    return queryRule;
+//}
+
+//void Term::setQueryRule(std::string newQueryRule)
+//{
+//    if (newQueryRule.empty()) {
+//        return;
+//    }
+//
+//    newQueryRule = essentials::Configuration::trim(newQueryRule);
+//    size_t endOfHead = newQueryRule.find(":-");
+//    if (endOfHead != std::string::npos) {
+//        // for rules (including variables)
+//        size_t startOfBody = endOfHead + 2;
+//        this->heads.push_back(essentials::Configuration::trim(newQueryRule.substr(0, endOfHead)));
+//        this->bodies.push_back(essentials::Configuration::trim(newQueryRule.substr(startOfBody, newQueryRule.size() - startOfBody - 1)));
+//    } else {
+//        // for ground literals
+//        this->heads.push_back(newQueryRule);
+//    }
+//    this->queryRule = newQueryRule;
+//}
 } /* namespace asp */
 } /* namespace reasoner */

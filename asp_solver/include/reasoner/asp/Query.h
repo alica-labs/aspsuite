@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-//#define ASPQUERY_DEBUG
+#define ASPQUERY_DEBUG
 
 namespace reasoner
 {
@@ -62,7 +62,7 @@ protected:
      * @param value2
      * @return True, if they match. False, otherwise.
      */
-    static bool match(Clingo::Symbol value1, Clingo::Symbol value2);
+    static bool match(const Clingo::Symbol& value1, const Clingo::Symbol& value2);
 
     int queryID;
     Solver* solver;

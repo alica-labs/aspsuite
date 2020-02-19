@@ -67,7 +67,7 @@ void ExtensionQueryCommand::execute()
                 std::cout << "ExtensionQueryCommand: malformed query rule! Aborting!" << std::endl;
                 return;
             }
-            term->setQueryRule(lines.at(i));
+            term->addRule(lines.at(i));
             this->toShow = QString(lines.at(i).c_str());
             continue;
         }
@@ -101,8 +101,11 @@ void ExtensionQueryCommand::execute()
         // handle proper result
         else {
             std::stringstream ss;
-            ss << "Variable Query: " << term->getQueryRule() << std::endl;
-            ss << "Result contains the predicates: " << std::endl;
+            ss << "Extension Query: ";
+            for (auto& queryValue : term->getQueryValues()) {
+                ss << queryValue << " ";
+            }
+            ss << std::endl << "Result contains the predicates: " << std::endl;
             // Handle query answer
             for (int i = 0; i < result.size(); i++) {
                 for (int j = 0; j < result.at(i)->variableQueryValues.size(); j++) {

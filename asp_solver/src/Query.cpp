@@ -17,8 +17,8 @@ Query::Query(int queryID, Solver* solver, Term* term, QueryType type)
         , term(term)
         , type(type)
 {
-
     this->lifeTime = term->getLifeTime();
+    this->addQueryValues(term->getQueryValues());
 }
 
 // CONFIGURATION and STATE STUFF
@@ -74,6 +74,9 @@ void Query::addQueryValues(const std::vector<std::string>& queryVec)
 
 void Query::onModel(Clingo::Model& clingoModel)
 {
+#ifdef ASPQUERY_DEBUG
+    std::cout << "[Query] Model received! " << std::endl;
+#endif
     Clingo::SymbolVector newModel;
     this->queryResultMappings.emplace_back();
     auto& mapping = this->queryResultMappings.back();
@@ -84,7 +87,7 @@ void Query::onModel(Clingo::Model& clingoModel)
         for (auto& entry : mapping) {
             if (Query::match(entry.first, modelSymbol)) {
 #ifdef ASPQUERY_DEBUG
-                std::cout << "[FilterQuery] Queried value: " << entry.first << " Model value: " << modelSymbol << std::endl;
+                std::cout << "[Query] Matched  " << entry.first << " and " << modelSymbol << std::endl;
 #endif
                 entry.second.push_back(modelSymbol);
             }
@@ -117,8 +120,11 @@ const std::vector<std::map<Clingo::Symbol, Clingo::SymbolVector>>& Query::getQue
 
 // UTILITY FUNCTIONS
 
-bool Query::match(Clingo::Symbol value1, Clingo::Symbol value2)
+bool Query::match(const Clingo::Symbol& value1,const Clingo::Symbol& value2)
 {
+#ifdef ASPQUERY_DEBUG
+//    std::cout << "[Query] Value 1 '" << value1 << "' Value 2 '" << value2 << "'" << std::endl;
+#endif
     if (value2.type() != Clingo::SymbolType::Function) {
         return false;
     }

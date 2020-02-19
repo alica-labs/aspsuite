@@ -53,16 +53,6 @@ void ExtensionQuery::generateQueryProgram()
     queryProgramStream << "#external " << externalName << ".\n";
 
     // 1. collect head predicates for encapsulating these for module property
-    std::vector<SyntaxUtils::Predicate> predicates = determineHeadPredicates(term->getQueryRule());
-    rememberPredicates(predicates);
-
-    // remember queried values from query rule head
-    std::vector<std::string> queryValues;
-    for (auto predicate : predicates) {
-        queryValues.push_back(predicate.toString());
-    }
-    this->addQueryValues(queryValues);
-
     for (auto& rule : term->getRules()) {
         rememberPredicates(determineHeadPredicates(rule));
     }
@@ -72,7 +62,6 @@ void ExtensionQuery::generateQueryProgram()
 
 #ifdef ASPQUERY_DEBUG
     std::cout << "INPUT PROGRAM: " << std::endl;
-    std::cout << term->getQueryRule() << std::endl;
     for (auto& rule : term->getRules()) {
         std::cout << rule << std::endl;
     }
@@ -102,9 +91,6 @@ void ExtensionQuery::generateQueryProgram()
     // 3. taking care of module property after head predicates where collected
     for (auto& fact : term->getFacts()) {
         queryProgramStream << expandFactModuleProperty(fact);
-    }
-    if (!term->getQueryRule().empty()) {
-        queryProgramStream << expandRuleModuleProperty(term->getQueryRule(), this->queryProgramSection);
     }
     for (auto& rule : term->getRules()) {
         queryProgramStream << expandRuleModuleProperty(rule, this->queryProgramSection);

@@ -106,7 +106,9 @@ std::unique_ptr<SolverContext> ASPSolverWrapper::createSolverContext()
 
     ::reasoner::asp::Term* ret = new ::reasoner::asp::Term();
     ret->setLifeTime(tmp->getLifeTime());
-    ret->setQueryRule(tmp->getQueryRule());
+    for (auto& queryValue : tmp->getQueryValues()) {
+        ret->addQueryValue(queryValue);
+    }
     for (auto it : tmp->getRules()) {
         ret->addRule(it);
     }

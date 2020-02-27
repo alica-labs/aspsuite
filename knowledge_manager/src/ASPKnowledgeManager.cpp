@@ -68,21 +68,27 @@ int ASPKnowledgeManager::addInformation(std::vector<std::string>& information, i
     return queryId;
 }
 
+void ASPKnowledgeManager::updateExternals(std::shared_ptr<std::map<std::string, bool> > externals) {
+    std::lock_guard<std::mutex> lock(mtx);
+    this->solver->handleExternals(externals);
+}
+
 /**
  * Adds the given rules permanently to the base program section and grounds it.
- * @param backgroundInformation
+ * @param rules
  */
-void ASPKnowledgeManager::addBackgroundRules(std::vector<std::string>& backgroundInformation)
+void ASPKnowledgeManager::addRulesPermanent(const std::string& programSection, std::vector<std::string>& rules)
 {
-    // TODO change to background knowledge query
-    std::stringstream backgroundInfoStream;
-    for (const auto& info : backgroundInformation) {
-        backgroundInfoStream << info;
+    // Future Work: change to background knowledge query
+    std::stringstream rulesStream;
+    rulesStream << "#program " << programSection << ".\n";
+    for (const auto& info : rules) {
+        rulesStream << info << "\n";
     }
+    std::cout << "[ASPKnowledgeManager] " << rulesStream.str() << std::endl;
     std::lock_guard<std::mutex> lock(mtx);
-    std::cout << "[ASPKnowledgeManager] background rules: " << backgroundInfoStream.str() << std::endl;
-    this->solver->add("base", {}, backgroundInfoStream.str().c_str());
-    this->solver->ground({{"base", {}}}, nullptr);
+    this->solver->add(programSection.c_str(), {}, rulesStream.str().c_str());
+    this->solver->ground({{programSection.c_str(), {}}}, nullptr);
 }
 
 /**

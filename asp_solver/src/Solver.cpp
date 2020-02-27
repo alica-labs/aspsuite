@@ -13,7 +13,7 @@
 #include <chrono>
 #include <utility>
 
-#define SOLVER_DEBUG
+//#define SOLVER_DEBUG
 
 namespace reasoner
 {
@@ -268,17 +268,17 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
 
 void Solver::handleExternals(std::shared_ptr<std::map<std::string, bool>> externals)
 {
-    for (auto p : *externals) {
+    for (const auto& externalEntry : *externals) {
         auto it = find_if(this->assignedExternals.begin(), this->assignedExternals.end(),
-                [p](std::shared_ptr<AnnotatedExternal> element) { return element->getAspPredicate() == p.first; });
+                [externalEntry](std::shared_ptr<AnnotatedExternal> element) { return element->getAspPredicate() == externalEntry.first; });
         if (it == this->assignedExternals.end()) {
-            std::shared_ptr<Clingo::Symbol> val = std::make_shared<Clingo::Symbol>(Clingo::parse_term(p.first.c_str()));
-            this->clingo->assign_external(*val, p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
-            this->assignedExternals.push_back(std::make_shared<AnnotatedExternal>(p.first, val, p.second));
+            std::shared_ptr<Clingo::Symbol> val = std::make_shared<Clingo::Symbol>(Clingo::parse_term(externalEntry.first.c_str()));
+            this->clingo->assign_external(*val, externalEntry.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
+            this->assignedExternals.push_back(std::make_shared<AnnotatedExternal>(externalEntry.first, val, externalEntry.second));
         } else {
-            if (p.second != (*it)->getValue()) {
-                this->clingo->assign_external(*((*it)->getGringoValue()), p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
-                (*it)->setValue(p.second);
+            if (externalEntry.second != (*it)->getValue()) {
+                this->clingo->assign_external(*((*it)->getGringoValue()), externalEntry.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
+                (*it)->setValue(externalEntry.second);
             }
         }
     }

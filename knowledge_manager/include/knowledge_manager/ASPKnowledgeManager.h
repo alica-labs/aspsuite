@@ -3,6 +3,7 @@
 #include <clingo.hh>
 
 #include <mutex>
+#include <map>
 #include <vector>
 
 namespace reasoner{
@@ -21,7 +22,9 @@ public:
 
     std::vector<std::string> filterModel(const std::string& queryValue);
     int addInformation(std::vector<std::string>& information, int lifetime = -1);
-    void addBackgroundRules(std::vector<std::string>& backgroundInformation);
+    void updateExternals(std::shared_ptr<std::map<std::string, bool>> externals);
+    void addRulesPermanent(const std::string& programSection, std::vector<std::string>& rules);
+
     void revoke(int queryID);
     virtual void setSolver(reasoner::asp::Solver* solver);
 

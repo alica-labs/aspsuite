@@ -46,6 +46,7 @@ public:
     void releaseExternal(Clingo::Symbol ext);
     bool solve();
     void add(char const* name, Clingo::StringSpan const& params, char const* par);
+    void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
     Clingo::Symbol parseValue(std::string const& str);
 
     /**
@@ -80,7 +81,7 @@ private:
     bool on_model(Clingo::Model& m);
     void reduceQueryLifeTime();
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
-    void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
+
 
     essentials::SystemConfig* sc;
     GrdProgramObserver observer;

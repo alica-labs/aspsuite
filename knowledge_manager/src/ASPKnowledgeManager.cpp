@@ -85,7 +85,7 @@ void ASPKnowledgeManager::addRulesPermanent(const std::string& programSection, s
     for (const auto& info : rules) {
         rulesStream << info << "\n";
     }
-    std::cout << "[ASPKnowledgeManager] " << rulesStream.str() << std::endl;
+//    std::cout << "[ASPKnowledgeManager] " << rulesStream.str() << std::endl;
     std::lock_guard<std::mutex> lock(mtx);
     this->solver->add(programSection.c_str(), {}, rulesStream.str().c_str());
     this->solver->ground({{programSection.c_str(), {}}}, nullptr);

@@ -85,7 +85,7 @@ bool Solver::loadFileFromConfig(std::string configKey)
     std::lock_guard<std::mutex> lock(this->clingoMtx);
 
     this->clingo->load(backGroundKnowledgeFile.c_str());
-//    std::cout << "RELEASE LOAD " << backGroundKnowledgeFile << std::endl;
+    //    std::cout << "RELEASE LOAD " << backGroundKnowledgeFile << std::endl;
 
     return true;
 }
@@ -109,8 +109,12 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 
     this->observer.clear();
     this->clingo->ground(vec, callBack);
-    //    std::cout << "1111" << std::endl;
-    //    std::cout << this->observer.getGroundProgram() << std::endl;
+        std::cout << "GROUND PROGRAM: *************" << std::endl;
+    std::cout << std::endl;
+    std::cout << this->observer.getGroundProgram() << std::endl;
+    std::cout << std::endl;
+    std::cout << "********************" << std::endl;
+    std::cout << std::endl;
 }
 
 /**
@@ -133,14 +137,14 @@ bool Solver::solve()
 bool Solver::on_model(Clingo::Model& m)
 {
 
-//    std::lock_guard<std::mutex> lock(this->clingoMtx);
-//#ifdef Solver_DEBUG
+    //    std::lock_guard<std::mutex> lock(this->clingoMtx);
+    //#ifdef Solver_DEBUG
     std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         std::cout << atom << " ";
     }
     std::cout << std::endl;
-//#endif
+    //#endif
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
     for (int i = 0; i < tmp.size(); i++) {
@@ -271,9 +275,9 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
         }
         if (!found) {
             if (term->getType() == QueryType::Extension) {
-//                std::cout << "register ext query" << std::endl;
+                //                std::cout << "register ext query" << std::endl;
                 this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
-//                std::cout << "*** register ext query DONE" << std::endl;
+                //                std::cout << "*** register ext query DONE" << std::endl;
             } else if (term->getType() == QueryType::Filter) {
                 this->registerQuery(std::make_shared<FilterQuery>(this, term));
             } else if (term->getType() == QueryType::IncrementalExtension) {
@@ -288,14 +292,14 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
         }
     }
 
-//    std::cout << "iterate over registered queries" << std::endl;
+    //    std::cout << "iterate over registered queries" << std::endl;
     // Handle externals from registered queries and the term from this solve call
     for (auto q : this->registeredQueries) {
         auto ext = q->getTerm()->getExternals();
         if (ext != nullptr) {
-//            std::cout << "handle externals getsolution" << std::endl;
+            //            std::cout << "handle externals getsolution" << std::endl;
             this->handleExternals(ext);
-//            std::cout << "handle externals getsolution DONE" << std::endl;
+            //            std::cout << "handle externals getsolution DONE" << std::endl;
         }
     }
     return vars.size();

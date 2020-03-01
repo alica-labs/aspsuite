@@ -103,6 +103,8 @@ public:
 //    Clingo::Control* clingo;
     static std::mutex clingoMtx;
 
+    void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
+
 private:
     bool on_model(Clingo::Model& m);
 
@@ -110,7 +112,6 @@ private:
 
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
 
-    void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
 
     std::vector<long> currentQueryIds;
     std::vector<std::string> alreadyLoaded;

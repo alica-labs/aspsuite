@@ -5,46 +5,11 @@ namespace reasoner
 namespace asp
 {
 
-std::vector<IncrementalExtensionQuery*> IncrementalExtensionQuery::queries = std::vector<IncrementalExtensionQuery*>();
-int IncrementalExtensionQuery::queryId = 0;
-
-void IncrementalExtensionQuery::clear() {
-//    for(auto query : IncrementalExtensionQuery::queries) { //FIXME double free - who is deleting these?
-//        delete query;
-//    }
-
-    IncrementalExtensionQuery::queries.clear();
-    IncrementalExtensionQuery::queryId = 0;
-}
-
 //#define QUERY_DEBUG
-void IncrementalExtensionQuery::cleanUp()
-{
-    // Hack - first is base term query
-    for (int i = 1; i < IncrementalExtensionQuery::queries.size(); ++i) {
-        auto query = IncrementalExtensionQuery::queries.at(i);
-        query->getSolver()->assignExternal(*(query->external), Clingo::TruthValue::False);
-    }
-}
-
-bool IncrementalExtensionQuery::isPresent(int horizon)
-{
-    // FIXME first is base term query
-    return IncrementalExtensionQuery::queries.size() > horizon;
-}
-
-void IncrementalExtensionQuery::activate(int horizon)
-{
-
-    auto query = IncrementalExtensionQuery::queries.at(horizon);
-    query->getSolver()->assignExternal(*(query->external), Clingo::TruthValue::True);
-}
-IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
+IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term, const std::string& queryExternalPrefix, int horizon)
         : ExtensionQuery(solver, term)
 
 {
-
-    IncrementalExtensionQuery::queries.push_back(this);
 
     this->type = QueryType::IncrementalExtension;
     std::stringstream ss;
@@ -55,8 +20,9 @@ IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
         return;
     }
 
-    ss << "incquery"; // << IncrementalExtensionQuery::queryId;
+    ss << queryExternalPrefix << "incquery"; // << IncrementalExtensionQuery::queryId;
     this->queryProgramSection = ss.str();
+    //    this->queryProgramSection = this->queryProgramSection + std::to_string(horizon);
     this->lastQuerySection = "";
 
     Clingo::SymbolVector paramsVec;
@@ -65,11 +31,13 @@ IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
         // TODO re-work, used for horizon externals
 
         this->lastQuerySection = this->queryProgramSection + std::to_string(stoi(param.second) - 1);
-        this->queryProgramSection = this->queryProgramSection + param.second;
+        //        this->queryProgramSection = this->queryProgramSection + param.second;
     }
-    if (term->getProgramSectionParameters().empty()) {
-        this->queryProgramSection = this->queryProgramSection + "0";
-    }
+    //    if (term->getProgramSectionParameters().empty()) {
+    //        this->queryProgramSection = this->queryProgramSection + "0";
+    //    }
+    this->queryProgramSection = this->queryProgramSection + std::to_string(horizon);
+    std::cout << "QUERY PROGRAM SECTION IS:" << this->queryProgramSection << std::endl;
 
     this->createProgramSection();
     this->solver->ground({{this->queryProgramSection.c_str(), paramsVec}}, nullptr);
@@ -78,9 +46,8 @@ IncrementalExtensionQuery::IncrementalExtensionQuery(Solver* solver, Term* term)
 
 void IncrementalExtensionQuery::onModel(Clingo::Model& clingoModel)
 {
-    // incremental query was successful, so the next inc query can be queried
-    IncrementalExtensionQuery::queryId += 1;
-    //IncrementalExtensionQuery::cleanUp();
+    // currently noop because this query type is only used for base/step terms - the results should be queried in the "check" terms, which are currently of type
+    // reusableExtQuery
 }
 
 void IncrementalExtensionQuery::createProgramSection()
@@ -120,8 +87,11 @@ void IncrementalExtensionQuery::createProgramSection()
 
     for (auto& headPredicate : predicatesToAritiesMap) {
         for (auto& arity : headPredicate.second) {
-            queryProgram << createKBCapturingRule(
-                    headPredicate.first, arity,this->queryProgramSection);
+            // FIXME HACK for safePathExists
+            if (headPredicate.first.find('}') == 0) {
+                continue;
+            }
+            queryProgram << createKBCapturingRule(headPredicate.first, arity, this->queryProgramSection);
         }
     }
 #ifdef QUERY_DEBUG
@@ -165,5 +135,6 @@ void IncrementalExtensionQuery::removeExternal()
 {
     this->solver->assignExternal(*(this->external.get()), Clingo::TruthValue::False);
 }
+
 }
 }

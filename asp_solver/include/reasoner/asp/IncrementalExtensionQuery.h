@@ -12,15 +12,11 @@ class IncrementalExtensionQuery : public ::reasoner::asp::ExtensionQuery
 {
 
 public:
-    static bool isPresent(int horizon);
-    static void activate(int horizon);
-    static void cleanUp();
-    static void clear();
-    static std::vector<IncrementalExtensionQuery*> queries;
-    static int queryId;
+
+    int queryId;
 
 
-    IncrementalExtensionQuery(Solver* solver, Term* term);
+    IncrementalExtensionQuery(Solver* solver, Term* term, const std::string& queryExternalPrefix, int horizon);
     void onModel(Clingo::Model& clingoModel) override;
     void removeExternal() override;
 

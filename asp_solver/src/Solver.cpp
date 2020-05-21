@@ -12,7 +12,7 @@
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
 
-//#define Solver_DEBUG
+#define Solver_DEBUG
 
 namespace reasoner
 {
@@ -109,12 +109,12 @@ void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 
     this->observer.clear();
     this->clingo->ground(vec, callBack);
-        std::cout << "GROUND PROGRAM: *************" << std::endl;
-    std::cout << std::endl;
-    std::cout << this->observer.getGroundProgram() << std::endl;
-    std::cout << std::endl;
-    std::cout << "********************" << std::endl;
-    std::cout << std::endl;
+    //    std::cout << "GROUND PROGRAM: *************" << std::endl;
+    //    std::cout << std::endl;
+    //    std::cout << this->observer.getGroundProgram() << std::endl;
+    //    std::cout << std::endl;
+    //    std::cout << "********************" << std::endl;
+    //    std::cout << std::endl;
 }
 
 /**
@@ -137,14 +137,14 @@ bool Solver::solve()
 bool Solver::on_model(Clingo::Model& m)
 {
 
-    //    std::lock_guard<std::mutex> lock(this->clingoMtx);
-    //#ifdef Solver_DEBUG
+//    std::lock_guard<std::mutex> lock(this->clingoMtx);
+#ifdef Solver_DEBUG
     std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         std::cout << atom << " ";
     }
     std::cout << std::endl;
-    //#endif
+#endif
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
     for (int i = 0; i < tmp.size(); i++) {
@@ -275,14 +275,12 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
         }
         if (!found) {
             if (term->getType() == QueryType::Extension) {
-                //                std::cout << "register ext query" << std::endl;
                 this->registerQuery(std::make_shared<ExtensionQuery>(this, term));
-                //                std::cout << "*** register ext query DONE" << std::endl;
             } else if (term->getType() == QueryType::Filter) {
                 this->registerQuery(std::make_shared<FilterQuery>(this, term));
             } else if (term->getType() == QueryType::IncrementalExtension) {
-                this->registerQuery(std::make_shared<IncrementalExtensionQuery>(this, term));
-
+                // FIXME decide whether incremental queries should be able to be constructed here
+                this->registerQuery(std::make_shared<IncrementalExtensionQuery>(this, term, "terms", -1));
             } else if (term->getType() == QueryType::ReusableExtension) {
                 this->registerQuery(std::make_shared<ReusableExtensionQuery>(this, term));
             } else {

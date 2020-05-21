@@ -127,7 +127,7 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
         auto it = this->solver->clingo->symbolic_atoms().begin(
                 Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();
         if (it == this->solver->clingo->symbolic_atoms().end()) {
-            std::cout << "FilterQuery: Didn't find any suitable domain!" << std::endl;
+            std::cout << "FilterQuery: Didn't find any suitable domain for " << value.first.name() << "!" << std::endl;
             continue;
         }
 

@@ -7,7 +7,7 @@
 
 #include <chrono>
 
-//#define QUERY_DEBUG
+#define QUERY_DEBUG
 
 namespace reasoner
 {
@@ -154,7 +154,7 @@ void ExtensionQuery::onModel(Clingo::Model& clingoModel)
 #ifdef QUERY_DEBUG
         std::cout << "ExtensionQuery::onModel: " << value.first << std::endl;
 #endif
-//        std::lock_guard<std::mutex> lock(this->solver->clingoMtx);
+        //        std::lock_guard<std::mutex> lock(this->solver->clingoMtx);
         auto it = ((Solver*) this->solver)
                           ->clingo->symbolic_atoms()
                           .begin(Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();

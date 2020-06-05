@@ -33,8 +33,11 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
 {
     for (auto queryString : queryVec) {
         if (queryString.compare("") == 0) {
-            return;
+            continue;
         }
+        //std::cout << "FilterQuery: " << queryString << std::endl;
+        this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
+        /*std::cout << "before parse1 " << queryString << std::endl;
         // TODO: Fix nested braces and move funtionality to central accessable helper class
         if (queryString.find(",") != std::string::npos) {
             size_t start = 0;
@@ -47,6 +50,7 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
                 }
                 currentQuery = queryString.substr(start, end - start + 1);
                 currentQuery = essentials::Configuration::trim(currentQuery);
+                std::cout << "before parse2 " << currentQuery << std::endl;
                 this->headValues.emplace(this->solver->parseValue(currentQuery), std::vector<Clingo::Symbol>());
                 start = queryString.find(",", end);
                 if (start != std::string::npos) {
@@ -54,8 +58,9 @@ void FilterQuery::addQueryValues(std::vector<std::string> queryVec)
                 }
             }
         } else {
+            std::cout << "before parse3 " << queryString << std::endl;
             this->headValues.emplace(this->solver->parseValue(queryString), std::vector<Clingo::Symbol>());
-        }
+        }*/
     }
 }
 

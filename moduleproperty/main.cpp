@@ -5,7 +5,7 @@
 #include <vector>
 
 static std::string queryProgramSection = "query1";
-static std::string externalName = "externalQuery1";
+static std::string externalName = "extQuery1";
 static std::map<std::string, std::unordered_set<int>> predicatesToAritiesMap;
 
 struct Predicate
@@ -527,60 +527,77 @@ int main()
 {
     // query rule
     // std::string queryRule = ":~ not goalReachable. [1@2]";
-    std::string queryRule = "#minimize {2*T@1 : maxTimestep(T)}.";
+    std::string queryRule = "filteredTask(X):-task(X), type(X,search).";
     //std::string queryRule = "success :- #count{1,X,Y : holds(on(X,Y),T), goal(X,Y)} = 1.";
     //std::string queryRule = "goalReachable :- safe(X,Y) : holds(on(X,Y),T).";
 
     // additional rules
     std::vector<std::string> rules;
+    rules.emplace_back("can(X, move) :- can(X, transport).");
+    rules.emplace_back("-can(X, transport) :- -can(X, move).");
+    rules.emplace_back("{ assign(X,R) : robot(R) } = 1 :- task(X).");
+    rules.emplace_back("{ assign(X,R) : task(X) } = 1 :- robot(R).");
+    rules.emplace_back(":- assign(X,R), type(X, transport), -can(R, transport).");
+    rules.emplace_back(":- assign(X,R), type(X, search), -can(R, move).");
 
-    rules.emplace_back("{goal(X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
-    rules.emplace_back("goalReachable :- safe(X,Y) : holds(on(X,Y),T).");
-    rules.emplace_back("{occurs(A,T) : action(A)} = 1 :- timestep(T).");
-    rules.emplace_back("occurs(pickup,0) :- on(X,Y), glitter(X,Y).");
-    rules.emplace_back("occurs(leave,0) :- on(X,Y), initial(X,Y), haveGold.");
-    rules.emplace_back("goal(X,Y) :- initial(X,Y), haveGold.");
-    rules.emplace_back("#minimize {2*T@1 : maxTimestep(T)}.");
-    rules.emplace_back("1{occurs(A,T) : action(A)}1 :- timestep(T).");
-    rules.emplace_back("success :- #count{1,X,Y : holds(on(X,Y),T) , goal(X,Y)} = 1.");
-    rules.emplace_back("holds(on(X,Y),0) :- on(X,Y).");
-    rules.emplace_back("holds(heading(X),0) :- heading(X).");
-    rules.emplace_back("timestep(0..X) :- maxTimestep(X).");
-    rules.emplace_back("holds(on(X,Y),T+1) :- occurs(move,T), fieldAhead(X,Y,T), timestep(T). ");
-    rules.emplace_back("fieldAhead(X-1,Y,T) :- field(X,Y), field(X-1,Y), holds(heading(0),T), holds(on(X,Y),T), timestep(T).");
-    rules.emplace_back("fieldAhead(X+1,Y,T) :- field(X,Y), field(X+1,Y), holds(heading(2),T), holds(on(X,Y),T), timestep(T).");
-    rules.emplace_back("fieldAhead(X,Y+1,T) :- field(X,Y), field(X,Y+1), holds(heading(3),T), holds(on(X,Y),T), timestep(T).");
-    rules.emplace_back("fieldAhead(X,Y-1,T) :- field(X,Y), field(X,Y-1), holds(heading(1),T), holds(on(X,Y),T), timestep(T).");
-    rules.emplace_back("holds(heading((X+1)\\4),T+1) :- holds(heading(X),T), occurs(turnLeft,T).");
-    rules.emplace_back("holds(heading((X+3)\\4),T+1) :- holds(heading(X),T), occurs(turnRight,T).");
-    rules.emplace_back("holds(on(X,Y),T+1) :- holds(on(X,Y),T), not occurs(move,T), timestep(T+1).");
-    rules.emplace_back("holds(heading(X),T+1) :- holds(heading(X),T), not occurs(turnLeft,T), not occurs(turnRight,T), timestep(T+1).");
-    rules.emplace_back(":- not success.");
-
-    rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
-    rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
-    rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
-    rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
-    rules.emplace_back("factA(X, Y):-factB(X).");
-    rules.emplace_back("{maxTimestep(0..(N*N)) : fieldSize(N)} = 1.");
-    rules.emplace_back("#minimize {T@1,id : maxTimestep(id,T)}.");
-    rules.emplace_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
-    rules.emplace_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
-    rules.emplace_back("factD(X); factE(Y,Z) :- factA(X), factZ(Y,Z).");
-    rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
-    rules.emplace_back(":- 1{occurs(A,T) : action(A)}1");
+//    rules.emplace_back("{goal(X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
+//    rules.emplace_back("goalReachable :- safe(X,Y) : holds(on(X,Y),T).");
+//    rules.emplace_back("{occurs(A,T) : action(A)} = 1 :- timestep(T).");
+//    rules.emplace_back("occurs(pickup,0) :- on(X,Y), glitter(X,Y).");
+//    rules.emplace_back("occurs(leave,0) :- on(X,Y), initial(X,Y), haveGold.");
+//    rules.emplace_back("goal(X,Y) :- initial(X,Y), haveGold.");
+//    rules.emplace_back("#minimize {2*T@1 : maxTimestep(T)}.");
+//    rules.emplace_back("1{occurs(A,T) : action(A)}1 :- timestep(T).");
+//    rules.emplace_back("success :- #count{1,X,Y : holds(on(X,Y),T) , goal(X,Y)} = 1.");
+//    rules.emplace_back("holds(on(X,Y),0) :- on(X,Y).");
+//    rules.emplace_back("holds(heading(X),0) :- heading(X).");
+//    rules.emplace_back("timestep(0..X) :- maxTimestep(X).");
+//    rules.emplace_back("holds(on(X,Y),T+1) :- occurs(move,T), fieldAhead(X,Y,T), timestep(T). ");
+//    rules.emplace_back("fieldAhead(X-1,Y,T) :- field(X,Y), field(X-1,Y), holds(heading(0),T), holds(on(X,Y),T), timestep(T).");
+//    rules.emplace_back("fieldAhead(X+1,Y,T) :- field(X,Y), field(X+1,Y), holds(heading(2),T), holds(on(X,Y),T), timestep(T).");
+//    rules.emplace_back("fieldAhead(X,Y+1,T) :- field(X,Y), field(X,Y+1), holds(heading(3),T), holds(on(X,Y),T), timestep(T).");
+//    rules.emplace_back("fieldAhead(X,Y-1,T) :- field(X,Y), field(X,Y-1), holds(heading(1),T), holds(on(X,Y),T), timestep(T).");
+//    rules.emplace_back("holds(heading((X+1)\\4),T+1) :- holds(heading(X),T), occurs(turnLeft,T).");
+//    rules.emplace_back("holds(heading((X+3)\\4),T+1) :- holds(heading(X),T), occurs(turnRight,T).");
+//    rules.emplace_back("holds(on(X,Y),T+1) :- holds(on(X,Y),T), not occurs(move,T), timestep(T+1).");
+//    rules.emplace_back("holds(heading(X),T+1) :- holds(heading(X),T), not occurs(turnLeft,T), not occurs(turnRight,T), timestep(T+1).");
+//    rules.emplace_back(":- not success.");
+//
+//    rules.emplace_back("1{goal(X,Y) : field(X,Y), not visited(X,Y)}1 :- not haveGold, not occurs(pickup,0), not occurs(leave,0).");
+//    rules.emplace_back("1{maxTimestep(0..(N*N)) : fieldSize(N)}1.");
+//    rules.emplace_back("{maxTimestep(id,0..(N*N)) : fieldSize(N)} = 1.");
+//    rules.emplace_back("timestep(0..X,id) :- maxTimestep(id,X).");
+//    rules.emplace_back("factA(X, Y):-factB(X).");
+//    rules.emplace_back("{maxTimestep(0..(N*N)) : fieldSize(N)} = 1.");
+//    rules.emplace_back("#minimize {T@1,id : maxTimestep(id,T)}.");
+//    rules.emplace_back("{goal(id,X,Y) : field(X,Y), not visited(X,Y)} = 1 :- not haveGold.");
+//    rules.emplace_back("fieldAhead(X-1,Y,T,id) :- field(X,Y), field(X-1,Y), holds(heading(0),T,id), holds(on(X,Y),T,id), timestep(T,id).");
+//    rules.emplace_back("factD(X); factE(Y,Z) :- factA(X), factZ(Y,Z).");
+//    rules.emplace_back(":~ not goalReachable(id) : goal(id,_,_). [1@2]");
+//    rules.emplace_back(":- 1{occurs(A,T) : action(A)}1");
 
     // facts
     std::vector<std::string> facts;
-    facts.emplace_back("factA.");
-    facts.emplace_back("factA(1).");
-    facts.emplace_back("factB(1).");
-    facts.emplace_back("factC(2).");
-    facts.emplace_back("factZ(1).");
-    facts.emplace_back("factZ(1251).");
-    facts.emplace_back("factZ(asc, 1251).");
-    facts.emplace_back("factAB(wtf, you, dick, head).");
-    facts.emplace_back("factAB(factB(wtf, you, factZ(1), head)).");
+    facts.emplace_back("task(t1).");
+    facts.emplace_back("type(t1, search).");
+    facts.emplace_back("task(t2).");
+    facts.emplace_back("type(t2, transport).");
+    facts.emplace_back("task(t3).");
+    facts.emplace_back("robot(sr1).");
+    facts.emplace_back("can(sr1, move).");
+    facts.emplace_back("robot(sr2).");
+    facts.emplace_back("can(sr2, transport).");
+    facts.emplace_back("robot(sr3).");
+    facts.emplace_back("-can(sr3, move).");
+//    facts.emplace_back("factA.");
+//    facts.emplace_back("factA(1).");
+//    facts.emplace_back("factB(1).");
+//    facts.emplace_back("factC(2).");
+//    facts.emplace_back("factZ(1).");
+//    facts.emplace_back("factZ(1251).");
+//    facts.emplace_back("factZ(asc, 1251).");
+//    facts.emplace_back("factAB(wtf, you, dick, head).");
+//    facts.emplace_back("factAB(factB(wtf, you, factZ(1), head)).");
 
     std::stringstream queryProgram;
     queryProgram << "#program " << queryProgramSection << ".\n";
@@ -595,6 +612,7 @@ int main()
     for (auto& rule : rules) {
         extractHeadPredicates(rule);
     }
+
 
     for (auto& headPredicate : predicatesToAritiesMap) {
         for (auto& arity : headPredicate.second) {

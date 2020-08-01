@@ -122,7 +122,7 @@ void FilterQuery::onModel(Clingo::Model& clingoModel)
 #ifdef QUERY_DEBUG
         std::cout << "FilterQuery::onModel: " << value.first << std::endl;
 #endif
-//        std::lock_guard<std::mutex> lock(this->solver->clingoMtx);
+        std::lock_guard<std::mutex> lock(this->solver->clingoModelMtx);
 
         auto it = this->solver->clingo->symbolic_atoms().begin(
                 Clingo::Signature(value.first.name(), value.first.arguments().size(), value.first.is_positive())); // value.first.signature();

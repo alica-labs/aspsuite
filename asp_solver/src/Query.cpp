@@ -49,6 +49,7 @@ void Query::reduceLifeTime()
 
 void Query::saveHeadValuePair(Clingo::Symbol key, Clingo::Symbol value)
 {
+//    std::cout << "QUERY: IN SAVE HEAD VALUE PAIR " << std::endl;
     auto entry = this->headValues.find(key);
     if (entry != this->headValues.end()) {
         if (find(entry->second.begin(), entry->second.end(), value) == entry->second.end()) {

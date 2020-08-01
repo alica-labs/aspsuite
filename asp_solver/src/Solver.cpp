@@ -12,7 +12,7 @@
 #include <reasoner/asp/Term.h>
 #include <reasoner/asp/Variable.h>
 
-#define Solver_DEBUG
+//#define Solver_DEBUG
 
 namespace reasoner
 {
@@ -24,8 +24,11 @@ const std::string Solver::WILDCARD_STRING = "wildcard";
 
 std::mutex Solver::queryCounterMutex;
 std::mutex Solver::clingoMtx;
+std::mutex Solver::clingoModelMtx;
+std::mutex Solver::queryMtx;
 
 Solver::Solver(std::vector<char const*> args)
+        : timesWritten(0)
 {
     Clingo::Logger logger = [](Clingo::WarningCode warningCode, char const* message) {
         switch (warningCode) {
@@ -41,13 +44,15 @@ Solver::Solver(std::vector<char const*> args)
             std::cerr << message << std::endl;
         }
     };
-
     this->clingo = std::make_shared<Clingo::Control>(args, logger, 20);
     //    this->clingo = new Clingo::Control(args, logger, 20);
     this->clingo->register_observer(this->observer);
     this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
-    // this->clingo->configuration()["configuration"] = "handy";
+    this->clingo->configuration()["configuration"] = "handy";
+
+    this->resultsDirectory = (*essentials::SystemConfig::getInstance())["WumpusEval"]->get<std::string>("TestRun.resultsDirectory", NULL);
+    this->fileName = "SolverStats_" + std::to_string(essentials::SystemConfig::getOwnRobotID());
 
     // should make the solver return all models (because you set it to 0)
     this->clingo->configuration()["solve"]["models"] = "0";
@@ -56,6 +61,7 @@ Solver::Solver(std::vector<char const*> args)
 Solver::~Solver()
 {
     std::lock_guard<std::mutex> lock(this->clingoMtx);
+    //    this->writeToFile("break", -1);
     this->clingo->cleanup();
 }
 
@@ -96,25 +102,28 @@ bool Solver::loadFileFromConfig(std::string configKey)
 void Solver::ground(Clingo::PartSpan vec, Clingo::GroundCallback callBack)
 {
 #ifdef Solver_DEBUG
-    std::cout << "================================ Solver_ground: " << std::endl;
-    for (auto part : vec) {
-        std::cout << part.name() << std::endl;
-        for (auto param : part.params()) {
-            std::cout << param.to_string() << std::endl;
-        }
-    }
+//    std::cout << "================================ Solver_ground: " << std::endl;
+//    for (auto part : vec) {
+//        std::cout << part.name() << std::endl;
+//        for (auto param : part.params()) {
+//            std::cout << param.to_string() << std::endl;
+//        }
+//    }
 
 #endif
     std::lock_guard<std::mutex> lock(clingoMtx);
 
     this->observer.clear();
+    auto start = std::chrono::high_resolution_clock::now().time_since_epoch();
     this->clingo->ground(vec, callBack);
-    //    std::cout << "GROUND PROGRAM: *************" << std::endl;
-    //    std::cout << std::endl;
-    //    std::cout << this->observer.getGroundProgram() << std::endl;
-    //    std::cout << std::endl;
-    //    std::cout << "********************" << std::endl;
-    //    std::cout << std::endl;
+    auto end = std::chrono::high_resolution_clock::now().time_since_epoch();
+    this->writeToFile("Ground", (end - start).count());
+    //        std::cout << "GROUND PROGRAM: *************" << std::endl;
+    //        std::cout << std::endl;
+    //        std::cout << this->observer.getGroundProgram() << std::endl;
+    //        std::cout << std::endl;
+    //        std::cout << "********************" << std::endl;
+    //        std::cout << std::endl;
 }
 
 /**
@@ -127,7 +136,10 @@ bool Solver::solve()
     // bind(&Solver::onModel, this, placeholders::_1)
     Clingo::SymbolicLiteralSpan span = {};
     std::lock_guard<std::mutex> lock(this->clingoMtx);
+    auto start = std::chrono::high_resolution_clock::now().time_since_epoch();
     auto result = this->clingo->solve(span, this, false, false);
+    auto end = std::chrono::high_resolution_clock::now();
+    this->writeToFile("Solve", (end - start).time_since_epoch().count());
     return result.get().is_satisfiable();
 }
 
@@ -138,19 +150,21 @@ bool Solver::on_model(Clingo::Model& m)
 {
 
 //    std::lock_guard<std::mutex> lock(this->clingoMtx);
-#ifdef Solver_DEBUG
+//#ifdef Solver_DEBUG
     std::cout << "Solver: Found the following model :" << std::endl;
     for (auto& atom : m.symbols(Clingo::ShowType::Shown)) {
         std::cout << atom << " ";
     }
     std::cout << std::endl;
-#endif
+//#endif
+    //    std::lock_guard<std::mutex> lock(this->clingoModelMtx);
     Clingo::SymbolVector vec;
     auto tmp = m.symbols(Clingo::ShowType::Shown);
     for (int i = 0; i < tmp.size(); i++) {
         vec.push_back(tmp[i]);
     }
     this->currentModels.push_back(vec);
+    std::lock_guard<std::mutex> lock2(this->queryMtx);
     for (auto& query : this->registeredQueries) {
         query->onModel(m);
     }
@@ -160,6 +174,8 @@ bool Solver::on_model(Clingo::Model& m)
 void Solver::assignExternal(Clingo::Symbol ext, Clingo::TruthValue truthValue)
 {
     std::lock_guard<std::mutex> lock(this->clingoMtx);
+    //    std::cout << "solver: assign external" << std::endl;
+    //    std::cout << ext.to_c() << std::endl;
     this->clingo->assign_external(ext, truthValue);
 }
 
@@ -236,6 +252,7 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
     }
 
     for (auto& queriedId : this->currentQueryIds) {
+        std::lock_guard<std::mutex> lock(queryMtx);
         for (auto& query : this->registeredQueries) {
             std::vector<Clingo::SymbolVector> vals;
             for (auto& pair : query->getHeadValues()) {
@@ -249,6 +266,8 @@ bool Solver::getSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls
     }
     this->removeDeadQueries();
     this->currentQueryIds.clear();
+    this->writeToFile("break", -1);
+    this->timesWritten++;
     if (results.size() > 0) {
         return true;
     } else {
@@ -268,6 +287,7 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
             //            this->clingo->configuration()["solve"]["models"] = term->getNumberOfModels().c_str();
         }
         bool found = false;
+        std::lock_guard<std::mutex> lock(queryMtx);
         for (auto query : this->registeredQueries) {
             if (term->getId() == query->getTerm()->getId()) {
                 found = true;
@@ -292,6 +312,7 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
 
     //    std::cout << "iterate over registered queries" << std::endl;
     // Handle externals from registered queries and the term from this solve call
+    std::lock_guard<std::mutex> lock(queryMtx);
     for (auto q : this->registeredQueries) {
         auto ext = q->getTerm()->getExternals();
         if (ext != nullptr) {
@@ -305,12 +326,15 @@ int Solver::prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& ca
 
 void Solver::handleExternals(std::shared_ptr<std::map<std::string, bool>> externals)
 {
+    //    std::lock_guard<std::mutex> lock(this->clingoMtx);
+    auto start = std::chrono::high_resolution_clock::now().time_since_epoch();
     for (auto p : *externals) {
         auto it = find_if(this->assignedExternals.begin(), this->assignedExternals.end(),
                 [p](std::shared_ptr<AnnotatedExternal> element) { return element->getAspPredicate() == p.first; });
         if (it == this->assignedExternals.end()) {
             std::shared_ptr<Clingo::Symbol> val = std::make_shared<Clingo::Symbol>(Clingo::parse_term(p.first.c_str()));
             std::lock_guard<std::mutex> lock(this->clingoMtx);
+            std::cout << "handle externals: " << val->to_string() << std::endl;
             this->clingo->assign_external(*val, p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
             this->assignedExternals.push_back(std::make_shared<AnnotatedExternal>(p.first, val, p.second));
 
@@ -318,10 +342,13 @@ void Solver::handleExternals(std::shared_ptr<std::map<std::string, bool>> extern
             if (p.second != (*it)->getValue()) {
                 std::lock_guard<std::mutex> lock(this->clingoMtx);
                 this->clingo->assign_external(*((*it)->getGringoValue()), p.second ? Clingo::TruthValue::True : Clingo::TruthValue::False);
+                std::cout << "handle externals 2: " << (*it)->getGringoValue()->to_string() << std::endl;
                 (*it)->setValue(p.second);
             }
         }
     }
+    auto end = std::chrono::high_resolution_clock::now().time_since_epoch();
+    this->writeToFile("Handle externals", (end - start).count());
 }
 
 std::shared_ptr<Variable> Solver::createVariable(long id)
@@ -350,11 +377,13 @@ const std::string& Solver::getWildcardString()
 
 int Solver::getRegisteredQueriesCount()
 {
+    std::lock_guard<std::mutex> lock(queryMtx);
     return this->registeredQueries.size();
 }
 
 void Solver::reduceQueryLifeTime()
 {
+    std::lock_guard<std::mutex> lock(queryMtx);
     for (auto query : this->registeredQueries) {
         query->reduceLifeTime();
     }
@@ -433,12 +462,67 @@ void Solver::printStats()
 
 std::vector<std::shared_ptr<Query>> Solver::getRegisteredQueries()
 {
+    std::lock_guard<std::mutex> lock(queryMtx);
+    std::lock_guard<std::mutex> lock2(clingoMtx);
     return registeredQueries;
 }
 
 const std::string Solver::getGroundProgram() const
 {
     return this->observer.getGroundProgram();
+}
+
+const std::vector<std::shared_ptr<Query>>& Solver::getRegisteredQueries2()
+{
+    std::lock_guard<std::mutex> lock(queryMtx);
+    std::lock_guard<std::mutex> lock2(this->clingoMtx);
+    //    for(auto elem : this->clingo->symbolic_atoms()) {
+    //        std::cout << "symbolic atoms symbol: " << elem.symbol() << std::endl;
+    //    }
+    return this->registeredQueries;
+}
+
+void Solver::writeToFile(std::string identifier, long duration)
+{
+    if (this->timesWritten >= 5) {
+        return;
+    }
+//    if (!this->wroteHeader) {
+//        this->writeHeader();
+//        this->wroteHeader = true;
+//    }
+//    std::ofstream fileWriter;
+//    std::string separator = ";";
+//
+//    auto folder = essentials::FileSystem::combinePaths(getenv("HOME"), this->resultsDirectory);
+//    fileWriter.open(essentials::FileSystem::combinePaths(folder, fileName), std::ios_base::app);
+//
+//    fileWriter << identifier;
+//    fileWriter << separator;
+//    fileWriter << std::to_string(duration);
+//    fileWriter << std::endl;
+//    fileWriter.close();
+}
+
+void Solver::writeHeader()
+{
+
+    std::ofstream fileWriter;
+    std::string separator = ";";
+
+    auto folder = essentials::FileSystem::combinePaths(getenv("HOME"), this->resultsDirectory);
+    fileWriter.open(essentials::FileSystem::combinePaths(folder, fileName), std::ios_base::app);
+
+    fileWriter << "Operation";
+    fileWriter << separator;
+    fileWriter << "TimeElapsed";
+    fileWriter << std::endl;
+    //    fileWriter << separator;
+    //    fileWriter << "TimeElapsed";
+    //    fileWriter << separator;
+    //    fileWriter << "TimeElapsed";
+    //    fileWriter << std::endl;
+    fileWriter.close();
 }
 
 } /* namespace asp */

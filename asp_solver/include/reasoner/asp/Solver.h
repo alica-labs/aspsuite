@@ -94,6 +94,7 @@ public:
     static const std::string& getWildcardString();
 
     std::vector<std::shared_ptr<Query>> getRegisteredQueries();
+    const std::vector<std::shared_ptr<Query>>& getRegisteredQueries2();
 
     std::vector<Clingo::SymbolVector> getCurrentModels();
 
@@ -102,6 +103,7 @@ public:
     std::shared_ptr<Clingo::Control> clingo;
 //    Clingo::Control* clingo;
     static std::mutex clingoMtx;
+    static std::mutex clingoModelMtx;
 
     void handleExternals(std::shared_ptr<std::map<std::string, bool>> externals);
 
@@ -109,6 +111,12 @@ private:
     bool on_model(Clingo::Model& m);
 
     void reduceQueryLifeTime();
+
+    bool wroteHeader;
+
+    std::string resultsDirectory;
+
+    std::string fileName;
 
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
 
@@ -123,12 +131,20 @@ private:
     essentials::SystemConfig* sc;
     GrdProgramObserver observer;
 
+    int timesWritten;
+
 protected:
     static std::mutex queryCounterMutex;
+
 
 #ifdef ASPSolver_DEBUG
     int modelCount;
 #endif
-};
+        static std::mutex queryMtx;
+
+        void writeToFile(std::string identifier, long duration);
+
+        void writeHeader();
+    };
 } /* namespace asp */
 } /* namespace reasoner */

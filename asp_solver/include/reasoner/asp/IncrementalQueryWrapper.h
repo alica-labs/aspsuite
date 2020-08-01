@@ -14,24 +14,24 @@ namespace asp
 class IncrementalQueryWrapper
 {
 public:
-    IncrementalQueryWrapper(asp::Solver* solver, std::string queryExternalPrefix);
+    IncrementalQueryWrapper(::reasoner::asp::Solver* solver, std::string queryExternalPrefix);
 
-    void addQueryForHorizon(int horizon, reasoner::asp::Term* term);
+    void addQueryForHorizon(int horizon, ::reasoner::asp::Term* term);
 
     std::string getQueryExternalPrefix() const;
 
     bool isPresent(int horizon);
     void activate(int horizon);
+    void deactivate(int horizon);
     void cleanUp();
     void clear();
 
 private:
-    std::map<int, std::shared_ptr<reasoner::asp::IncrementalExtensionQuery>> queries;
-
-    asp::Solver* solver;
+    std::map<int, std::shared_ptr<::reasoner::asp::IncrementalExtensionQuery>> queries;
+    std::shared_ptr<::reasoner::asp::IncrementalExtensionQuery> baseQuery;
+    ::reasoner::asp::Solver* solver;
 
     const std::string queryExternalPrefix;
-
 };
 }
 }

@@ -133,7 +133,8 @@ void IncrementalExtensionQuery::createProgramSection()
 
 void IncrementalExtensionQuery::removeExternal()
 {
-    this->solver->assignExternal(*(this->external.get()), Clingo::TruthValue::False);
+//    this->solver->assignExternal(*(this->external.get()), Clingo::TruthValue::False);
+    this->solver->assignExternal(*(this->external), Clingo::TruthValue::False);
 }
 
 }

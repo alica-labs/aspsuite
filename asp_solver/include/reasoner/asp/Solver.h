@@ -3,7 +3,7 @@
 #include "reasoner/asp/GrdProgramObserver.h"
 #include "reasoner/asp/Term.h"
 
-#include <SystemConfig.h>
+#include <essentials/SystemConfig.h>
 #include <clingo.hh>
 
 #include <memory>
@@ -83,7 +83,7 @@ private:
     int prepareSolution(std::vector<Variable*>& vars, std::vector<Term*>& calls);
 
 
-    essentials::SystemConfig* sc;
+    essentials::SystemConfig& sc;
     GrdProgramObserver observer;
     Clingo::Control* clingo;
 

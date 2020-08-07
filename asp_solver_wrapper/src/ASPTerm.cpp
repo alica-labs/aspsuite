@@ -5,7 +5,7 @@
  *      Author: Stefan Jakob
  */
 
-#include <SystemConfig.h>
+#include <essentials/SystemConfig.h>
 #include <asp_solver_wrapper/ASPTerm.h>
 
 namespace alica

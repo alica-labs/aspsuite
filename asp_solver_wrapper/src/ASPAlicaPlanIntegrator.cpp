@@ -13,8 +13,9 @@
 #include <engine/model/SuccessState.h>
 #include <engine/model/Synchronisation.h>
 #include <engine/model/Task.h>
+#include <engine/model/ConfAbstractPlanWrapper.h>
 
-#include <CustomHashes.h>
+#include <essentials/CustomHashes.h>
 #include <regex>
 
 namespace alica
@@ -118,14 +119,14 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan* p, uint64_t instanceElement
             // add state
             this->solver->add("planBase", {}, gen->state(state).c_str());
 
-            for (const AbstractPlan* abstractChildPlan : state->getPlans()) {
-                if (const alica::Plan* childPlan = dynamic_cast<const alica::Plan*>(abstractChildPlan)) {
+            for (const ConfAbstractPlanWrapper* confAbstractPlanWrapper : state->getConfAbstractPlanWrappers()) {
+                if (const alica::Plan* childPlan = dynamic_cast<const alica::Plan*>(confAbstractPlanWrapper->getAbstractPlan())) {
                     this->solver->add("planBase", {}, gen->hasPlan(state, childPlan).c_str());
 
                     instanceElementHash = handleRunningPlan(childPlan, state, instanceElementHash);
 
                     this->processPlan(childPlan, instanceElementHash);
-                } else if (const alica::PlanType* childPlanType = dynamic_cast<const alica::PlanType*>(abstractChildPlan)) {
+                } else if (const alica::PlanType* childPlanType = dynamic_cast<const alica::PlanType*>(confAbstractPlanWrapper->getAbstractPlan())) {
                     this->solver->add("planBase", {}, gen->planType(childPlanType).c_str());
                     this->solver->add("planBase", {}, gen->hasPlanType(state, childPlanType).c_str());
 
@@ -136,7 +137,7 @@ void ASPAlicaPlanIntegrator::processPlan(const Plan* p, uint64_t instanceElement
 
                         this->processPlan(childPlan, instanceElementHash);
                     }
-                } else if (const alica::Behaviour* childBehaviour = dynamic_cast<const alica::Behaviour*>(abstractChildPlan)) {
+                } else if (const alica::Behaviour* childBehaviour = dynamic_cast<const alica::Behaviour*>(confAbstractPlanWrapper->getAbstractPlan())) {
                     // TODO: Handle Behaviour
                     this->solver->add("planBase", {}, gen->behaviour(childBehaviour).c_str());
                     this->solver->add("planBase", {}, gen->hasBehaviour(state, childBehaviour).c_str());

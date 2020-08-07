@@ -19,7 +19,7 @@ namespace alica
 {
 namespace reasoner
 {
-ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args)
+ASPSolverWrapper::ASPSolverWrapper(AlicaEngine* ae)
         : alica::ISolver<ASPSolverWrapper, ::reasoner::asp::AnnotatedValVec*>(ae)
 {
     this->ae = ae;
@@ -46,7 +46,7 @@ bool ASPSolverWrapper::existsSolutionImpl(SolverContext* ctx, const std::vector<
     ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
     if (!masterPlanLoaded) {
-        this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
+        this->planIntegrator->loadPlanTree(this->ae->getPlanBase().getRootNode()->getActivePlanAsPlan());
         masterPlanLoaded = true;
     }
 
@@ -68,7 +68,7 @@ bool ASPSolverWrapper::getSolutionImpl(
     ASPSolverContext* solverCtx = static_cast<ASPSolverContext*>(ctx);
 
     if (!masterPlanLoaded) {
-        this->planIntegrator->loadPlanTree(this->ae->getPlanBase()->getMasterPlan());
+        this->planIntegrator->loadPlanTree(this->ae->getPlanBase().getRootNode()->getActivePlanAsPlan());
         masterPlanLoaded = true;
     }
 

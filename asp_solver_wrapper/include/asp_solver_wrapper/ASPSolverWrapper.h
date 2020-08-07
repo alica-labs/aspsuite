@@ -32,7 +32,7 @@ class ASPGenerator;
 class ASPSolverWrapper : public alica::ISolver<ASPSolverWrapper, ::reasoner::asp::AnnotatedValVec*>
 {
 public:
-    ASPSolverWrapper(AlicaEngine* ae, std::vector<char const*> args);
+    ASPSolverWrapper(alica::AlicaEngine* ae);
     virtual ~ASPSolverWrapper();
 
     bool existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls);

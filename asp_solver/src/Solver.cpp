@@ -26,7 +26,7 @@ const std::string Solver::WILDCARD_STRING = "wildcard";
 std::mutex Solver::queryCounterMutex;
 std::mutex Solver::clingoMtx;
 
-Solver::Solver(std::vector<char const*> args)
+Solver::Solver(std::vector<char const*> args) : sc(essentials::SystemConfig::getInstance())
 {
     Clingo::Logger logger = [](Clingo::WarningCode warningCode, char const* message) {
         switch (warningCode) {
@@ -44,7 +44,6 @@ Solver::Solver(std::vector<char const*> args)
     };
     this->clingo = new Clingo::Control(args, logger, 20);
     this->clingo->register_observer(this->observer);
-    this->sc = essentials::SystemConfig::getInstance();
     this->queryCounter = 0;
     this->clingo->configuration()["configuration"] = "handy";
     // should make the solver return all models (because you set it to 0)
@@ -71,9 +70,9 @@ bool Solver::loadFileFromConfig(const std::string& configKey)
         }
     }
 
-    std::string backGroundKnowledgeFile = (*this->sc)["Solver"]->get<std::string>(configKey.c_str(), NULL);
+    std::string backGroundKnowledgeFile = this->sc["Solver"]->get<std::string>(configKey.c_str(), NULL);
     this->alreadyLoaded.push_back(configKey.c_str());
-    backGroundKnowledgeFile = essentials::FileSystem::combinePaths((*this->sc).getConfigPath(), backGroundKnowledgeFile);
+    backGroundKnowledgeFile = essentials::FileSystem::combinePaths(this->sc.getConfigPath(), backGroundKnowledgeFile);
     std::lock_guard<std::mutex> lock(clingoMtx);
     this->clingo->load(backGroundKnowledgeFile.c_str());
     return true;

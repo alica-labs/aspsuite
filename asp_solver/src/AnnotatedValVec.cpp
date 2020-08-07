@@ -1,6 +1,6 @@
 #include "reasoner/asp/AnnotatedValVec.h"
 #include "reasoner/asp/Query.h"
-#include <Configuration.h>
+#include <essentials/Configuration.h>
 
 namespace reasoner
 {

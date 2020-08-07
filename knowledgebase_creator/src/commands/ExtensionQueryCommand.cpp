@@ -15,7 +15,7 @@
 
 #include <reasoner/asp/Solver.h>
 
-#include <SystemConfig.h>
+#include <essentials/SystemConfig.h>
 
 namespace kbcr
 {
